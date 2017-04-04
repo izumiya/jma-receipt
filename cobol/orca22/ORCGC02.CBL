@@ -335,6 +335,8 @@
       *                                     移行病名の疑いフラグの表示をする
       *  04.08.10    NACL-藤原    16/11/16  病名入力時の置換病名コードへ
       *                                     変更した時の疾患区分の表示
+      *  04.08.11    NACL-藤原    17/04/04  自院病名入力時の補足コメント
+      *                                     の表示を行う
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4160,6 +4162,20 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                WHEN    "ACTIVATE"      ALSO    "BYOMEICD_5"
                WHEN    "ACTIVATE"      ALSO    "BYOMEICD_6"
                    PERFORM 4102-BYOMEICD-CHK-SEC
+                   IF    ( SPA-ERRCD       NOT =   SPACE )
+                   OR    ( SPA-CIDCD2      NOT =   SPACE )
+                   OR    ( SPA-CIDCD6      NOT =   SPACE )
+                       CONTINUE
+                   ELSE
+                       MOVE    SPA-GMN-C02-HOSOKU-COMMENT
+                                               TO  C02-HOSOKU-COMMENT
+                       MOVE    SPA-GMN-C02-HOSOKUCD (1)
+                                               TO  C02-HOSOKUCD (1)
+                       MOVE    SPA-GMN-C02-HOSOKUCD (2)
+                                               TO  C02-HOSOKUCD (2)
+                       MOVE    SPA-GMN-C02-HOSOKUCD (3)
+                                               TO  C02-HOSOKUCD (3)
+                   END-IF
                WHEN    "ACTIVATE"      ALSO    "BYOMEI"
                    PERFORM 41013-BYOMEI-CHK-SEC
                WHEN    OTHER
