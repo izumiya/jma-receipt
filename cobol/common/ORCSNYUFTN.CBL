@@ -180,6 +180,8 @@
       *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
       *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
       *  04.08.05    NACL-ÌçÏÆ    17/02/21  ½é¿Ç»»Äê¾ò·ïÄÉ²Ã
+      *  04.08.06    NACL-ÌçÏÆ    17/04/06  Æþ±¡´ü´Ö³°¤ÎÆþ±¡¿ÇÎÅ¹Ô°ÙÆþÎÏ
+      *                                     ¥Á¥§¥Ã¥¯
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -215,6 +217,7 @@
            03  WRK-GENSAN-ERR              PIC 9(01).
            03  WRK-GENSAN-ERR2             PIC 9(01).
            03  WRK-TENTEKI-ERR             PIC 9(01).
+           03  WRK-NYUINKIKANGAI-ERR       PIC 9(01).
            03  WRK-KENSU-ERR               PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
@@ -1053,6 +1056,11 @@
                 MOVE     28     TO    LNK-S02-RC
              END-IF
            END-IF.
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-NYUINKIKANGAI-ERR =  1
+                MOVE     32     TO    LNK-S02-RC
+             END-IF
+           END-IF.
       *
       ***  IF    LNK-S02-RC   =   ZERO
       ***    IF   WRK-JNISSU-ERR  =  1
@@ -1494,7 +1502,7 @@
       *
               END-PERFORM
       *
-           END-PERFORM
+           END-PERFORM.
       *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                        UNTIL   (IDX                    >    10 )
@@ -1669,7 +1677,8 @@
            PERFORM    VARYING   IDY   FROM   WRK-HI-ST(IDX)   BY   1
                                     UNTIL    IDY    >    WRK-HI-ED(IDX)
       *
-             IF        ACCT-DAY(1 IDY)   NOT =  ZERO 
+             IF      ( ACCT-DAY(1 IDY)   NOT =  ZERO )
+             AND     ( WRK-DAY5(IDX IDY) NOT =  ZERO )
               IF   ACCT-JIHOKBN   =  SPACE
                  MOVE   ZERO     TO    FLG-HANBETU
                  PERFORM    VARYING   IDZ  FROM   1   BY   1
@@ -1720,6 +1729,19 @@
              END-IF
       *
            END-PERFORM.
+      *
+      *    Æþ±¡´ü´Ö³°¤ÎÆþ±¡¿ÇÎÅ¹Ô°ÙÆþÎÏ¥Á¥§¥Ã¥¯¡Ê¥ì¥»¥×¥È½èÍý»þ¡Ë
+      *    ¡ÊÆþ±¡´µ¼Ô¤ÎÂà±¡ÅÐÏ¿¤ò¡ÖÂà±¡ÅÐÏ¿¡Ê¿ÇÎÅÊÝÂ¸¡Ë¡×¤Ç¹Ô¤¤¡¢
+      *      Æþ±¡´ü´Ö³°¤ËÆþ±¡¿ÇÎÅ¹Ô°ÙÆþÎÏ¤¬Â¸ºß¤¹¤ë»ö¤È¤Ê¤Ã¤¿¾ì¹ç¡Ë
+           IF   LNK-S02-TEIKI-KBN   =   "X"
+             PERFORM    VARYING   IDY   FROM   1   BY   1
+                         UNTIL    IDY    >    31
+                 IF  ( ACCT-DAY(1 IDY)   NOT =  ZERO )
+                 AND ( WRK-DAY5X(IDX IDY)    =  ZERO )
+                     MOVE    1         TO  WRK-NYUINKIKANGAI-ERR
+                 END-IF
+             END-PERFORM
+           END-IF.
       *
        NYUIN-DAY-TAIHI2-EXT.
            EXIT.

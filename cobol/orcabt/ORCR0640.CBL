@@ -735,6 +735,8 @@
       *                                     レセ電請求が不可となる事に伴う対応
       *  04.08.32    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
       *                                     （公費請求書に関わる対応）
+      *  04.08.34    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
+      *                                     （レセプト分割に関わる修正）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -19849,11 +19851,15 @@
              END-IF
            END-IF
       *
-           IF   WRK-CHK-TAISYO       =  1
-           AND  WRK-CHK-CNT          =  2
-             IF ((RECE62-HKNJANUM  NOT = SPACE            ) AND
-                 (RECE62-HKNJANUM  NOT = WRK-CHK-HKNJANUM ))
-             OR ( RECE62-HONKZKKBN NOT = WRK-CHK-HONKZKKBN )
+           IF  ((  WRK-CHK-TAISYO       =  1                 )  AND
+                (  WRK-CHK-CNT          =  2                 )  AND
+                (((RECE62-HKNJANUM  NOT = SPACE            ) AND
+                  (RECE62-HKNJANUM  NOT = WRK-CHK-HKNJANUM ))  OR
+                 ( RECE62-HONKZKKBN NOT = WRK-CHK-HONKZKKBN )))
+           OR  ((  WRK-CHK-TAISYO       =  ZERO              )  AND
+                (  WRK-CHK-CNT          =  2                 )  AND
+                (  RECE62-RECEIPT-KBN(2:3)  NOT = SPACE      )  AND
+                (  RECE62-RECEIPT-KBN(4:1)      = "2"        ))
       *
                 INITIALIZE                 ORCSKOREIFTNCHKAREA
                 MOVE    RECE62-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
@@ -19911,7 +19917,6 @@
                                        TO  WRK-CHIHOU-KIN
                 END-IF
       *
-             END-IF
            END-IF
       *
            IF   FLG-TOKU75-XXX  =  1

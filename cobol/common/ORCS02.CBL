@@ -22991,6 +22991,9 @@
               IF  LNK-S02-DOJITU-DAY(IDY)  =  1
                   PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
               END-IF
+              IF  LNK-S02-DOJITU-DAY(IDY)  =  7 OR 8
+                  PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+              END-IF
       *
            END-PERFORM
       *
@@ -23242,6 +23245,21 @@
            .
       *
        230462-SHOKUJI-FURIWAKE2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    入院時食事療養と特別食加算をわける
+      ******************************************************************
+       230463-SHOKUJI-FURIWAKE3-SEC                 SECTION.
+      *
+           MOVE   ZERO   TO  WK-SHOKUJI-ASA (IDY)
+           MOVE   ZERO   TO  WK-SHOKUJI-HIRU(IDY)
+           MOVE   ZERO   TO  WK-SHOKUJI-YORU(IDY)
+           MOVE   ZERO   TO  WK-SHOKUDOKASAN(IDY)
+      *
+           .
+      *
+       230463-SHOKUJI-FURIWAKE3-EXT.
            EXIT.
       *
       ******************************************************************
