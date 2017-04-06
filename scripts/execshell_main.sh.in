@@ -64,6 +64,7 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $(printf "[%s]" "$$" "END")  >>  ${LOG_TEMP}
 
   if [ ${MCP_MIDDLEWARE_NAME} == "ginbee" ]; then
     cat ${LOG_TEMP} >> "${MCP_LOGFILE_PREFIX}${LOG_FILE}"
+    chmod a+r "${MCP_LOGFILE_PREFIX}${LOG_FILE}"
   else
     gzip -c ${LOG_TEMP} >> ${LOG_GZ}
     if [ -f ${LOG_GZ} ];  then
