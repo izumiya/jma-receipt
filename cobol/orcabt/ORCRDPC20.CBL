@@ -3133,44 +3133,27 @@
              MOVE    TBL-HEIMA-30M-IDX (IDZ3)
                                            TO  WRK-HEIMA-IDX
              IF      WRK-HEIMA-IDX   NOT =   ZERO
-                   MOVE    TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
-                                          TO  WRK-KZM-SURYO
-                   MOVE    ZERO  TO  TBL-HEIMA-ZAN-SURYO (WRK-HEIMA-IDX)
-                   MOVE    ZERO  TO  TBL-HEIMA-30M-SURYO (WRK-HEIMA-IDX)
-             END-IF
-      **     DISPLAY " "
-      **     DISPLAY "WRK-HEIMA-IDX = " WRK-HEIMA-IDX
-             PERFORM VARYING IDXW FROM 1  BY  1
-                     UNTIL   ( IDXW > TBL-HEIMA-MAX )
-                        OR   ( WRK-HEIMA-IDX = ZERO )
-               IF      IDXW          NOT =   WRK-HEIMA-IDX
-                   MOVE    IDXW            TO  IDW
-                   PERFORM VARYING IDW0 FROM TBL-HEIMA-MAX  BY  -1
-                           UNTIL   ( IDW0 = 0 )
-                     IF    ( IDW0      NOT =   WRK-HEIMA-IDX ) AND
-                           ( IDW0      NOT =   IDXW )
-                       IF      TBL-HEIMA-ZAN-SURYO (IDW0)
-                                       =   TBL-HEIMA-ZAN-SURYO (IDXW)
-                         MOVE  IDW0        TO  IDW
-                         MOVE  1           TO  IDW0
-                       END-IF
+                 PERFORM VARYING IDXW FROM 1 BY 1
+                         UNTIL ( IDXW > TBL-HEIMA-MAX )
+                     MOVE    TBL-HEIMA-30M-IDX (IDXW)
+                                           TO  IDW
+                     IF      IDW           NOT =   ZERO
+                         COMPUTE WRK-KZM-SURYO =   WRK-KZM-SURYO
+                                               +   TBL-HEIMA-ZAN-SURYO
+                                                   (IDW)
+                         IF      WRK-KZM-SURYO >=  30
+                             COMPUTE TBL-HEIMA-ZAN-SURYO (IDW) =
+                                     WRK-KZM-SURYO -   30
+                             MOVE    30        TO  WRK-KZM-SURYO
+                         ELSE 
+                             MOVE    ZERO      TO  TBL-HEIMA-ZAN-SURYO
+                                                   (IDW)
+                             MOVE    ZERO      TO  TBL-HEIMA-30M-SURYO
+                                                   (IDW)
+                         END-IF
                      END-IF
-                   END-PERFORM
-      **     DISPLAY "IDW = " IDW
-                   COMPUTE WRK-HEIMA-SURYO =  30  -  WRK-KZM-SURYO
-                   IF      TBL-HEIMA-ZAN-SURYO (IDW) < WRK-HEIMA-SURYO
-                       COMPUTE WRK-KZM-SURYO =  WRK-KZM-SURYO
-                                         +  TBL-HEIMA-ZAN-SURYO (IDW)
-                       MOVE    ZERO      TO TBL-HEIMA-ZAN-SURYO (IDW)
-                   ELSE
-                       COMPUTE TBL-HEIMA-ZAN-SURYO (IDW)
-                                         =  TBL-HEIMA-ZAN-SURYO (IDW)
-                                         -  WRK-HEIMA-SURYO
-                       MOVE    30            TO WRK-KZM-SURYO
-                       MOVE    TBL-HEIMA-MAX TO IDXW
-                   END-IF
-               END-IF
-             END-PERFORM
+                 END-PERFORM
+             END-IF
              COMPUTE TBL-HEIMA-COM-SURYO (WRK-HEIMA-IDX)
                                  =  TBL-HEIMA-COM-SURYO (WRK-HEIMA-IDX)
                                  +  WRK-KZM-SURYO
