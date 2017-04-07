@@ -26,6 +26,7 @@
       * 04.07.00     NACL-多々納  14/11/XX  初回・最終来院日他追加
       * 04.07.00     NACL-多々納  15/01/XX  労災自賠責編集追加
       * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先追加
+      * 04.08.00     NACL-多々納  17/04/XX  職業から入金方法追加等
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -72,45 +73,45 @@
                       06  PTRES-HOME-HPONE2        PIC X(15).
       *H28.10
       *           勤務先情報
-                  04  PTMODRES-OFFICE-INFO.
+                  04  PTRES-OFFICE-INFO.
       *               勤務先名
-                      06  PTMODRES-OFFICE-NAME        PIC X(50).
+                      06  PTRES-OFFICE-NAME        PIC X(50).
       *               郵便番号
-                      06  PTMODRES-OFFICE-ZIP-CODE    PIC X(7).
+                      06  PTRES-OFFICE-ZIP-CODE    PIC X(7).
       *               住所
-                      06  PTMODRES-OFFICE-ADDRESSES1  PIC X(100).
+                      06  PTRES-OFFICE-ADDRESSES1  PIC X(100).
       *               番地番号
-                      06  PTMODRES-OFFICE-ADDRESSES2  PIC X(100).
+                      06  PTRES-OFFICE-ADDRESSES2  PIC X(100).
       *               電話番号
-                      06  PTMODRES-OFFICE-HPONE        PIC X(15).
+                      06  PTRES-OFFICE-HPONE        PIC X(15).
       *           連絡先情報
-                  04  PTMODRES-RENRAKU-INFO.
+                  04  PTRES-RENRAKU-INFO.
       *               連絡先名
-                      06  PTMODRES-RENRAKU-NAME        PIC X(50).
+                      06  PTRES-RENRAKU-NAME        PIC X(50).
       *               連絡先続柄
-                      06  PTMODRES-RENRAKU-ZOKUGARA    PIC X(30).
+                      06  PTRES-RENRAKU-ZOKUGARA    PIC X(30).
       *               郵便番号
-                      06  PTMODRES-RENRAKU-ZIP-CODE    PIC X(7).
+                      06  PTRES-RENRAKU-ZIP-CODE    PIC X(7).
       *               住所
-                      06  PTMODRES-RENRAKU-ADDRESSES1  PIC X(100).
+                      06  PTRES-RENRAKU-ADDRESSES1  PIC X(100).
       *               番地番号
-                      06  PTMODRES-RENRAKU-ADDRESSES2  PIC X(100).
+                      06  PTRES-RENRAKU-ADDRESSES2  PIC X(100).
       *               電話番号　昼
-                      06  PTMODRES-RENRAKU-HPONE1      PIC X(15).
+                      06  PTRES-RENRAKU-HPONE1      PIC X(15).
       *               電話番号　夜
-                      06  PTMODRES-RENRAKU-HPONE2      PIC X(15).
+                      06  PTRES-RENRAKU-HPONE2      PIC X(15).
       *           帰省先情報
-                  04  PTMODRES-KISEI-INFO.
+                  04  PTRES-KISEI-INFO.
       *               帰省先名
-                      06  PTMODRES-KISEI-NAME          PIC X(50).
+                      06  PTRES-KISEI-NAME          PIC X(50).
       *               郵便番号
-                      06  PTMODRES-KISEI-ZIP-CODE      PIC X(7).
+                      06  PTRES-KISEI-ZIP-CODE      PIC X(7).
       *               住所
-                      06  PTMODRES-KISEI-ADDRESSES1    PIC X(100).
+                      06  PTRES-KISEI-ADDRESSES1    PIC X(100).
       *               番地番号
-                      06  PTMODRES-KISEI-ADDRESSES2    PIC X(100).
+                      06  PTRES-KISEI-ADDRESSES2    PIC X(100).
       *               電話番号
-                      06  PTMODRES-KISEI-HPONE         PIC X(15).
+                      06  PTRES-KISEI-HPONE         PIC X(15).
       *
       *           禁忌１
                   04  PTRES-TABOO-1              PIC  X(200).
@@ -128,6 +129,31 @@
                   04  PTRES-COMMENT-1            PIC  X(200).
       *           コメント２
                   04  PTRES-COMMENT-2            PIC  X(200).
+      *H29.4
+      *           職業
+                  04  PTRES-JOB                PIC X(20).
+      *           通称
+                  04  PTRES-NICKNAME           PIC  X(50).
+      *           携帯電話番号
+                  04  PTRES-KEITAI-TEL         PIC  X(15).
+      *           ＦＡＸ番号
+                  04  PTRES-FAX                PIC  X(15).
+      *           電子メールアドレス
+                  04  PTRES-EMAIL              PIC  X(050).
+      *           減免事由
+                  04  PTRES-DISCOUNTKBN        PIC  X(02).
+                  04  PTRES-DISCOUNTKBN-NAME   PIC  X(20).
+      *           割引率
+                  04  PTRES-DISCOUNT           PIC  X(02).
+                  04  PTRES-DISCOUNT-NAME      PIC  X(14).
+      *           状態１から３
+                  04  PTRES-CONDITION-KBN-G.
+                      05  PTRES-CONDITION-OCC    OCCURS   3.
+                          07  PTRES-CONDITION-KBN     PIC X(02).
+                          07  PTRES-CONDITION-NAME    PIC X(20).
+      *           入金方法区分
+                  04  PTRES-IC-CODE           PIC  X(02).
+                  04  PTRES-IC-CODE-NAME      PIC  X(20).
       *H25.12
       *           地域連携ID
                   04  PTRES-COMMUNITY-CID        PIC  X(20).
@@ -154,6 +180,9 @@
                       06  PTRES-COMBINATION-RATE-ADM   PIC X(04).
       *               保険組合せ　負担割合（外来）
                       06  PTRES-COMBINATION-RATE-OUT   PIC X(04).
+      *H29.04
+      *               非表示区分
+                      06  PTRES-COMBINATION-HYOJI      PIC X(01).
       *
       *               保険の種類
                       06  PTRES-MAIN-INSURANCE-CLASS   PIC X(03).

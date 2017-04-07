@@ -34,6 +34,8 @@
       * 04.07.00     NACL-多々納  15/01/XX  労災保険編集追加対応
       * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先を追加対応
       * 04.08.00     NACL-多々納  16/12/22  患者個人番号追加対応
+      * 04.08.00     NACL-多々納  17/04/XX  入金方法、状態等追加
+      *                                     保険組合せ非表示追加
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -106,6 +108,10 @@
            03  WRK-FTNRATE             PIC 9(02)V99.
            03  WRK-Z9                  PIC 9.ZZ.
            03  WRK-FTNRATEMEI          PIC X(04).
+      *    割引率
+           03  WRK-RATE-EDIT.
+               05  WRK-RATE-EDITZ      PIC ZZZZZZZ.
+               05  WRK-RATE-TANI       PIC X(04).
       *
        01  WRK-XML-AREA.
            03  WRK-PTNUM               PIC X(20).
@@ -148,6 +154,14 @@
            COPY  "CPSK1010.INC".
       *
            COPY  "CPSK4002.INC".
+      *    状態情報
+           COPY    "CPSK1018.INC".
+      *    減免事由情報
+           COPY    "CPSK1026.INC".
+      *    割引率情報
+           COPY    "CPSK1027.INC".
+      *    入金方法
+           COPY    "CPSK1041.INC".
       *
       *    患者マスタ−
        01  PTNUM-REC.
@@ -406,26 +420,123 @@
            MOVE    PTINF-COMMENT-2     TO  PTRES-COMMENT-2
       *H28.10
       *    勤務先情報
-           MOVE    PTINF-OFFICE-NAME   TO  PTMODRES-OFFICE-NAME
-           MOVE    PTINF-OFFICE-POST   TO  PTMODRES-OFFICE-ZIP-CODE
-           MOVE    PTINF-OFFICE-ADRS   TO  PTMODRES-OFFICE-ADDRESSES1
-           MOVE    PTINF-OFFICE-BANTI  TO  PTMODRES-OFFICE-ADDRESSES2
-           MOVE    PTINF-OFFICE-TEL    TO  PTMODRES-OFFICE-HPONE
+           MOVE    PTINF-OFFICE-NAME   TO  PTRES-OFFICE-NAME
+           MOVE    PTINF-OFFICE-POST   TO  PTRES-OFFICE-ZIP-CODE
+           MOVE    PTINF-OFFICE-ADRS   TO  PTRES-OFFICE-ADDRESSES1
+           MOVE    PTINF-OFFICE-BANTI  TO  PTRES-OFFICE-ADDRESSES2
+           MOVE    PTINF-OFFICE-TEL    TO  PTRES-OFFICE-HPONE
       *    連絡先情報
-           MOVE    PTINF-RENRAKU-NAME  TO  PTMODRES-RENRAKU-NAME
+           MOVE    PTINF-RENRAKU-NAME  TO  PTRES-RENRAKU-NAME
            MOVE    PTINF-RENRAKU-ZOKUGARA
-                                       TO  PTMODRES-RENRAKU-ZOKUGARA
-           MOVE    PTINF-RENRAKU-POST  TO  PTMODRES-RENRAKU-ZIP-CODE
-           MOVE    PTINF-RENRAKU-ADRS  TO  PTMODRES-RENRAKU-ADDRESSES1
-           MOVE    PTINF-RENRAKU-BANTI TO  PTMODRES-RENRAKU-ADDRESSES2
-           MOVE    PTINF-RENRAKU-TEL1  TO  PTMODRES-RENRAKU-HPONE1
-           MOVE    PTINF-RENRAKU-TEL2  TO  PTMODRES-RENRAKU-HPONE2
+                                       TO  PTRES-RENRAKU-ZOKUGARA
+           MOVE    PTINF-RENRAKU-POST  TO  PTRES-RENRAKU-ZIP-CODE
+           MOVE    PTINF-RENRAKU-ADRS  TO  PTRES-RENRAKU-ADDRESSES1
+           MOVE    PTINF-RENRAKU-BANTI TO  PTRES-RENRAKU-ADDRESSES2
+           MOVE    PTINF-RENRAKU-TEL1  TO  PTRES-RENRAKU-HPONE1
+           MOVE    PTINF-RENRAKU-TEL2  TO  PTRES-RENRAKU-HPONE2
       *    帰省先
-           MOVE    PTINF-KISEI-NAME    TO  PTMODRES-KISEI-NAME
-           MOVE    PTINF-KISEI-POST    TO  PTMODRES-KISEI-ZIP-CODE
-           MOVE    PTINF-KISEI-ADRS    TO  PTMODRES-KISEI-ADDRESSES1
-           MOVE    PTINF-KISEI-BANTI   TO  PTMODRES-KISEI-ADDRESSES2
-           MOVE    PTINF-KISEI-TEL     TO  PTMODRES-KISEI-HPONE
+           MOVE    PTINF-KISEI-NAME    TO  PTRES-KISEI-NAME
+           MOVE    PTINF-KISEI-POST    TO  PTRES-KISEI-ZIP-CODE
+           MOVE    PTINF-KISEI-ADRS    TO  PTRES-KISEI-ADDRESSES1
+           MOVE    PTINF-KISEI-BANTI   TO  PTRES-KISEI-ADDRESSES2
+           MOVE    PTINF-KISEI-TEL     TO  PTRES-KISEI-HPONE
+      *H29.4
+      *    通称名
+           MOVE    PTINF-NICKNAME      TO  PTRES-NICKNAME
+      *    職業
+           MOVE    PTINF-JOB           TO  PTRES-JOB
+      *    ＦＡＸ番号
+           MOVE    PTINF-FAX           TO  PTRES-FAX
+      *    携帯
+           MOVE    PTINF-KEITAI-TEL    TO  PTRES-KEITAI-TEL
+      *    メール
+           MOVE    PTINF-EMAIL         TO  PTRES-EMAIL
+      *    減免事由
+           MOVE    PTINF-DISCOUNT-KBN  TO  PTRES-DISCOUNTKBN
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1026"              TO  SYS-KANRICD
+           MOVE    PTINF-DISCOUNT-KBN  TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           PERFORM 900-SYSKANRI-KEYREAD-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1026-REC
+               MOVE    SYS-1026-DISCOUNT-BODY
+                                           TO  PTRES-DISCOUNTKBN-NAME
+           END-IF
+      *    割引率
+           MOVE    PTINF-DISCOUNT      TO  PTRES-DISCOUNT
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1027"              TO  SYS-KANRICD
+           MOVE    PTINF-DISCOUNT      TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           PERFORM 900-SYSKANRI-KEYREAD-SEC
+      *
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1027-REC
+               MOVE    SPACE               TO  WRK-RATE-EDIT
+               MOVE    SYS-1027-DISCOUNT-RATE
+                                       TO  WRK-RATE-EDITZ
+               EVALUATE    SYS-1027-TEIRITU
+               WHEN    "0"
+                   MOVE    "該当なし"      TO  PTRES-DISCOUNT-NAME
+               WHEN    "1"
+                   MOVE    "(%)"           TO  WRK-RATE-TANI
+                   MOVE    WRK-RATE-EDIT   TO  PTRES-DISCOUNT-NAME
+               WHEN    "2"
+                   MOVE    "(円)"          TO  WRK-RATE-TANI
+                   MOVE    WRK-RATE-EDIT   TO  PTRES-DISCOUNT-NAME
+               END-EVALUATE
+           END-IF
+      *    状態１〜３
+           PERFORM VARYING   IDX       FROM    1   BY  1
+                   UNTIL    (IDX       >  3        )
+               INITIALIZE                      SYSKANRI-REC
+               EVALUATE    IDX
+               WHEN    1
+                   MOVE    "1018"              TO  SYS-KANRICD
+                   MOVE    PTINF-CONDITION-1   TO  SYS-KBNCD
+                   MOVE    PTINF-CONDITION-1   TO  PTRES-CONDITION-KBN
+                                                          (IDX)
+               WHEN    2
+                   MOVE    "1019"              TO  SYS-KANRICD
+                   MOVE    PTINF-CONDITION-2   TO  SYS-KBNCD
+                   MOVE    PTINF-CONDITION-2   TO  PTRES-CONDITION-KBN
+                                                          (IDX)
+               WHEN    3
+                   MOVE    "1020"              TO  SYS-KANRICD
+                   MOVE    PTINF-CONDITION-3   TO  SYS-KBNCD
+                   MOVE    PTINF-CONDITION-3   TO  PTRES-CONDITION-KBN
+                                                          (IDX)
+               END-EVALUATE
+               MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               PERFORM 900-SYSKANRI-KEYREAD-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1018-REC
+                   MOVE    SYS-1018-CONDITION-BODY
+                                               TO  PTRES-CONDITION-NAME
+                                                           (IDX)
+               END-IF
+           END-PERFORM
+      *    入金方法
+           MOVE    PTINF-NYUKIN-HOHO   TO  PTRES-IC-CODE
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1041"              TO  SYS-KANRICD
+           MOVE    PTINF-NYUKIN-HOHO   TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           PERFORM 900-SYSKANRI-KEYREAD-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1041-REC
+               MOVE    SYS-1041-NYKN-TANNAME
+                                           TO  PTRES-IC-CODE-NAME
+           END-IF
       *
       *    保険種類変換処理
            PERFORM 200210-HKNCOMBI-HEN-SEC
@@ -945,6 +1056,22 @@
       *H26.11
       *    保険組合せ負担割合
            PERFORM 20021011-HKNCOMBI-FTNHEN-SEC
+      *H29.4
+      *    保険組合せ非表示
+           EVALUATE    ORCSAPIHKN-HYOJIKBN (IDX)
+               WHEN    "2"
+      *            入院非表示
+                   MOVE    "I"         TO  PTRES-COMBINATION-HYOJI
+                                                            (IDX)
+               WHEN    "3"
+      *            外来非表示
+                   MOVE    "O"         TO  PTRES-COMBINATION-HYOJI
+                                                            (IDX)
+               WHEN    OTHER
+      *            非表示なし
+                   MOVE    "N"         TO  PTRES-COMBINATION-HYOJI
+                                                            (IDX)
+           END-EVALUATE
       *
       *    公費情報
            PERFORM VARYING     IDY2    FROM    1   BY  1
