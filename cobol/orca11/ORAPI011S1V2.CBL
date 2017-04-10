@@ -30,6 +30,7 @@
       *  04.07.00    NACL-多々納  13/09/26  CLAIM診療区分名称編集
       *  04.07.00    NACL-多々納  14/06/XX  ワーニングメッセージ対応他
       *  04.08.00    NACL-多々納  15/12/01  保険組合せ番号送信追加
+      *  04.08.00    NACL-多々納  17/04/XX  保険組合せ非表示区分追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1263,6 +1264,23 @@
            MOVE    ORCSAPIHKN-THKNCOMBI (IDX)
                                        TO  ACCPTRES-COMBINATION-NUMBER
                                                                  (IDY)
+      *H29.4
+      *    保険組合せ非表示
+           EVALUATE    ORCSAPIHKN-HYOJIKBN (IDX)
+               WHEN    "2"
+      *            入院非表示
+                   MOVE    "I"         TO  ACCPTRES-COMBINATION-HYOJI
+                                                            (IDY)
+               WHEN    "3"
+      *            外来非表示
+                   MOVE    "O"         TO  ACCPTRES-COMBINATION-HYOJI
+                                                            (IDY)
+               WHEN    OTHER
+      *            非表示なし
+                   MOVE    "N"         TO  ACCPTRES-COMBINATION-HYOJI
+                                                            (IDY)
+           END-EVALUATE
+      *
       *    保険の種類
            MOVE    ORCSAPIHKN-HKNNUM (IDX)
                                    TO  ACCPTRES-MAIN-INSURANCE-CLASS

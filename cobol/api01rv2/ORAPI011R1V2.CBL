@@ -939,6 +939,23 @@
            MOVE    ORCSAPIHKN-THKNCOMBI (IDH)
                                    TO  ACPLSTRES-COMBINATION-NUMBER
                                                                 (IDX)
+      *H29.4
+      *    保険組合せ非表示
+           EVALUATE    ORCSAPIHKN-HYOJIKBN (IDH)
+               WHEN    "2"
+      *            入院非表示
+                   MOVE    "I"         TO  ACPLSTRES-COMBINATION-HYOJI
+                                                            (IDX)
+               WHEN    "3"
+      *            外来非表示
+                   MOVE    "O"         TO  ACPLSTRES-COMBINATION-HYOJI
+                                                            (IDX)
+               WHEN    OTHER
+      *            非表示なし
+                   MOVE    "N"         TO  ACPLSTRES-COMBINATION-HYOJI
+                                                            (IDX)
+           END-EVALUATE
+      *
       *
       *    保険の種類
            MOVE    ORCSAPIHKN-HKNNUM (IDH)
