@@ -159,6 +159,7 @@
       *                                     で算定入院料が短期滞在の場合に包括入力分
       *                                     の入院料がＥファイルとＦファイルに誤って
       *                                     記録されていたのを修正（入院料未算定日）
+      *              NACL-小豆沢  17/04/10  上記３月２９日修正分は一旦保留とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3707,7 +3708,7 @@
       *
       *--- AZU-ADD START 2017.03.29
       *            一度セットした日は再セットを行わないよう区分を初期化
-                   MOVE   SPACE  TO  LNK-NYUINDAY-TANKI2-KBN(IDXX)
+      ****         MOVE   SPACE  TO  LNK-NYUINDAY-TANKI2-KBN(IDXX)
       *--- AZU-ADD END 2017.03.29
       *
            END-PERFORM
