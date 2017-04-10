@@ -46,6 +46,7 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-藤原    17/03/31  同日再入院の入退院履歴のチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1716,7 +1717,8 @@
                            UNTIL   IDX >       IDX5
                        IF    ( IDX             =   IDX4 )
                        AND   ( WRK-RECE200-DOUJITSU-HKNCOMBI (IDX)
-                                               >   ZERO )
+                                               =
+                                               PTNYUINRRK-HKNCOMBINUM )
       *                    同日再入院のとき再入院分の保険組合せをチェック
                            IF      WRK-RECE200-DOUJITSU-HKNCOMBI (IDX)
                                                =   WRK-RECE200-HKNCOMBI

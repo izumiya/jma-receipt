@@ -239,6 +239,7 @@
       *  04.08.04    NACL-門脇    16/02/08  RECE62の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正
       *  04.08.05    NACL-藤原    16/07/20  ＥＦファイル作成対応
+      *  04.08.06    NACL-藤原    17/03/31  同日再入院の入退院履歴のチェック
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -369,7 +370,8 @@
            03  FLG-KYUSEIRRK                           PIC 9(01).
            03  FLG-PTTOKKI                             PIC 9(01).
            03  FLG-HKNCOMBI                            PIC 9(01). 
-      *   
+           03  FLG-PTRSIINF                            PIC 9(01).
+      *
            03  FLG-ARI                                 PIC 9(01).
            03  FLG-SET                                 PIC 9(01).
            03  FLG-ROUJINHOKEN                         PIC 9(01).
@@ -377,7 +379,6 @@
            03  FLG-SEIHO                               PIC 9(01).
            03  FLG-RIREKI-HEN                          PIC 9(01).
            03  FLG-BUNBEN-SET                          PIC 9(01).
-           03  FLG-PTRSIINF                            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -3795,7 +3796,8 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                            UNTIL   IDX >       IDX5
                        IF    ( IDX             =   IDX4 )
                        AND   ( RECE61-DOUJITSU-HKNCOMBI (IDX)
-                                               >   ZERO )
+                                               =
+                                               PTNYUINRRK-HKNCOMBINUM )
       *                    同日再入院のとき再入院分の保険組合せをチェック
                            PERFORM VARYING IDY FROM    1   BY  1
                                    UNTIL   IDY >       10
@@ -3808,7 +3810,7 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                                    MOVE   IDX5             TO  IDX
                                END-IF
                            END-PERFORM
-                       ELSE    
+                       ELSE
                            PERFORM VARYING IDY FROM    1   BY  1
                                    UNTIL   IDY >       10
                                    OR  RECE62-HKNCOMBI (IDY)   =   ZERO
