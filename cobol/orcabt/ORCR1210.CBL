@@ -546,7 +546,8 @@
                       ELSE
                         MOVE  SPACE     TO   RECE200-NYUINRYOFLG
                       END-IF
-                      IF   WRK-DAY1(IDY)   NOT =    ZERO
+                      IF  (WRK-DAY1(IDY)    NOT =    ZERO )
+                      OR  (RECE200-NYUINDAY-KBN(IDY) = "1")
                           MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
                       END-IF
                  END-IF
