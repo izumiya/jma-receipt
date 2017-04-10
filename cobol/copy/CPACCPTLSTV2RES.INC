@@ -78,6 +78,8 @@
                       07  ACPLSTRES-INSURANCE-INFO.
       *                 保険組合せ番号
                         09  ACPLSTRES-COMBINATION-NUMBER     PIC X(04).
+      *H29.4            非表示区分
+                        09  ACPLSTRES-COMBINATION-HYOJI      PIC X(01).
       *                 保険の種類
                         09  ACPLSTRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *                 保険者番号
