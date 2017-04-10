@@ -1136,7 +1136,7 @@
                    07  TBL-RYOCOM2-ADL-SRYCD-H22     PIC  X(09).
                    07  TBL-RYOCOM2-ADL-TEN-H22       PIC  9(02).
                    07  TBL-RYOCOM2-ADL-TEN-MOJI-H22  PIC  X(04).
-               05  TBL-RYOCOM2-INF4            OCCURS  31.
+               05  TBL-RYOCOM2-INF5            OCCURS  31.
                  06  TBL-RYOCOM2-DAY           PIC  9(01).
       *
        01  TBL-CYOJKSN-INF.

@@ -929,7 +929,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE  SPACE           TO    RECE82-NYUINRYOFLG
                       END-IF
                       MOVE    ZERO            TO    FLG-SHOSAISIN
-                      IF   WRK-DAY1(IDY)   NOT =    ZERO
+                      IF  (WRK-DAY1(IDY)   NOT =    ZERO )
+                      OR  (RECE82-NYUINDAY-KBN(IDY) = "1")
                                MOVE    1      TO    FLG-SHOSAISIN
                       END-IF
                       PERFORM   2202-RECE82-TENSOU11-SEC

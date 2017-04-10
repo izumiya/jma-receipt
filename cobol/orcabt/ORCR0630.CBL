@@ -1109,10 +1109,10 @@
                           OR      RECE62-HKNCOMBI (IDX1)  =   ZERO 
       *
                  IF        WRK-DAY5(IDY)   =   RECE62-HKNCOMBI (IDX1)
-                      MOVE    ZERO            TO    FLG-SHOSAISIN
+                      MOVE    ZERO    TO    FLG-SHOSAISIN
                       IF  (WRK-DAY1(IDY)   NOT =    ZERO )
                       OR  (RECE62-NYUINDAY-KBN(IDY) = "1")
-                               MOVE    1      TO    FLG-SHOSAISIN
+                         MOVE   1     TO    FLG-SHOSAISIN
                       END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
@@ -1143,9 +1143,10 @@
                         MOVE  SPACE   TO    RECE62-NYUINRYOFLG
                       END-IF
       *
-                      MOVE    ZERO            TO    FLG-SHOSAISIN
-                      IF   WRK-DAY1(IDY)   NOT =    ZERO
-                               MOVE    1      TO    FLG-SHOSAISIN
+                      MOVE    ZERO    TO    FLG-SHOSAISIN
+                      IF  (WRK-DAY1(IDY)   NOT =    ZERO )
+                      OR  (RECE62-NYUINDAY-KBN(IDY) = "1")
+                         MOVE   1     TO    FLG-SHOSAISIN
                       END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
