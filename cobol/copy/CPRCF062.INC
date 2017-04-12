@@ -155,6 +155,7 @@
       *  04.08.06    NACL-門脇    16/05/30  １９原爆一般の特殊計算対応
       *  04.08.07    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
       *                                     （公費請求書に関わる対応）
+      *  04.08.08    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -1046,6 +1047,13 @@
                05  RECE62-GENBAKU-OCC           OCCURS 10.
                    07  RECE62-GENBAKU-FTNKIN    PIC 9(07)V9(01).
                    07  RECE62-GENBAKU-IDX       PIC 9(01).
+      *
+      *請求点数０円レセプト作成フラグ
+           03  RECE62-SKYZEROFLG                PIC 9(01).
+      *
+      *入院料算定日テーブル情報（ＥＦ用）
+           03  RECE62-EF-NYUINDAY-TBL.
+               05  RECE62-EF-NYUINDAY-KBN       PIC X(01)  OCCURS 31.
       *
       *予備
            03  RECE62-YOBIETC-AREA.

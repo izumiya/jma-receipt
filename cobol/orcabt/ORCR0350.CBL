@@ -418,6 +418,7 @@
       *  04.08.14    NACL-門脇    16/08/23  持参薬対応
       *  04.08.15    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
+      *  04.08.16    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10379,6 +10380,27 @@
                                    AND ( SYS-2009-SYUKA-KOUIKI = "1" ) )
                                MOVE    2               TO  FLG-READ
                              END-IF
+                           ELSE
+                               IF    ( RECE62-TOTALTEN (1) =   ZERO    )
+                               AND   ( RECE62-TOTALTEN (2) =   ZERO    )
+                               AND   ( RECE62-TOTALTEN (3) =   ZERO    )
+                               AND   ( RECE62-TOTALTEN (4) =   ZERO    )
+                               AND   ( RECE62-TOTALTEN (5) =   ZERO    )
+                               AND   ( RECE62-SHOKUJIRYOYOHI(1)
+                                                           =   ZERO    )
+                               AND   ( RECE62-SHOKUJIRYOYOHI(2)
+                                                           =   ZERO    )
+                               AND   ( RECE62-SHOKUJIRYOYOHI(3)
+                                                           =   ZERO    )
+                               AND   ( RECE62-SHOKUJIRYOYOHI(4)
+                                                           =   ZERO    )
+                               AND   ( RECE62-SHOKUJIRYOYOHI(5)
+                                                           =   ZERO    )
+                               AND   ( RECE62-SKYZEROFLG   =   ZERO    )
+                               AND   ( RECE62-RECESYUBETU  NOT =  8888
+                                                              AND ZERO )
+                                   MOVE    2               TO  FLG-READ
+                               END-IF
                            END-IF
                          END-IF
                        END-IF    

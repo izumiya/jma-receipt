@@ -131,7 +131,7 @@
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.06    NACL-門脇    16/08/23  持参薬対応
       *  04.08.07    NACL-門脇    16/11/12  徳島県地方公費対応
-      *  04.08.08    NACL-門脇    15/02/23  茨城県地方公費対応（システム管理
+      *  04.08.08    NACL-門脇    17/02/23  茨城県地方公費対応（システム管理
       *                                     ２０１０のデフォルト設定修正）
       *****************************************************************
       *
@@ -1113,6 +1113,7 @@
                       IF  (WRK-DAY1(IDY)   NOT =    ZERO )
                       OR  (RECE62-NYUINDAY-KBN(IDY) = "1")
                          MOVE   1     TO    FLG-SHOSAISIN
+                         MOVE  "1"    TO    RECE62-EF-NYUINDAY-KBN(IDY)
                       END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
@@ -1147,6 +1148,7 @@
                       IF  (WRK-DAY1(IDY)   NOT =    ZERO )
                       OR  (RECE62-NYUINDAY-KBN(IDY) = "1")
                          MOVE   1     TO    FLG-SHOSAISIN
+                         MOVE  "1"    TO    RECE62-EF-NYUINDAY-KBN(IDY)
                       END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC

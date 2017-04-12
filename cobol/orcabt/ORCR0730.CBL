@@ -233,6 +233,7 @@
       *  04.08.14    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *  04.08.15    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
       *                                     （公費請求書に関わる対応）
+      *  04.08.16    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -12227,7 +12228,8 @@
                    AND   ( RECE62-SHOKUJIRYOYOHI (4)
                                                =   ZERO            )
                    AND   ( RECE62-SHOKUJIRYOYOHI (5)
-                                               =   ZERO             )
+                                               =   ZERO            )
+                   AND   ( RECE62-SKYZEROFLG   =   ZERO            )
                        IF      RECE62-RECESYUBETU
                                                NOT =   8888    AND ZERO
                            GO  TO  900-RECE62-READ-SEC

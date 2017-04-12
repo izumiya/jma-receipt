@@ -760,12 +760,13 @@
       *  04.08.37    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
       *  04.08.38    NACL-門脇    17/01/05  広島県地方公費対応
-      *  04.08.39    NACL-門脇    15/02/23  茨城県地方公費対応（システム管理
+      *  04.08.39    NACL-門脇    17/02/23  茨城県地方公費対応（システム管理
       *                                     ２０１０のデフォルト設定修正）
       *  04.08.40    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
       *                                     レセ電請求が不可となる事に伴う対応
       *  04.08.41    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
       *                                     （公費請求書に関わる対応）
+      *  04.08.42    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *  04.08.43    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
       *                                     （レセプト分割に関わる修正）
       *****************************************************************
@@ -11259,6 +11260,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
              IF       SRY-SRYCD(IDX2)  =  "099999923" OR "099999924"
                   MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
+             IF       SRY-SRYCD(IDX2)  =  "099999929"
+                  MOVE    1     TO    FLG-HENSYU-NG
+                  MOVE    1     TO    RECE02-SKYZEROFLG
              END-IF
              IF       SRY-SRYCD(IDX2)(1:5)  =
                       "09960" OR "09970" OR "09980" OR "09983"
@@ -22907,6 +22912,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  END-IF
                 END-IF
                END-IF
+               IF  (WRK-CHK-KINGAKU        = 9999999)
+               AND (WRK-CHK-KINGAKU2       = 9999999)
+                    MOVE    "3"      TO   RECE02-ZAITAKU
+               END-IF
       *
                IF  (FLG-ZENKOKUKOHI-NISYU4  =   1      )
                AND (RECE02-ZAITAKU          =  "3"     )
@@ -23425,6 +23434,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE    "4"      TO   RECE02-ZAITAKU
                      END-IF
                    END-IF
+               END-IF
+      *
+               IF  (WRK-CHK-KINGAKU        = 9999999)
+               AND (WRK-CHK-KINGAKU2       = 9999999)
+                        MOVE    "4"      TO   RECE02-ZAITAKU
                END-IF
       *
                IF  (FLG-ZENKOKUKOHI-NISYU4  =   1      )
