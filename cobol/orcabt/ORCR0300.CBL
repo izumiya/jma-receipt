@@ -446,6 +446,7 @@
       *                                     （記録）対応
       *  04.08.11    NACL-門脇    17/03/22  医療情報連携
       *                                     後発品変更可（処方単位）
+      *  04.08.12    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9246,6 +9247,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
                                AND   ( RECE02-TOTALTEN (3) =   ZERO    )
                                AND   ( RECE02-TOTALTEN (4) =   ZERO    )
                                AND   ( RECE02-TOTALTEN (5) =   ZERO    )
+                               AND   ( RECE02-SKYZEROFLG   =   ZERO    )
                                AND   ( RECE02-RECESYUBETU  NOT =  8888
                                                               AND ZERO )
                                    MOVE    2               TO  FLG-READ

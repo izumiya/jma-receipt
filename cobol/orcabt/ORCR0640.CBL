@@ -735,6 +735,7 @@
       *                                     レセ電請求が不可となる事に伴う対応
       *  04.08.32    NACL-門脇    17/03/17  保険別請求チェック表の機能追加
       *                                     （公費請求書に関わる対応）
+      *  04.08.33    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *  04.08.34    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
       *                                     （レセプト分割に関わる修正）
       *****************************************************************
@@ -7600,6 +7601,10 @@
             END-IF
             IF       SRY-SRYCD(IDX2)   =  "099999923" OR "099999924"
                   MOVE    1     TO    FLG-HENSYU-NG
+            END-IF
+            IF       SRY-SRYCD(IDX2)   =  "099999929"
+                  MOVE    1     TO    FLG-HENSYU-NG
+                  MOVE    1     TO    RECE62-SKYZEROFLG
             END-IF
             IF       SRY-SRYCD(IDX2)(1:5)  =
                      "09960" OR "09970" OR "09980" OR "09983"
@@ -27319,6 +27324,10 @@
                     MOVE    "3"      TO   RECE62-KOUREI
                  END-IF
                 END-IF
+               END-IF
+               IF  (WRK-CHK-KINGAKU        = 9999999)
+               AND (WRK-CHK-KINGAKU2       = 9999999)
+                    MOVE    "3"      TO   RECE62-KOUREI
                END-IF
       *
                IF  (FLG-ZENKOKUKOHI-NISYU4  =   1      )

@@ -144,6 +144,7 @@
       *                                     （記録）対応修正
       *  04.08.14    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
+      *  04.08.15    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2190,6 +2191,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
              IF       SRY-SRYCD(IDX2)  =  "099999909" OR "099999910" OR
                                           "099999921" OR "099999922" OR
                                           "099999923" OR "099999924"
+                  MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
+      *
+             IF       SRY-SRYCD(IDX2)  =  "099999929"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *

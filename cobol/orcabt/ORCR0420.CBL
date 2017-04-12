@@ -308,6 +308,7 @@
       *                                     コメント記載修正
       *  04.08.16    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
       *                                     レセ電請求が不可となる事に伴う対応
+      *  04.08.17    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2903,6 +2904,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE   SPACE  TO    RECE41-SYOKAIFLG
                END-IF
                MOVE       1     TO    FLG-HENSYU-NG
+             END-IF
+      *
+             IF       SRY-SRYCD(IDX2)  =  "099999929"
+                  MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *
              IF       SRY-SRYCD(IDX2)(1:5)  =

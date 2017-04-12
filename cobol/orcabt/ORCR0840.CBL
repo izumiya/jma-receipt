@@ -291,6 +291,7 @@
       *                                     （記録）対応修正
       *  04.08.15    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
       *                                     レセ電請求が不可となる事に伴う対応
+      *  04.08.16    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3010,14 +3011,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
             END-IF
       *
-             IF       SRY-SRYCD(IDX2)  =  "099999924"
+            IF       SRY-SRYCD(IDX2)  =  "099999924"
                IF    (ACCT-JIHOKBN          =  SPACE       )
                AND   (RECE82-HKNKBN         =  "1"  OR  "2")
                AND   (RECE82-SYOKAIFLG      =  "1"         )
                   MOVE   SPACE  TO    RECE82-SYOKAIFLG
                END-IF
                MOVE       1     TO    FLG-HENSYU-NG
-             END-IF
+            END-IF
+      *
+            IF       SRY-SRYCD(IDX2)  =  "099999929"
+                  MOVE    1     TO    FLG-HENSYU-NG
+            END-IF
       *
             IF       SRY-SRYCD(IDX2)(1:5)  =
                      "09960" OR "09970" OR "09980" OR "09983"
