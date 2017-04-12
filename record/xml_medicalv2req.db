@@ -44,6 +44,8 @@ xml_medicalv2req {
 				Medication_Name		varchar(80);
 				Medication_Number	varchar(40);
 				Medication_Generic_Flg	varchar(03);
+				Medication_Continue		varchar(01);
+				Medication_Internal_Kinds	varchar(01);
 			} [40];
 		}[40] ;
 		Disease_Information  {

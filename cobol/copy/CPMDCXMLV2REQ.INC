@@ -104,6 +104,12 @@
                     06  MDCREQ-PRSCRPT-NUMBER        PIC X(40).
       *             処方せん一般名記載
                     06  MDCREQ-GENERIC-FLG           PIC X(03).
+      *H29.4
+      *             継続コメント指示区分
+                    06  MDCREQ-CONTKBN               PIC X(01).
+      *             内服１種類区分
+                    06  MDCREQ-NAIFKBN               PIC X(01).
+      *
       *         病名
                 04  MDCREQ-DIAGNOSIS-INFO          OCCURS  50 TIMES.
                   05  MDCREQ-DIAGNOSIS-NUMBER        PIC X(50).
