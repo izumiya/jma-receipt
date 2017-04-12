@@ -160,6 +160,7 @@
       *                                     の入院料がＥファイルとＦファイルに誤って
       *                                     記録されていたのを修正（入院料未算定日）
       *              NACL-小豆沢  17/04/10  上記３月２９日修正分は一旦保留とする
+      *              NACL-小豆沢  17/04/12  上記３月２９日修正分を再修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3658,6 +3659,15 @@
            ELSE
               GO  TO   200731-ZAI-HENSYU-EXT
            END-IF
+      *
+      *--- AZU-ADD START 2017.04.12
+      *    短期滞在を算定したRECE62-FILE処理時だけ処理を行う
+           IF      RECE62-EF-NYUINDAY-TBL   NOT =   SPACE
+              CONTINUE
+           ELSE
+              GO  TO   200731-ZAI-HENSYU-EXT
+           END-IF
+      *--- AZU-ADD END   2017.04.12
       *
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       31
