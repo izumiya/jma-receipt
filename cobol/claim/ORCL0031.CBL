@@ -83,6 +83,7 @@
       *  04.08.00    NACL-多々納  16/03/28  Ｈ２８年４月改正対応
       *  04.08.00    NACL-多々納  16/06/XX  自費金額対応
       *                                     入院日付指定５０文字対応
+      *  04.08.00    NACL-多々納  17/04/XX  内服１種類・継続コメント対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2326,6 +2327,29 @@
                                                        (TBL-MAX IDX-S)
       *H24.7
                MOVE    WRK-KAISU       TO  WRK-GAIYO-KAISU
+           END-IF
+      *H29.4
+      *API
+      *    内服１種類区分、継続コメント区分
+           IF     (LNK-KBN-CODE        =   "1" )
+             AND  (LNK-KBN-V2          =   "1" )
+      *        内服１種類区分
+               IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)    =   "6")
+                  AND (TBL-WKSRY-SRYKBN(TBL-MAX)   =   "21"  )
+                  AND (LF04-NAIFKBN  (IDX1 IDX2)   =   "1"   )
+                   MOVE    "2"             TO  TBL-WKSRY-INPUTKBN
+                                                       (TBL-MAX IDX-S)
+               END-IF
+      *        継続指示区分
+               IF     (LF04-CONTKBN  (IDX1 IDX2)   =   "1"   )
+      *        継続コメント
+                 AND ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
+                                                   =   "8"  )
+                   OR (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
+                                                   =   "008"))
+                   MOVE    "1"             TO  TBL-WKSRY-INPUTKBN
+                                                       (TBL-MAX IDX-S)
+               END-IF
            END-IF
       *
       *H24.4

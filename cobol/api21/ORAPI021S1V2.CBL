@@ -32,6 +32,7 @@
       *  04.07.00    NACL-多々納  14/11/XX  保険組合せ設定対応
       *  04.07.00    NACL-多々納  14/11/XX  CLASS=4 外来追加対応他
       *  04.08.00    NACL-多々納  15/12/01  保険組合せ番号送信追加
+      *  04.08.00    NACL-多々納  17/04/XX  内服１種類・継続コメント対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1298,6 +1299,17 @@
       *                   銘柄名記載
                           MOVE    "91"         TO  LF04-SURYOCD(IDY IDZ)
                    END-EVALUATE
+      *H29.4
+      *            内服１種類区分
+                   IF      MDCREQ-NAIFKBN  (IDY IDZ) =   "1"
+                       MOVE    "1"             TO  LF04-NAIFKBN
+                                                            (IDY IDZ)
+                   END-IF
+      *            継続コメント指示区分
+                   IF      MDCREQ-CONTKBN  (IDY IDZ) =   "1"
+                       MOVE    "1"             TO  LF04-CONTKBN
+                                                            (IDY IDZ)
+                   END-IF
       *
                    IF      MDCREQ-PRSCRPT-CODE (IDY IDZ)   NOT =   SPACE
                        ADD     1               TO  CNT-SRYCNT
