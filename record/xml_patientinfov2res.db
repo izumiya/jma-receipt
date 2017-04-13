@@ -168,7 +168,7 @@ xml_patientinfov2res {
 				D_WholeName		varchar(100);
 				};
 		};
-        	} [20];
+        	} [30];
 		Care_Information   {
 		Insurance     {
                 	InsuranceProvider_Number	varchar(06);

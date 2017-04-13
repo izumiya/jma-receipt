@@ -74,7 +74,7 @@
                   05  ACCPTRES-HOME-ADDRESSES         PIC X(100).
       *         保険情報
                 04  ACCPTRES-INSURANCE-G.
-                  05  ACCPTRES-INSURANCE-INFO          OCCURS 20 TIMES.
+                  05  ACCPTRES-INSURANCE-INFO          OCCURS 30 TIMES.
       *             保険組合せ番号
                     06  ACCPTRES-COMBINATION-NUMBER     PIC X(04).
       *H29.04

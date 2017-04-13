@@ -57,7 +57,7 @@ xml_acceptv2res {
                 	Certificate_IssuedDate		varchar(10);
                 	Certificate_ExpiredDate		varchar(10);
             	} [4];
-        	} [20];
+        	} [30];
     	};
    	};
 };
