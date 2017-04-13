@@ -8372,6 +8372,9 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                    END-IF     
            END-EVALUATE
       *
+           MOVE    WIDGET-NORMAL   TO  TID2-B10-STATE
+                                       TID2-B11-STATE
+      *
            MOVE    ZERO            TO  FLG-RECEDEN-CHK
       *
            MOVE    "B12"           TO  MCP-WIDGET

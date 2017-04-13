@@ -1,10 +1,12 @@
 TID2 {
   fixed1 {
     B10 {
+      state int;
       visible bool;
       label varchar(14);
     };
     B11 {
+      state int;
       visible bool;
       label varchar(14);
     };
