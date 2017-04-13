@@ -6643,7 +6643,8 @@
                                RECE62-SHOKUJIRYOYOHI (2) = ZERO  AND
                                RECE62-SHOKUJIRYOYOHI (3) = ZERO  AND
                                RECE62-SHOKUJIRYOYOHI (4) = ZERO  AND
-                               RECE62-SHOKUJIRYOYOHI (5) = ZERO     )
+                               RECE62-SHOKUJIRYOYOHI (5) = ZERO  AND
+                               RECE62-SKYZEROFLG   =   ZERO        )
                            MOVE    2               TO  FLG-READ
                        ELSE
       *                    主科設定のとき未設定なら更新しない
