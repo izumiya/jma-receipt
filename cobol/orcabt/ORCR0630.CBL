@@ -1148,7 +1148,7 @@
                       IF  (WRK-DAY1(IDY)   NOT =    ZERO )
                       OR  (RECE62-NYUINDAY-KBN(IDY) = "1")
                          MOVE   1     TO    FLG-SHOSAISIN
-                         MOVE  "1"    TO    RECE62-EF-NYUINDAY-KBN(IDY)
+      *****              MOVE  "1"    TO    RECE62-EF-NYUINDAY-KBN(IDY)
                       END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
