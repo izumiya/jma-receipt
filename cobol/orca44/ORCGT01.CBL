@@ -207,6 +207,7 @@
       *  04.08.12    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
       *                                     期間コード変更月のときの対応
       *  04.08.13    NACL-藤原    17/03/09  期間表示の設定の追加
+      *  04.08.14    NACL-藤原    17/04/11  ボタン設定の修正
       *
       *  04.09.01    NACL-藤原    16/11/18  Ｄｏｃｋｅｒ対応
       *  04.09.02    NACL-藤原    17/02/24  レポジトリ名設定時は地方公費
@@ -8114,7 +8115,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
            END-EVALUATE
       *
-           MOVE    SPACE           TO  TID2
+           INITIALIZE                  TID2
       *
            MOVE    "black"         TO  TID2-ID1MSG-STYLE
            MOVE    "blue"          TO  TID2-LABEL-STYLE
@@ -8398,6 +8399,9 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                        END-STRING
                    END-IF     
            END-EVALUATE
+      *
+           MOVE    WIDGET-NORMAL   TO  TID2-B10-STATE
+                                       TID2-B11-STATE
       *
            MOVE    ZERO            TO  FLG-RECEDEN-CHK
       *
