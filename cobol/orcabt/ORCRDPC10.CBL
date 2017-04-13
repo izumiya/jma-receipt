@@ -161,6 +161,7 @@
       *                                     記録されていたのを修正（入院料未算定日）
       *              NACL-小豆沢  17/04/10  上記３月２９日修正分は一旦保留とする
       *              NACL-小豆沢  17/04/12  上記３月２９日修正分を再修正
+      *              NACL-小豆沢  17/04/13  請求点０点出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7113,7 +7114,7 @@
       *
            PERFORM VARYING IJ  FROM  1  BY  1
                    UNTIL   IJ  >  31
-               IF      RECE62-JNISSUTBL(IJ)    =   SPACE
+               IF      RECE62-EF-NYUINDAY-KBN(IJ)    =   SPACE
                    COMPUTE ACCT-ZAIKAISU       =   ACCT-ZAIKAISU
                                                -   ACCT-DAY(1 IJ)
                    MOVE    ZERO                TO  ACCT-DAY(1 IJ)
