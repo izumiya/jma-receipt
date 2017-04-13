@@ -984,13 +984,14 @@
       *
       *    ÊÝ¸±ÁÈ¹ç¤»ÊÔ½¸½èÍý
            INITIALIZE                      ORCSAPIHKNAREA
+           MOVE    "1"                 TO  ORCSAPIHKN-KBN3
            CALL    "ORCSAPIHKN"        USING
                                        SPA-AREA
                                        ORCSAPIHKNAREA
       *
       *    ½ÐÎÏÎÎ°èÊÝ¸±¾ðÊóÊÔ½¸
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   20  )
+                   UNTIL      (IDX     >   30  )
                          OR   (ORCSAPIHKN-THKNCOMBI (IDX)
                                            =   SPACE  )
                PERFORM 2002101-HKNHEN-TBL-SEC

@@ -27,6 +27,7 @@
       * 04.07.00     NACL-多々納  15/01/XX  労災自賠責編集追加
       * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先追加
       * 04.08.00     NACL-多々納  17/04/XX  職業から入金方法追加等
+      *                                     保険組合せ３０件へ
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -172,7 +173,7 @@
                   04  PTRES-DISCHARGE-DATE       PIC  X(10).
       *
       *           保険情報
-                  04  PTRES-INSURANCE-INFO     OCCURS  20 TIMES.
+                  04  PTRES-INSURANCE-INFO     OCCURS  30 TIMES.
       *               保険組合せ番号
                       06  PTRES-COMBINATION-NUMBER     PIC X(04).
       *H26.11

@@ -1142,6 +1142,7 @@
                                        TO  ORCSAPIHKN-IN-JKYSNUM  (IDX)
            END-PERFORM
       *
+           MOVE    "1"                 TO  ORCSAPIHKN-KBN3
            CALL    "ORCSAPIHKN"        USING
                                        SPA-AREA
                                        ORCSAPIHKNAREA
@@ -1199,6 +1200,7 @@
       *        ¿ÇÎÅ²Ê
                MOVE    WRK-SRYKA           TO  ORCSAPIHKN-SRYKA
                MOVE    WRK-HKNCOMBI        TO  ORCSAPIHKN-IN-HKNCOMBI
+               MOVE    "1"                 TO  ORCSAPIHKN-KBN3
                CALL    "ORCSAPIHKN"        USING
                                            SPA-AREA
                                            ORCSAPIHKNAREA
@@ -1228,20 +1230,23 @@
            IF      WRK-HKNCOMBI    NOT =   ZERO
       *        ÂÐ¾Ý¤ÎÊÝ¸±ÁÈ¹ç¤»¤ò£±·ïÌÜ
                PERFORM VARYING     IDX     FROM    1   BY  1
-                       UNTIL      (IDX     >   20  )
+      *!!              UNTIL      (IDX     >   20  )
+                       UNTIL      (IDX     >   200 )
                              OR   (ORCSAPIHKN-THKNCOMBI (IDX)
                                            =   SPACE  )
                    IF      ORCSAPIHKN-THKNCOMBI (IDX)  =   WRK-HKNCOMBI
                        PERFORM 200231-HKNHEN-TBL-SEC
-                       MOVE    20                  TO  IDX
+                       MOVE    200                 TO  IDX
                    END-IF
                END-PERFORM
            END-IF
       *    »Ä¤ê¤òÊÔ½¸
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   20  )
+      *H29.4       UNTIL      (IDX     >   20   )
+                   UNTIL      (IDX     >   200  )
                          OR   (ORCSAPIHKN-THKNCOMBI (IDX)
                                        =   SPACE  )
+                         OR   (IDY     >=  30     )
                IF     (WRK-HKNCOMBI        NOT =   ZERO  )  AND
                       (ORCSAPIHKN-THKNCOMBI (IDX)  =   WRK-HKNCOMBI )
                    CONTINUE
