@@ -1963,7 +1963,7 @@
                MOVE    ZERO                TO  SPA-GMN-CONT-MAX
                MOVE    SPACE               TO  SPA-GMN-CONTKBN-G
            ELSE
-               IF      SPA-GMN-HKNNUM      =   "002"
+               IF      SPA-GMN-HKNNUM      =   "003"
                    MOVE    3               TO  WRK-CONT-MAX
                ELSE
                    MOVE    2               TO  WRK-CONT-MAX
