@@ -2151,6 +2151,17 @@
                END-IF
            END-IF
       *
+      *    平成２８年改正で新設された入院料加算ではないが点数マスタに
+      *    入院基本料加算区分がセットされていない加算について、
+      *    コードを読み替えて加算チェックを行う。
+      *  ・A234-2 感染防止対策地域連携加算（感染防止対策加算の注加算）
+      *           を感染防止対策加算１のコードに読み替える
+           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190147470"
+                   MOVE   "190147210"  TO  TNS-SRYCD
+               END-IF
+           END-IF
+      *
            MOVE    LNK-NYUKSNGET-SANTEIYM
                                    TO  TNS-YUKOSTYMD(1:6)
            MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
