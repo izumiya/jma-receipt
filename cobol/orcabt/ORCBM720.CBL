@@ -33,6 +33,8 @@
       *                                     追加対応
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    17/04/12  平成２９年３月診療分からの
+      *                                     様式変更対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -516,7 +518,11 @@
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE   "HCM78.red"          TO  SPRT-PRTID
+           IF      LNK-PRTKANRI-SRYYM  <   "201702"
+               MOVE    "HCM78.red"         TO  SPRT-PRTID
+           ELSE
+               MOVE    "HCM78V01.red"      TO  SPRT-PRTID
+           END-IF
            MOVE    "光ディスク等送付書（労災）"
                                        TO  SPRT-TITLE
            MOVE    HCM78               TO  SPRT-PRTDATA
