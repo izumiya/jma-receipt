@@ -838,7 +838,7 @@ W07 {
             state int;
           };
           count int;
-            item varchar(20)[3];
+            item varchar(20)[4];
           state int;
         };
         S04SUMKBN_COMBO {
