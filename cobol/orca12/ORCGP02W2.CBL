@@ -140,6 +140,10 @@
       *                                     混在する場合）
       *  04.08.04    NACL-門脇    16/11/11  減額（円超）の対応
       *  04.08.05    NACL-門脇    17/02/13  東京都地方公費組み合わせ作成
+      *  04.08.06    NACL-門脇    17/04/04  全国公費に関わる保険組み合わせ
+      *                                     作成対応
+      *  04.08.07    NACL-門脇    17/04/17  継続区分「３特別」選択時は、
+      *                                     主保険名に（特）をつける
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -300,7 +304,6 @@
            03  WRK-LCOMB2-MAX      PIC 9(04).
            03  WRK-LCOMB-MAX-O     PIC 9(04).
            03  WRK-TCOMB2-MAX      PIC 9(04).
-      *    1:通常 / 2:生保つけない / 3:元にたいして生保つけない
            03  WRK-FTN-FLG         PIC X(01).
       *    負担割合
            03  WRK-GAIKFTNRATE     PIC 9(03).
@@ -418,6 +421,7 @@
        01  WRK-EDIT-AREA.
            03  WRK-KEI1            PIC X(06)   VALUE  "（継）".
            03  WRK-KEI2            PIC X(06)   VALUE  "（任）".
+           03  WRK-KEI3            PIC X(06)   VALUE  "（特）".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -965,6 +969,12 @@
       *        ...継続区分＝"2"の場合、後に[任]　EX.船員（任）
                    STRING  WRK-KEN-SEIDO   DELIMITED  BY  " "
                            WRK-KEI2        DELIMITED  BY  SIZE
+                           INTO            WRK-KEN-SEIDO
+                   END-STRING
+               WHEN    "3"
+      *        ...継続区分＝"3"の場合、後に[特]　EX.一般（特）
+                   STRING  WRK-KEN-SEIDO   DELIMITED  BY  " "
+                           WRK-KEI3        DELIMITED  BY  SIZE
                            INTO            WRK-KEN-SEIDO
                    END-STRING
                END-EVALUATE
@@ -3774,7 +3784,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              INITIALIZE                WRK-IDXSRT-AREA
       *
       *      補助公費を付加する対象かどうかの判定
-      *        1:通常 / 3:通常 / 2:補助公費つけない
+      *        1:補助公費つける  2:補助公費つけない
              MOVE    SPACE             TO  WRK-FTNKBN-AREA
              INITIALIZE                    WRK-FTNKBN-AREA
              MOVE    1                 TO  FLG-HANTEI
@@ -3782,7 +3792,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
              EVALUATE    WRK-FTN-FLG
              WHEN    "1"
-             WHEN    "3"
       *        公費表中より補助公費を検索し適用開始日順に
       *                                   インデックス取得
                MOVE    WRK-KCOMB-TEKSTYMD (IDX2)
@@ -4116,7 +4125,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              INITIALIZE                WRK-IDXSRT-AREA
       *
       *      生保を付加する対象かどうかの判定
-      *        1:通常 / 2:生保つけない / 3:元にたいして生保つけない
+      *        1:生保つける  2:生保つけない
              MOVE    SPACE             TO  WRK-FTN-FLG
              MOVE    SPACE             TO  WRK-FTNKBN-AREA
              INITIALIZE                    WRK-FTNKBN-AREA
@@ -4125,50 +4134,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
              EVALUATE    WRK-FTN-FLG
              WHEN    "1"
-               IF (WRK-KCOMB-HKNNUM (IDX2)        =   "060"
-                                                  OR  "039")
-               OR (WRK-KCOMB-KOH4HKNNUM(IDX2) NOT =   SPACE)
-                   CONTINUE
-               ELSE
-      *           公費表中より生保を検索し、適用開始日順に
-      *                                           インデックス取得
-                   MOVE    WRK-KCOMB-TEKSTYMD (IDX2)
-                                           TO  WRK-SRT-STYMD
-                   MOVE    WRK-KCOMB-TEKEDYMD (IDX2)
-                                           TO  WRK-SRT-EDYMD
-                   PERFORM 570111-SEHIDX-SORT-SEC
-               END-IF
-               IF  WRK-SRT-SEH-CNT       >   ZERO
-      *            生保を検索
-                 PERFORM     VARYING   IDZ   FROM  1   BY  1
-                             UNTIL     IDZ   >     WRK-SRT-SEH-CNT
-                   MOVE    WRK-SRT-SEH-IDX (IDZ)
-                                             TO  WRK-COMB-IDX
-      *###
-                   PERFORM 570144-FUTAN-KONZAI-SEH-SEC
-                 END-PERFORM
-                 IF  WRK-KCOMB-TEKSTYMD (IDX2)
-      *@@>                            NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
-                                         <=  WRK-KCOMB-TEKEDYMD (IDX2)
-                   ADD     1               TO  WRK-RCOMB-MAX
-                   MOVE    WRK-KCOMB-REC (IDX2)
-                                           TO  WRK-RCOMB-REC
-                                                     (WRK-RCOMB-MAX)
-                 END-IF
-               ELSE
-                 ADD     1                 TO  WRK-RCOMB-MAX
-                 MOVE    WRK-KCOMB-REC (IDX2)
-                                           TO  WRK-RCOMB-REC
-                                                     (WRK-RCOMB-MAX)
-               END-IF
-      *
              WHEN    "2"
-             WHEN    "3"
                  ADD     1                 TO  WRK-RCOMB-MAX
                  MOVE    WRK-KCOMB-REC (IDX2)
                                            TO  WRK-RCOMB-REC
                                                      (WRK-RCOMB-MAX)
-                 IF  WRK-FTN-FLG           =   "3"
+                 IF  WRK-FTN-FLG           =   "1"
                    IF (WRK-KCOMB-HKNNUM (IDX2)        =   "060"
                                                       OR  "039")
                    OR (WRK-KCOMB-KOH4HKNNUM(IDX2) NOT =   SPACE)
@@ -4667,24 +4638,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  MOVE    "1"            TO  WRK-NYU-KBN (3)
              END-IF
            END-IF
-      *    <判定>
-           IF  WRK-FTNKBN-AREA      NOT =   ALL "2"
-               MOVE    "1"              TO  WRK-FTN-FLG
-           ELSE
-             IF  WRK-FTNKBN-AREA    NOT =   ALL "1"
-                 MOVE    "2"            TO  WRK-FTN-FLG
-             ELSE
-                 MOVE    "3"            TO  WRK-FTN-FLG
-             END-IF
-           END-IF
       *
+      *    <判定>
            IF  (WRK-GAI-KBN (1)     NOT =   "2")  AND
                (WRK-GAI-KBN (2)     NOT =   "2")  AND
                (WRK-GAI-KBN (3)     NOT =   "2")  AND
                (WRK-NYU-KBN (1)     NOT =   "2")  AND
                (WRK-NYU-KBN (2)     NOT =   "2")  AND
                (WRK-NYU-KBN (3)     NOT =   "2")
-               MOVE    "1"              TO  WRK-FTN-FLG
+                 MOVE    "1"            TO  WRK-FTN-FLG
            ELSE
              IF  (WRK-GAI-KBN (1)     NOT =   "1")  AND
                  (WRK-GAI-KBN (2)     NOT =   "1")  AND
@@ -4694,7 +4656,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  (WRK-NYU-KBN (3)     NOT =   "1")
                  MOVE    "2"            TO  WRK-FTN-FLG
              ELSE
-                 MOVE    "3"            TO  WRK-FTN-FLG
+                 MOVE    "1"            TO  WRK-FTN-FLG
              END-IF
            END-IF
       *
@@ -4703,18 +4665,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "186"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "186" )
-                   MOVE    "3"            TO  WRK-FTN-FLG
+                   MOVE    "1"            TO  WRK-FTN-FLG
                END-IF
              END-IF
       *
              IF  ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                   (WRK-KCOMB-KOH2HKNNUM (IDX2)
-                        = "021" OR "020" OR "091" OR "019" OR
+                        = "020" OR "091" OR "019" OR
                           "053" OR "011" OR "062"             ))
              OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2)
-                        = "021" OR "020" OR "091" OR "019" OR
+                        = "020" OR "091" OR "019" OR
                           "053" OR "011" OR "062"              )
-                   MOVE    "3"            TO  WRK-FTN-FLG
+                   MOVE    "1"            TO  WRK-FTN-FLG
              END-IF
            END-IF
       *
@@ -4725,22 +4687,28 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                          OR "016"))
                OR  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "021" OR "015"
                                                          OR "016" )
+                 IF  WRK-KCOMB-HKNNUM (IDX2)     =  SPACE
+      *              主保険がない場合は、
       *              自立支援＋生保の組合せを作成しない
                      MOVE    "2"            TO  WRK-FTN-FLG
+                 END-IF
                END-IF
              END-IF
       *
              IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "201501"
-               IF  ( WRK-KCOMB-KOH1HKNNUM (IDX2) = "054" OR "052" )
-               AND ( WRK-KCOMB-HKNNUM (IDX2)     =  SPACE         )
+               IF    WRK-KCOMB-KOH1HKNNUM (IDX2) = "054" OR "052"
+                 IF  WRK-KCOMB-HKNNUM (IDX2)     =  SPACE
       *              主保険がない場合は、
       *              難病＋生保、小児慢性＋生保の組合せを作成しない
                      MOVE    "2"            TO  WRK-FTN-FLG
+                 END-IF
                END-IF
              END-IF
       *
-             IF    WRK-FTN-FLG  =  "1"
-                     MOVE    "3"            TO  WRK-FTN-FLG
+             IF    WRK-KCOMB-TEKSTYMD(IDX2)(1:6) >= "200804"
+               IF    WRK-KCOMB-KOH1HKNNUM (IDX2) = "091"
+                     MOVE    "1"            TO  WRK-FTN-FLG
+               END-IF
              END-IF
            END-IF
       *
