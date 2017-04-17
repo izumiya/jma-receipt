@@ -1140,7 +1140,7 @@
                                13  SPA-GMN-S04KIKANMEIL    PIC X(08).
                        09  SPA-GMN-S04DSPLST-G.
                            11  SPA-GMN-S04DSP-MAX          PIC 9(03).
-                           11  SPA-GMN-S04DSPLST           OCCURS  3.
+                           11  SPA-GMN-S04DSPLST           OCCURS  4.
                                13  SPA-GMN-S04DSPL         PIC X(01).
                                13  SPA-GMN-S04DSP-F1L      PIC X(01).
                                13  SPA-GMN-S04DSPMEIL      PIC X(18).
@@ -1817,7 +1817,8 @@
            MOVE    "1 印字する"            TO  SPA-GMN-S04DSPLST(1)
            MOVE    "2 印字しない"          TO  SPA-GMN-S04DSPLST(2)
            MOVE    "3 医保分のみ印字する"  TO  SPA-GMN-S04DSPLST(3)
-           MOVE    3                       TO  SPA-GMN-S04DSP-MAX
+           MOVE    "4 入金分のみ印字する"  TO  SPA-GMN-S04DSPLST(4)
+           MOVE    4                       TO  SPA-GMN-S04DSP-MAX
       *
            MOVE    "1 支払額に含める"      TO  SPA-GMN-S04SUMKBNLST(1)
            MOVE    "2 支払額に含めない"    TO  SPA-GMN-S04SUMKBNLST(2)

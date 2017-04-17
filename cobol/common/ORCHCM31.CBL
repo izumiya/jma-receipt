@@ -587,7 +587,7 @@
       *
       *    入金編集処理
            PERFORM 220-NUKIN-HENSYU-SEC
-           IF    ( ORCHCM31-DSPKBN =  "1" OR "4" )
+           IF    ( ORCHCM31-DSPKBN =   "1" )
                    PERFORM 21011-SRYKIKAN-HEN-SEC
            ELSE
                IF    ( HCM31S01-BFKINGAKU (1)      >   ZERO )
@@ -992,8 +992,7 @@
            END-IF
       *
            IF    ( ORCHCM31-KIKANKBN   =   "1"   )
-      *      AND  ( ORCHCM31-DSPKBN     =   "1" OR "2" OR "3"  )
-             AND ( ORCHCM31-DSPKBN     =   "2" OR "3"  )
+            AND  ( ORCHCM31-DSPKBN     =   "2" OR "3" OR "4"  )
             AND  ( WRK-GAKU (IDX4) =   ZERO )
                    MOVE    ZERO    TO  FLG-TAISYO
            END-IF

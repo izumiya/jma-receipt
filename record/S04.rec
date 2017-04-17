@@ -20,21 +20,21 @@ S04 {
         textdata varchar(12);
       };
       count int;
-        item varchar(12)[3];
+        item varchar(12)[5];
     };
     NYUGAICOMBO {
       NYUGAIKBN {
         textdata varchar(6);
       };
       count int;
-        item varchar(6)[3];
+        item varchar(6)[5];
     };
     SRYCOMBO {
       SRYKBN {
         textdata varchar(8);
       };
       count int;
-        item varchar(8)[3];
+        item varchar(8)[5];
     };
     STRSRYYMD {
       textdata varchar(10);
@@ -48,7 +48,7 @@ S04 {
         textdata varchar(10);
       };
       count int;
-        item varchar(10)[2];
+        item varchar(10)[5];
     };
     DSPCOMBO {
       DSPKBN {
@@ -56,7 +56,7 @@ S04 {
         state int;
       };
       count int;
-        item varchar(20)[3];
+       item varchar(20)[5];
       state int;
     };
     SUMKBNCOMBO {
@@ -65,7 +65,7 @@ S04 {
         state int;
       };
       count int;
-        item varchar(18)[2];
+        item varchar(18)[5];
       state int;
     };
     SYORICOMBO {
@@ -74,7 +74,7 @@ S04 {
         state int;
       };
       count int;
-        item varchar(18)[2];
+        item varchar(18)[5];
       state int;
     };
     JIHICOMBO {
@@ -83,7 +83,7 @@ S04 {
         state int;
       };
       count int;
-        item varchar(12)[3];
+        item varchar(12)[5];
       state int;
     };
   };

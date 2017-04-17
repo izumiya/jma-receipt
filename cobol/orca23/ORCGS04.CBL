@@ -133,7 +133,7 @@
       *
                05  SPA-GMN-DSPLIST-G.
                    07  SPA-GMN-DSPLIST-MAX     PIC 9(05).
-                   07  SPA-GMN-DSPLIST             OCCURS  3.
+                   07  SPA-GMN-DSPLIST             OCCURS  4.
                        09  SPA-GMN-DSPKBNL     PIC X(01).
                        09  SPA-GMN-FL13        PIC X(01).
                        09  SPA-GMN-DSPMEIL     PIC X(18).
@@ -755,8 +755,9 @@
            MOVE    "1 印字する"            TO  SPA-GMN-DSPLIST(1)
            MOVE    "2 印字しない"          TO  SPA-GMN-DSPLIST(2)
            MOVE    "3 医保分のみ印字する"  TO  SPA-GMN-DSPLIST(3)
+           MOVE    "4 入金分のみ印字する"  TO  SPA-GMN-DSPLIST(4)
       *
-           MOVE    3               TO  SPA-GMN-DSPLIST-MAX
+           MOVE    4               TO  SPA-GMN-DSPLIST-MAX
       *
            .
        3101-DSPLIST-SET-EXT.
