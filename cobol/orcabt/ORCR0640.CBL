@@ -19079,6 +19079,11 @@
                          ELSE
                             PERFORM 21044-RECE62-FTN-HENSYU-SEC
                          END-IF
+                        ELSE
+                         IF   RECE62-NYUINRYOFLG  =  "1"
+                         AND  FLG-NYUINRYO        =  ZERO
+                            PERFORM 210441-NYUINRYOFLG-SET-SEC
+                         END-IF
                         END-IF
                         MOVE    1           TO   FLG-SYUNOU-ARI
                        END-IF
