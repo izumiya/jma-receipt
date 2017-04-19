@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/04/XX  ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»Êñ³çÂÐ±þ
       *****************************************************************
       *
       *
@@ -63,6 +64,27 @@
            03  CONS-TANKI3HKT-AREA-R  REDEFINES  CONS-TANKI3HKT-AREA.
              05   CONS-TANKI3HKT-TBL      OCCURS  3.
                 07   CONS-TANKI3HKT-SRYCD  PIC X(09).
+      *
+      *H29.4
+      *    Êñ³ç³°¸¡ººÈ½ÃÇÎÁ
+           03   CONS-TANKI3HKTNO-AREA.
+      *      Ç¢¡¦ÊµÊØÈ½ÃÇÎÁ
+             05   CONS-HKTNO1              PIC X(09) VALUE "160061710".
+      *      À¸²½³ØÅª¸¡ºº¡Ê£²¡ËÈ½ÃÇÎÁ
+             05   CONS-HKTNO2              PIC X(09) VALUE "160062010".
+      *      ÈùÀ¸Êª³ØÅªÈ½ÃÇÎÁ
+             05   CONS-HKTNO3              PIC X(09) VALUE "160062210".
+      *
+      *    ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»
+           03   CONS-TANKI3KSN-AREA.
+      *      ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»£±
+             05   CONS-KSN1                PIC X(09) VALUE "160170170".
+      *      ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»£²
+             05   CONS-KSN2                PIC X(09) VALUE "160182770".
+      *      ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»£³
+             05   CONS-KSN3                PIC X(09) VALUE "160161610".
+      *      ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»£´
+             05   CONS-KSN4                PIC X(09) VALUE "160185770".
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -153,14 +175,14 @@
        100-PRM-CHK-SEC                     SECTION.
       *
       *    ´µ¼Ô¥Þ¥¹¥¿¡¼¸¡º÷
-           INITIALIZE                         PTINF-REC
-           MOVE    LNK-TANKI3HKT-HOSPNUM  TO  PTINF-HOSPNUM
-           MOVE    LNK-TANKI3HKT-PTID     TO  PTINF-PTID
-           PERFORM 900-PTINF-READ-SEC
-           IF      FLG-PTINF              NOT =   ZERO
-               MOVE    1                  TO  LNK-TANKI3HKT-RC
-               GO  TO  100-PRM-CHK-EXT
-           END-IF
+      *    INITIALIZE                         PTINF-REC
+      *    MOVE    LNK-TANKI3HKT-HOSPNUM  TO  PTINF-HOSPNUM
+      *    MOVE    LNK-TANKI3HKT-PTID     TO  PTINF-PTID
+      *    PERFORM 900-PTINF-READ-SEC
+      *    IF      FLG-PTINF              NOT =   ZERO
+      *        MOVE    1                  TO  LNK-TANKI3HKT-RC
+      *        GO  TO  100-PRM-CHK-EXT
+      *    END-IF
       *
       *    »»ÄêÇ¯·îÆü¥Á¥§¥Ã¥¯
            IF      LNK-TANKI3HKT-SANTEIYMD  =   SPACE
@@ -177,9 +199,41 @@
       *****************************************************************
        200-MAIN-SEC            SECTION.
       *
-           IF    LNK-TANKI3HKT-SRYCD    =   CONS-TANKI3HKT-SRYCD(1) OR
-                                            CONS-TANKI3HKT-SRYCD(2) OR
-                                            CONS-TANKI3HKT-SRYCD(3)
+           EVALUATE    LNK-TANKI3HKT-SRYCD
+      *        ¸¡ººÈ½ÃÇÎÁÊñ³çÂÐ¾Ý¥Á¥§¥Ã¥¯
+               WHEN    CONS-TANKI3HKT-SRYCD(1)
+               WHEN    CONS-TANKI3HKT-SRYCD(2)
+               WHEN    CONS-TANKI3HKT-SRYCD(3)
+                   MOVE    SPACE               TO  LNK-TANKI3HKT-KBN2
+                   PERFORM 2001-MAIN-CHK-SEC
+      *
+      *        ¸¡ººÈ½ÃÇÎÁÊñ³çÂÐ¾Ý³°
+               WHEN    CONS-HKTNO1
+               WHEN    CONS-HKTNO2
+               WHEN    CONS-HKTNO3
+                   MOVE    SPACE               TO  LNK-TANKI3HKT-KBN
+                   MOVE    "1"                 TO  LNK-TANKI3HKT-KBN2
+      *        ¸¡ººÈ½ÃÇÎÁÊñ³ç¤Ë¤è¤ëÊñ³çÂÐ¾Ý
+               WHEN    CONS-KSN1
+               WHEN    CONS-KSN2
+               WHEN    CONS-KSN3
+               WHEN    CONS-KSN4
+                   IF      LNK-TANKI3HKT-HKTKBN    =   "1"
+                       MOVE    "1"             TO  LNK-TANKI3HKT-KBN
+                   ELSE
+                       MOVE    SPACE           TO  LNK-TANKI3HKT-KBN
+                   END-IF
+                   MOVE    SPACE               TO  LNK-TANKI3HKT-KBN2
+           END-EVALUATE
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸¡ººÈ½ÃÇÎÁÊñ³çÂÐ¾Ý¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2001-MAIN-CHK-SEC            SECTION.
       *
              MOVE    LNK-TANKI3HKT-SANTEIYMD  TO  WRK-SANTEI-YMD
       *
@@ -225,10 +279,8 @@
                 MOVE    "1"                 TO    LNK-TANKI3HKT-KBN
              END-IF
       *
-           END-IF
-      *
            .
-       200-MAIN-EXT.
+       2001-MAIN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
