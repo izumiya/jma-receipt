@@ -719,6 +719,7 @@
                                                =   "0"
                            MOVE    2               TO  WRK-HKNNUM
                        END-IF
+                   WHEN    "040"
                    WHEN    "068"
                    WHEN    "069"
                        CONTINUE
