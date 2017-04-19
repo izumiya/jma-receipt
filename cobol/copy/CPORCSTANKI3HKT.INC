@@ -28,6 +28,7 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  17/04/XX  検体検査管理加算包括対応
       ************************************************************
        01  ORCSTANKI3HKT-AREA.
       *
@@ -39,10 +40,16 @@
            03  LNK-TANKI3HKT-SANTEIYMD         PIC  X(08).
       *診療行為コード
            03  LNK-TANKI3HKT-SRYCD             PIC  X(09).
+      *H29.4
+      *１：短期滞在３包括により算定不可対象とする
+           03  LNK-TANKI3HKT-HKTKBN            PIC  X(01).
       *返却項目
            03  LNK-TANKI3HKT-HENKYAKU-AREA.
       *包括区分（空白：算定可　１：短期滞在３包括により算定不可）
              05  LNK-TANKI3HKT-KBN             PIC  X(01).
+      *H29.4
+      *包括区分２（１：短期滞在３包括により算定可の検査判断料）
+             05  LNK-TANKI3HKT-KBN2            PIC  X(01).
       *
       *復帰コード（１：患者検索エラー　２：算定年月日エラー）
            03  LNK-TANKI3HKT-RC                PIC S9(9) BINARY.

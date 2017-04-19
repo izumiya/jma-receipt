@@ -42,6 +42,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *                                     ÂÐ¾Ý¥Æ¡¼¥Ö¥ë£²£°£°¤Ø
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/01/17  Íâ·îÆþ±¡ÎÁ¥Á¥§¥Ã¥¯ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/04/XX  Ã»½Ñ£³¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»ÂÐ±þ
       *****************************************************************
       *
       *
@@ -82,6 +83,9 @@
       *ver.4.7
            03  FLG-INPUTOK2            PIC 9(01).
            03  FLG-INPUTOK6            PIC 9(01).
+      *H29.4
+           03  FLG-TANKI3HKT-OK         PIC 9(01).
+           03  FLG-TANKI3HKT-NO         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1595,6 +1599,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
       *    Êñ³ç¿ÇÎÅ¥³¡¼¥É¥Á¥§¥Ã¥¯
            MOVE    ZERO                TO  FLG-SANTEIOK
+           MOVE    ZERO                TO  FLG-TANKI3HKT-NO
+           MOVE    ZERO                TO  FLG-TANKI3HKT-OK
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
                IF     (SPA-COM-HKNCOMBI (IDX-Z)    =   "9999")
@@ -1681,9 +1687,22 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    WRK-SRYYMD          TO  LNK-TANKI3HKT-SANTEIYMD
       *    ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É
            MOVE    WRK-SRYCD           TO  LNK-TANKI3HKT-SRYCD
+      *H29.4
+           IF     (FLG-TANKI3HKT-OK    =   1  )
+              AND (FLG-TANKI3HKT-NO    =   ZERO )
+               MOVE    "1"                 TO  LNK-TANKI3HKT-HKTKBN
+           END-IF
+      *
            CALL    "ORCSTANKI3HKT"     USING
                                        ORCSTANKI3HKT-AREA
                                        SPA-AREA
+      *
+           IF      LNK-TANKI3HKT-KBN2  =   "1"
+               MOVE    1                   TO  FLG-TANKI3HKT-NO
+           END-IF
+           IF      LNK-TANKI3HKT-KBN   =   "1"
+               MOVE    1                   TO  FLG-TANKI3HKT-OK
+           END-IF
            .
        200131-TANKI3HKT-CHEK-EXT.
            EXIT.
@@ -1693,6 +1712,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
        200132-TANKI3AUTO-CHK-SEC         SECTION.
       *
+           MOVE    ZERO                TO  FLG-TANKI3HKT-NO
+           MOVE    ZERO                TO  FLG-TANKI3HKT-OK
            INITIALIZE                  WRK-ORCSC-KASAN
            PERFORM VARYING     IDX-L1  FROM    1   BY  1
                    UNTIL      (IDX-L1      >   10  )
