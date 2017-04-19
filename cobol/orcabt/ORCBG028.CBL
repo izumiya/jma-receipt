@@ -596,6 +596,7 @@
                WHEN    "113003710"
                WHEN    "113019710"
                WHEN    "113019910"
+               WHEN    "099110001"
                    MOVE    5           TO  FLG-SYUKEI
       *        ºÆ¿Ç
                WHEN    "112007410"
@@ -610,6 +611,7 @@
                WHEN    "113003810"
                WHEN    "113019810"
                WHEN    "113020010"
+               WHEN    "099120001"
                    MOVE    6           TO  FLG-SYUKEI
            END-EVALUATE
       *
