@@ -489,6 +489,14 @@
                IF      SPA-SRYYMD          <   "20160401"
                    MOVE    "0"             TO  SPA-TEISHOHOU-FLG
                END-IF
+      *H29.4
+      *        ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯
+               IF      SYS-1008-SHOHOU30CHK    =   SPACE
+                   MOVE    "0"             TO  SPA-SHOHOU30CHK
+               ELSE
+                   MOVE    SYS-1008-SHOHOU30CHK
+                                           TO  SPA-SHOHOU30CHK
+               END-IF
            ELSE
                MOVE    ZERO                TO  SPA-INTERACT-KIKAN
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
@@ -529,6 +537,8 @@
       *H29.3
       *        ÄûÀµ»þ¤ÎÅ¸³«¡Ê½èÊýÎÁ¡Ë
                MOVE    "0"                 TO  SPA-TEISHOHOU-FLG
+      *        ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯
+               MOVE    "0"                 TO  SPA-SHOHOU30CHK
            END-IF
       *    ¿Ç»¡ÎÁ¼«Æ°È¯À¸¤Ê¤·¤Ï¡¢»þ´Ö³°²Ã»»¤Ê¤·
            IF      SPA-INITAUTO-FLG    =   "0"
@@ -1480,6 +1490,14 @@
                IF      SPA-SRYYMD          <   "20160401"
                    MOVE    "0"             TO  SPA-TEISHOHOU-FLG
                END-IF
+      *H29.4
+      *        ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯
+               IF      SYS-1008-SHOHOU30CHK    =   SPACE
+                   MOVE    "0"             TO  SPA-SHOHOU30CHK
+               ELSE
+                   MOVE    SYS-1008-SHOHOU30CHK
+                                           TO  SPA-SHOHOU30CHK
+               END-IF
            ELSE
                MOVE    "1"                 TO  SPA-GAIKANRIKBN-CHK
       *        ¸¡ÂÎ¸¡ºº²Ã»»¼«Æ°È¯À¸
@@ -1491,6 +1509,7 @@
       *H29.3
       *        ÄûÀµ»þ¤ÎÅ¸³«¡Ê½èÊýÎÁ¡Ë
                MOVE    "0"                 TO  SPA-TEISHOHOU-FLG
+               MOVE    "0"                 TO  SPA-SHOHOU30CHK
            END-IF
       *
            .

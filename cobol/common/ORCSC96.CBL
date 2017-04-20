@@ -3522,6 +3522,14 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H29.4
+               WHEN    "K268"
+                   STRING  "確認！"
+                           "長期投薬のため理由の記載が"
+                           "必要となる場合があります。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       **
                WHEN    "K910"
                    STRING  "警告！"

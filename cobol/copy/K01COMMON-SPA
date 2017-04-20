@@ -245,6 +245,9 @@
       *H29.3
       *訂正時の展開（処方料）
                05  SPA-TEISHOHOU-FLG       PIC X(01).
+      *H29.4
+      *投薬３０日超チェック
+               05  SPA-SHOHOU30CHK         PIC X(01).
       *ver.4.8
       *患者情報表示
                05  SPA-POPUPKBN-G.
@@ -655,6 +658,9 @@
       *H28.9
       *認知症地域包括薬剤チェック区分
                05  SPA-NINCHI-CHK          PIC 9(01).
+      *H29.4
+      *投薬３０日超チェックチェック区分
+               05  SPA-SHOH30-CHK          PIC 9(01).
       *@
            03  SPA-SONOTA-AREA.
       *確認メッセージ

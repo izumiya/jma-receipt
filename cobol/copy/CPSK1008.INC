@@ -139,6 +139,8 @@
            03  SYS-1008-TOUYOCHK-FLG        PIC X(01).
       *ÄûÀµ»þ¤ÎÅ¸³«¡Ê½èÊýÎÁ¡Ë
            03  SYS-1008-TEISHOHOU-FLG       PIC X(01).
+      *ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯¶èÊ¬
+           03  SYS-1008-SHOHOU30CHK         PIC X(01).
       *Í½È÷
       *****03  FILLER                   PIC X(489).
       *****03  FILLER                   PIC X(486).
@@ -148,7 +150,8 @@
       *****03  FILLER                   PIC X(449).
       **** 03  FILLER                   PIC X(445).
       **** 03  SYS-1008-YOBI2           PIC X(440).
-           03  SYS-1008-YOBI2           PIC X(436).
+      ***  03  SYS-1008-YOBI2           PIC X(436).
+           03  SYS-1008-YOBI2           PIC X(435).
       *Ã¼Ëö£É£Ä
            03  SYS-1008-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä
