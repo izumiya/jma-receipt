@@ -70,6 +70,7 @@
       *                                     Æþ±¡»þ»ý»²ÌôÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/03/XX  ½èÊýÎÁÄûÀµÅ¸³«ÂÐ±þ
       *                                     °ìÈÌÌ¾²Ã»»ÂÐ¾Ý°åÌôÉÊÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/04/XX  ½èÊý£³£°ÆüÄ¶·Ù¹ðÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1724,6 +1725,26 @@
                                MOVE    10              TO  IDX-KA
                            END-IF
                        END-PERFORM
+                   END-IF
+      *
+      *H29.4
+      *            ÅêÌôÆü¿ô¤¬£³£°ÆüÄ¶¤Ï·Ù¹ð
+                   IF     (WRK-COM-HKNCOMBI(IDX)   NOT =   "9999")
+                     AND  (SPA-SHOHOU30CHK         =   "1" )
+                     AND  (WRK-COM-SRYKBN (IDX)    =   "21"
+                                                   OR  "22")
+                     AND  (WRK-COM-ZAIEND (IDX)    =   "1" )
+                     AND  (WRK-COM-KAISU  (IDX)    >   30  )
+                       IF     (WRK-COM-KZMFLG (IDX)
+                                                   =   SPACE) AND
+                              (LNK-ORCSC-KEI-IDX   =   ZERO )
+                           MOVE    "K268"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX)
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX)
+                           MOVE    IDX             TO  LNK-ORCSC-KEI-IDX
+                       END-IF
                    END-IF
       *
                END-PERFORM

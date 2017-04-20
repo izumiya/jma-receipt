@@ -137,6 +137,7 @@
       *  04.08.00    NACL-多々納  16/11/XX  投薬投与量チェック区分対応
       *  04.08.00    NACL-多々納  16/12/XX  病名表示区分に追加対応
       *  04.08.00    NACL-多々納  17/03/XX  訂正時の自動発生（処方料）追加
+      *  04.08.00    NACL-多々納  17/04/XX  投薬３０日超チェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -413,6 +414,16 @@
                            11  SPA-GMN-TOUYOCHK-LIST       PIC X(40)
                                                            OCCURS  5.
                        09  SPA-GMN-TOUYOCHK-MAX            PIC 9(02).
+      *H29.4
+      *                投薬３０日超チェック区分
+                       09  SPA-GMN-SHOHOU30CHK-G.
+                           11  SPA-GMN-SHOHOU30CHK         PIC X(01).
+                           11  SPA-GMN-SHOHOU30CHK-F1      PIC X(01).
+                           11  SPA-GMN-SHOHOU30CHK-MEI     PIC X(38).
+                       09  SPA-GMN-SHOHOU30CHK-COMB.
+                           11  SPA-GMN-SHOHOU30CHK-LIST    PIC X(40)
+                                                           OCCURS  5.
+                       09  SPA-GMN-SHOHOU30CHK-MAX         PIC 9(02).
       *
                    07  SPA-GMN-PAGE2-AREA.
       *                カルテの病名対象
@@ -1901,6 +1912,13 @@
            MOVE    "1 展開する"
                                        TO  SPA-GMN-TEISHOHOU-LIST (2)
            MOVE    2                   TO  SPA-TEISHOHOU-MAX
+      *H29.4
+      *    投薬３０日超チェック区分
+           MOVE    "0 チェックしない"
+                                       TO  SPA-GMN-SHOHOU30CHK-LIST (1)
+           MOVE    "1 チェックする"
+                                       TO  SPA-GMN-SHOHOU30CHK-LIST (2)
+           MOVE    2                   TO  SPA-GMN-SHOHOU30CHK-MAX
       *
       *
       *    病名表示区分
@@ -2194,7 +2212,7 @@
            MOVE    "0 一般名表示"      TO  SPA-GMN-GENERICFLG-LST(1)
            MOVE    "1 銘柄名表示"      TO  SPA-GMN-GENERICFLG-LST(2)
            MOVE    2                   TO  SPA-GMN-GENERICFLG-MAX
-      *v5.から
+      *v5.0 から
       **   MOVE    "2 一般名表示（全画面）"
       *                                TO  SPA-GMN-GENERICFLG-LST(3)
       **   MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
@@ -2687,6 +2705,9 @@
       *H28.11  薬剤投与量チェック区分
                MOVE    SYS-1008-TOUYOCHK-FLG
                                            TO  SPA-GMN-TOUYOCHK
+      *H29.4   投薬３０日超チェック区分
+               MOVE    SYS-1008-SHOHOU30CHK
+                                           TO  SPA-GMN-SHOHOU30CHK
            END-IF
       *    チェック除外時間
            PERFORM VARYING     IDT     FROM    1   BY  1
@@ -3168,6 +3189,21 @@
                    MOVE    SPA-GMN-TOUYOCHK-LIST(IDY)
                                                TO SPA-GMN-TOUYOCHK-G
                    MOVE    SPA-GMN-TOUYOCHK-MAX    TO  IDY
+               END-IF
+           END-PERFORM
+      *H29.4
+      *    投薬３０日超チェック区分
+           IF      SPA-GMN-SHOHOU30CHK  =   SPACE
+               MOVE    "0"              TO  SPA-GMN-SHOHOU30CHK
+           END-IF
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-SHOHOU30CHK-MAX
+               IF      SPA-GMN-SHOHOU30CHK
+                                       =   SPA-GMN-SHOHOU30CHK-LIST
+                                                        (IDY) (1:1)
+                   MOVE    SPA-GMN-SHOHOU30CHK-LIST(IDY)
+                                               TO SPA-GMN-SHOHOU30CHK-G
+                   MOVE    SPA-GMN-SHOHOU30CHK-MAX    TO  IDY
                END-IF
            END-PERFORM
       *
@@ -5584,6 +5620,9 @@
            MOVE    W07-KINKCHK         TO  SPA-GMN-KINKCHK-G
       *H28.11
            MOVE    W07-TOUYOCHK        TO  SPA-GMN-TOUYOCHK-G
+      *H29.4
+           MOVE    W07-SHOHOU30CHK     TO  SPA-GMN-SHOHOU30CHK-G
+      *
            MOVE    W07-GAIKANKBN       TO  SPA-GMN-GAIKANRIKBN-G
            MOVE    W07-GAIMOVE         TO  SPA-GMN-GAIMOVE-G
            MOVE    W07-SURYOZERO       TO  SPA-GMN-SURYOZERO-G
@@ -5877,6 +5916,11 @@
       *            薬剤投与量チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4103-TOUYOCHK-CHK-SEC
+                   END-IF
+      *H29.4
+      *            投薬３０日超チェック区分
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4103-SHOHOU30CHK-CHK-SEC
                    END-IF
       *            包括入力チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -7098,6 +7142,32 @@
       *
           .
        4103-TOUYOCHK-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    投薬３０日超チェック区分処理
+      *****************************************************************
+       4103-SHOHOU30CHK-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-SHOHOU30CHK-MAX)
+                          OR  (FLG-OK  =   1                  )
+               IF      SPA-GMN-SHOHOU30CHK
+                                       =   SPA-GMN-SHOHOU30CHK-LIST
+                                                           (IDX)(1:1)
+                   MOVE    SPA-GMN-SHOHOU30CHK-LIST(IDX)
+                                          TO  SPA-GMN-SHOHOU30CHK-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    90              TO  SPA-GMN-CUR
+               MOVE    "0047"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4103-SHOHOU30CHK-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10693,6 +10763,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *H28.11
       *    薬剤投与量チェック区分
            MOVE    SPA-GMN-TOUYOCHK        TO  SYS-1008-TOUYOCHK-FLG
+      *H29.4
+      *    投薬３０日超チェック区分
+           MOVE    SPA-GMN-SHOHOU30CHK     TO  SYS-1008-SHOHOU30CHK
       *
       *    時間外加算特例乳幼児
            MOVE    SPA-GMN-JIKANTOKU-NYU   TO
@@ -11602,6 +11675,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-TOUYOCHK-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-GMN-TOUYOCHK-MAX  TO  W07-TOUYOCHK-COUNT
+      *
+      *    投薬３０日超チェック
+           MOVE    SPA-GMN-SHOHOU30CHK-G     TO  W07-SHOHOU30CHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-SHOHOU30CHK-MAX
+               MOVE    SPA-GMN-SHOHOU30CHK-LIST (IDX)
+                                       TO  W07-SHOHOU30CHK-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-SHOHOU30CHK-MAX  TO  W07-SHOHOU30CHK-COUNT
       *
       *    包括入力
            MOVE    SPA-GMN-HOUKATU-G       TO  W07-HOUKATU
@@ -12904,6 +12986,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0046"
                    MOVE    "訂正時の展開（処方料）区分エラー"
                                                        TO  SPA-ERRMSG
+               WHEN    "0047"
+                   MOVE    "薬投３０日超チェック区分エラー"
+                                                       TO  SPA-ERRMSG
       *        
                WHEN    "1001"
                    MOVE    "カルテの病名対象区分がありません。"
@@ -13365,7 +13450,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    88
                    MOVE  "JGAIKEIKBN"      TO   MCP-WIDGET
                WHEN    89
-                   MOVE  "TOUYOCHK"      TO   MCP-WIDGET
+                   MOVE  "TOUYOCHK"        TO   MCP-WIDGET
+               WHEN    90
+                   MOVE  "SHOHOU30CHK"     TO   MCP-WIDGET
                WHEN    84
                    MOVE  "HOUKATU"         TO   MCP-WIDGET
                WHEN    85
@@ -13846,6 +13933,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *********    MOVE    84              TO  SPA-GMN-CUR
                    MOVE    89              TO  SPA-GMN-CUR
                WHEN    "TOUYOCHK"
+      *******      MOVE    84              TO  SPA-GMN-CUR
+                   MOVE    90              TO  SPA-GMN-CUR
+      *
+               WHEN    "SHOHOU30CHK"
                    MOVE    84              TO  SPA-GMN-CUR
       *
                WHEN    "HOUKATU"
