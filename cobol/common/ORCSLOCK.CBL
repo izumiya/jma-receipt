@@ -32,6 +32,7 @@
       *  03.05.00    NACL-太田    07/05/09  グループ診療対応
       *
       *  04.05.01    NACL-竹田    10/02/27  監視ログ出力対応
+      *  04.08.00    NACL-多々納  17/04/XX  受付の排他追加
       *****************************************************************
 001200*
 001300 ENVIRONMENT             DIVISION.
@@ -424,6 +425,8 @@ grpsys                            SPA-AREA
                                        OR  "ORCA31"
                                        OR  "ORCA32"
                                        OR  "ORCA41"
+      *H29.4     受付も対象とする
+                                       OR  "ORCA11"
                MOVE    1               TO  FLG-ALLCHK
            ELSE
                MOVE    ZERO            TO  FLG-ALLCHK
