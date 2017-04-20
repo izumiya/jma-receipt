@@ -36,6 +36,7 @@
       *  02.00.03    NACL-多々納  05/11/11  MONFUNC 対応 他
       *  03.05.00    NACL-多々納  07/05/XX  グループ診療対応
       *  03.05.01    NACL-多々納  07/06/11  氏名変更の予約・受付対応
+      *  04.08.00    NACL-多々納  17/04/20  受付取消の表示対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -156,6 +157,8 @@
                    07  WRK-NAI-SRYNAI      PIC X(02).
                    07  WRK-NAI-YYKID       PIC 9(02).
                    07  WRK-NAI-YYKTIME     PIC 9(04).
+      *H29.4
+                   07  WRK-NAI20-DELKBN      PIC 9(01).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -489,6 +492,11 @@
                        MOVE    SPA-HKNCOMBI-MAX    TO  IDY
                    END-IF
                END-PERFORM
+           END-IF
+      *H29.4
+      *    削除分
+           IF      UKE-UPYMD       =   "99999999"
+               MOVE    1                TO  SPA-NAI20-DELKBN (IDX)
            END-IF
       *
            .
@@ -1448,6 +1456,9 @@
            MOVE    SPA-GMN20-HKNKUMI   TO  SPA-GMN20-THKNCOMBI(IDX)
            MOVE    SPA-NAI20-HKNCOMBIMEI
                                        TO  SPA-GMN20-THKNCOMBIMEI(IDX)
+      *H29.4
+      *    削除解除
+           MOVE    ZERO                TO  SPA-NAI20-DELKBN (IDX)
       *
            MOVE    SPACE               TO  SPA-GMN20-YSELNUM
            MOVE    ZERO                TO  SPA-NAI20-YSELNUM
@@ -1493,6 +1504,17 @@
                                                    (SPA-NAI20-YSELNUM)
                MOVE    SPACE           TO  SPA-NAI20-UKETIME
                                                    (SPA-NAI20-YSELNUM)
+      *H29.4
+      *        受付済みは削除区分設定
+               IF      SPA-NAI20-UKEID(SPA-NAI20-YSELNUM)
+                                                   =    ZERO
+                                                   OR   99999
+                   CONTINUE
+               ELSE
+                   MOVE    1           TO  SPA-NAI20-DELKBN
+                                                   (SPA-NAI20-YSELNUM)
+               END-IF
+      *
                MOVE    SPACE           TO  SPA-GMN20-YSELNUM
                MOVE    ZERO            TO  SPA-NAI20-YSELNUM
                MOVE    SPA-GMN20-KARUTE-LST(1)
@@ -1503,6 +1525,11 @@
                MOVE    ZERO            TO  SPA-NAI20-HKNKUMI 
                GO      TO                  422-UKETUDEL-EXT
            END-IF
+      *
+      *H29.4
+           IF      SPA-NAI20-UKEID(SPA-NAI20-YSELNUM)  =    ZERO
+                                                       OR   99999
+      *新規登録分
       *
       *    １行取り消し
            INITIALIZE                SPA-GMN20-TBLO(SPA-NAI20-YSELNUM)
@@ -1524,6 +1551,15 @@
            END-PERFORM
       *
            COMPUTE SPA-NAI20-UKEMAX    =   SPA-NAI20-UKEMAX   -   1
+      *
+      *H29.4
+           ELSE
+      *        受付済みは削除区分設定
+               MOVE    1               TO  SPA-NAI20-DELKBN
+                                                   (SPA-NAI20-YSELNUM)
+           END-IF
+      *
+      *
            MOVE    SPACE               TO  SPA-GMN20-YSELNUM
            MOVE    ZERO                TO  SPA-NAI20-YSELNUM
            MOVE    SPACE               TO  SPA-GMN20-KARUTE-G
@@ -1702,13 +1738,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                    END-IF
                END-PERFORM
-      *        削除データ
+      *H29.4
+      *        存在なしデータ
                IF      FLG-OK          =   ZERO
                    IF     (SPA-GMN-PTID        =   ZERO )  AND
                           (SPA-P02-UKEID   NOT =   UKE-UKEID)
                        CONTINUE
                    ELSE
-                       MOVE    "99999999"         TO  UKE-UPYMD
+      *H29.4
+      ******           MOVE    "99999999"         TO  UKE-UPYMD
+      *                他で登録？
                        PERFORM 5002-UKE-PARA-SEC
                    END-IF
                END-IF
@@ -1783,8 +1822,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *D   IF      SPA-P02-UKEID   NOT =   UKE-UKEID
                MOVE    SPA-GMN-NAME        TO  UKE-NAME
       *D   END-IF
+      *H29.4
+      *    削除分
+           IF      SPA-NAI20-DELKBN (IDX)  =   1
+               MOVE    "99999999"          TO  UKE-UPYMD
+           ELSE
+               MOVE    SPACE               TO  UKE-UPYMD
+           END-IF
       *
-      *    パラメタ編集済み 
+      *    パラメタ編集済み
            MOVE    SPACE               TO  SPA-NAI20-UKETIME(IDX)
            .
       *

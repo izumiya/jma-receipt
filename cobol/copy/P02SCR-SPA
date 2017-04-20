@@ -698,6 +698,8 @@
                            11  SPA-NAI20-SRYNAI      PIC X(02).
                            11  SPA-NAI20-YYKID       PIC 9(02).
                            11  SPA-NAI20-YYKTIME     PIC 9(04).
+      *H29.4               ºï½ü¶èÊ¬
+                           11  SPA-NAI20-DELKBN      PIC 9(01).
                    07  SPA-NAI20-COMBMAX             PIC 9(04).
       *
       *    P027(ÊÝ¸±KUMIAWASE¡Ë
