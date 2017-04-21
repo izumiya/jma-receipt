@@ -2182,11 +2182,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1               TO  FLG-UKETUKE
            END-IF
-           PERFORM VARYING     IDX     FROM    1  BY  1
-                   UNTIL       FLG-UKETUKE     =  1
+           MOVE    ZERO                TO  IDX
+           PERFORM
+                   UNTIL      (FLG-UKETUKE     =   1 )
+                       OR     (IDX             >=  10 )
                IF      UKE-UKEID           =   ZERO
                    CONTINUE
                ELSE
+                   ADD     1                   TO  IDX
                    MOVE    SPACE               TO  PARA-REC
                    INITIALIZE                      PARA-REC
                    MOVE    "UKETUKE"           TO  PARA-FILEMEI
@@ -3639,6 +3642,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  P02-P020-ULYYKTIME (IDX)(3:)
                MOVE    SPA-GMN20-TUKETIME (IDX)
                                        TO  P02-P020-ULUKETIME (IDX)(3:)
+      *H29.4
+               IF    SPA-NAI20-DELKBN(IDX)  =   1
+      *            ºï½üÊ¬
+                   MOVE    ALL "*"     TO  P02-P020-ULUKETIME(IDX)
+               END-IF
+      *
                MOVE    SPA-GMN20-TSRYKA   (IDX)
                                        TO  P02-P020-ULSRYKA   (IDX)
                MOVE    SPA-GMN20-TDRCD    (IDX)
