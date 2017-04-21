@@ -10399,6 +10399,7 @@
                                AND   ( RECE62-SKYZEROFLG   =   ZERO    )
                                AND   ( RECE62-RECESYUBETU  NOT =  8888
                                                               AND ZERO )
+                               AND   ( WRK-PARA-PRTKBN     NOT =  "9"  )
                                    MOVE    2               TO  FLG-READ
                                END-IF
                            END-IF

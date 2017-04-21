@@ -162,6 +162,8 @@
       *              NACL-小豆沢  17/04/10  上記３月２９日修正分は一旦保留とする
       *              NACL-小豆沢  17/04/12  上記３月２９日修正分を再修正
       *              NACL-小豆沢  17/04/13  請求点０点出力対応
+      *              NACL-小豆沢  17/04/13  請求点０点出力対応（システム予約コード
+      *                                     の入力が無くても作成できるよう修正）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6635,17 +6637,6 @@
                                                        8888   OR 
                                                        6666        )
       *??              OR  (   RECE62-SRYYM    NOT =   WRK-PARA-SRYYM)
-                       OR  (   RECE62-TOTALTEN (1) =   ZERO   AND
-                               RECE62-TOTALTEN (2) =   ZERO   AND
-                               RECE62-TOTALTEN (3) =   ZERO   AND
-                               RECE62-TOTALTEN (4) =   ZERO   AND
-                               RECE62-TOTALTEN (5) =   ZERO   AND
-                               RECE62-SHOKUJIRYOYOHI (1) = ZERO  AND
-                               RECE62-SHOKUJIRYOYOHI (2) = ZERO  AND
-                               RECE62-SHOKUJIRYOYOHI (3) = ZERO  AND
-                               RECE62-SHOKUJIRYOYOHI (4) = ZERO  AND
-                               RECE62-SHOKUJIRYOYOHI (5) = ZERO  AND
-                               RECE62-SKYZEROFLG   =   ZERO        )
                            MOVE    2               TO  FLG-READ
                        ELSE
       *                    主科設定のとき未設定なら更新しない
