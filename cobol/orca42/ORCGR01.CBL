@@ -179,6 +179,8 @@
       *                                     設定の修正
       *  04.08.05    NACL-藤原    16/08/24  持参薬対応
       *  04.08.06    NACL-藤原    16/10/10  個別作成の最大を２０００に変更
+      *  04.08.07    NACL-藤原    17/04/20  ＥＦファイル、連携基盤のときの
+      *                                     診療会計のチェックを変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -369,6 +371,8 @@
       *
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
+           03  WRK-MCP-SRYACCT-PATHNAME
+                                   PIC X(64).
       *
            03  WRK-SRYYM           PIC 9(06).
       *
@@ -2450,11 +2454,18 @@ grpsys     MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    WRK-ACCT-NYUGAIKBN  TO  ACCT-NYUGAIKBN
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "tbl_sryacct"   TO  MCP-TABLE
-           MOVE    "key30"         TO  MCP-PATHNAME
+           IF      SPA-R01-PRTKBN  =   "8" OR  "9"
+               MOVE    "key68"         TO  WRK-MCP-SRYACCT-PATHNAME
+           ELSE
+               MOVE    "key30"         TO  WRK-MCP-SRYACCT-PATHNAME
+           END-IF
+           MOVE    WRK-MCP-SRYACCT-PATHNAME
+                                       TO  MCP-PATHNAME
 grpsys     PERFORM 900-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_sryacct"   TO  MCP-TABLE
-               MOVE    "key30"         TO  MCP-PATHNAME
+               MOVE    WRK-MCP-SRYACCT-PATHNAME
+                                       TO  MCP-PATHNAME
                PERFORM 900-SRYACCT-READ-SEC
            ELSE
                INITIALIZE                  SRYACCT-REC
@@ -2519,13 +2530,15 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                        OR      FLG-ERR         =   1 
                        OR      KEY-NEW     NOT =   KEY-OLD
                    MOVE    "tbl_sryacct"   TO  MCP-TABLE
-                   MOVE    "key30"         TO  MCP-PATHNAME
+                   MOVE    WRK-MCP-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            END-PERFORM
       *    カーソルクロース
            MOVE    "tbl_sryacct"   TO  MCP-TABLE
-           MOVE    "key30"         TO  MCP-PATHNAME
+           MOVE    WRK-MCP-SRYACCT-PATHNAME
+                                   TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
            .
        42031-SRYACCT-CHK-EXT.
