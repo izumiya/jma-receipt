@@ -9250,6 +9250,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
                                AND   ( RECE02-SKYZEROFLG   =   ZERO    )
                                AND   ( RECE02-RECESYUBETU  NOT =  8888
                                                               AND ZERO )
+                               AND   ( WRK-PARA-PRTKBN     NOT =  "9"  )
                                    MOVE    2               TO  FLG-READ
                                END-IF
                            END-IF

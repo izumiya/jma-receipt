@@ -4902,12 +4902,6 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
                                                        8888   OR 
                                                        6666        )
       *??              OR  (   RECE02-SRYYM    NOT =   WRK-PARA-SRYYM)
-                       OR  (   RECE02-TOTALTEN (1) =   ZERO   AND
-                               RECE02-TOTALTEN (2) =   ZERO   AND
-                               RECE02-TOTALTEN (3) =   ZERO   AND
-                               RECE02-TOTALTEN (4) =   ZERO   AND
-                               RECE02-TOTALTEN (5) =   ZERO   AND
-                               RECE02-SKYZEROFLG   =   ZERO        )
                            MOVE    2               TO  FLG-READ
                        ELSE
       *                    主科設定のとき未設定なら更新しない
