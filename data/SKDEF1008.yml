@@ -1,7 +1,7 @@
 kanri_cd    : "1008"
 name        : "¥Á¥§¥Ã¥¯µ¡Ç½À©¸æ¾ðÊó"
 class_cd    : "*"
-item_max    : 40
+item_max    : 41
 item_list   :
 - item_no   : 1
   item      : "INTERACT-KIKAN"
@@ -48,7 +48,7 @@ item_list   :
   length    : 1
 - item_no   : 8
   item      : "YOBI1"
-  item_jp   : "Í½È÷£±"
+  item_jp   : "Í½È÷"
   type      : "X"
   start     : 10
   length    : 1
@@ -248,8 +248,14 @@ item_list   :
   start     : 66
   length    : 1
 - item_no   : 40
-  item      : "YOBI2"
-  item_jp   : "Í½È÷£²"
+  item      : "TEISHOHOU-FLG"
+  item_jp   : "ÄûÀµ»þ¤ÎÅ¸³«¡Ê½èÊýÎÁ¡Ë"
   type      : "X"
   start     : 67
-  length    : 437
+  length    : 1
+- item_no   : 41
+  item      : "SHOHOU30CHK"
+  item_jp   : "ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯¶èÊ¬"
+  type      : "X"
+  start     : 68
+  length    : 1
