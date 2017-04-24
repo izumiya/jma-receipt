@@ -55,6 +55,8 @@
            03  FLG-PRTKANRI            PIC 9(01).
            03  FLG-PRTDATA             PIC 9(01). 
       *
+           COPY    "ENUM-VALUE".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -71,7 +73,10 @@
       *    サブプロ用領域
       *****************************************************************
       *
-      *   日付変換サブ
+      *    一時ディレクトリ取得サブ
+           COPY    "CPORCSGETTEMP.INC".
+      *
+      *    日付変換サブ
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
       *    数字変換領域
@@ -106,6 +111,12 @@ grpsys     COPY    "COMMON-SPA".
       *    主処理
       *****************************************************************
        000-PROC-SEC                SECTION.
+      *
+      *    SPA-MWの値を取得
+           INITIALIZE                  SGETTEMP-AREA
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           MOVE     SGETTEMP-MW        TO  SPA-MW
       *
            IF      SPRT-GYOUMU-CD  NOT NUMERIC
                    MOVE  99            TO  SPRT-GYOUMU-CD
@@ -335,7 +346,13 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
            END-IF    
            MOVE    SPRT-PRTNM          TO  PRTDATA-PRTNM
            MOVE    FUNCTION LOWER-CASE (SPRT-DATA-TYPE)
-                                           TO  PRTDATA-DATA-TYPE
+                                       TO  PRTDATA-DATA-TYPE
+      *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+            AND  ( SPRT-SITEKBN        =   "2" )
+               MOVE    "pdf"           TO  PRTDATA-DATA-TYPE
+           END-IF
+      *
            MOVE    SPRT-API-ID         TO  PRTDATA-API-ID
       *
            IF    ( PRTDATA-DATA-TYPE   =   "pdf" )
