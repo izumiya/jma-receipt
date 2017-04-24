@@ -164,6 +164,7 @@
       *              NACL-小豆沢  17/04/13  請求点０点出力対応
       *              NACL-小豆沢  17/04/13  請求点０点出力対応（システム予約コード
       *                                     の入力が無くても作成できるよう修正）
+      *              NACL-小豆沢  17/04/21  不要な持参薬区分が記録されないよう対処
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2533,6 +2534,7 @@
                        PERFORM 20073-ZAI-HENSYU-SEC
                    END-IF
                END-IF
+               MOVE    RECE641-REC      TO   WRK-RECE641-REC
                PERFORM 990-RECE641-NEXT-SEC
                IF      FLG-RECE64    =   1
                    MOVE   1     TO   FLG-END
@@ -2541,6 +2543,7 @@
       *   AZU-ADD END 2015.6.9
       *
       *    入院会計編集処理（入院料）
+           MOVE    WRK-RECE641-REC    TO   RECE641-REC
            PERFORM 20077-NYUIN-HENSYU-SEC
       *
       *   AZU-ADD START 2015.6.9
@@ -5825,6 +5828,7 @@
                    MOVE    ZERO        TO  WRK-FEDT-DEKIDAKA-TEN
                 END-IF
            END-IF
+      *
       *--- AZU-ADD START 2016.08.23
       *    持参薬で使用量不明はゼロをセット
            IF    RECE641-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
