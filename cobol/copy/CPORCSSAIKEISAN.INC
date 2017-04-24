@@ -47,6 +47,10 @@
            03  LNK-ORCSSKS-IKTJISSIFLG     PIC  X(01).
       *一括再計算該当者チェックフラグ
            03  LNK-ORCSSKS-IKTCHECKFLG     PIC  X(01).
+      *処理日
+           03  LNK-ORCSSKS-SYSYMD          PIC  X(08).
+      *処理時刻
+           03  LNK-ORCSSKS-SYSHMS          PIC  X(06).
       *
       *返却値
       *

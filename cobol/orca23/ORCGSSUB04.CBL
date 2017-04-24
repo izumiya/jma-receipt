@@ -16,154 +16,155 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION                  DIVISION.
-       PROGRAM-ID.                     ORCGSID1.
+       PROGRAM-ID.                     ORCGSSUB04.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
-      *  サブシステム名    : 収納登録
-      *  コンポーネント名  : 確認画面１（ＳＩＤ１）
+      *  サブシステム名    : 収納
+      *  コンポーネント名  : 収納サブ（照会HAORI終了）
       *  管理者            : 
-      *  03/02/18    NACL−太田   新規作成
+      *  作成日付    作業者        記述
+      *  16/10/04    NACL−太田    新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  03.05.00    NACL-太田    07/05/20  グループ診療対応
       *****************************************************************
-      *
-       ENVIRONMENT                     DIVISION.
-       CONFIGURATION                   SECTION.
-       INPUT-OUTPUT                    SECTION.
+       ENVIRONMENT                 DIVISION.
+       CONFIGURATION               SECTION.
+       INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-       DATA                            DIVISION.
-      *FILE                            SECTION.
+       DATA                        DIVISION.
+       FILE                        SECTION.
       *
       *
-       WORKING-STORAGE                 SECTION.
+       WORKING-STORAGE             SECTION.
       *
-      *    スパ領域
-           COPY    "COMMON-SPA".
+       01  WRK-AREA.
+           03  WRK-TERM                PIC X(64).
+           03  WRK-WINDOW              PIC X(64).
+           03  WRK-MOTOPG              PIC X(08).
       *
-      *    収納共通パラメタ
-           COPY    "S01COMMON-SPA".
-      *
-      *    フラグ領域
-       01  FLG-AREA.
-           03  FLG-END             PIC 9(01).
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
       *
+      *
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
       *
-      *    ＤＢ検索
+           COPY    "MCPAREA".
            COPY    "MCPDATA.INC".
-      *     
-           COPY    "CPORCMCP.INC".  
+      *
+      *    排他制御
+           COPY    "CPORCSLOCK.INC".
       *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
-        LINKAGE                     SECTION.
+       LINKAGE                     SECTION.
       *
-           COPY    MCPAREA.
-           COPY    "ORCA-SPA".
-      *
-           COPY    "LINKAREA".
-      *
-       01  SCRAREA.
-           COPY    "ORCA23SCRAREA.INC".
+       01  APIPARA-REC.
+           COPY    "CPAPIPARA.INC".
+           COPY    "COMMON-SPA".
       *
        PROCEDURE                   DIVISION    USING
-           MCPAREA
-           SPAAREA
-           LINKAREA
-           SCRAREA.
-      *
+           APIPARA-REC
+           SPA-AREA.
       *****************************************************************
       *    主　　処理
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
-           MOVE    SPA-COMMON      TO  SPA-AREA
-           MOVE    SPA-WORK        TO  SPA-S01KYOUTU
+           PERFORM 100-INIT-SEC
       *
-      * 
-           EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
-               WHEN    "LINK"          ALSO    ANY
-                   PERFORM 100-INIT-SEC
-      *    画面遷移
-               WHEN     "PUTG"           ALSO   "CLICKED"
-                   PERFORM 200-GMNSENI
-           END-EVALUATE.
+           PERFORM 200-MAIN-SEC
       *
-           MOVE    SPA-S01KYOUTU   TO  SPA-WORK
-           MOVE    SPA-AREA        TO  SPA-COMMON
+           PERFORM 300-END-SEC
       *
+           EXIT PROGRAM
            .
-           EXIT    PROGRAM
-           .
+      *
       *****************************************************************
-      *    初期　処理
+      *    初期処理
       *****************************************************************
        100-INIT-SEC                SECTION.
+      *
+           INITIALIZE              WRK-AREA
       *
            .
        100-INIT-EXT.
            EXIT.
-      *
       *****************************************************************
-      *    画面遷移処理
+      *    主処理
       *****************************************************************
-       200-GMNSENI                   SECTION.
+       200-MAIN-SEC                SECTION.
       *
-           EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
-      *        戻る
-               WHEN    "CLICKED"       ALSO    "B01"
-                   MOVE    SPACE           TO  SPA-SID1-FLG
-                   PERFORM 210-BACK
-      *     登録
-               WHEN    "CLICKED"       ALSO    "B12"
-                   MOVE    "OK"            TO  SPA-SID1-FLG
-                   PERFORM 210-BACK
-           END-EVALUATE
+           PERFORM 990-LOCK-OUT-SEC
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    APIPARA-REC     TO  MCPDATA-REC
+               MOVE    "tbl_api_para"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBDELETE-SEC
+               IF    ( MCP-RC          NOT =   ZERO )
+                   MOVE    "4003"      TO  SPA-ERRCD
+               END-IF
+           END-IF
       *
            .
-       200-GMNSENI-EXT.
+       200-MAIN-EXT.
            EXIT.
       *****************************************************************
-      *    戻る　処理
+      *    終了処理
       *****************************************************************
-       210-BACK                    SECTION.
-      * 
-           MOVE    SPA-MOTOPG          TO  SPA-SAKIPG
-           MOVE    "SID1"              TO  SPA-MOTOPG
+       300-END-SEC                     SECTION.
       *
-           MOVE    "JOIN"              TO  MCP-PUTTYPE
-           MOVE    SPA-SAKIPG          TO  MCP-WINDOW
-      *
-           PERFORM 900-PUT-WINDOW
-      *
-           MOVE    1                   TO  FLG-END
       *
            .
-       210-BACK-EXT.
+       300-END-EXT.
            EXIT.
-      *
       *****************************************************************
-      *    ＰＵＴ　処理
+      *    ＤＢＤＥＬＥＴＥ処理
       *****************************************************************
-       900-PUT-WINDOW              SECTION.
+       910-DBDELETE-SEC                 SECTION.
       *
-           MOVE   "PUTWINDOW"       TO  MCP-FUNC.
+           MOVE    "DBDELETE"       TO  MCP-FUNC
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
       *
            .
-       900-PUT-WINDOW-EXT.
-           EXIT.
       *
+       910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    排他制御解除処理
+      *****************************************************************
+       990-LOCK-OUT-SEC         SECTION.
+      *
+           MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
+           MOVE    MCP-WINDOW          TO  WRK-WINDOW
+           MOVE    MCP-TERM            TO  WRK-TERM
+           MOVE    APIPARA-TERMID      TO  MCP-TERM
+      *
+           MOVE    "S02"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
+      *
+      *    排他制御解除処理
+           MOVE    2                   TO  SLOCK-MODE
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+      *
+           MOVE    WRK-MOTOPG          TO  SPA-MOTOPG
+           MOVE    WRK-WINDOW          TO  MCP-WINDOW
+           MOVE    WRK-TERM            TO  MCP-TERM
+      *
+           .
+       990-LOCK-OUT-EXT.
+           EXIT.

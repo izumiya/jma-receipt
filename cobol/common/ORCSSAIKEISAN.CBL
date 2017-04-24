@@ -3407,7 +3407,12 @@
       *入返金額
            MOVE    ZERO                 TO  SMEI-NYUHEN-MONEY
       *入返金日
-           MOVE    SPA-SYSYMD           TO  SMEI-NYUHEN-YMD
+           IF    ( LNK-ORCSSKS-SYSYMD   IS  NUMERIC )
+               MOVE    LNK-ORCSSKS-SYSYMD
+                                        TO  SMEI-NYUHEN-YMD
+           ELSE
+               MOVE    SPA-SYSYMD       TO  SMEI-NYUHEN-YMD
+           END-IF
       *入金方法
            MOVE    "00"                 TO  SMEI-NYUKIN-HOHO
       *状態区分
@@ -3426,6 +3431,12 @@
            MOVE    SMEI-CREYMD         TO  SDAILYKEY-CREYMD
            MOVE    SMEI-CREHMS         TO  SDAILYKEY-CREHMS
            MOVE    SMEI-NYUHEN-YMD     TO  SDAILYKEY-BASEYMD
+           IF    ( LNK-ORCSSKS-SYSHMS  IS  NUMERIC )
+               MOVE    SMEI-NYUHEN-YMD TO  SDAILYKEY-CREYMD
+               MOVE    LNK-ORCSSKS-SYSHMS
+                                       TO  SDAILYKEY-CREHMS
+               MOVE    "FORCE"         TO  SDAILYKEY-BASEYMD
+           END-IF
            PERFORM 800-DAILYKEY-SEC
            MOVE    SDAILYKEY-DAILYKEY  TO  SMEI-DAILYKEY
       *

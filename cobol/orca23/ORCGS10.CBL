@@ -147,20 +147,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "S02.INC".
-           COPY    "S03.INC".
-           COPY    "S04.INC".
-           COPY    "S06.INC".
-           COPY    "S07.INC".
-           COPY    "S08.INC".
-           COPY    "S09.INC".
-           COPY    "S10.INC".
-           COPY    "S99.INC".
-           COPY    "SERR.INC".
-           COPY    "SID1.INC".
-           COPY    "SID2.INC".
-           COPY    "SID3.INC".
-           COPY    "SID4.INC".
+           COPY    "ORCA23SCRAREA.INC".
       *
        PROCEDURE                   DIVISION    USING
                                                MCPAREA
@@ -424,16 +411,16 @@
                MOVE     3      TO  SPA-GMN-TSECMONEY(IDXL)
              END-IF
            END-IF
-           IF    SYU-SECMONEY  =  7
+           IF    SYU-ACCT-UPDKBN  NOT =  SPACE
              IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1 AND 2 AND 3
-               MOVE    "該当者チェック抽出分"
+               MOVE    "収納更新未処理"
                                TO  SPA-GMN-TKBNMEI(IDXL)
                MOVE     4      TO  SPA-GMN-TSECMONEY(IDXL)
              END-IF
            END-IF
-           IF    SYU-ACCT-UPDKBN  NOT =  SPACE
+           IF    SYU-SECMONEY  =  7
              IF  SPA-GMN-TSECMONEY(IDXL)  NOT =  1 AND 2 AND 3 AND 4
-               MOVE    "収納更新未処理"
+               MOVE    "該当者チェック抽出分"
                                TO  SPA-GMN-TKBNMEI(IDXL)
                MOVE     5      TO  SPA-GMN-TSECMONEY(IDXL)
              END-IF

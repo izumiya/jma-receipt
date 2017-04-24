@@ -518,6 +518,7 @@ RECORD_files = \
     findv3.rec \
     findinfv3.rec \
 	medicalmodv36.rec \
+	incomev3.rec \
 
 DEF_files = \
 
@@ -877,6 +878,12 @@ DB_files = \
     xml_findinfv3res.db  \
 	xml_medicalv3req6.db \
 	xml_medicalv3res6.db \
+	xml_incomev3req.db \
+	xml_incomev3req01.db \
+	xml_incomev3req02.db \
+	xml_incomev3res01.db \
+	xml_incomev3res02.db \
+	xml_incomev3res03.db \
 
 
 shell.db: shell.db.in

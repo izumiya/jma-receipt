@@ -16,14 +16,14 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION      DIVISION.
-       PROGRAM-ID.         ORCGQAPI01S99.
+       PROGRAM-ID.         ORCGSAPI01S99.
       *****************************************************************
       *  システム名        : 日医標準レセプトソフト
       *  サブシステム名    : API連携用モジュール（削除）
-      *  コンポーネント名  : 患者照会
+      *  コンポーネント名  : 収納
       *  管理者            :
       *  作成日付    作業者        記述
-      *  16/10/31    NACL−太田　新規作成
+      *  17/03/20    NACL−太田　新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
@@ -40,11 +40,8 @@
       *
        WORKING-STORAGE             SECTION.
       *
-           COPY    "Q01SCR-SPA".
-      *
        01  FLG-AREA.
            03  FLG-APIPARA             PIC 9(01).
-           03  FLG-PTSRH               PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -80,6 +77,9 @@
                05  WRK-TIME-MM         PIC 9(02).
                05  WRK-TIME-FL2        PIC X(01).
                05  WRK-TIME-SS         PIC 9(02).
+           03  WRK-DELYMDHMS.
+               05  WRK-DELYMDHMS-YMD               PIC X(08).
+               05  WRK-DELYMDHMS-HMS               PIC X(06).
       *
        01  RES-AREA.
            03  RES-ORCA-UID            PIC X(36).
@@ -90,8 +90,9 @@
       *    サブプロ用　領域
       *****************************************************************
       *
-      *    API XML書き込み用定義体
-           COPY    "CPFINDV3RES.INC".
+      *    API XML用定義体
+           COPY    "CPAPIV3REQ.INC".
+           COPY    "CPINCOMEV3RES01.INC".
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
@@ -110,7 +111,7 @@
       *    ＡＰＩパラメタ
        01  APIPARA-REC.
            COPY    "CPAPIPARA.INC".
-           COPY    "CPPARA013.INC".
+           COPY    "CPPARA023.INC".
       *
       *    照会情報
        01  PTSRH-REC.
@@ -125,14 +126,14 @@
        LINKAGE                 SECTION.
       *
        01  SCRAREA.
-           COPY    "ORCA13SCRAREA.INC".
+           COPY    "ORCA23SCRAREA.INC".
       *
-           COPY    "CPFINDV3REQ.INC".
+           COPY    "CPINCOMEV3REQ.INC".
            COPY    "COMMON-SPA".
       *
        PROCEDURE                   DIVISION    USING
                                                SCRAREA
-                                               XML-FINDV3REQ
+                                               INCOMEREQ-AREA
                                                SPA-AREA.
       *
       *****************************************************************
@@ -167,12 +168,19 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                  XML-FINDV3RES
+           INITIALIZE                  INCOMERES01-AREA
       *
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
+           MOVE    SMCNDATE-YMD        TO  WRK-YMD
+           COMPUTE WRK-ZOGEN   =   -1
+           MOVE    "1"                 TO  WRK-ZOGENPTN
+           PERFORM 800-CALENDAR-SEC
+           MOVE    WRK-KEISANYMD       TO  WRK-DELYMDHMS-YMD
+           MOVE    SMCNDATE-HMS        TO  WRK-DELYMDHMS-HMS
+           PERFORM 900-APIPARA-DEL5-SEC
       *
            .
        100-INIT-EXT.
@@ -206,7 +214,7 @@
       *****************************************************************
        2001-STATE-CHK-SEC              SECTION.
       *
-           IF    ( FINDREQ-KARTE-UID   =   SPACE )
+           IF    ( INCOMEREQ-KARTE-UID   =   SPACE )
                MOVE    "0208"              TO  SPA-ERRCD
            END-IF
       *
@@ -217,13 +225,13 @@
            PERFORM UNTIL ( FLG-APIPARA NOT =   ZERO )
                     OR   ( SPA-ERRCD   NOT =   SPACE )
       *
-               MOVE    APIPARA-DATA-REC    TO  PARA013-REC
-               IF    ( APIPARA-KARTE-UID   =   FINDREQ-KARTE-UID )
-                OR   ( APIPARA-TERMID      =   FINDREQ-ORCA-UID )
+               MOVE    APIPARA-DATA-REC    TO  PARA023-REC
+               IF    ( APIPARA-KARTE-UID   =   INCOMEREQ-KARTE-UID )
+                OR   ( APIPARA-TERMID      =   INCOMEREQ-ORCA-UID )
       *
                    MOVE    APIPARA-KARTE-UID   TO  RES-KARTE-UID
                    MOVE    APIPARA-TERMID      TO  RES-ORCA-UID
-                   MOVE    PARA013-STATE       TO  RES-STATE
+                   MOVE    PARA023-STATE       TO  RES-STATE
       *
                    PERFORM 20011-TERMINATE-SEC
       *
@@ -237,9 +245,9 @@
            MOVE    "key6"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF    ( SPA-ERRCD          =   SPACE )
-               IF    ( CNT-APIPARA         =   ZERO )
-                   MOVE    "0207"          TO  SPA-ERRCD
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( CNT-APIPARA     =   ZERO )
+                   MOVE    "0207"      TO  SPA-ERRCD
                END-IF
            END-IF
       *
@@ -253,7 +261,7 @@
       *
            COMPUTE CNT-APIPARA =   CNT-APIPARA +   1
       *
-           CALL    "ORCGQSUB04"    USING
+           CALL    "ORCGSSUB04"    USING
                                    APIPARA-REC
                                    SPA-AREA
       *
@@ -414,9 +422,8 @@
       *
            MOVE    SPA-MOTOPG      TO  WRK-MOTOPG
            MOVE    "API"           TO  SPA-MOTOPG
-           CALL    "ORCGQERRMSG"   USING
+           CALL    "ORCGSERRMSG"   USING
                                    SPA-AREA
-                                   SPA-Q01FREE
            MOVE    WRK-MOTOPG      TO  SPA-MOTOPG
       *
            .
@@ -428,74 +435,65 @@
       *****************************************************************
        900-XML-WRITE-SEC             SECTION.
       *
-           MOVE    FINDREQ-REQNUM  TO  FINDRES-REQNUM
+           MOVE    INCOMEREQ-REQNUM  TO  INCOMERES01-REQNUM
       *
            IF    ( SPA-ERRCD       =   ZERO )
-               MOVE    "01"            TO  FINDRES-RESNUM
-               MOVE    RES-KARTE-UID   TO  FINDRES-KARTE-UID
-               MOVE    RES-ORCA-UID    TO  FINDRES-ORCA-UID
+               MOVE    "01"            TO  INCOMERES01-RESNUM
+               MOVE    RES-KARTE-UID   TO  INCOMERES01-KARTE-UID
+               MOVE    RES-ORCA-UID    TO  INCOMERES01-ORCA-UID
            ELSE
                IF    ( RES-STATE   NOT =   SPACE )
-                   MOVE    "01"        TO  FINDRES-RESNUM
+                   MOVE    "01"        TO  INCOMERES01-RESNUM
                END-IF
-               MOVE    FINDREQ-KARTE-UID
-                                       TO  FINDRES-KARTE-UID
-               MOVE    FINDREQ-ORCA-UID
-                                       TO  FINDRES-ORCA-UID
+               MOVE    INCOMEREQ-KARTE-UID
+                                       TO  INCOMERES01-KARTE-UID
+               MOVE    INCOMEREQ-ORCA-UID
+                                       TO  INCOMERES01-ORCA-UID
            END-IF
       *
            MOVE    SMCNDATE-YMD    TO  WRK-SYMD
            PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE        TO  FINDRES-INFORMATION-DATE
+           MOVE    WRK-DATE        TO  INCOMERES01-INFORMATION-DATE
       *
            MOVE    SMCNDATE-HMS    TO  WRK-HMS
            PERFORM 800-TIME-SEC
-           MOVE    WRK-TIME        TO  FINDRES-INFORMATION-TIME
+           MOVE    WRK-TIME        TO  INCOMERES01-INFORMATION-TIME
       *
            PERFORM 890-ERRCD-MSG-SEC
            IF    ( SPA-ERRCD       =   ZERO )
-               MOVE    ZERO        TO  FINDRES-API-RESULT
+               MOVE    ZERO        TO  INCOMERES01-API-RESULT
            ELSE
-               MOVE    "E"         TO  FINDRES-API-RESULT
-               MOVE    SPA-ERRCD   TO  FINDRES-API-RESULT(2:)
+               MOVE    "E"         TO  INCOMERES01-API-RESULT
+               MOVE    SPA-ERRCD   TO  INCOMERES01-API-RESULT(2:)
            END-IF
-           MOVE    SPA-Q01-ERRMSG  TO  FINDRES-API-RESULT-MSG
+           MOVE    SPA-ERRMSG      TO  INCOMERES01-API-RESULT-MSG
+           MOVE    INCOMERES01-AREA  TO  APIREQ-AREA
+           MOVE    1               TO  APIREQ-MODE
       *
-           MOVE    "xml_findv3res" TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    1               TO  FINDRES-MODE
-           MOVE    "XMLOPEN"       TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       XML-FINDV3RES
-           IF    ( MCP-RC          =   ZERO  OR  1  )
-               CONTINUE
+           MOVE    "xml_incomev3res01"   TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-XMLOPEN-SEC
+           IF    ( MCP-RC              =   ZERO  OR  1  )
+               MOVE    "xml_incomev3res01"   TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "incomev3res"       TO  APIREQ-RECORDNAME
+               PERFORM 910-XMLWRITE-SEC
+               IF    ( MCP-RC              =   ZERO  OR  1  )
+                   CONTINUE
+               ELSE
+                   DISPLAY "XMLWRITE failure = " MCP-RC
+               END-IF
            ELSE
                DISPLAY "XMLOPEN failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_findv3res" TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    "findv3res"     TO  FINDRES-RECORDNAME
-           MOVE    "XMLWRITE"      TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       XML-FINDV3RES
-           IF     (MCP-RC          =   ZERO  OR  1  )
-               CONTINUE
-           ELSE
-               DISPLAY "XMLWRITE failure = " MCP-RC
-           END-IF
-      *
-           MOVE    "xml_findv3res" TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    "XMLCLOSE"      TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       XML-FINDV3RES
+           MOVE    "xml_incomev3res01" TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-XMLCLOSE-SEC
            IF     (MCP-RC              =   ZERO  OR  1  )
-               MOVE    FINDRES-OBJECT      TO  QAPI01-BODY
-               MOVE    "application/xml"   TO  QAPI01-CONTENT-TYPE
+               MOVE    APIREQ-OBJECT   TO  SAPI01-BODY
+               MOVE    "application/xml"
+                                       TO  SAPI01-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
                DISPLAY "appoint xml write failure "
@@ -513,7 +511,7 @@
       *
            INITIALIZE                      APIPARA-REC
            MOVE    SPA-HOSPNUM         TO  APIPARA-HOSPNUM
-           MOVE    "api013"            TO  APIPARA-GYOUMUID
+           MOVE    "api023"            TO  APIPARA-GYOUMUID
            MOVE    1                   TO  APIPARA-EDANUM
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "tbl_api_para"      TO  MCP-TABLE
@@ -548,6 +546,23 @@
       *
            .
        900-APIPARA-KEY6-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩパラメタ削除処理
+      *****************************************************************
+       900-APIPARA-DEL5-SEC              SECTION.
+      *
+           INITIALIZE                  APIPARA-REC
+           MOVE    SPA-HOSPNUM     TO  APIPARA-HOSPNUM
+           MOVE    "api023"        TO  APIPARA-GYOUMUID
+           MOVE    WRK-DELYMDHMS   TO  APIPARA-DATA-REC
+           MOVE    APIPARA-REC     TO  MCPDATA-REC
+           MOVE    "tbl_api_para"  TO  MCP-TABLE
+           MOVE    "del5"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-APIPARA-DEL5-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
@@ -643,45 +658,41 @@
        910-DBDELETE-EXT.
            EXIT.
       *****************************************************************
-      *    ＸＭＬオープン処理
+      *    XMLOPEN処理
       *****************************************************************
-       910-RES-XMLOPEN-SEC                 SECTION.
+       910-XMLOPEN-SEC                 SECTION.
       *
            MOVE    "XMLOPEN"       TO  MCP-FUNC
            CALL    "MONFUNC"           USING
                                        MCPAREA
-                                       XML-FINDV3RES
+                                       APIREQ-AREA
       *
            .
-      *
-       910-RES-XMLOPEN-EXT.
+       910-XMLOPEN-EXT.
            EXIT.
       *****************************************************************
-      *    ＸＭＬ書込処理
+      *    XMLWRITE処理
       *****************************************************************
-       910-RES-XMLWRITE-SEC                SECTION.
+       910-XMLWRITE-SEC                 SECTION.
       *
-           MOVE    "XMLWRITE"      TO  MCP-FUNC
+           MOVE    "XMLWRITE"       TO  MCP-FUNC
            CALL    "MONFUNC"           USING
                                        MCPAREA
-                                       XML-FINDV3RES
+                                       APIREQ-AREA
       *
            .
-      *
-       910-RES-XMLWRITE-EXT.
+       910-XMLWRITE-EXT.
            EXIT.
       *****************************************************************
-      *    ＸＭＬクローズ処理
+      *    XMLCLOSE処理
       *****************************************************************
-       910-RES-XMLCLOSE-SEC            SECTION.
+       910-XMLCLOSE-SEC                SECTION.
       *
            MOVE    "XMLCLOSE"      TO  MCP-FUNC
            CALL    "MONFUNC"           USING
                                        MCPAREA
-                                       XML-FINDV3RES
+                                       APIREQ-AREA
       *
            .
-      *
-       910-RES-XMLCLOSE-EXT.
+       910-XMLCLOSE-EXT.
            EXIT.
-      *
