@@ -153,7 +153,7 @@
       *    収納更新
            PERFORM    VARYING  IDX   FROM  1  BY  1
              UNTIL    (IDX        >   LNK-SCNYUKINS-MAX )   OR
-                      (IDX        >   400)                     OR
+                      (IDX        >   500)                     OR
                       (LNK-SCNYUKINS-RC   NOT =    ZERO)
                        PERFORM   300-SYUNOU-UPD-SEC
                        PERFORM   310-SYUMEI-INS-SEC
@@ -193,15 +193,28 @@
                        ADD     1              TO  SYU-NYUKIN-KAISU
                    END-IF
                    IF      SYU-DENPJTIKBN   NOT =   "3"
-                     IF      SYU-SKYMONEY        >   SYU-NYUKIN-TOTAL
+                     EVALUATE      TRUE
+                     WHEN  ( SYU-SKYMONEY    =   ZERO )
+                         MOVE    SPACE       TO  SYU-DENPJTIKBN
+                     WHEN  ( SYU-SKYMONEY    >   SYU-NYUKIN-TOTAL )
                          MOVE   "2"          TO  SYU-DENPJTIKBN
-                     ELSE
+                     WHEN  OTHER
                          MOVE   "1"          TO  SYU-DENPJTIKBN
-                     END-IF
+                     END-EVALUATE
                   END-IF
       *
                    MOVE    SMCNDATE-YMD    TO  SYU-UPYMD
                    MOVE    SMCNDATE-HMS    TO  SYU-UPHMS
+                   MOVE    SPA-OPID        TO  SYU-OPID
+      *
+                   MOVE    SYU-SKYMONEY
+                                   TO  LNK-SCNYUKINS-SKYMONEY (IDX)
+                   MOVE    SYU-NYUKIN-TOTAL
+                                   TO  LNK-SCNYUKINS-NYUKIN-TOTAL (IDX)
+                   MOVE    SYU-DENPJTIKBN
+                                   TO  LNK-SCNYUKINS-DENPJTIKBN (IDX)
+                   MOVE    SYU-CREATEKBN
+                                   TO  LNK-SCNYUKINS-CREATEKBN (IDX)
       *
       *           収納更新
                   MOVE    SYUNOU-REC          TO  MCPDATA-REC
@@ -295,7 +308,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *請求金額
            MOVE    ZERO                TO  SMEI-SKYMONEY
       *入返金区分
-           IF  LNK-SCNYUKINS-NYUKIN-MONEY(IDX)  >  ZERO
+           IF  LNK-SCNYUKINS-NYUKIN-MONEY(IDX)  >=  ZERO
                MOVE    "1"             TO  SMEI-NYUHEN-KBN
            ELSE
                MOVE    "2"             TO  SMEI-NYUHEN-KBN
@@ -304,15 +317,26 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    LNK-SCNYUKINS-NYUKIN-MONEY(IDX)
                                        TO  SMEI-NYUHEN-MONEY
       *入返金日
-           MOVE    LNK-SCNYUKINS-NYUKIN-YMD
+           IF    ( LNK-SCNYUKINS-NYUKIN-YMD2 (IDX)
+                                       NOT =   SPACE )
+               MOVE    LNK-SCNYUKINS-NYUKIN-YMD2 (IDX)
                                        TO  SMEI-NYUHEN-YMD
+           ELSE
+               MOVE    LNK-SCNYUKINS-NYUKIN-YMD
+                                       TO  SMEI-NYUHEN-YMD
+           END-IF
       *入金方法
            IF  LNK-SCNYUKINS-NYUKIN-MONEY(IDX)  >  ZERO
-               MOVE    LNK-SCNYUKINS-NYUKIN-HOHO
+               IF    ( LNK-SCNYUKINS-NYUKIN-HOHO2 (IDX)
+                                       NOT =   SPACE )
+                   MOVE    LNK-SCNYUKINS-NYUKIN-HOHO2 (IDX)
                                        TO  SMEI-NYUKIN-HOHO
+               ELSE
+                   MOVE    LNK-SCNYUKINS-NYUKIN-HOHO
+                                       TO  SMEI-NYUKIN-HOHO
+               END-IF
            ELSE
                MOVE    "00"            TO  SMEI-NYUKIN-HOHO
-               MOVE    SPACE           TO  SMEI-NYUHEN-KBN
            END-IF
       *状態区分
            IF  LNK-SCNYUKINS-NYUKIN-MONEY(IDX)  >  ZERO
@@ -329,8 +353,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMEI-CREYMD         TO  SDAILYKEY-CREYMD
            MOVE    SMEI-CREHMS         TO  SDAILYKEY-CREHMS
            MOVE    SMEI-NYUHEN-YMD     TO  SDAILYKEY-BASEYMD
+      *
+           IF    ( LNK-SCNYUKINS-NYUKIN-HMS2 (IDX)
+                                       NOT =   SPACE )
+               MOVE    SMEI-NYUHEN-YMD TO  SDAILYKEY-CREYMD
+               MOVE    LNK-SCNYUKINS-NYUKIN-HMS2 (IDX)
+                                       TO  SDAILYKEY-CREHMS
+               MOVE    "FORCE"         TO  SDAILYKEY-BASEYMD
+           END-IF
+      *
            PERFORM 800-DAILYKEY-SEC
            MOVE    SDAILYKEY-DAILYKEY  TO  SMEI-DAILYKEY
+      *
+           MOVE    SPA-OPID            TO  SMEI-OPID
       *
            MOVE    SYUMEI-REC          TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC

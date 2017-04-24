@@ -531,6 +531,7 @@ RECORD_files = \
     imagegetv2.rec \
 	medicalmodv36.rec \
 	diseasev2.rec \
+	incomev3.rec \
 
 DEF_files = \
 
@@ -968,7 +969,12 @@ DB_files = \
 	xml_medicalv3res6.db \
 	xml_diseasev2req.db \
 	xml_diseasev2res.db \
-
+	xml_incomev3req.db \
+	xml_incomev3req01.db \
+	xml_incomev3req02.db \
+	xml_incomev3res01.db \
+	xml_incomev3res02.db \
+	xml_incomev3res03.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

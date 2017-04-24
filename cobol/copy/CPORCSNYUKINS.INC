@@ -36,13 +36,26 @@
       *    入金額設定情報
            03  LNK-SCNYUKINS-AREA.
                05  LNK-SCNYUKINS-MAX         PIC 9(05).
-               05  LNK-SCNYUKINS-TBL    OCCURS 400.
+               05  LNK-SCNYUKINS-TBL    OCCURS 500.
       *            入外区分
                    07  LNK-SCNYUKINS-NYUGAIKBN     PIC X(01).
       *            伝票番号
                    07  LNK-SCNYUKINS-DENPNUM       PIC 9(07).
+      *            入金日２
+                   07  LNK-SCNYUKINS-NYUKIN-YMD2   PIC X(08).
+      *            入金時刻
+                   07  LNK-SCNYUKINS-NYUKIN-HMS2   PIC X(06).
+      *            入金方法
+                   07  LNK-SCNYUKINS-NYUKIN-HOHO2  PIC X(02).
       *            入金額
                    07  LNK-SCNYUKINS-NYUKIN-MONEY  PIC S9(08).
+      *
+      *            以下返却情報
+                   07  LNK-SCNYUKINS-SKYMONEY      PIC S9(08).
+                   07  LNK-SCNYUKINS-NYUKIN-TOTAL  PIC S9(08).
+                   07  LNK-SCNYUKINS-DENPJTIKBN    PIC X(01).
+                   07  LNK-SCNYUKINS-CREATEKBN     PIC X(01).
+      *
       *復帰コード
       *00:正常
       *10:パラメータ不正

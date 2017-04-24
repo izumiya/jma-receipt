@@ -18,6 +18,7 @@ bind	"SID1"		"OpenCOBOL"	"ORCGSID1";
 bind	"SID2"		"OpenCOBOL"	"ORCGSID2";
 bind	"SID3"		"OpenCOBOL"	"ORCGSID3";
 bind	"SID4"		"OpenCOBOL"	"ORCGSID4";
+bindapi "incomev3"    "OpenCOBOL"	"ORCGSAPI01"; 
 
 multiplex_group	orca23;
 
@@ -40,11 +41,18 @@ data	{
                 SID2;
                 SID3;
                 SID4;
+                incomev3;
 	};
 };
 db "xml2" {
  fm_statement;
  fm_invoice_receipt;
+ xml_incomev3req;
+ xml_incomev3req01;
+ xml_incomev3res01;
+ xml_incomev3req02;
+ xml_incomev3res02;
+ xml_incomev3res03;
 };
 
 #include "orcadb.inc"
