@@ -188,6 +188,9 @@
            03  CONST-BTPARA-JOBID      PIC 9(07)   VALUE   2.
            03  CONST-BTPARA-DSP-RENNUM PIC 9(03)   VALUE   2.
       *
+      *    点数マスタ退避ワーク
+           COPY    "CPTTNS.INC".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -244,6 +247,9 @@
       *    指定診療行為件数調サブ２
            COPY    "CPORCSS009.INC".
       *
+      *    会計カード編集サブ
+           COPY    "CPORCHCM34.INC".
+      *
       *    一時ファイル名編集
            COPY    "CPORCSGETTEMP.INC".
       *
@@ -293,6 +299,7 @@
            INITIALIZE                  CNT-AREA
            INITIALIZE                  SPA-AREA
            INITIALIZE                  RECEERR
+           INITIALIZE                  TTNS-AREA
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -318,6 +325,9 @@
            END-UNSTRING
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+           MOVE    LNK-PRTKANRI-SKYYMD
+                                       TO  SPA-SYSYMD
+           MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
       *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
@@ -542,11 +552,6 @@
       *****************************************************************
        260-TOKEI-OUT-SEC           SECTION.
       *
-      *    個別指示
-           IF      WRK-PARA-KBTKBN     =   "1"
-               PERFORM 900-BTPARA-DELETE-SEC
-           END-IF
-      *
            MOVE    ZERO            TO  CNT-PAGE
            MOVE    ZERO            TO  CNT-LINE
            MOVE    ZERO            TO  CNT-TOKEI
@@ -622,7 +627,7 @@
                COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
       *        個別指示
                IF      WRK-PARA-KBTKBN     =   "1"
-                   PERFORM 900-BTPARA-INSERT-SEC
+                   PERFORM 800-ORCHCM34-SEC
                END-IF
                IF      CNT-LINE    NOT =   4
                    COMPUTE CNT-LINE    =   CNT-LINE    +   1
@@ -657,7 +662,8 @@
                                        TO  SPRT-TBL-KEY
            MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  SPRT-TBL-GROUP
-           MOVE    SPACE               TO  SPRT-SRYYM
+           MOVE    WRK-PARA-SRYYM
+                                       TO  SPRT-SRYYM
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPRT-SKYYMD
            MOVE    LNK-PRTKANRI-SHELLID
                                        TO  SPRT-SHELLID
@@ -682,6 +688,68 @@
            END-IF
            .
        390-PRINT-MEISAI-OUT-EXT.
+           EXIT.
+      *****************************************************************
+      *    会計カード作成処理
+      *****************************************************************
+       800-ORCHCM34-SEC            SECTION.
+      *
+           MOVE    TOKEI-PTID  TO  SPA-PTID
+      *
+           INITIALIZE              ORCHCM34AREA
+           MOVE    "2"         TO  ORCHCM34-KBN
+           MOVE    WRK-PARA-SRYYM
+                                   TO  ORCHCM34-SRYYM
+           MOVE    TOKEI-NYUGAIKBN
+                                   TO  ORCHCM34-NYUGAIKBN
+           MOVE    WRK-PARA-SRYYM  TO  ORCHCM34-STSRYYMD
+           MOVE    "01"            TO  ORCHCM34-STSRYYMD(7:2)
+           MOVE    WRK-PARA-SRYYM  TO  ORCHCM34-EDSRYYMD
+           MOVE    "31"            TO  ORCHCM34-EDSRYYMD(7:2)
+           MOVE    "1"         TO  ORCHCM34-PRTCTRLKBN
+           MOVE    1               TO  ORCHCM34-STDAY
+           MOVE    31              TO  ORCHCM34-EDDAY
+      *
+           INITIALIZE              ORCSPRTAREA
+           MOVE    "INS"       TO  SPRT-MODE
+           MOVE    LNK-PRTKANRI-RENNUM
+                               TO  SPRT-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                               TO  SPRT-TBL-KEY
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                               TO  SPRT-TBL-GROUP
+           MOVE    WRK-PARA-SRYYM
+                               TO  SPRT-SRYYM
+           MOVE    LNK-PRTKANRI-SKYYMD
+                               TO  SPRT-SKYYMD
+           MOVE    LNK-PRTKANRI-SHELLID
+                               TO  SPRT-SHELLID
+           COMPUTE SPRT-SHORI-RENNUM
+               =   LNK-PRTKANRI-SHORI-RENNUM   +   1
+           MOVE    LNK-PRTKANRI-PRIORITY
+                               TO  SPRT-PRIORITY
+           MOVE    "会計カード"
+                               TO  SPRT-TITLE
+           MOVE    LNK-PRTKANRI-TERMID
+                               TO  SPRT-TERMID
+           MOVE    LNK-PRTKANRI-OPID
+                               TO  SPRT-OPID
+           MOVE    LNK-PRTKANRI-PRTNM
+                               TO  SPRT-PRTNM
+           MOVE    "1"         TO  SPRT-SITEKBN
+      *
+           MOVE    ORCSPRTAREA TO  ORCHCM34-PRTAREA
+      *
+           CALL    "ORCHCM34"      USING
+                                       SPA-AREA
+                                       ORCHCM34AREA
+                                       TTNS-AREA
+                                       TTNS-CONST-MAX
+           COMPUTE CNT-PAGE
+               =   CNT-PAGE    +   ORCHCM34-PAGE
+      *
+           .
+       800-ORCHCM34-EXT.
            EXIT.
       *****************************************************************
       *    西暦日本語変換処理
@@ -947,67 +1015,6 @@
            PERFORM 900-DBCLOSECURSOR-SEC
            .
        900-SYSKANRI-READ-EXT.
-           EXIT.
-      *****************************************************************
-      *    バッチパラメタ削除処理
-      *****************************************************************
-       900-BTPARA-DELETE-SEC           SECTION.
-      *
-           INITIALIZE                      BTPARA-REC
-           MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
-           MOVE    CONST-BTPARA-SHELLID
-                                       TO  BTPARA-SHELLID
-           MOVE    CONST-BTPARA-JOBID  TO  BTPARA-JOBID
-           MOVE    CONST-BTPARA-DSP-RENNUM
-                                       TO  BTPARA-DSP-RENNUM
-           MOVE    BTPARA-REC          TO  MCPDATA-REC
-           MOVE    "tbl_btpara"        TO  MCP-TABLE
-           MOVE    "del4"              TO  MCP-PATHNAME
-           PERFORM 900-DBDELETE-SEC
-           IF    ( MCP-RC          NOT =   ZERO )
-               MOVE    1               TO  FLG-BTPARA
-           ELSE
-               MOVE    ZERO            TO  FLG-BTPARA
-           END-IF
-           .
-       900-BTPARA-DELETE-EXT.
-           EXIT.
-      *****************************************************************
-      *    バッチパラメタ追加処理
-      *****************************************************************
-       900-BTPARA-INSERT-SEC           SECTION.
-      *
-           INITIALIZE                      BTPARA-REC
-           MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
-           MOVE    CONST-BTPARA-SHELLID
-                                       TO  BTPARA-SHELLID
-           MOVE    LNK-PRTKANRI-OPID   TO  BTPARA-RUN-OPID
-           MOVE    CONST-BTPARA-DSP-RENNUM
-                                       TO  BTPARA-DSP-RENNUM
-           MOVE    CNT-TOKEI           TO  BTPARA-RENNUM
-           MOVE    CONST-BTPARA-JOBID  TO  BTPARA-JOBID
-           MOVE    SPACE               TO  BTPARA-SCRIPTID
-           MOVE    LNK-PRTKANRI-TERMID TO  BTPARA-TERMID
-           MOVE    SYS-YMD             TO  BTPARA-CREYMD
-                                           BTPARA-UPYMD
-           MOVE    SYS-TIME            TO  BTPARA-UPHMS
-      *
-           INITIALIZE                      QTOANY-AREA
-           MOVE    TOKEI-PTID          TO  QTOANY-PTID
-           MOVE    TOKEI-PTNUM         TO  QTOANY-PTNUM
-           MOVE    QTOANY-AREA         TO  BTPARA-INFO-PARA
-      *
-           MOVE    BTPARA-REC          TO  MCPDATA-REC
-           MOVE    "tbl_btpara"        TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 900-DBINSERT-SEC
-           IF    ( MCP-RC          NOT =   ZERO )
-               MOVE    1               TO  FLG-BTPARA
-           ELSE
-               MOVE    ZERO            TO  FLG-BTPARA
-           END-IF
-           .
-       900-BTPARA-INSERT-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢＳＥＬＥＣＴ処理
