@@ -666,8 +666,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            MOVE    "HCMSL80.red"       TO  SPRT-PRTID
-           MOVE    "診療区分別指定点数該当患者数調べ"
-                                       TO  SPRT-TITLE
+           MOVE    "長期投与患者一覧"  TO  SPRT-TITLE
            MOVE    HCMSL80             TO  SPRT-PRTDATA
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
