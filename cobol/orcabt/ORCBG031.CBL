@@ -382,8 +382,8 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMD          TO  WRK-PRT-PRTYMD
       *
+           ACCEPT  WRK-PRTTIME         FROM    TIME
            ACCEPT  SYS-TIME            FROM    TIME
-           MOVE    SYS-TIME            TO  WRK-PRTTIME
            MOVE    SPACE               TO  WRK-HENTIME
            MOVE    WRK-PRTTIME(1:2)    TO  WRK-HH
            MOVE    ":"                 TO  WRK-FILLER1
