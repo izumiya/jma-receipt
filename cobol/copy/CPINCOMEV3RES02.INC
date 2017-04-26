@@ -74,7 +74,7 @@
                                                    PIC X(10).
                   09  INCOMERES02-ETCJIHI-OCC      OCCURS  10.
                     11  INCOMERES02-JIHI-NO        PIC X(2).
-                    11  INCOMERES02-JIHI-NAME      PIC X(10).
+                    11  INCOMERES02-JIHI-NAME      PIC X(20).
                     11  INCOMERES02-JIHI-TAXNASI   PIC X(10).
                     11  INCOMERES02-JIHI-TAXARI    PIC X(10).
                 07  INCOMERES02-RSI-AREA.
