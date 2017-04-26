@@ -56,7 +56,7 @@ xml_incomev3res02{
         Tax_In_Oe_Etc_Ttl_Money_Taxable varchar(10);
         Oe_Etc_Detail{
           Oe_Etc_Number                varchar(02);
-          Oe_Etc_Name                  varchar(10);
+          Oe_Etc_Name                  varchar(20);
           Oe_Etc_Money_Non_Taxable     varchar(10);
           Oe_Etc_Money_Taxable         varchar(10);
         }[10];
