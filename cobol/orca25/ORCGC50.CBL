@@ -4532,8 +4532,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                     (SPA-COMMENT-MAX)
                MOVE    RECECOM-RENNUM      TO  SPA-GMN-TRENNUM
                                                     (SPA-COMMENT-MAX)
-               MOVE    RECECOM-COMMENT     TO  SPA-GMN-TCOMMENT
-                                                    (SPA-COMMENT-MAX)
+      *H29.5   コメント文字数で変換
+               PERFORM 21031-RECCOMMENT-HEN-SEC
+      **       MOVE    RECECOM-COMMENT     TO  SPA-GMN-TCOMMENT
+      **                                            (SPA-COMMENT-MAX)
                MOVE    "tbl_rececom"       TO  MCP-TABLE
                MOVE    "key6"              TO  MCP-PATHNAME
                PERFORM 920-RECECOM-READ-SEC
@@ -4559,6 +4561,32 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        2103-RECECOM-HEN-EXT.
+           EXIT.
+      *H29.5
+      *****************************************************************
+      *    コメントチェック処理
+      *****************************************************************
+       21031-RECCOMMENT-HEN-SEC                   SECTION.
+      *
+           INITIALIZE                  ORCXKANACONVAREA
+           MOVE    100                 TO  KANACONV-LEN
+           MOVE    5000                TO  KANACONV-STLEN
+           MOVE    0                   TO  KANACONV-CONV-FLAG
+           MOVE    0                   TO  KANACONV-CHAR-TYPE
+           MOVE    RECECOM-COMMENT     TO  KANACONV-INDATA
+           CALL    "kanaconv"          USING ORCXKANACONVAREA
+           IF     (KANACONV-RETURN     =   ZERO )
+               MOVE    KANACONV-OUTDATA
+                                       TO  SPA-GMN-TCOMMENT
+                                                    (SPA-COMMENT-MAX)
+           ELSE
+               MOVE    KANACONV-OUTDATA
+                                       TO  SPA-GMN-TCOMMENT
+                                                    (SPA-COMMENT-MAX)
+           END-IF
+           .
+      *
+       21031-RECCOMMENT-HEN-EXT.
            EXIT.
       *
       *****************************************************************

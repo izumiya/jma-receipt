@@ -331,8 +331,9 @@
                        MOVE    IDX             TO  SPA-C501-BUNREIMAX
                        MOVE    EXAMPLE-RENNUM  TO  SPA-C501-TRENNUM
                                                                   (IDX)
-                       MOVE    EXAMPLE-COMMENT TO  SPA-C501-TCOMMENT
-                                                                  (IDX)
+      **               MOVE    EXAMPLE-COMMENT TO  SPA-C501-TCOMMENT
+      **                                                          (IDX)
+                       PERFORM 31011-COMMENT-HEN-SEC
                    END-IF
                END-IF
       *
@@ -348,6 +349,30 @@
       *
            .
        3101-BUNREI-HEN-EXT.
+           EXIT.
+      *H29.5
+      *****************************************************************
+      *    コメントチェック処理
+      *****************************************************************
+       31011-COMMENT-HEN-SEC            SECTION.
+      *
+           INITIALIZE                  ORCXKANACONVAREA
+           MOVE    400                 TO  KANACONV-LEN
+           MOVE    5000                TO  KANACONV-STLEN
+           MOVE    0                   TO  KANACONV-CONV-FLAG
+           MOVE    0                   TO  KANACONV-CHAR-TYPE
+           MOVE    EXAMPLE-COMMENT     TO  KANACONV-INDATA
+           CALL    "kanaconv"          USING ORCXKANACONVAREA
+           IF     (KANACONV-RETURN     =   ZERO )
+               MOVE    KANACONV-OUTDATA
+                                       TO  SPA-C501-TCOMMENT(IDX)
+           ELSE
+               MOVE    KANACONV-OUTDATA
+                                       TO  SPA-C501-TCOMMENT(IDX)
+           END-IF
+           .
+      *
+       31011-COMMENT-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -804,6 +829,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-C50ID1-FLG
       *
            MOVE    SPACE               TO  C50ID1
+           INITIALIZE                      C50ID1
            MOVE    SPA-C50IDCD         TO  C50ID1-ID1CODE
            MOVE    WRK-C50IDMSG        TO  C50ID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
