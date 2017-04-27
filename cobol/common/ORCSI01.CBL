@@ -48,6 +48,7 @@
            03  FLG-TENSU                   PIC 9(01).
            03  FLG-NYUKSNCHK               PIC 9(01).
            03  FLG-NRRKSRH                 PIC 9(01).
+           03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
       *
        01  WRK-AREA.
@@ -85,6 +86,10 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    システム管理
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK5001.INC".
       *
       *    点数
            COPY    "CPTENSU.INC".
@@ -147,6 +152,15 @@
                                            SI01-JOKUSOUKBN
                                            SI01-KSN-G
                                            SI01-KSNLST-G
+      *
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "5001"              TO  SYS-KANRICD
+           MOVE    SI01-BTUNUM         TO  SYS-KBNCD
+           MOVE    SI01-SRYYMD         TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC        TO  SYS-5001-REC
       *
            .
        100-INIT-EXT.
@@ -215,6 +229,15 @@
                     OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
                        CONTINUE
                    ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
+               IF    ( CONST-KSNCD (IDX-KSN)
+                                       =   CONST-KSNCD-190134270 )
+                   IF    ( SYS-5001-YKNCHOKAKBN    =   "1" )
+                    OR   ( SYS-5001-YKNTOKUKBN     =   "1" )
+                    OR   ( SYS-5001-SYOKUINKBN     =   "1" )
                        MOVE    ZERO    TO  FLG-HIT
                    END-IF
                END-IF
@@ -502,6 +525,31 @@
       *
            .
        900-NRRKSRH-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC      =   ZERO )
+               MOVE    MCPDATA-REC TO  SYSKANRI-REC
+           ELSE
+               MOVE    1           TO  FLG-SYSKANRI
+               INITIALIZE              SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

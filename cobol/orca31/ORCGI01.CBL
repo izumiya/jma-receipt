@@ -6111,6 +6111,8 @@
            MOVE    SPA-NAI-I01-PTID    TO  SI01-PTID
            MOVE    WRK-KJNYMD          TO  SI01-SRYYMD
            MOVE    SPA-NAI-I01-NYUINYMD TO SI01-NYUINYMD
+           MOVE    SPA-GMN-I01-BTUNAME-CD
+                                       TO  SI01-BTUNUM
            MOVE    SPA-NAI-I01-BTUSBT  TO  SI01-BTUSBT
            MOVE    SPA-NAI-I01-SNTNYUINCD
                                        TO  SI01-SNTNYUINCD
