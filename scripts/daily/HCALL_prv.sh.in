@@ -10,8 +10,10 @@ fi
 . $JMARECEIPT_ENV
 
 export HOME=/home/orca
-export PATH=$SITESCRIPTSDIR/daily:$PATCHSCRIPTSDIR/daily:$SCRIPTSDIR/daily:$(dirname ${MONUPLOAD}):$PATH
-
+export PATH=$SITESCRIPTSDIR/daily:$PATCHSCRIPTSDIR/daily:$SCRIPTSDIR/daily:$PATH
+export MONBLOB
+export MONUPLOAD
+export LDDIRECTORY
 
 #----------------------------------------------------------------------#
 #       引数	

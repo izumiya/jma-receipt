@@ -212,7 +212,7 @@ class Jma_print
   end
 
   def execute_monblob(item)
-    execute("monblob -dir #{ENV['LDDIRECTORY']} -export #{item[:data]} -output #{item[:temp_pdf_file]}")
+    execute("#{ENV['MONBLOB']} -dir #{ENV['LDDIRECTORY']} -export #{item[:data]} -output #{item[:temp_pdf_file]}")
   end
 
   def execute_monpe(item)
@@ -263,7 +263,7 @@ class Jma_print
     case @print_order
     when "5"
       monupload_options = (@show_dialog ? "-s" : "-p #{printer}")
-      execute("monupload -t report -T \"#{@report_title}\" #{monupload_options} #{out_file}")
+      execute("#{ENV['MONUPLOAD']} -t report -T \"#{@report_title}\" #{monupload_options} #{out_file}")
     when "6"
       execute("lpr -P #{printer} #{out_file}")
     end
