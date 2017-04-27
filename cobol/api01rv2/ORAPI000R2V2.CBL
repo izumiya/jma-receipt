@@ -175,6 +175,8 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
       *
+           MOVE     SPACE          TO  METAPARA
+           MOVE     SPACE          TO  ZIPPARA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -750,6 +752,10 @@
       *    終了前実行処理
       *****************************************************************
        990-TERMINATE-SEC               SECTION.
+      *
+           IF    ( ZIPPARA         NOT =   SPACE )
+               CALL "CBL_DELETE_FILE"  USING ZIPPARA
+           END-IF
       *
            CALL "CBL_DELETE_DIR"   USING MCP-TEMPDIR
       *
