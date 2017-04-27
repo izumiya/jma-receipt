@@ -37,3 +37,25 @@
                         PIC X(30)   OCCURS  200 TIMES.
               03  Z08-MSGLBEL.
                 04  Z08-VALUE   PIC X(100).
+              03  Z08-MIDASHI.
+                04  Z08-MIDASHI-STYLE  PIC X(20).
+                04  Z08-MIDASHI-DATA   PIC X(80).
+              03  Z08-SCROLLEDWINDOW1.
+                04  Z08-SHONAMELIST.
+                  05  Z08-SHONAMELIST-COUNT   PIC S9(9)   BINARY.
+                  05  Z08-SHONAMELIST-ROW PIC S9(9)   BINARY.
+                  05  Z08-SHONAMELIST-SELECT
+                          PIC X       OCCURS  200 TIMES.
+                  05  Z08-FGCOLOR
+                          PIC X(256)  OCCURS  200 TIMES.
+                  05  Z08-BGCOLOR
+                          PIC X(256)  OCCURS  200 TIMES.
+                  05  Z08-ITEM        OCCURS  200 TIMES.
+                    06  Z08-RENNUM  PIC X(3).
+                    06  Z08-SNAME   PIC X(200).
+                    06  Z08-KIKAKU  PIC X(120).
+              03  Z08-SELNUM.
+                04  Z08-TEXTDATA    PIC X(3).
+              03  Z08-MNEXT.
+                04  Z08-MNEXT-STYLE   PIC X(20).
+                04  Z08-MNEXT-DATA    PIC X(30).

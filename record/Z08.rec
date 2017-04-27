@@ -53,5 +53,30 @@ Z08 {
     MSGLBEL {
       textdata varchar(100);
     };
+    MIDASHI { #GtkLabel
+      style varchar(20);
+      textdata varchar(80);
+    };
+    scrolledwindow1 { #GtkScrolledWindow
+      SHONAMELIST { #GtkPandaCList
+        count int;
+        row int;
+        selectdata bool[200];
+        fgcolor varchar(256)[200];
+        bgcolor varchar(256)[200];
+        item {
+          column1 varchar(03);
+          column2 varchar(200);
+          column3 varchar(120);
+        }[200];
+      };
+    };
+    SELNUM { #GtkPandaEntry
+      textdata varchar(3);
+    };
+    MNEXT { #GtkLabel
+      style varchar(20);
+      textdata varchar(30);
+    };
   };
 };

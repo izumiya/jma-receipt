@@ -251,4 +251,13 @@ db	{
 	tbl_access_key;
 	tbl_mstkanri_public;
 	tbl_mstkanri_master;
+	tbl_material_h;
+	tbl_material_s;
+	tbl_material_k;
+	tbl_material_h_m_master;
+	tbl_material_h_c_master;
+	tbl_material_h_k_master;
+	tbl_material_h_n_master;
+	tbl_material_s_master;
+	tbl_material_k_master;
 };

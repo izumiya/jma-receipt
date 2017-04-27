@@ -260,4 +260,7 @@
            03  SPA-Z97-FILESV-CHK-FLG      PIC 9(01).
       *
       *    他の画面
-           03  SPA-Z01SONOTA                     PIC X(59000). 
+           03  SPA-Z01SONOTA                     PIC X(200000). 
+      *
+      *    ユーザー設定
+           03  SPA-Z010FREE                      PIC X(15000). 
