@@ -26,6 +26,7 @@
            03  SI01-PTID                   PIC 9(10).
            03  SI01-SRYYMD                 PIC X(08).
            03  SI01-NYUINYMD               PIC X(08).
+           03  SI01-BTUNUM                 PIC X(02).
            03  SI01-BTUSBT                 PIC X(02).
            03  SI01-SNTNYUINCD             PIC X(09).
            03  SI01-JOKUSOUYMD             PIC X(08).
