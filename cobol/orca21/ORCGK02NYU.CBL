@@ -285,6 +285,8 @@
            03  FLG-F7                  PIC 9(01).
            03  FLG-INSEND              PIC 9(01).
       *!!!!!!!!!!!!!!!!!!
+      *H29.4
+           03  FLG-KEIFLG              PIC 9(01).
       *
       *
       *    Åº»úÎÎ°è
@@ -6119,9 +6121,18 @@
            MOVE    SPACE           TO  SPA-COM-INPUTCD(SPA-GMN-IDX)
            MOVE    SPA-COM-IN4(SPA-GMN-IDX)    TO  WRK-FLG-IN4
            MOVE    SPA-COM-KZMFLGN2(SPA-GMN-IDX)   TO  WRK-KINKIFLG
+      *H29.4   ÅêÌô·Ù¹ðÊÝÂ¸
+           IF      SPA-COM-KZMFLG (SPA-GMN-IDX) =  "1"
+               MOVE    1               TO  FLG-KEIFLG
+           ELSE
+               MOVE    ZERO            TO  FLG-KEIFLG
+           END-IF
            INITIALIZE                  SPA-COM-TBLREC (SPA-GMN-IDX)
            MOVE    WRK-FLG-IN4     TO  SPA-COM-IN4 (SPA-GMN-IDX)
            MOVE    WRK-KINKIFLG    TO  SPA-COM-KZMFLGN2 (SPA-GMN-IDX)
+           IF      FLG-KEIFLG      =   1
+               MOVE    "1"         TO  SPA-COM-KZMFLG (SPA-GMN-IDX)
+           END-IF
       *
       *    ²ó¿ô¡ÊÌ¤ÆþÎÏ»þ¡¢£±²ó¡Ë
            IF      WRK-ACCT-MCNT       =   ZERO
