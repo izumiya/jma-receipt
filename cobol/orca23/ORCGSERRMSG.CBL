@@ -202,7 +202,7 @@
                MOVE "過入金許可フラグの入力に誤りがあります。" 
                                                TO  SPA-ERRMSG
            WHEN    "0105"
-               MOVE "処理時間の入力に誤りがあります。" 
+               MOVE "処理時刻の入力に誤りがあります。" 
                                                TO  SPA-ERRMSG
            WHEN    "0106"
                MOVE    "返金額を入力してください。"
