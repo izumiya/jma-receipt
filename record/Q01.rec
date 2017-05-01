@@ -17,10 +17,10 @@ Q01 {
     };
     CMB_SELPATTERN {
       SELPATTERN {
-        textdata varchar(103);
+        textdata varchar(104);
       };
       count int;
-        item varchar(103)[50];
+        item varchar(104)[200];
     };
     STSRYYMD {
       textdata varchar(10);

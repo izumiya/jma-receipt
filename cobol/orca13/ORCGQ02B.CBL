@@ -1869,8 +1869,6 @@
       *
       *    選択番号範囲チェック
            IF      ( IDX-PTNUM         =   ZERO )
-               MOVE    4               TO  SPA-GMN-Q02-CUR
-               MOVE    "0002"          TO  SPA-ERRCD
                GO  TO  480-GYOUMU-SENI-EXT
            END-IF
       *

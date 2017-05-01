@@ -1854,7 +1854,6 @@
                            -   SPA-GMN-Q02-SKIP-KNS
       *
            IF  SPA-GMN-Q02-TPTNUM (IDX1)  =  SPACE
-               MOVE    "1002"          TO  SPA-ERRCD
                GO  TO  480-GYOUMU-SENI-EXT
            END-IF
       *
