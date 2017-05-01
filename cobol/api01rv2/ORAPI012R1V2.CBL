@@ -36,6 +36,7 @@
       * 04.08.00     NACL-多々納  16/12/22  患者個人番号追加対応
       * 04.08.00     NACL-多々納  17/04/XX  入金方法、状態等追加
       *                                     保険組合せ非表示追加
+      * 04.08.00     NACL-多々納  17/05/XX  テスト患者・死亡区分追加
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -440,6 +441,14 @@
            MOVE    PTINF-KISEI-ADRS    TO  PTRES-KISEI-ADDRESSES1
            MOVE    PTINF-KISEI-BANTI   TO  PTRES-KISEI-ADDRESSES2
            MOVE    PTINF-KISEI-TEL     TO  PTRES-KISEI-HPONE
+      *H29.5
+      *    テスト患者番号区分
+           MOVE    PTINF-TSTPTNUMKBN   TO  PTMODRES-TEST-PATIENT
+           IF      PTINF-TSTPTNUMKBN   =   SPACE
+               MOVE    "0"                 TO  PTMODRES-TEST-PATIENT
+           END-IF
+      *    死亡区分
+           MOVE    PTINF-DEATHKBN      TO  PTMODRES-DEATHKBN
       *H29.4
       *    通称名
            MOVE    PTINF-NICKNAME      TO  PTRES-NICKNAME

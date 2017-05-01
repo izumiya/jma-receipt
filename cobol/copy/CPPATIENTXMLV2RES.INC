@@ -28,6 +28,7 @@
       * 04.08.00     NACL-多々納  16/10/XX  勤務先から帰省先追加
       * 04.08.00     NACL-多々納  17/04/XX  職業から入金方法追加等
       *                                     保険組合せ３０件へ
+      * 04.08.00     NACL-多々納  17/05/XX  テスト患者・死亡区分追加
       ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
@@ -130,6 +131,11 @@
                   04  PTRES-COMMENT-1            PIC  X(200).
       *           コメント２
                   04  PTRES-COMMENT-2            PIC  X(200).
+      *H29.5
+      *           テスト患者区分
+                  04  PTMODRES-TEST-PATIENT      PIC  X(01).
+      *           死亡区分
+                  04  PTMODRES-DEATHKBN          PIC  X(01).
       *H29.4
       *           職業
                   04  PTRES-JOB                PIC X(20).
