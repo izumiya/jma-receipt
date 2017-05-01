@@ -58,6 +58,10 @@ xml_patientinfov2res {
 		Infection2			varchar(200);
 		Comment1			varchar(200);
 		Comment2			varchar(200);
+#-----> テスト患者区分
+		TestPatient_Flag		varchar(01);
+#-----> 死亡区分
+		Death_Flag			varchar(01);
 #-----> 職業
 		Occupation     			varchar(20);
 #-----> 通称名
