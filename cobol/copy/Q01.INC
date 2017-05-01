@@ -23,9 +23,9 @@
               04  Q01-B06-LABEL                PIC X(10).
               04  Q01-B07-LABEL                PIC X(10).
               04  Q01-CMB-SELPATTERN.
-                05  Q01-SELPATTERN             PIC X(103).
+                05  Q01-SELPATTERN             PIC X(104).
                 05  Q01-CMB-SELPATTERN-COUNT   PIC S9(9)   BINARY.
-                05  Q01-CMB-SELPATTERN-ITEM    PIC X(103)  OCCURS  50.
+                05  Q01-CMB-SELPATTERN-ITEM    PIC X(104)  OCCURS 200.
               04  Q01-STSRYYMD                 PIC X(10).
               04  Q01-EDSRYYMD                 PIC X(10).
               04  Q01-LBLSENISAKI              PIC X(40).

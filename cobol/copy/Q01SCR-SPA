@@ -61,7 +61,7 @@
                    07  SPA-GMN-Q01-AREA.
       *                ¸¡º÷¾ò·ï
                        09  SPA-GMN-Q01-SELPATTERN-G.
-                           11  SPA-GMN-Q01-SELPATTERN  PIC X(02).
+                           11  SPA-GMN-Q01-SELPATTERN  PIC X(03).
                            11  SPA-GMN-Q01-SELPATTERNFL
                                                        PIC X(01).
                            11  SPA-GMN-Q01-SELPATTERNMEI
@@ -601,10 +601,10 @@
                        09  SPA-GMN-Q01-SELPATTERNLST-G.
                            11  SPA-GMN-Q01-SELPATTERNLST-MAX
                                                            PIC 9(05).
-                           11  SPA-GMN-Q01-SELPATTERNLST-OCC OCCURS  50.
+                           11  SPA-GMN-Q01-SELPATTERNLST-OCC OCCURS 200.
                                13  SPA-GMN-Q01-SELPATTERNLST.
                                    15  SPA-GMN-Q01-SELPATTERNL
-                                                           PIC X(02).
+                                                           PIC X(03).
                                    15  SPA-GMN-Q01-SELPATTERNFLL
                                                            PIC X(01).
                                    15  SPA-GMN-Q01-SELPATTERNMEIL
@@ -1116,8 +1116,9 @@
                    07  SPA-GMN-Q04-CUR                 PIC 9(03).
                    07  SPA-GMN-Q04-AREA.
                        09  SPA-GMN-Q04-NAME            PIC X(100).
+                       09  SPA-GMN-Q04-LBLRENNUM       PIC X(10).
+                       09  SPA-GMN-Q04-RENNUM          PIC 9(03).
                        09  SPA-GMN-Q04-TITLEKBN        PIC X(01).
-      *
       *
       *    £Ñ£¹£¶ÍÑ
            03  SPA-Q96-AREA.
@@ -1471,7 +1472,9 @@
       *        Q01¢«¢ªQ04Á«°Ü¾ðÊó
                05  SPA-Q01-Q04-SENI-AREA.
                    07  SPA-Q01-Q04-UPDKBN              PIC  X(03).
+                   07  SPA-Q01-Q04-RENNUM-MAX          PIC  9(03).
                    07  SPA-Q01-Q04-UID                 PIC  X(36).
+                   07  SPA-Q01-Q04-RENNUM              PIC  9(03).
                    07  SPA-Q01-Q04-NAME                PIC  X(100).
                    07  SPA-Q01-Q04-TITLEKBN            PIC  X(01).
       *

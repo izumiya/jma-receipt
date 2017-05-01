@@ -30,7 +30,7 @@
       *UID
                05  SHOKANRI-UID        PIC  X(36).
       *連番
-           03  SHOKANRI-RENNUM         PIC  9(05).
+           03  SHOKANRI-RENNUM         PIC  S9(05).
       *検索条件名称
            03  SHOKANRI-NAME           PIC  X(100).
       *入外区分
@@ -47,3 +47,6 @@
            03  SHOKANRI-UPYMD          PIC  X(08).
       *更新時間
            03  SHOKANRI-UPHMS          PIC  X(06).
+      *virtual項目
+           03  SHOKANRI-RENNUM-FIRST   PIC  9(05).
+           03  SHOKANRI-RENNUM-LAST    PIC  9(05).

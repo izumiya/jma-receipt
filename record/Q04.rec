@@ -6,6 +6,14 @@ Q04 {
     TITLEKBN {
       isactive bool;
     };
+    LBLRENNUM {
+      textdata varchar(10);
+    };
+    RENNUM {
+          visible bool;
+          state   integer;
+          numdata number(3);
+    };
     NAME {
       textdata varchar(100);
     };

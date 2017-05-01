@@ -10,6 +10,8 @@ tbl_shoukaikanri {
 	CREYMD		char(8);
 	UPYMD			char(8);
 	UPHMS			char(6);
+	RENNUM_FIRST		number(5,0),virtual;
+	RENNUM_LAST		number(5,0),virtual;
 };
 
 primary	{
@@ -82,6 +84,27 @@ path	all 	{
 		SELECT *
 		FROM		tbl_shoukaikanri
 		WHERE		HOSPNUM	= :HOSPNUM
+		;
+	};
+};
+
+path	upd2		{ 	
+	DBUPDATE	{
+		UPDATE	tbl_shoukaikanri AS M
+		SET			RENNUM   = S.SEQ
+		FROM ( SELECT  HOSPNUM,UID, ROW_NUMBER() OVER(ORDER BY RENNUM) AS SEQ FROM tbl_shoukaikanri ) AS S
+		WHERE 	M.HOSPNUM	= S.HOSPNUM
+		AND			M.UID			=	S.UID
+		;
+	};
+};
+
+path	upd3		{
+	DBUPDATE	{
+		UPDATE	tbl_shoukaikanri
+		SET			RENNUM   = RENNUM + :RENNUM
+		WHERE 	HOSPNUM	= :HOSPNUM
+		AND     RENNUM  BETWEEN :RENNUM_FIRST AND :RENNUM_LAST
 		;
 	};
 };

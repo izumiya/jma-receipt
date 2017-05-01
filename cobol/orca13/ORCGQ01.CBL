@@ -201,7 +201,7 @@
            03  WRK-STR                  PIC X(20000).
            03  WRK-STR-LEN              PIC 9(05).
            03  WRK-SELPATTERN-G.
-               05  WRK-SELPATTERN       PIC 9(02).
+               05  WRK-SELPATTERN       PIC 9(03).
                05  WRK-SELPATTERNFL     PIC X(01).
                05  WRK-SELPATTERNMEI    PIC X(100).
            03  WRK-RENNUM               PIC 9(05).
@@ -211,6 +211,7 @@
                05  WRK-CMB-ITM                     PIC X(200).
                05  WRK-CMB-ITM2                    PIC X(200).
                05  WRK-CMB-ITM3                    PIC X(200).
+               05  WRK-CMB-IDX                     PIC 9(05).
            03  WRK-QIDMSG                          PIC X(80).
            03  WRK-UPDKBN               PIC X(03).
            03  WRK-RECECOM-G.
@@ -302,9 +303,9 @@
                05  CONST-ZENNUM-R      REDEFINES   CONST-ZENNUM-VAL.
                    07  CONST-ZENNUM            PIC X(02)   OCCURS    10.
       *
-           03  CONST-BYOMEI-MAX                    PIC 9(05)   VALUE 80.
-           03  CONST-SELPATTERN-MAX                PIC 9(05)   VALUE 50.
-           03  CONST-UTF8                          PIC 9(01)   VALUE 2.
+           03  CONST-BYOMEI-MAX                PIC 9(05)   VALUE 80.
+           03  CONST-SELPATTERN-MAX            PIC 9(05)   VALUE 200.
+           03  CONST-UTF8                      PIC 9(01)   VALUE 2.
            03  CONST-NOT               PIC X(01)   VALUE "9".
       *
       *    画面項目ID
@@ -633,10 +634,16 @@
        310-Q04SPASET-SEC               SECTION.
       *
            IF  ( SPA-Q01-Q04-NAME  NOT =  SPACE )
-               IF    ( SPA-Q01-Q04-UPDKBN =    "UPD" )
-                   PERFORM 4601-SELPATTERN-UPD-SEC
-               ELSE
-                   PERFORM 700-SELPATTERN-INS-SEC
+      *
+               PERFORM 800-MCNDATE-SEC
+      *
+               PERFORM 4601-SELPATTERN-UPD2-SEC
+               IF    ( SPA-ERRCD           =   SPACE )
+                   IF    ( SPA-Q01-Q04-UPDKBN =    "UPD" )
+                       PERFORM 4601-SELPATTERN-UPD-SEC
+                   ELSE
+                       PERFORM 700-SELPATTERN-INS-SEC
+                   END-IF
                END-IF
            END-IF
       *
@@ -6691,6 +6698,7 @@
                                        TO  WRK-CMB-ITM2
                    MOVE    SPA-GMN-Q01-SELPATTERN-TTLKBNL(IDX-CMB)
                                        TO  WRK-CMB-ITM3
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
                END-IF
            END-PERFORM
       *
@@ -6702,7 +6710,7 @@
       *****************************************************************
        4201-SELPATTERNLST-CHK-SEC        SECTION.
       *
-           INITIALIZE                    WRK-CMB-ITM-G.
+           INITIALIZE                    WRK-CMB-ITM-G
       *
            PERFORM VARYING IDX-CMB FROM    1   BY  1
                    UNTIL ( IDX-CMB >   SPA-GMN-Q01-SELPATTERNLST-MAX )
@@ -6716,6 +6724,7 @@
                                        TO  WRK-CMB-ITM2
                    MOVE    SPA-GMN-Q01-SELPATTERN-TTLKBNL(IDX-CMB)
                                        TO  WRK-CMB-ITM3
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
                END-IF
            END-PERFORM
       *
@@ -7445,23 +7454,53 @@
                MOVE    "4004"          TO  SPA-ERRCD
            END-IF
       *
+           IF    ( SPA-ERRCD           =   SPACE )
+               PERFORM 4601-SELPATTERN-UPD2-SEC
+           END-IF
+      *
            .
        45011-SHOUKAIKANRI-DEL-EXT.
            EXIT.
       *****************************************************************
-      *    検索条件保存内容削除処理
+      *    検索条件保存内容更新処理
       *****************************************************************
        4601-SELPATTERN-UPD-SEC         SECTION.
       *
-           INITIALIZE                      SHOUKAIKANRI-REC
+           PERFORM 900-SHOUKAIKANRI-KEY-SEL-SEC
+           MOVE    SHOKANRI-RENNUM     TO  WRK-RENNUM
+           IF    ( SHOKANRI-RENNUM NOT =   SPA-Q01-Q04-RENNUM )
+               IF    ( SHOKANRI-RENNUM >   SPA-Q01-Q04-RENNUM )
+                   MOVE    SPA-Q01-Q04-RENNUM
+                                       TO  SHOKANRI-RENNUM-FIRST
+                   MOVE    WRK-RENNUM  TO  SHOKANRI-RENNUM-LAST
+                   MOVE            1   TO  SHOKANRI-RENNUM
+               ELSE
+                   MOVE    WRK-RENNUM  TO  SHOKANRI-RENNUM-FIRST
+                   MOVE    SPA-Q01-Q04-RENNUM
+                                       TO  SHOKANRI-RENNUM-LAST
+                   MOVE           -1   TO  SHOKANRI-RENNUM
+               END-IF
+               MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
+               MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
+               MOVE    "upd3"              TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF    ( MCP-RC      NOT =   ZERO )
+                   MOVE    "4007"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           PERFORM 800-MCNDATE-SEC
+           MOVE    SMCNDATE-YMD        TO  SHOKANRI-UPYMD
+           MOVE    SMCNDATE-HMS        TO  SHOKANRI-UPHMS
+           MOVE    SPA-OPID            TO  SHOKANRI-OPID
+      *
            MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
-           MOVE    SPA-NAI-Q01-SELPATTERN-UID
-                                       TO  SHOKANRI-UID
+           MOVE    SPA-Q01-Q04-RENNUM  TO  SHOKANRI-RENNUM
            MOVE    SPA-Q01-Q04-NAME    TO  SHOKANRI-NAME
            MOVE    SPA-Q01-Q04-TITLEKBN TO SHOKANRI-TITLEKBN
            MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
            MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
-           MOVE    "upd1"              TO  MCP-PATHNAME
+           MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBUPDATE-SEC
            IF    ( MCP-RC      NOT =   ZERO )
                MOVE    "4005"          TO  SPA-ERRCD
@@ -7493,6 +7532,23 @@
        4601-SELPATTERN-UPD-EXT.
            EXIT.
       *****************************************************************
+      *    検索条件保存内容更新処理（連番更新）
+      *****************************************************************
+       4601-SELPATTERN-UPD2-SEC         SECTION.
+      *
+           INITIALIZE                      SHOUKAIKANRI-REC
+           MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
+           MOVE    "upd2"              TO  MCP-PATHNAME
+           PERFORM 910-DBUPDATE-SEC
+           IF    ( MCP-RC      NOT =   ZERO )
+               MOVE    "4006"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4601-SELPATTERN-UPD2-EXT.
+           EXIT.
+      *****************************************************************
       *    検索条件保存画面遷移
       *****************************************************************
        470-Q04-SENI-SEC                SECTION.
@@ -7512,6 +7568,18 @@
                                        TO  SPA-Q01-Q04-UID
                    MOVE    SPA-NAI-Q01-SELPATTERN-TTLKBN
                                        TO  SPA-Q01-Q04-TITLEKBN
+                   MOVE    SPA-NAI-Q01-SELPATTERN-UID
+                                       TO  WRK-CMB-CD
+                   PERFORM 4201-SELPATTERNLST-CHK-SEC
+                   MOVE    WRK-CMB-IDX TO  SPA-Q01-Q04-RENNUM
+                   MOVE    SPA-GMN-Q01-SELPATTERNLST-MAX
+                                       TO  SPA-Q01-Q04-RENNUM-MAX
+               ELSE
+                   COMPUTE SPA-Q01-Q04-RENNUM
+                       =   SPA-GMN-Q01-SELPATTERNLST-MAX
+                       +   1
+                   MOVE    SPA-Q01-Q04-RENNUM
+                                       TO  SPA-Q01-Q04-RENNUM-MAX
                END-IF
       *
                MOVE    SPA-AREA        TO  SPA-COMMON
@@ -12020,7 +12088,7 @@
                                            DELIMITED BY SIZE
                INTO    SPA-ERRMSG
                END-STRING
-           WHEN    "4001"      THRU    "4999"
+           WHEN    "4001"      THRU    "4008"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
            END-EVALUATE
@@ -12813,8 +12881,6 @@
       *    患者照会検索条件登録処理
       *****************************************************************
        7001-SHOUKAIDATA-INS-SEC        SECTION.
-      *
-           PERFORM 800-MCNDATE-SEC
       *
            INITIALIZE                      SHOUKAIDATA-REC
            MOVE    SPA-HOSPNUM         TO  SHODATA-HOSPNUM
@@ -14288,26 +14354,41 @@
       *****************************************************************
        7001-SHOUKAIKANRI-INS-SEC       SECTION.
       *
-           PERFORM 900-SHOUKAIKANRI-KEY4-SEL-SEC
-           COMPUTE WRK-RENNUM  =   SHOKANRI-RENNUM     +   1
-      *
            INITIALIZE                  SHOUKAIKANRI-REC
-      *
-           MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
-           MOVE    WRK-UID             TO  SHOKANRI-UID
-           MOVE    WRK-RENNUM          TO  SHOKANRI-RENNUM
-           MOVE    SPA-Q01-Q04-NAME    TO  SHOKANRI-NAME
-           MOVE    SPA-Q01-Q04-TITLEKBN TO SHOKANRI-TITLEKBN
-           MOVE    "0"                 TO  SHOKANRI-NYUGAIKBN
-           MOVE    SMCNDATE-YMD        TO  SHOKANRI-CREYMD
-                                           SHOKANRI-UPYMD
-           MOVE    SMCNDATE-HMS        TO  SHOKANRI-UPHMS
+           MOVE    SPA-HOSPNUM     TO  SHOKANRI-HOSPNUM
+           MOVE    1               TO  SHOKANRI-RENNUM
+           MOVE    SPA-Q01-Q04-RENNUM
+                                   TO  SHOKANRI-RENNUM-FIRST
+           MOVE    99999           TO  SHOKANRI-RENNUM-LAST
            MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
            MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-DBINSERT-SEC
-           IF    ( MCP-RC      NOT  =  ZERO )
-               MOVE    "4002"          TO  SPA-ERRCD
+           MOVE    "upd3"              TO  MCP-PATHNAME
+           PERFORM 910-DBUPDATE-SEC
+           IF    ( MCP-RC      NOT =   ZERO )
+               MOVE    "4008"      TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               INITIALIZE                  SHOUKAIKANRI-REC
+      *
+               MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
+               MOVE    WRK-UID             TO  SHOKANRI-UID
+               MOVE    SPA-Q01-Q04-RENNUM
+                                           TO  SHOKANRI-RENNUM
+               MOVE    SPA-Q01-Q04-NAME    TO  SHOKANRI-NAME
+               MOVE    SPA-Q01-Q04-TITLEKBN TO SHOKANRI-TITLEKBN
+               MOVE    "0"                 TO  SHOKANRI-NYUGAIKBN
+               MOVE    SPA-OPID            TO  SHOKANRI-OPID
+               MOVE    SMCNDATE-YMD        TO  SHOKANRI-CREYMD
+                                               SHOKANRI-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SHOKANRI-UPHMS
+               MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
+               MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+               IF    ( MCP-RC      NOT  =  ZERO )
+                   MOVE    "4002"          TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -15108,6 +15189,35 @@
            .
       *
        910-USERBYOMEI-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会検索条件管理情報検索処理
+      *****************************************************************
+       900-SHOUKAIKANRI-KEY-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SHOUKAIKANRI
+      *
+           INITIALIZE                      SHOUKAIKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
+           MOVE    SPA-NAI-Q01-SELPATTERN-UID
+                                       TO  SHOKANRI-UID
+           MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF  ( MCP-RC        =   ZERO )
+               MOVE    MCPDATA-REC     TO  SHOUKAIKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-SHOUKAIKANRI
+               INITIALIZE                  SHOUKAIKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+           .
+      *
+       900-SHOUKAIKANRI-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    患者照会検索条件管理情報検索処理
