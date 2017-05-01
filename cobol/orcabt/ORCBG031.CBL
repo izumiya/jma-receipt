@@ -96,6 +96,7 @@
            03  CNT-PAGE                PIC 9(03).
            03  CNT-LINE                PIC 9(02).
            03  CNT-TOKEI               PIC 9(05).
+           03  CNT-GPAGE               PIC 9(03).
       *
       *    システム領域
        01  SYS-AREA.
@@ -555,6 +556,7 @@
            MOVE    ZERO            TO  CNT-PAGE
            MOVE    ZERO            TO  CNT-LINE
            MOVE    ZERO            TO  CNT-TOKEI
+           MOVE    ZERO            TO  CNT-GPAGE
       *
            INITIALIZE                  TOKEI-REC
       *    統計ファイル読み込み
@@ -593,6 +595,7 @@
            MOVE    SPACE           TO  HCMSL80
       *
            COMPUTE CNT-PAGE    =   CNT-PAGE    +   1
+           COMPUTE CNT-GPAGE   =   CNT-GPAGE   +   1
       *
            MOVE    CNT-PAGE        TO  WRK-Z03
            MOVE    WRK-Z03         TO  WRK-PRT-PAGE
@@ -633,6 +636,13 @@
                    COMPUTE CNT-LINE    =   CNT-LINE    +   1
                    MOVE    ALL "-"         TO  HCMSL80-MOJI(CNT-LINE)
                END-IF
+           END-IF
+      *
+           IF      CNT-LINE        >=  80
+      *        帳票編集処理
+               PERFORM 390-PRINT-MEISAI-OUT-SEC
+      *        見出し
+               PERFORM 310-PRT-HEAD-SEC
            END-IF
       *
            MOVE    TOKEI-SRYYMD    TO  WRK-SYMD
@@ -745,8 +755,8 @@
                                        ORCHCM34AREA
                                        TTNS-AREA
                                        TTNS-CONST-MAX
-           COMPUTE CNT-PAGE
-               =   CNT-PAGE    +   ORCHCM34-PAGE
+           COMPUTE CNT-GPAGE
+               =   CNT-GPAGE   +   ORCHCM34-PAGE
       *
            .
        800-ORCHCM34-EXT.
@@ -831,7 +841,7 @@
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
-           MOVE    CNT-PAGE        TO  JOB-UPDCNT
+           MOVE    CNT-GPAGE       TO  JOB-UPDCNT
            CALL    "ORCSJOB"           USING
                                        ORCSJOBKANRIAREA
                                        JOBKANRI-REC
