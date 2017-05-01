@@ -8637,6 +8637,8 @@
       *
            MOVE    SPA-NAI-I01-NYUINYMD
                                        TO  ORCHCN01-NYUINYMD
+           MOVE    SPA-NAI-I01-TAIINYMD
+                                       TO  ORCHCN01-TAIINYMD
       *
       *    DISPLAY "ORCHCN01-SYORIKBN  = " ORCHCN01-SYORIKBN
       *    DISPLAY "ORCHCN01-PRTKBN    = " ORCHCN01-PRTKBN

@@ -33,3 +33,5 @@
                    07  ORCHCN01-DR         PIC X(05).
       *    Æþ±¡Æü ... Ç¤°Õ
            03  ORCHCN01-NYUINYMD           PIC X(08).
+      *    Âà±¡Æü ... Ç¤°Õ
+           03  ORCHCN01-TAIINYMD           PIC X(08).
