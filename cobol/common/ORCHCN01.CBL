@@ -34,7 +34,8 @@
       *  04.06.00    NACL=多々納  10/11/25  病名補足コメント対応
       *  04.06.00    NACL=多々納  11/02/03  保険適応病名判定対応
       *  04.07.00    NACL-多々納  13/10/08  第三者行為対応
-      * 04.08.00     NACL-多々納  14/07/30  一時ディレクトリ対応
+      *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
+      *  05.00.00    NACL-太田    17/04/29  退院日編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -193,6 +194,7 @@
            03  PARA-CHARTKBN           PIC X(01).
            03  PARA-HKNCOMBIKBN        PIC X(01).
            03  PARA-DAISANKBN          PIC X(01).
+           03  PARA-TAIINYMDKBN        PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -385,6 +387,7 @@
            MOVE    "1"             TO  PARA-NYUGAIKBN
            MOVE    "1"             TO  PARA-UTAGAIKBN
            MOVE    "1"             TO  PARA-CHARTKBN
+           MOVE    "0"             TO  PARA-TAIINYMDKBN
       *
       *    病名編集
            IF    ( SYS-1017-KARUTE-BYOMEI
@@ -431,6 +434,13 @@
            MOVE    "DAISANKBN"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-DAISANKBN
+      *
+      *    退院日区分
+           MOVE    "TAIINYMDKBN"       TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA(1:1)       =   "0" OR "1" )
+               MOVE    WRK-PARA(1:1)   TO  PARA-TAIINYMDKBN
+           END-IF
       *
            .
        100-OPTION-SELECT-EXT.
@@ -627,6 +637,17 @@
                MOVE    WRK-HYY             TO  HCN01-NYUINYY
                MOVE    WRK-HMM             TO  HCN01-NYUINMM
                MOVE    WRK-HDD             TO  HCN01-NYUINDD
+           END-IF
+      *
+      *    退院日
+           IF      PARA-TAIINYMDKBN        =   "1"
+            AND    ORCHCN01-TAIINYMD   NOT =   SPACE
+               MOVE    ORCHCN01-TAIINYMD   TO  WRK-SYMD
+               PERFORM 31012-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG(1:4)    TO  HCN01-TAIINGG
+               MOVE    WRK-HYY             TO  HCN01-TAIINYY
+               MOVE    WRK-HMM             TO  HCN01-TAIINMM
+               MOVE    WRK-HDD             TO  HCN01-TAIINDD
            END-IF
       *
            .
