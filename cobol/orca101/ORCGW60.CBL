@@ -129,6 +129,10 @@
                    07  SPA-GMN-SRYHEIEXPKBN    PIC X(01).
                    07  SPA-GMN-SRYHEIEXPKBNFL  PIC X(01).
                    07  SPA-GMN-SRYHEIEXPKBNMEI PIC X(30).
+               05  SPA-GMN-SRYMATERKKBN-G.
+                   07  SPA-GMN-SRYMATERKKBN    PIC X(01).
+                   07  SPA-GMN-SRYMATERKKBNFL  PIC X(01).
+                   07  SPA-GMN-SRYMATERKKBNMEI PIC X(30).
                05  SPA-GMN-SRYKAISUMSTKBN-G.
                    07  SPA-GMN-SRYKAISUMSTKBN    PIC X(01).
                    07  SPA-GMN-SRYKAISUMSTKBNFL  PIC X(01).
@@ -277,6 +281,12 @@
                        09  SPA-GMN-SRYHEIEXPKBNL   PIC X(01).
                        09  SPA-GMN-SRYHEIEXPKBNFLL PIC X(01).
                        09  SPA-GMN-SRYHEIEXPKBNMEIL PIC X(30).
+               05  SPA-GMN-SRYMATERKKBNLST-G.
+                   07  SPA-GMN-SRYMATERKKBN-MAX    PIC 9(03).
+                   07  SPA-GMN-SRYMATERKKBNLST     OCCURS   2.
+                       09  SPA-GMN-SRYMATERKKBNL   PIC X(01).
+                       09  SPA-GMN-SRYMATERKKBNFLL PIC X(01).
+                       09  SPA-GMN-SRYMATERKKBNMEIL PIC X(30).
                05  SPA-GMN-SRYKAISUMSTKBNLST-G.
                    07  SPA-GMN-SRYKAISUMSTKBN-MAX    PIC 9(03).
                    07  SPA-GMN-SRYKAISUMSTKBNLST     OCCURS   2.
@@ -683,6 +693,15 @@
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYHEIEXPKBN-G
            END-IF
       *
+           MOVE    SPA-GMN-SRYMATERKKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYMATERKKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYMATERKKBNLST (2)
+                                       TO  SPA-GMN-SRYMATERKKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYMATERKKBN-G
+           END-IF
+      *
            MOVE    SPA-GMN-SRYKAISUMSTKBN TO  WRK-CMB-CD
            PERFORM 4200-SRYKAISUMSTKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
@@ -843,6 +862,9 @@
                MOVE    SYS-1101-SRYHEIEXPKBN
                                        TO  SPA-GMN-SRYHEIEXPKBN
       *
+               MOVE    SYS-1101-SRYMATERKKBN
+                                       TO  SPA-GMN-SRYMATERKKBN
+      *
                MOVE    SYS-1101-SRYKAISUMSTKBN
                                        TO  SPA-GMN-SRYKAISUMSTKBN
       *
@@ -997,6 +1019,9 @@
       *
       *    併用算定電子点数表特例コンボ設定処理
            PERFORM 3101-SRYHEIEXPKBNLST-SEC
+      *
+      *    算定漏れ特定器材関連手技マスタ参照コンボ設定処理
+           PERFORM 3101-SRYMATERKKBNLST-SEC
       *
       *    電子点数表回数参照コンボ設定処理
            PERFORM 3101-SRYKAISUMSTKBNLST-SEC
@@ -1446,6 +1471,29 @@
        3101-SRYHEIEXPKBNLST-EXT.
            EXIT.
       *****************************************************************
+      *    算定漏れ特定器材関連手技マスタ参照コンボ設定処理
+      *****************************************************************
+       3101-SRYMATERKKBNLST-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-SRYMATERKKBNLST-G
+      *
+           MOVE    2               TO  SPA-GMN-SRYMATERKKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-SRYMATERKKBNL    (1)
+           MOVE    "参照する"
+                                   TO  SPA-GMN-SRYMATERKKBNMEIL (1)
+      *
+           MOVE    "2"             TO  SPA-GMN-SRYMATERKKBNL    (2)
+           MOVE    "参照しない"
+                                   TO  SPA-GMN-SRYMATERKKBNMEIL (2)
+      *
+           MOVE    SPA-GMN-SRYMATERKKBNLST  (2)
+                                   TO  SPA-GMN-SRYMATERKKBN-G
+      *
+           . 
+       3101-SRYMATERKKBNLST-EXT.
+           EXIT.
+      *****************************************************************
       *    電子点数表回数参照コンボ設定処理
       *****************************************************************
        3101-SRYKAISUMSTKBNLST-SEC           SECTION.
@@ -1784,6 +1832,7 @@
            MOVE    W60-SRYHEIWRNKBN    TO  SPA-GMN-SRYHEIWRNKBN-G
            MOVE    W60-SRYHEIMSTKBN    TO  SPA-GMN-SRYHEIMSTKBN-G
            MOVE    W60-SRYHEIEXPKBN    TO  SPA-GMN-SRYHEIEXPKBN-G
+           MOVE    W60-SRYMATERKKBN    TO  SPA-GMN-SRYMATERKKBN-G
            MOVE    W60-SRYKAISUMSTKBN  TO  SPA-GMN-SRYKAISUMSTKBN-G
            MOVE    W60-SRYKAISUWRNKBN  TO  SPA-GMN-SRYKAISUWRNKBN-G
            MOVE    W60-ERR990009KBN    TO  SPA-GMN-ERR990009KBN-G
@@ -1890,6 +1939,10 @@
       *
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4101-SRYHEIEXPKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRYMATERKKBN-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
@@ -2264,6 +2317,24 @@
            .
       *
        4101-SRYHEIEXPKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定器材関連手技参照チェック処理
+      *****************************************************************
+       4101-SRYMATERKKBN-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-SRYMATERKKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYMATERKKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYMATERKKBNLST (2)
+                                   TO  SPA-GMN-SRYMATERKKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-SRYMATERKKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-SRYMATERKKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    電子点数表回数参照チェック処理
@@ -2824,6 +2895,30 @@
        4200-SRYHEIEXPKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    特定器材関連手技参照コンボチェック処理
+      *****************************************************************
+       4200-SRYMATERKKBNLST-CHK-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB         >   SPA-GMN-SRYMATERKKBN-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-SRYMATERKKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-SRYMATERKKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-SRYMATERKKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    電子点数表回数参照コンボチェック処理
       *****************************************************************
        4200-SRYKAISUMSTKBNLST-CHK-SEC  SECTION.
@@ -3308,6 +3403,9 @@
                MOVE    "2"             TO   SYS-1101-SRYHEIEXPKBN
            END-IF
       *
+           MOVE    SPA-GMN-SRYMATERKKBN
+                                          TO SYS-1101-SRYMATERKKBN
+      *
            MOVE    SPA-GMN-SRYKAISUMSTKBN TO SYS-1101-SRYKAISUMSTKBN
       *
            MOVE    SPA-GMN-SRYKAISUWRNKBN TO SYS-1101-SRYKAISUWRNKBN
@@ -3722,6 +3820,19 @@
                END-PERFORM
            END-IF
       *
+           MOVE    SPA-GMN-SRYMATERKKBN-G
+                                       TO  W60-SRYMATERKKBN
+      *
+           MOVE    SPA-GMN-SRYMATERKKBN-MAX
+                                       TO  W60-SRYMATERKKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-SRYMATERKKBN-MAX )
+      *
+               MOVE    SPA-GMN-SRYMATERKKBNLST (IDX0)
+                                       TO  W60-SRYMATERKKBN-ITEM (IDX0)
+      *
+           END-PERFORM
+      *
            MOVE    SPA-GMN-SRYKAISUMSTKBN-G   TO  W60-SRYKAISUMSTKBN
       *
            MOVE    SPA-GMN-SRYKAISUMSTKBN-MAX
@@ -3947,6 +4058,8 @@
                MOVE    "SRYHEIEXPKBN"   TO  MCP-WIDGET
            WHEN    217
                MOVE    "SRYHEIWRNKBN"   TO  MCP-WIDGET
+           WHEN    218
+               MOVE    "SRYMATERKKBN"   TO  MCP-WIDGET
            WHEN    908
                MOVE    "B08"           TO  MCP-WIDGET
            WHEN    912
@@ -4010,6 +4123,8 @@
            WHEN    "SRYHEIEXPKBN"
                MOVE    217         TO  SPA-GMN-CUR
            WHEN    "SRYHEIWRNKBN"
+               MOVE    218         TO  SPA-GMN-CUR
+           WHEN    "SRYMATERKKBN"
                MOVE    213         TO  SPA-GMN-CUR
            WHEN    "SRYKAISUMSTKBN"
                MOVE    214         TO  SPA-GMN-CUR

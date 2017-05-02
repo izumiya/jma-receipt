@@ -125,6 +125,7 @@
                05  SPA-NAI-TEKBYOSRYKBN        PIC X(01).
                05  SPA-NAI-TENKIBYOMEIKBN      PIC X(01).
                05  SPA-NAI-SRYHEIMSTKBN        PIC X(01).
+               05  SPA-NAI-SRYMATERKKBN        PIC X(01).
                05  SPA-NAI-GSRAUTH-22          PIC X(01).
                05  SPA-NAI-GSRAUTH-103         PIC X(01).
                05  SPA-NAI-ERR-AREA.

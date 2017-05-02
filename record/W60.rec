@@ -181,6 +181,13 @@ W60 {
           item varchar(40)[5];
  		  state int;
         };
+        CMB_SRYMATERKKBN {
+          SRYMATERKKBN{
+            textdata varchar(22);
+          };
+          count int;
+            item varchar(22)[5];
+        };
         CMB_SRYKAISUMSTKBN {
           SRYKAISUMSTKBN {
             textdata varchar(22);

@@ -292,6 +292,7 @@
            03  FLG-CHKMST                              PIC 9(01).
            03  FLG-CHKSND                              PIC 9(01).
            03  FLG-CHKREIGAI                           PIC 9(01).
+           03  FLG-MATERK                              PIC 9(01).
            03  FLG-TENSU                               PIC 9(01).
            03  FLG-PTBYOMEI                            PIC 9(01).
            03  FLG-NYUINACCT                           PIC 9(01).
@@ -1153,6 +1154,9 @@
        01  CHKTRD-REC.
            COPY    "CPCHKTRD.INC".
       *
+       01  MATERIAL-K-REC.
+           COPY    "CPMATERIAL-K.INC".
+      *
       *    チェックマスタ４
            COPY    "CPCHK004.INC".
            COPY    "CPCK1102.INC".
@@ -1698,12 +1702,14 @@
            END-IF
       *
       *    診療行為どうしの算定漏れ
-           MOVE    "7"                 TO  WRK-CHK-CHKKBN
-           MOVE    "2"                 TO  WRK-CHK-CDKBN
-           PERFORM 900-CHKTRD-KEY5-SEL-SEC
-           IF    ( FLG-CHKMST          =   ZERO )
-               MOVE    1               TO  FLG-SRYSNT
-           END-IF
+      *    MOVE    "7"                 TO  WRK-CHK-CHKKBN
+      *    MOVE    "2"                 TO  WRK-CHK-CDKBN
+      *    PERFORM 900-CHKTRD-KEY5-SEL-SEC
+      *    IF    ( FLG-CHKMST          =   ZERO )
+      *        MOVE    1               TO  FLG-SRYSNT
+      *    END-IF
+      *
+           MOVE    1                   TO  FLG-SRYSNT
       *
       *    病名と薬剤
            MOVE    "8"                 TO  WRK-CHK-CHKKBN
@@ -2804,9 +2810,6 @@
                                    TO   WRK-ZAIHKNNUM
            END-IF
            PERFORM 2001111-TAISYO-HKN-CHK-SEC
-           DISPLAY "PTNUM-PTNUM  =" PTNUM-PTNUM
-           DISPLAY "WRK-ZAIHKNNUM=" WRK-ZAIHKNNUM
-           DISPLAY "FLG-TAISYO-HKN=" FLG-TAISYO-HKN
            IF    ( FLG-TAISYO-HKN      =   1 )
            AND   ( DCACCT-STS-NYUINDAY =   ZERO )
       *
@@ -9893,9 +9896,12 @@
            MOVE    WRK-KJNYMD          TO  TCHK-CHK-YMD
            MOVE    "2"                 TO  TCHK-CHK-CDKBN
            PERFORM 230-CHKTRD-GET-SEC
-           IF    ( TCHK-ACT-CD-MAX     >   ZERO )
-               CONTINUE
-           ELSE
+           IF    ( TCHK-ACT-CD-MAX     =   ZERO )
+               IF    ( SYS-1101-SRYMATERKKBN   =   "1" )
+                   PERFORM 231-CHKTRD-GET-SEC
+               END-IF
+           END-IF
+           IF    ( TCHK-ACT-CD-MAX     =   ZERO )
                MOVE    "7"             TO  WRK-CHK-CHKKBN
                MOVE    "2"             TO  WRK-CHK-CDKBN
                MOVE    TSRYCD-SRYCD (IDX6)
@@ -13736,6 +13742,57 @@
        230-CHKTRD-GET-EXT.
            EXIT.
       *****************************************************************
+      *    チェックマスタ３情報取得処理（特定器材関連手技マスタより）
+      *****************************************************************
+       231-CHKTRD-GET-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATERK
+      *
+           INITIALIZE                      TCHK-ACTIVE-G
+           MOVE    ZERO                TO  IDX-MAX
+      *
+           PERFORM 900-MATERIAL-K-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-MATERK  NOT =   ZERO )
+                    OR   ( IDX-MAX        >=   CONST-TCHK-STK-CD-MAX )
+      *
+               COMPUTE IDX-MAX =   IDX-MAX +   1
+      *
+               IF    ( IDX-MAX     =   1 )
+                   MOVE    "7"                 TO  TCHK-ACT-CHKKBN
+                   MOVE    MATERK-SRYCD        TO  TCHK-ACT-SRYCD
+                   MOVE    "00000000"          TO  TCHK-ACT-YUKOSTYMD
+                   MOVE    "99999999"          TO  TCHK-ACT-YUKOEDYMD
+                   MOVE    "2"                 TO  TCHK-ACT-CDKBN
+               END-IF
+      *
+               MOVE    MATERK-SCD              TO  TCHK-ACT-CD (IDX-MAX)
+               MOVE    "1"                     TO  TCHK-ACT-DAYMONTHKBN
+                                                           (IDX-MAX)
+               MOVE    SPACE                   TO  TCHK-ACT-NYUGAIKBN
+                                                               (IDX-MAX)
+               MOVE    "1"                     TO  TCHK-ACT-NYUGAIBNDKBN
+                                                           (IDX-MAX)
+      *
+               PERFORM 900-MATERIAL-K-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_material_k"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( IDX-MAX         >   ZERO )
+               MOVE    IDX-MAX     TO  TCHK-ACT-CD-MAX
+               PERFORM 2301-TCHK-HEN-SEC
+           ELSE
+               MOVE    1           TO  FLG-MATERK
+           END-IF
+      *
+           .
+       231-CHKTRD-GET-EXT.
+           EXIT.
+      *****************************************************************
       *    チェックマスタ５情報取得処理
       *****************************************************************
        230-CHK005-GET-SEC              SECTION.
@@ -16468,6 +16525,52 @@
            .
       *
        900-PTCARE-NINTEI-KEY1-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定器材関連手技マスタ検索処理
+      *****************************************************************
+       900-MATERIAL-K-KEY2-SEL-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATERK
+      *
+           INITIALIZE                      MATERIAL-K-REC
+      *
+           MOVE    TCHK-CHK-SRYCD      TO  MATERK-SRYCD
+           MOVE    MATERIAL-K-REC      TO  MCPDATA-REC
+           MOVE    "tbl_material_k"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  MATERIAL-K-REC
+           ELSE
+               INITIALIZE                  MATERIAL-K-REC
+               MOVE    1               TO  FLG-MATERK
+           END-IF
+      *
+           .
+      *
+       900-MATERIAL-K-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定器材関連手技マスタFETCH処理
+      *****************************************************************
+       900-MATERIAL-K-KEY2-FET-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATERK
+      *
+           MOVE    "tbl_material_k"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  MATERIAL-K-REC
+           ELSE
+               INITIALIZE                  MATERIAL-K-REC
+               MOVE    1               TO  FLG-MATERK
+           END-IF
+      *
+           .
+      *
+       900-MATERIAL-K-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

@@ -63,6 +63,7 @@ db	{
 	tbl_prtdata;
 	tbl_prtkanri;
 	tbl_tekiou_disease;
+    tbl_material_s;
 };
 
 #include "orcadbh.inc"

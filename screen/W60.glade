@@ -1711,7 +1711,7 @@
             <class>GtkNumberEntry</class>
             <name>SYA_INGAITEN</name>
             <x>56</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1734,7 +1734,7 @@
             <class>GtkNumberEntry</class>
             <name>KOK_INGAITEN</name>
             <x>128</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1757,7 +1757,7 @@
             <class>GtkNumberEntry</class>
             <name>KOU_INGAITEN</name>
             <x>200</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1780,7 +1780,7 @@
             <class>GtkNumberEntry</class>
             <name>RSI_INGAITEN</name>
             <x>272</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1803,7 +1803,7 @@
             <class>GtkNumberEntry</class>
             <name>JBI_INGAITEN</name>
             <x>344</x>
-            <y>272</y>
+            <y>324</y>
             <width>56</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1826,7 +1826,7 @@
             <class>GtkNumberEntry</class>
             <name>KGI_INGAITEN</name>
             <x>416</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1849,7 +1849,7 @@
             <class>GtkNumberEntry</class>
             <name>JIH_INGAITEN</name>
             <x>488</x>
-            <y>272</y>
+            <y>324</y>
             <width>60</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1872,7 +1872,7 @@
             <class>GtkLabel</class>
             <name>label315</name>
             <x>36</x>
-            <y>352</y>
+            <y>404</y>
             <width>180</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1890,7 +1890,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_ERRA10001KBN</name>
             <x>36</x>
-            <y>324</y>
+            <y>376</y>
             <width>164</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1928,7 +1928,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_ERR990009KBN</name>
             <x>652</x>
-            <y>204</y>
+            <y>256</y>
             <width>164</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1966,7 +1966,7 @@
             <class>GtkLabel</class>
             <name>label309</name>
             <x>36</x>
-            <y>428</y>
+            <y>480</y>
             <width>55</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1984,7 +1984,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_PRTSRTKBN</name>
             <x>180</x>
-            <y>428</y>
+            <y>480</y>
             <width>164</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2022,7 +2022,7 @@
             <class>GtkLabel</class>
             <name>label331</name>
             <x>128</x>
-            <y>252</y>
+            <y>304</y>
             <width>60</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2040,7 +2040,7 @@
             <class>GtkLabel</class>
             <name>label332</name>
             <x>192</x>
-            <y>252</y>
+            <y>304</y>
             <width>76</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2058,7 +2058,7 @@
             <class>GtkLabel</class>
             <name>label333</name>
             <x>272</x>
-            <y>252</y>
+            <y>304</y>
             <width>60</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2076,7 +2076,7 @@
             <class>GtkLabel</class>
             <name>label334</name>
             <x>344</x>
-            <y>252</y>
+            <y>304</y>
             <width>56</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2094,7 +2094,7 @@
             <class>GtkLabel</class>
             <name>label336</name>
             <x>416</x>
-            <y>252</y>
+            <y>304</y>
             <width>60</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2112,7 +2112,7 @@
             <class>GtkLabel</class>
             <name>label335</name>
             <x>488</x>
-            <y>252</y>
+            <y>304</y>
             <width>60</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2130,7 +2130,7 @@
             <class>GtkLabel</class>
             <name>label337</name>
             <x>36</x>
-            <y>300</y>
+            <y>352</y>
             <width>360</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2148,7 +2148,7 @@
             <class>GtkLabel</class>
             <name>label329</name>
             <x>36</x>
-            <y>228</y>
+            <y>280</y>
             <width>180</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2166,7 +2166,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_PRTPTLSTKBN</name>
             <x>180</x>
-            <y>452</y>
+            <y>504</y>
             <width>164</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2204,7 +2204,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_REIGAICHKKBN</name>
             <x>36</x>
-            <y>376</y>
+            <y>428</y>
             <width>164</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2242,7 +2242,7 @@
             <class>GtkLabel</class>
             <name>label312</name>
             <x>36</x>
-            <y>452</y>
+            <y>504</y>
             <width>145</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2260,7 +2260,7 @@
             <class>GtkLabel</class>
             <name>label330</name>
             <x>56</x>
-            <y>252</y>
+            <y>304</y>
             <width>60</width>
             <height>22</height>
             <sensitive>True</sensitive>
@@ -2278,7 +2278,7 @@
             <class>GtkLabel</class>
             <name>label308</name>
             <x>36</x>
-            <y>404</y>
+            <y>456</y>
             <width>240</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2296,7 +2296,7 @@
             <class>GtkLabel</class>
             <name>label325</name>
             <x>36</x>
-            <y>204</y>
+            <y>256</y>
             <width>616</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2314,7 +2314,7 @@
             <class>GtkLabel</class>
             <name>label324</name>
             <x>36</x>
-            <y>180</y>
+            <y>232</y>
             <width>240</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2332,7 +2332,7 @@
             <class>GtkLabel</class>
             <name>label347</name>
             <x>36</x>
-            <y>104</y>
+            <y>156</y>
             <width>144</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2350,7 +2350,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_SRYKAISUWRNKBN</name>
             <x>180</x>
-            <y>152</y>
+            <y>204</y>
             <width>156</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2388,7 +2388,7 @@
             <class>GtkPandaCombo</class>
             <name>CMB_SRYKAISUMSTKBN</name>
             <x>180</x>
-            <y>128</y>
+            <y>180</y>
             <width>156</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2426,7 +2426,7 @@
             <class>GtkLabel</class>
             <name>label348</name>
             <x>36</x>
-            <y>128</y>
+            <y>180</y>
             <width>124</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2444,7 +2444,7 @@
             <class>GtkLabel</class>
             <name>label349</name>
             <x>36</x>
-            <y>152</y>
+            <y>204</y>
             <width>144</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -2612,6 +2612,80 @@
               <editable>True</editable>
               <text_max_length>32</text_max_length>
               <text>1 対象とする</text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label6</name>
+            <x>36</x>
+            <y>104</y>
+            <width>200</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>＜診療行為どうしの算定漏れ＞</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label8</name>
+            <x>36</x>
+            <y>128</y>
+            <width>120</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>特材品目マスタ</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>CMB_SRYMATERKKBN</name>
+            <x>180</x>
+            <y>128</y>
+            <width>156</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>SRYMATERKKBN</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <text_max_length>32</text_max_length>
+              <text>1 参照する</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
               <signal>

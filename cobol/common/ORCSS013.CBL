@@ -49,6 +49,7 @@
            03  FLG-CHKSND                      PIC 9(01).
            03  FLG-TEKBYO                      PIC 9(01).
            03  FLG-TEKDIS                      PIC 9(01).
+           03  FLG-MATERS                      PIC 9(01).
       *
        01  WRK-AREA.
            03  WRK-BYOMEI                      PIC X(200).
@@ -85,6 +86,9 @@
       *
        01  TEKIOU-DISEASE-REC.
            COPY    "CPTEKIOU-DISEASE.INC".
+      *
+       01  MATERIAL-S-REC.
+           COPY    "CPMATERIAL-S.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -301,56 +305,14 @@
       *
            EVALUATE    SS013-CHKKBN
            WHEN    "1"
-               PERFORM 900-TEKIOU-DISEASE-KEY3-SEL-SEC
       *
-               PERFORM UNTIL ( FLG-TEKDIS  NOT =   ZERO )
-      *
-                   MOVE    CONST-RENNUM    TO  CHKSND-RENNUM
-                   MOVE    TEKDIS-SELSRYCD TO  KEY-SRYCD
-      *
-                   PERFORM UNTIL ( FLG-TEKDIS      NOT =   ZERO )
-                            OR   ( TEKDIS-SELSRYCD NOT =   KEY-SRYCD )
-      *
-                       MOVE    TEKDIS-SELBYOMEI
-                                       TO  WRK-BYOMEI
-      *
-                       PERFORM 80011-TMPSND-EDIT-SEC
-      *
-                       PERFORM 900-TEKIOU-DISEASE-KEY3-FET-SEC
-      *
-                   END-PERFORM
-      *
-               END-PERFORM
-      *
-               MOVE    "tbl_tekiou_disease"    TO   MCP-TABLE
-               MOVE    "key3"                  TO   MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
+               PERFORM 80011-TEKDIS-TO-CHKSND-SEC
       *
            WHEN    "2"
-               PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
       *
-               PERFORM UNTIL ( FLG-TEKBYO  NOT =   ZERO )
+               PERFORM 80011-TEKBYO-TO-CHKSND-SEC
       *
-                   MOVE    CONST-RENNUM    TO  CHKSND-RENNUM
-                   MOVE    TEKBYO-SRYCD    TO  KEY-SRYCD
-      *
-                   PERFORM UNTIL ( FLG-TEKBYO      NOT =   ZERO )
-                            OR   ( TEKBYO-SRYCD    NOT =   KEY-SRYCD )
-      *
-                       MOVE    TEKBYO-BYOMEI
-                                       TO  WRK-BYOMEI
-      *
-                       PERFORM 80011-TMPSND-EDIT-SEC
-      *
-                       PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
-      *
-                   END-PERFORM
-      *
-               END-PERFORM
-      *
-               MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
-               MOVE    "key2"              TO   MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
+               PERFORM 80011-MATERS-TO-CHKSND-SEC
       *
            END-EVALUATE
       *
@@ -375,6 +337,106 @@
       *
            .
        8001-TMPSND-EDIT-EXT.
+            EXIT.
+      *****************************************************************
+      *    一時チェックマスタ２編集処理
+      *****************************************************************
+       80011-TEKDIS-TO-CHKSND-SEC      SECTION.
+      *
+           PERFORM 900-TEKIOU-DISEASE-KEY3-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-TEKDIS  NOT =   ZERO )
+      *
+               MOVE    CONST-RENNUM    TO  CHKSND-RENNUM
+               MOVE    TEKDIS-SELSRYCD TO  KEY-SRYCD
+      *
+               PERFORM UNTIL ( FLG-TEKDIS      NOT =   ZERO )
+                        OR   ( TEKDIS-SELSRYCD NOT =   KEY-SRYCD )
+      *
+                   MOVE    TEKDIS-SELBYOMEI
+                                       TO  WRK-BYOMEI
+      *
+                   PERFORM 80011-TMPSND-EDIT-SEC
+      *
+                   PERFORM 900-TEKIOU-DISEASE-KEY3-FET-SEC
+      *
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_tekiou_disease"    TO   MCP-TABLE
+           MOVE    "key3"                  TO   MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       80011-TEKDIS-TO-CHKSND-EXT.
+            EXIT.
+      *****************************************************************
+      *    一時チェックマスタ２編集処理
+      *****************************************************************
+       80011-TEKBYO-TO-CHKSND-SEC      SECTION.
+      *
+           PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-TEKBYO  NOT =   ZERO )
+      *
+               COMPUTE CHKSND-RENNUM = CONST-RENNUM * 2
+      *
+               MOVE    TEKBYO-SRYCD    TO  KEY-SRYCD
+      *
+               PERFORM UNTIL ( FLG-TEKBYO      NOT =   ZERO )
+                        OR   ( TEKBYO-SRYCD    NOT =   KEY-SRYCD )
+      *
+                   MOVE    TEKBYO-BYOMEI
+                                       TO  WRK-BYOMEI
+      *
+                   PERFORM 80011-TMPSND-EDIT-SEC
+      *
+                   PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
+      *
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
+           MOVE    "key2"              TO   MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       80011-TEKBYO-TO-CHKSND-EXT.
+            EXIT.
+      *****************************************************************
+      *    一時チェックマスタ２編集処理
+      *****************************************************************
+       80011-MATERS-TO-CHKSND-SEC      SECTION.
+      *
+           PERFORM 900-MATERIAL-S-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-MATERS  NOT =   ZERO )
+      *
+               MOVE    CONST-RENNUM    TO  CHKSND-RENNUM
+               MOVE    MATERS-SRYCD    TO  KEY-SRYCD
+      *
+               PERFORM UNTIL ( FLG-MATERS      NOT =   ZERO )
+                        OR   ( MATERS-SRYCD    NOT =   KEY-SRYCD )
+      *
+                   MOVE    MATERS-BYOMEI
+                                       TO  WRK-BYOMEI
+      *
+                   PERFORM 80011-TMPSND-EDIT-SEC
+      *
+                   PERFORM 900-MATERIAL-S-KEY2-FET-SEC
+      *
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_material_s"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       80011-MATERS-TO-CHKSND-EXT.
             EXIT.
       *****************************************************************
       *    一時チェックマスタ２編集処理
@@ -679,6 +741,51 @@
            .
       *
        900-TEKIOU-DISEASE-KEY3-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    医薬品傷病名マスタ検索
+      *****************************************************************
+       900-MATERIAL-S-KEY2-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-MATERS
+      *
+           INITIALIZE                      MATERIAL-S-REC
+           IF    ( SS013-SRYCD         =   SPACE )
+               MOVE    "%"             TO  MATERS-SRYCD
+           ELSE
+               MOVE    SS013-SRYCD     TO  MATERS-SRYCD
+           END-IF
+           MOVE    MATERIAL-S-REC      TO  MCPDATA-REC
+           MOVE    "tbl_material_s"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  MATERIAL-S-REC
+           ELSE
+               INITIALIZE                  MATERIAL-S-REC
+               MOVE    1               TO  FLG-MATERS
+           END-IF
+      *
+           .
+       900-MATERIAL-S-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    医薬品傷病名マスタFETCH
+      *****************************************************************
+       900-MATERIAL-S-KEY2-FET-SEC       SECTION.
+      *
+           MOVE    "tbl_material_s"    TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  MATERIAL-S-REC
+           ELSE
+               INITIALIZE                  MATERIAL-S-REC
+               MOVE    1               TO  FLG-MATERS
+           END-IF
+           .
+      *
+       900-MATERIAL-S-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ作成処理
