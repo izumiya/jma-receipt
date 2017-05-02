@@ -165,6 +165,7 @@
       *              NACL-小豆沢  17/04/13  請求点０点出力対応（システム予約コード
       *                                     の入力が無くても作成できるよう修正）
       *              NACL-小豆沢  17/04/21  不要な持参薬区分が記録されないよう対処
+      *              NACL-小豆沢  17/05/02  上記４月２１日修正を変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1216,6 +1217,7 @@
            03  WRK-FEDT-PREV-TEN50     PIC 9(08).
            03  WRK-FEDT-PREV-TEN54     PIC 9(08).
            03  WRK-FEDT-PREV-TEN721    PIC 9(08).
+           03  WRK-FEDT-JISANYAKKBN    PIC X(01).
            03  WRK-FEDT-KOUI-MEISAI.
              05  WRK-FEDT-KOUI-MEISAI1   PIC 9(01).
              05  WRK-FEDT-KOUI-MEISAI2   PIC 9(01).
@@ -2534,7 +2536,9 @@
                        PERFORM 20073-ZAI-HENSYU-SEC
                    END-IF
                END-IF
-               MOVE    RECE641-REC      TO   WRK-RECE641-REC
+      *   AZU-DEL START 2017.5.2
+      ****         MOVE    RECE641-REC      TO   WRK-RECE641-REC
+      *   AZU-DEL END   2017.5.2
                PERFORM 990-RECE641-NEXT-SEC
                IF      FLG-RECE64    =   1
                    MOVE   1     TO   FLG-END
@@ -2543,7 +2547,9 @@
       *   AZU-ADD END 2015.6.9
       *
       *    入院会計編集処理（入院料）
-           MOVE    WRK-RECE641-REC    TO   RECE641-REC
+      *   AZU-DEL START 2017.5.2
+      ***     MOVE    WRK-RECE641-REC    TO   RECE641-REC
+      *   AZU-DEL END 2017.5.2
            PERFORM 20077-NYUIN-HENSYU-SEC
       *
       *   AZU-ADD START 2015.6.9
@@ -3774,6 +3780,8 @@
            MOVE    RECE641-ZAITEN      TO  WRK-FEDT-ZAITEN
       *行為薬剤料
            MOVE    RECE641-YKZTEN      TO  WRK-FEDT-YKZTEN
+      *持参薬区分
+           MOVE    RECE641-JISANYAKKBN TO  WRK-FEDT-JISANYAKKBN
       *行為材料料
            MOVE    RECE641-KIZAITEN    TO  WRK-FEDT-KIZAITEN
            IF      RECE641-SRYKBN      =   "70"
@@ -4475,6 +4483,8 @@
            END-IF
       *行為薬剤料
            MOVE    RECE641-YKZTEN      TO  WRK-FEDT-YKZTEN
+      *持参薬区分
+           MOVE    RECE641-JISANYAKKBN TO  WRK-FEDT-JISANYAKKBN
       *行為材料料
            MOVE    RECE641-KIZAITEN    TO  WRK-FEDT-KIZAITEN
       *円・点区分
@@ -4664,6 +4674,8 @@
            END-IF
       *行為薬剤料
            MOVE    RECE641-YKZTEN      TO  WRK-FEDT-YKZTEN
+      *持参薬区分
+           MOVE    RECE641-JISANYAKKBN TO  WRK-FEDT-JISANYAKKBN
       *行為材料料
            MOVE    WRK-FEDT-ZAITEN     TO  WRK-FEDT-KIZAITEN
       *****MOVE    RECE641-KIZAITEN    TO  WRK-FEDT-KIZAITEN
@@ -5222,6 +5234,8 @@
            END-IF
       *行為薬剤料
            MOVE    ZERO                TO  WRK-FEDT-YKZTEN
+      *持参薬区分
+           MOVE    SPACE               TO  WRK-FEDT-JISANYAKKBN
       *行為材料料
            MOVE    ZERO                TO  WRK-FEDT-KIZAITEN
       *円・点区分
@@ -5685,7 +5699,7 @@
            END-IF
       *--- AZU-ADD START 2016.08.23
       *    持参薬は行為点数にゼロをセット
-           IF    RECE641-JISANYAKKBN  =  "1" OR "2" OR "3" OR "4" OR
+           IF    WRK-FEDT-JISANYAKKBN  = "1" OR "2" OR "3" OR "4" OR
                                          "5" OR "6" OR "7" OR "8"
                  MOVE     ZERO         TO  WRK-TENSU
            END-IF
@@ -5701,7 +5715,7 @@
            END-IF
       *--- AZU-ADD START 2016.08.23
       *    持参薬は行為薬剤料にゼロをセット
-           IF    RECE641-JISANYAKKBN  =  "1" OR "2" OR "3" OR "4" OR
+           IF    WRK-FEDT-JISANYAKKBN =  "1" OR "2" OR "3" OR "4" OR
                                          "5" OR "6" OR "7" OR "8"
                  MOVE     ZERO         TO  WRK-TENSU
            END-IF
@@ -5790,7 +5804,7 @@
              MOVE  WRK-FEDT-SRYSURYO   TO  WRK-SRYSURYO
       *--- AZU-ADD START 2016.08.23
       *      持参薬で使用量不明はゼロをセット
-             IF    RECE641-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
+             IF    WRK-FEDT-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
                  MOVE     ZERO         TO  WRK-SRYSURYO
              END-IF
       *--- AZU-ADD END 2016.08.23
@@ -5831,7 +5845,7 @@
       *
       *--- AZU-ADD START 2016.08.23
       *    持参薬で使用量不明はゼロをセット
-           IF    RECE641-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
+           IF    WRK-FEDT-JISANYAKKBN  =    "5" OR "6" OR "7" OR "8"
                MOVE     ZERO         TO  WRK-FEDT-DEKIDAKA-TEN
            END-IF
       *--- AZU-ADD END 2016.08.23
@@ -5875,15 +5889,15 @@
                END-IF
       *--- AZU-ADD START 2016.08.23
       *        持参薬区分
-               IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+               IF     WRK-FEDT-JISANYAKKBN       =   "1" OR "2" OR
                                                      "3" OR "4" OR
                                                      "5" OR "6" OR
                                                      "7" OR "8"
-                  IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+                  IF     WRK-FEDT-JISANYAKKBN       =   "1" OR "2" OR
                                                         "5" OR "6"
                      MOVE    1             TO  WRK-FEDT-KOUI-MEISAI3
                   END-IF
-                  IF     RECE641-JISANYAKKBN        =   "3" OR "4" OR
+                  IF     WRK-FEDT-JISANYAKKBN       =   "3" OR "4" OR
                                                         "7" OR "8"
                      MOVE    2             TO  WRK-FEDT-KOUI-MEISAI3
                   END-IF
@@ -5891,15 +5905,15 @@
                   MOVE   ZERO              TO  WRK-FEDT-KOUI-MEISAI3
                END-IF
       *        持参薬処方区分
-               IF     RECE641-JISANYAKKBN        =   "1" OR "2" OR
+               IF     WRK-FEDT-JISANYAKKBN       =   "1" OR "2" OR
                                                      "3" OR "4" OR
                                                      "5" OR "6" OR
                                                      "7" OR "8"
-                  IF     RECE641-JISANYAKKBN        =   "1" OR "3" OR
+                  IF     WRK-FEDT-JISANYAKKBN       =   "1" OR "3" OR
                                                         "5" OR "7"
                      MOVE    1             TO  WRK-FEDT-KOUI-MEISAI4
                   END-IF
-                  IF     RECE641-JISANYAKKBN        =   "2" OR "4" OR
+                  IF     WRK-FEDT-JISANYAKKBN       =   "2" OR "4" OR
                                                         "6" OR "8"
                      MOVE    2             TO  WRK-FEDT-KOUI-MEISAI4
                   END-IF
