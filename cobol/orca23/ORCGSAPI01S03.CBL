@@ -652,24 +652,27 @@
            MOVE    SYU-TGMONEY-TAX-SAI TO  WRK-KINGAKUMM
            MOVE    WRK-KINGAKUMM       TO  INCOMERES02-TGMONEY-TAX-SAI
       *
-           PERFORM VARYING IDXL    FROM    1   BY  1
-                   UNTIL ( IDXL    >   16 )
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   16 )
       *
-               IF    ( IDXL                NOT =   16 )
-                 OR  ( SYU-HKNTEN (IDXL)   NOT =   ZERO )
-                 OR  ( SYU-TGMONEY(IDXL)   NOT =   ZERO )
-                       MOVE    SS015-SRYITEML (IDXL)
-                               TO  INCOMERES02-SRYITEM-KBN  (IDXL)
-                       MOVE    SS015-SRYITEMMEIL (IDXL)
-                               TO  INCOMERES02-SRYITEM-NAME (IDXL)
-                       MOVE    SYU-HKNTEN (IDXL)
+               IF    ( IDX0                NOT =   16 )
+                 OR  ( SYU-HKNTEN (IDX0)   NOT =   ZERO )
+                 OR  ( SYU-TGMONEY(IDX0)   NOT =   ZERO )
+                       MOVE    SS015-SRYITEML (IDX0)
+                               TO  INCOMERES02-SRYITEM-KBN  (IDX0)
+                       MOVE    SS015-SRYITEMMEIL (IDX0)
+                               TO  INCOMERES02-SRYITEM-NAME (IDX0)
+                       MOVE    SYU-HKNTEN (IDX0)
                                TO  WRK-KINGAKUM9
                        MOVE    WRK-KINGAKUM9
-                               TO  INCOMERES02-HKNTEN (IDXL)
-                       MOVE    SYU-TGMONEY (IDXL)
+                               TO  INCOMERES02-HKNTEN (IDX0)
+                       COMPUTE WRK-KINGAKU
+                           =   SYU-TGMONEY (IDX0)
+                           +   SYU-TGMONEY-TAX (IDX0)
+                       MOVE    WRK-KINGAKU
                                TO  WRK-KINGAKUMM
                        MOVE    WRK-KINGAKUMM
-                               TO  INCOMERES02-TGMONEY (IDXL)
+                               TO  INCOMERES02-TGMONEY (IDX0)
                END-IF
       *
            END-PERFORM
