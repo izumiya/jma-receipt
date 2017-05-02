@@ -81,6 +81,7 @@
            03  IDXH                    PIC 9(05).
            03  IDXJ                    PIC 9(05).
            03  IDXK                    PIC 9(05).
+           03  IDXN                    PIC 9(05).
            03  IDXS                    PIC 9(05).
            03  IDXT                    PIC 9(05).
       *
@@ -123,6 +124,9 @@
            03  WRK-HKNCOMBI.
                05  WRK-HKNCOMBINUM     PIC 9(04).
            03  WRK-MISYU-TOTAL         PIC S9(10).
+           03  WRK-KBNCDJ.
+               05  WRK-KBNCDJ9         PIC 9(02).
+           03  WRK-NOZ                 PIC Z9.
       *
        01  KEY-AREA.
            03  KEY-RANGE               PIC X(01).
@@ -175,6 +179,7 @@
       *
        01  CONST-AREA.
            03  CONST-TCOMB-MAX         PIC 9(05)   VALUE   30.
+           03  CONST-TJIHINAME-MAX     PIC 9(05)   VALUE   40.
            03  CONST-SYUNOU-MAX        PIC 9(05)   VALUE   200.
            03  CONST-MISYU-MAX         PIC 9(05)   VALUE   50.
            03  CONST-H190401           PIC X(08)   VALUE   "20070401".
@@ -225,6 +230,8 @@
            COPY    "CPSK1010.INC".
       *    ¿ÇÎÅ²Ê¾ðÊó
            COPY    "CPSK1005.INC".
+      *    ¼«ÈñÌ¾¾Î
+           COPY    "CPSK1013.INC".
       *    ¼ýÇ¼µ¡Ç½¾ðÊó
            COPY    "CPSK1039.INC".
       *
@@ -584,6 +591,10 @@
                MOVE    WRK-DATE        TO  ICINFRES-SRYYMD (IDXA)
            END-IF
       *
+           MOVE    SYU-DENPPRTYMD      TO  WRK-SYMD
+           PERFORM 800-DATE-SEC
+           MOVE    WRK-DATE            TO  ICINFRES-DENPPRTYMD (IDXA)
+      *
            MOVE    SYU-NYUGAIKBN       TO  ICINFRES-NYUGAIKBN (IDXA)
            MOVE    SYU-DENPNUM         TO  ICINFRES-DENPNUM   (IDXA)
            MOVE    SYU-HKNCOMBINUM     TO  ICINFRES-HKNCOMBI  (IDXA)
@@ -594,6 +605,9 @@
       *
            MOVE    SYU-SKYMONEY        TO  WRK-KINGAKUM9
            MOVE    WRK-KINGAKUM9       TO  ICINFRES-SKYMONEY (IDXA)
+           MOVE    SYU-SKYMONEY-TAX-SAI
+                                   TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-SKYMONEY-TAX-SAI (IDXA)
            MOVE    SYU-NYUKIN-TOTAL    TO  WRK-KINGAKUM9
            MOVE    WRK-KINGAKUM9       TO  ICINFRES-NYUKIN   (IDXA)
            MOVE    SYU-HKNTEKMONEY     TO  WRK-KINGAKUM9
@@ -626,8 +640,18 @@
                COMPUTE WRK-KINGAKU         =   SYU-SKYMONEY-SKJ-KEI
                                            +   SYU-SKYMONEY-LIFE-KEI
                MOVE    WRK-KINGAKU         TO  WRK-KINGAKUM9
-               MOVE    WRK-KINGAKUM9       TO  ICINFRES-SKJMONEY (IDXA)
+               MOVE    WRK-KINGAKUM9       TO  ICINFRES-SLMONEY (IDXA)
+      *
+               MOVE    SYU-SKYMONEY-SKJ-KEI TO WRK-KINGAKUMM
+               MOVE    WRK-KINGAKUMM       TO  ICINFRES-SKJMONEY (IDXA)
+      *
+               MOVE    SYU-SKYMONEY-LIFE-KEI TO WRK-KINGAKUMM
+               MOVE    WRK-KINGAKUMM       TO  ICINFRES-LIFEMONEY (IDXA)
+      *
            END-IF
+      *
+           MOVE    SYU-RSI-TOTAL       TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM       TO  ICINFRES-RSI-TOTAL (IDXA)
       *
            COMPUTE WRK-KINGAKU         =   SYU-RSISHOSHIN-MONEY
                                        +   SYU-RSISAISHIN-MONEY
@@ -648,38 +672,158 @@
            MOVE    SYU-TOTAL-HKNTEN    TO  WRK-KINGAKUM9
            MOVE    WRK-KINGAKUM9       TO  ICINFRES-TOTAL-TEN (IDXA)
       *
+           COMPUTE WRK-KINGAKU
+               =   SYU-TOTAL-TGMONEY
+               +   SYU-TOTAL-TGMONEY-TAX
+           MOVE    WRK-KINGAKU     TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-TOTAL-TGMONEY (IDXA)
+      *
+           MOVE    SYU-TGMONEY-TAX-SAI
+                                   TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-TGMONEY-TAX-SAI (IDXA)
+      *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   16 )
       *
-               IF    ( IDX0    =   16 )
-                   IF    ( SYU-HKNTEN (IDX0)   NOT =   ZERO )
-                       MOVE    TBL-HKNTEN-KBN (IDX0)
-                               TO  ICINFRES-SRYITEM-KBN  (IDXA IDX0)
-                       MOVE    TBL-HKNTEN-MEI (IDX0)
-                               TO  ICINFRES-SRYITEM-NAME  (IDXA IDX0)
-                       MOVE    SYU-HKNTEN (IDX0)
-                               TO  WRK-KINGAKUMM
-                       MOVE    WRK-KINGAKUMM
-                               TO  ICINFRES-SRYITEM-TENSU (IDXA IDX0)
-                   END-IF
-               ELSE
+               IF    ( IDX0                NOT =   16 )
+                 OR  ( SYU-HKNTEN (IDXA)   NOT =   ZERO )
+                 OR  ( SYU-TGMONEY(IDXA)   NOT =   ZERO )
                    MOVE    TBL-HKNTEN-KBN (IDX0)
                                TO  ICINFRES-SRYITEM-KBN  (IDXA IDX0)
                    MOVE    TBL-HKNTEN-MEI (IDX0)
                                TO  ICINFRES-SRYITEM-NAME  (IDXA IDX0)
                    MOVE    SYU-HKNTEN (IDX0)
-                               TO  WRK-KINGAKUM9
-                   MOVE    WRK-KINGAKUM9
+                               TO  WRK-KINGAKUMM
+                   MOVE    WRK-KINGAKUMM
                                TO  ICINFRES-SRYITEM-TENSU (IDXA IDX0)
+                   COMPUTE WRK-KINGAKU
+                       =   SYU-TGMONEY (IDX0)
+                       +   SYU-TGMONEY-TAX (IDX0)
+                   MOVE    WRK-KINGAKU
+                               TO  WRK-KINGAKUMM
+                   MOVE    WRK-KINGAKUMM
+                               TO  ICINFRES-SRYITEM-TGMONEY (IDXA IDX0)
                END-IF
            END-PERFORM
+           MOVE    SYU-JIHI-TOTAL  TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-JIHI-TOTAL (IDXA)
+      *
+           MOVE    SYU-JIHI-TOTAL-TAX
+                                   TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-JIHI-TOTAL-TAX (IDXA)
+      *
+           MOVE    SYU-JIHI-TAX    TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM   TO  ICINFRES-JIHI-TOTAL-TAX-SAI(IDXA)
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   10 )
+      *
+               MOVE    2               TO  IDXN
+               IF    ( SYU-NYUGAIKBN   =   "1" )
+                   MOVE    1           TO  IDXN
+               END-IF
+      *
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    "1013"              TO  SYS-KANRICD
+               MOVE    SYU-NYUGAIKBN       TO  SYS-KBNCD(1:1)
+               MOVE    IDX0                TO  WRK-KBNCDJ9
+               MOVE    WRK-KBNCDJ (2:1)    TO  SYS-KBNCD(2:1)
+               MOVE    SYU-SRYYMD          TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC        TO  SYS-1013-REC
+      *
+               IF    ( SYS-1013-JIHINAME           NOT =   SPACE )
+                OR   ( SYU-JIHI-TAXNASI (IDX0)     NOT =   ZERO )
+                OR   ( SYU-JIHI-TAXARI (IDX0)      NOT =   ZERO )
+      *
+                   MOVE    IDX0    TO  WRK-NOZ
+                   MOVE    WRK-NOZ TO  ICINFRES-JIHI-NO (IDXA IDX0)
+      *
+                   MOVE    SYS-1013-JIHINAME
+                                   TO  ICINFRES-JIHI-NAME (IDXA IDX0)
+                   MOVE    SYU-JIHI-TAXNASI (IDX0)
+                                   TO  WRK-KINGAKUMM
+                   MOVE    WRK-KINGAKUMM
+                                   TO  ICINFRES-JIHI-TAXNASI (IDXA IDX0)
+                   MOVE    SYU-JIHI-TAXARI (IDX0)
+                                   TO  WRK-KINGAKUMM
+                   MOVE    WRK-KINGAKUMM
+                                   TO  ICINFRES-JIHI-TAXARI (IDXA IDX0)
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           MOVE    SYU-RSISHOSHIN-MONEY
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RSISHOSHIN-MONEY (IDXA)
+      *
+           MOVE    SYU-RSISAISHIN-MONEY
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RSISAISHIN-MONEY (IDXA)
+      *
+           MOVE    SYU-RSISDO-MONEY
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RSISDO-MONEY (IDXA)
+      *
+           MOVE    SYU-RSIETC-MONEY
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RSIETC-MONEY (IDXA)
       *
            IF    ( SYU-NYUGAIKBN       =   "1" )
-               COMPUTE WRK-KINGAKU         =   SYU-RYOYOHI-SKJ
-                                           +   SYU-RYOYOHI-LIFE
-               MOVE    WRK-KINGAKU         TO  WRK-KINGAKUM9
-               MOVE    WRK-KINGAKUM9       TO  ICINFRES-SKJRYOYO (IDXA)
+               COMPUTE WRK-KINGAKU     =   SYU-RYOYOHI-SKJ
+                                       +   SYU-RYOYOHI-LIFE
+                                       +   SYU-RYOYOHI-SKJ-JIHI
+                                       +   SYU-RYOYOHI-LIFE-JIHI
+               MOVE    WRK-KINGAKU     TO  WRK-KINGAKUM9
+               MOVE    WRK-KINGAKUM9   TO  ICINFRES-SLRYOYO (IDXA)
            END-IF
+      *
+           MOVE    SYU-RYOYOHI-SKJ
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-SKJRYOYO (IDXA)
+      *
+           MOVE    SYU-RYOYOHI-LIFE
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-LIFERYOYO (IDXA)
+      *
+           MOVE    SYU-RYOYOHI-SKJ-JIHI
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-SKJRYOYO-JIHI (IDXA)
+      *
+           MOVE    SYU-SKYMONEY-SKJ-JIHI-KEI
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-SKJFTN-JIHI (IDXA)
+      *
+           MOVE    SYU-RYOYOHI-LIFE-JIHI
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-LIFERYOYO-JIHI (IDXA)
+      *
+           MOVE    SYU-SKYMONEY-LIFE-JIHI-KEI
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-LIFEFTN-JIHI (IDXA)
+      *
+           MOVE    SYU-RMSAGAKU
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RMSAGAKU (IDXA)
+      *
+           MOVE    SYU-RMSAGAKU-TAX-SAI
+                                 TO  WRK-KINGAKUMM
+           MOVE    WRK-KINGAKUMM
+                                 TO  ICINFRES-RMSAGAKU-TAX-SAI (IDXA)
       *
            .
        20011-SYUNOU-EDIT-EXT.

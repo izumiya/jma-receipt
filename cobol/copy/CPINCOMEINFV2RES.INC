@@ -38,6 +38,7 @@
               05  ICINFRES-INCONEINF-OCC               OCCURS 200.
                 07  ICINFRES-SRYYMD                    PIC X(10).
                 07  ICINFRES-SKYEDYMD                  PIC X(10).
+                07  ICINFRES-DENPPRTYMD                PIC X(10).
                 07  ICINFRES-NYUGAIKBN                 PIC X(1).
                 07  ICINFRES-DENPNUM                   PIC X(7).
                 07  ICINFRES-HKNCOMBI                  PIC X(4).
@@ -46,24 +47,53 @@
                 07  ICINFRES-SRYKANAME                 PIC X(30).
                 07  ICINFRES-PTFTN-AREA.
                   09  ICINFRES-SKYMONEY                PIC X(10).
+                  09  ICINFRES-SKYMONEY-TAX-SAI        PIC X(10).
                   09  ICINFRES-NYUKIN                  PIC X(10).
                   09  ICINFRES-HKNMONEY                PIC X(10).
                   09  ICINFRES-JIHIMONEY               PIC X(10).
                   09  ICINFRES-YKZMONEY                PIC X(10).
                   09  ICINFRES-RJNMONEY                PIC X(10).
                   09  ICINFRES-KOHMONEY                PIC X(10).
+                  09  ICINFRES-SLMONEY                 PIC X(10).
                   09  ICINFRES-SKJMONEY                PIC X(10).
+                  09  ICINFRES-LIFEMONEY               PIC X(10).
+                  09  ICINFRES-RSI-TOTAL               PIC X(10).
                   09  ICINFRES-RSIMONEY                PIC X(10).
                   09  ICINFRES-GENMEN                  PIC X(10).
                   09  ICINFRES-CHOSEI1                 PIC X(10).
                   09  ICINFRES-CHOSEI2                 PIC X(10).
                 07  ICINFRES-AC-POINT-INFORMATION.
                   09  ICINFRES-TOTAL-TEN               PIC X(10).
+                  09  ICINFRES-TOTAL-TGMONEY           PIC X(10).
+                  09  ICINFRES-TGMONEY-TAX-SAI         PIC X(10).
                   09  ICINFRES-SRYITEM-OCC             OCCURS 16.
                     11  ICINFRES-SRYITEM-KBN           PIC X(03).
                     11  ICINFRES-SRYITEM-NAME          PIC X(30).
                     11  ICINFRES-SRYITEM-TENSU         PIC X(10).
+                    11  ICINFRES-SRYITEM-TGMONEY       PIC X(10).
+                07  ICINFRES-ETCJIHI-AREA.
+                  09  ICINFRES-JIHI-TOTAL              PIC X(10).
+                  09  ICINFRES-JIHI-TOTAL-TAX          PIC X(10).
+                  09  ICINFRES-JIHI-TOTAL-TAX-SAI      PIC X(10).
+                  09  ICINFRES-ETCJIHI-OCC             OCCURS  10.
+                    11  ICINFRES-JIHI-NO               PIC X(2).
+                    11  ICINFRES-JIHI-NAME             PIC X(20).
+                    11  ICINFRES-JIHI-TAXNASI          PIC X(10).
+                    11  ICINFRES-JIHI-TAXARI           PIC X(10).
+                07  ICINFRES-RSI-AREA.
+                  09  ICINFRES-RSISHOSHIN-MONEY        PIC X(10).
+                  09  ICINFRES-RSISAISHIN-MONEY        PIC X(10).
+                  09  ICINFRES-RSISDO-MONEY            PIC X(10).
+                  09  ICINFRES-RSIETC-MONEY            PIC X(10).
+                07  ICINFRES-SLRYOYO                   PIC X(10).
                 07  ICINFRES-SKJRYOYO                  PIC X(10).
+                07  ICINFRES-LIFERYOYO                 PIC X(10).
+                07  ICINFRES-SKJRYOYO-JIHI             PIC X(10).
+                07  ICINFRES-SKJFTN-JIHI               PIC X(10).
+                07  ICINFRES-LIFERYOYO-JIHI            PIC X(10).
+                07  ICINFRES-LIFEFTN-JIHI              PIC X(10).
+                07  ICINFRES-RMSAGAKU                  PIC X(10).
+                07  ICINFRES-RMSAGAKU-TAX-SAI          PIC X(10).
               05  ICINFRES-HKNCOMBI-INF-AREA           OCCURS  20.
                 07  ICINFRES-HKNCOMBI-KEY              PIC X(04).
                 07  ICINFRES-HKNNUM                    PIC X(03).
