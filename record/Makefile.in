@@ -519,6 +519,7 @@ RECORD_files = \
     findinfv3.rec \
 	medicalmodv36.rec \
 	incomev3.rec \
+ 	Q05.rec \
 
 DEF_files = \
 

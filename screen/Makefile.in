@@ -444,6 +444,7 @@ SCREEN_screen = \
 	UDR.glade \
 	W061.glade \
 	I4ID2.glade \
+	Q05.glade \
 
 SCREEN_objs = $(SCREEN_sources:.glade.in=.glade)
 
