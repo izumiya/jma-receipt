@@ -23,6 +23,7 @@
            COPY    "Q02B.INC".
            COPY    "Q03.INC".
            COPY    "Q04.INC".
+           COPY    "Q05.INC".
            COPY    "Q96.INC".
            COPY    "Q97.INC".
            COPY    "Q98.INC".

@@ -532,6 +532,7 @@ RECORD_files = \
 	medicalmodv36.rec \
 	diseasev2.rec \
 	incomev3.rec \
+ 	Q05.rec \
 
 DEF_files = \
 

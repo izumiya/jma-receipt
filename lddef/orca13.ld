@@ -10,6 +10,7 @@ bind	"Q02A"		"OpenCOBOL"	"ORCGQ02A";
 bind	"Q02B"		"OpenCOBOL"	"ORCGQ02B";
 bind	"Q03"		"OpenCOBOL"	"ORCGQ03";
 bind	"Q04"		"OpenCOBOL"	"ORCGQ04";
+bind	"Q05"		"OpenCOBOL"	"ORCGQ05";
 bind	"Q96"		"OpenCOBOL"	"ORCGQ96";
 bind	"Q97"		"OpenCOBOL"	"ORCGQ97";
 bind	"Q98"		"OpenCOBOL"	"ORCGQ98";
@@ -31,6 +32,7 @@ data	{
 		Q02B;
 		Q03;
 		Q04;
+		Q05;
 		Q96;
 		Q97;
 		Q98;

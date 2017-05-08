@@ -1120,6 +1120,22 @@
                        09  SPA-GMN-Q04-RENNUM          PIC 9(03).
                        09  SPA-GMN-Q04-TITLEKBN        PIC X(01).
       *
+      *    £Ñ£°£µÍÑ
+           03  SPA-Q05-AREA.
+               05  SPA-GMN-Q05-CUR                     PIC 9(03).
+      *
+               05  SPA-GMN-Q05-AREA.
+                   07  SPA-GMN-Q05-SELNUM              PIC 9(03).
+      *
+               05  SPA-GMN-Q05-JKNLST-AREA.
+                   07  SPA-GMN-Q05-JKNLST-MAX          PIC 9(05).
+                   07  SPA-GMN-Q05-JKNLST-SEL          PIC 9(05).
+                   07  SPA-GMN-Q05-JKNLST-OCC          OCCURS  200.
+                       09  SPA-GMN-Q05-TNUM            PIC 9(03).
+                       09  SPA-GMN-Q05-TUID            PIC X(36).
+                       09  SPA-GMN-Q05-TNAME           PIC X(100).
+                       09  SPA-GMN-Q05-TTITLEKBN       PIC X(1).
+      *
       *    £Ñ£¹£¶ÍÑ
            03  SPA-Q96-AREA.
                05  SPA-Q96-MOTOPG                    PIC X(08).
@@ -1280,6 +1296,7 @@
       *
                05  SPA-Q01-ERRMSG                      PIC X(100).
                05  SPA-Q01-CLIENT-SAVE                 PIC X(1).
+               05  SPA-Q01-UID                         PIC X(36).
       *
       *        Q01¢«¢ªQ02Á«°Ü¾ðÊó
                05  SPA-Q01-Q02-SENI-AREA.

@@ -437,6 +437,7 @@
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-Q01FREE
       *
+      *
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
       *
@@ -529,6 +530,9 @@
                GO      TO      300-SCREEN-EXT
            WHEN    "Q04"
                PERFORM 310-Q04SPASET-SEC
+               GO      TO      300-SCREEN-EXT
+           WHEN    "Q05"
+               PERFORM 310-Q05SPASET-SEC
                GO      TO      300-SCREEN-EXT
       *    確認メッセージ画面
            WHEN    "QID1"
@@ -649,6 +653,38 @@
       *
            .
        310-Q04SPASET-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ｑ０５戻りスパ編集処理
+      *****************************************************************
+       310-Q05SPASET-SEC               SECTION.
+      *
+           PERFORM 3101-SELPATTERNLST-SEC
+      *
+           IF  ( SPA-Q01-UID       NOT =  SPACE )
+      *
+               MOVE    SPA-Q01-UID TO  WRK-CMB-CD
+               PERFORM 4201-SELPATTERNLST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  Q01-SELPATTERN
+               PERFORM 4100-SELPATTERN-CHK-SEC
+               PERFORM 3102-DRCDLST-SEC
+           ELSE
+               IF    ( SPA-NAI-Q01-SELPATTERN-UID
+                                   NOT =  SPACE )
+                   MOVE    SPA-NAI-Q01-SELPATTERN-UID
+                                   TO  WRK-CMB-CD
+                   PERFORM 4201-SELPATTERNLST-CHK-SEC
+                   MOVE    WRK-CMB-ITM
+                                   TO  SPA-GMN-Q01-SELPATTERN-G
+                   MOVE    WRK-CMB-ITM2
+                                   TO SPA-NAI-Q01-SELPATTERN-UID
+                   MOVE    WRK-CMB-ITM3
+                                   TO SPA-NAI-Q01-SELPATTERN-TTLKBN
+               END-IF
+           END-IF
+      *
+           .
+       310-Q05SPASET-EXT.
            EXIT.
       *****************************************************************
       *    ＱＩＤ１戻りスパ編集処理
@@ -2112,6 +2148,8 @@
                MOVE    1           TO  FLG-CHGSRYYMD
                PERFORM 4100-CHGSRYYMD-SEC
                PERFORM 3102-DRCDLST-SEC
+           WHEN    "CLICKED"       ALSO    "B08S"
+               PERFORM 480-Q05-SENI-SEC
            END-EVALUATE
       *
            .
@@ -7616,6 +7654,47 @@
       *
            .
        470-Q04-SENI-EXT.
+           EXIT.
+      *****************************************************************
+      *    検索条件保存画面遷移
+      *****************************************************************
+       480-Q05-SENI-SEC                SECTION.
+      *
+           MOVE    1           TO  FLG-ALL-TAB
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *
+               MOVE    SPA-AREA        TO  SPA-COMMON
+               MOVE    SPA-Q01FREE     TO  SPA-FREE
+      *
+               MOVE    "LINK"          TO  MCP-STATUS
+               MOVE    SPACE           TO  MCP-EVENT
+      *
+               CALL    "ORCGQ05"           USING
+                                           MCPAREA
+                                           SPAAREA
+                                           LINKAREA
+                                           SCRAREA
+      *
+               MOVE    SPA-COMMON      TO  SPA-AREA
+               MOVE    SPA-FREE        TO  SPA-Q01FREE
+      *
+               MOVE    "SELNUM"        TO  MCP-WIDGET
+      *
+               MOVE    "Q01"           TO  SPA-MOTOPG
+               MOVE    "Q05"           TO  SPA-SAKIPG
+      *
+               MOVE    "NEW"           TO  MCP-PUTTYPE
+               MOVE    "Q05    "       TO  MCP-WINDOW
+      *
+               PERFORM 900-PUT-WINDOW
+      *
+               MOVE    1               TO  FLG-END
+           END-IF
+      *
+           .
+       480-Q05-SENI-EXT.
            EXIT.
       *****************************************************************
       *    病名部分検索処理
