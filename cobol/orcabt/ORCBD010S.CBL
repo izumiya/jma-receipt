@@ -85,8 +85,9 @@
       *
            COPY    "CPRECEERR.INC".
       *
-           COPY    "HCM51V03.INC"  REPLACING   //HCM51V03//
-                                   BY          //HCM51//.
+      *     COPY    "HCM51V03.INC"  REPLACING   //HCM51V03//
+      *                             BY          //HCM51//.
+           COPY    "HCM51.INC".
            COPY    "HCM51V02.INC".
            COPY    "HCM52V05.INC"  REPLACING   //HCM52V05//
                                    BY          //HCM52//.
@@ -224,6 +225,7 @@
            03  TTL-CHOSEI2             PIC     S9(10).
            03  TTL-GENMEN              PIC     S9(10).
            03  TTL-MISYU               PIC     S9(10).
+           03  TTL-ZENMISYU            PIC     S9(10).
       *
        01  CSV-AREA.
            03  CSV-SYOSIN              PIC X(10).
@@ -1963,6 +1965,8 @@
                COMPUTE TTL-MISYU
                    =   TTL-MISYU   +   BD01004-TTLMISYU
            END-IF
+           COMPUTE TTL-ZENMISYU
+               =   TTL-ZENMISYU    +   BD01004-ZENMISYU
       *
            .
        220-SUM-BODY-TOTAL-EXT.
@@ -1993,6 +1997,7 @@
            MOVE    "¡ÊÆâº£²óÆþ¶â³Û¡Ë"
                                    TO  HCM51-TTL-KONNYUKINMSG
            MOVE    "º£²óÌ¤¼ý³Û"    TO  HCM51-TTL-MISYUMSG
+           MOVE    "Á°²óÌ¤¼ý³Û"    TO  HCM51-TTL-ZENMISYUMSG
       *
            MOVE    TTL-HKNTEN      TO  WRK-ZZZZZZZ9
            MOVE    WRK-ZZZZZZZ9    TO  HCM51-TTL-HKNTEN
@@ -2024,6 +2029,8 @@
            MOVE    WRK-ZZZZZZZ9    TO  HCM51-TTL-GENMEN
            MOVE    TTL-MISYU       TO  WRK-ZZZZZZZ9
            MOVE    WRK-ZZZZZZZ9    TO  HCM51-TTL-MISYU
+           MOVE    TTL-ZENMISYU    TO  WRK-ZZZZZZZ9
+           MOVE    WRK-ZZZZZZZ9    TO  HCM51-TTL-ZENMISYU
       *
            .
        2201-BODY-TOTAL-EXT.
@@ -2035,7 +2042,8 @@
       *
            INITIALIZE                  ORCSPRTAREA
            PERFORM 230-PRINT-COMMON-SEC
-           MOVE   "HCM51V03.red"   TO  SPRT-PRTID
+      *     MOVE   "HCM51V03.red"   TO  SPRT-PRTID
+           MOVE   "HCM51.red"      TO  SPRT-PRTID
            MOVE    "¼ýÇ¼ÆüÊó"      TO  SPRT-TITLE
            MOVE    HCM51           TO  SPRT-PRTDATA
            CALL    "ORCSPRT"           USING
