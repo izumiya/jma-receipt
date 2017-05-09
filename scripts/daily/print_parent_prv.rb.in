@@ -6,7 +6,7 @@ Encoding.default_external = "ascii-8bit" if defined?(Encoding) && Encoding.respo
 $:.unshift(File.dirname(__FILE__))
 require 'yaml'
 require "securerandom"
-require 'print_parent_common'
+require 'daily/print_parent_common'
 
 # 引数指定方法
 #   引数1         設定ファイル名
