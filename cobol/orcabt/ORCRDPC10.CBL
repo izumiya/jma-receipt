@@ -166,6 +166,11 @@
       *                                     の入力が無くても作成できるよう修正）
       *              NACL-小豆沢  17/04/21  不要な持参薬区分が記録されないよう対処
       *              NACL-小豆沢  17/05/02  上記４月２１日修正を変更
+      *              NACL-小豆沢  17/05/09  医保以外で療養病棟入院基本料を算定した
+      *                                     場合に入院会計から算定入院料を取得し、
+      *                                     F-19（行為明細区分情報）２桁目の
+      *                                     入院料包括項目区分を再セットする
+      *                                     （17/03/16の修正に追加）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2232,6 +2237,62 @@
                    PERFORM   900-CLOSE-SEC
                 END-IF
       *--- AZU-ADD END   2017.03.16
+      *
+      *--- AZU-ADD START 2017.05.09
+      *         医保以外で療養病棟入院基本料を算定している場合を考慮して
+      *         WRK-HOUKATU-KBN(IDX)が未セット日は入院会計を再取得
+      *         して再セット
+                IF    WRK-HOUKATU-KBN(IDX)          =   SPACE
+                   INITIALIZE                           NYUINACCT-REC
+                   MOVE  RECE62-HOSPNUM             TO  NACCT-HOSPNUM
+                   MOVE  RECE62-PTID                TO  NACCT-PTID
+                   MOVE  RECE62-SRYYM               TO  NACCT-SRYYM
+                   MOVE  "1"                        TO  NACCT-ZAISKBKBN
+                   MOVE  "tbl_nyuinacct"            TO  MCP-TABLE
+                   MOVE  "key35"                    TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT            =   ZERO
+                      MOVE    "tbl_nyuinacct"       TO  MCP-TABLE
+                      MOVE    "key35"               TO  MCP-PATHNAME
+                      PERFORM   910-NYUINACCT-READ-SEC
+                      PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+                         IF   (NACCT-SRYKBN         =   "90")  AND
+                              (NACCT-DAY(IDX)       =   1)
+      *                     該当入院行為テーブルの読み込み
+                            PERFORM    210-NYUINACT-GET-SEC
+                            INITIALIZE                  TNS-TENSU-REC
+                            MOVE    NSRY-SRYCD(1)   TO  TNS-SRYCD
+                            PERFORM 900-TENSU-READ-SEC
+                            IF   TNS-CDKBN-KBN     =   "A"
+                              IF ((TNS-CDKBN-KBNNUM      =  101)   AND
+                                  (TNS-CDKBN-KOUBAN      =  1))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  101)   AND
+                                  (TNS-CDKBN-KOUBAN      =  2))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  101)   AND
+                                  (TNS-CDKBN-KOUBAN      =  3))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  101)   AND
+                                  (TNS-CDKBN-KOUBAN      =  9))    OR
+                                 ((TNS-CDKBN-KBNNUM      =  101)   AND
+                                  (TNS-CDKBN-KOUBAN      =  10))   OR
+                                 ((TNS-CDKBN-KBNNUM      =  100)   AND
+                                  (TNS-CDKBN-KOUBAN      =  16))
+                                     MOVE  "2" TO  WRK-HOUKATU-KBN(IDX)
+                              END-IF
+                              MOVE  NSRY-SRYCD(1)   TO
+                                           WRK-IHO-IGAI-TOKNYUINCD(IDX)
+                            END-IF
+                         END-IF
+                         MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
+                         MOVE    "key35"           TO  MCP-PATHNAME
+                         PERFORM 910-NYUINACCT-READ-SEC
+                      END-PERFORM
+                   END-IF
+      *            入院会計クローズ
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key35"                 TO  MCP-PATHNAME
+                   PERFORM   900-CLOSE-SEC
+                END-IF
+      *--- AZU-ADD END   2017.05.09
       *
       *         入院料の包括グループ番号取得
                 IF    LNK-DPCNYUIN-SRYCD(1 IDX 1)  NOT = SPACE
