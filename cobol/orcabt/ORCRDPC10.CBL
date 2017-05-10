@@ -2171,9 +2171,9 @@
                 END-IF
       *
       *--- AZU-ADD START 2017.03.16
-      *         医保以外で特定入院料を算定している場合を考慮して
-      *         WRK-HOUKATU-KBN(IDX)が未セット日は入院会計を再取得
-      *         して再セット
+      *         医保以外で特定入院料（又は療養病棟入院基本料）を算定して
+      *         いる場合を考慮してWRK-HOUKATU-KBN(IDX)が未セット日は入院
+      *         会計を再取得して再セット
                 IF    WRK-HOUKATU-KBN(IDX)          =   SPACE
                    INITIALIZE                           NYUINACCT-REC
                    MOVE  RECE62-HOSPNUM             TO  NACCT-HOSPNUM
@@ -2226,36 +2226,7 @@
                                            WRK-IHO-IGAI-TOKNYUINCD(IDX)
                             END-IF
                          END-IF
-                         MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
-                         MOVE    "key35"           TO  MCP-PATHNAME
-                         PERFORM 910-NYUINACCT-READ-SEC
-                      END-PERFORM
-                   END-IF
-      *            入院会計クローズ
-                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
-                   MOVE    "key35"                 TO  MCP-PATHNAME
-                   PERFORM   900-CLOSE-SEC
-                END-IF
-      *--- AZU-ADD END   2017.03.16
-      *
       *--- AZU-ADD START 2017.05.09
-      *         医保以外で療養病棟入院基本料を算定している場合を考慮して
-      *         WRK-HOUKATU-KBN(IDX)が未セット日は入院会計を再取得
-      *         して再セット
-                IF    WRK-HOUKATU-KBN(IDX)          =   SPACE
-                   INITIALIZE                           NYUINACCT-REC
-                   MOVE  RECE62-HOSPNUM             TO  NACCT-HOSPNUM
-                   MOVE  RECE62-PTID                TO  NACCT-PTID
-                   MOVE  RECE62-SRYYM               TO  NACCT-SRYYM
-                   MOVE  "1"                        TO  NACCT-ZAISKBKBN
-                   MOVE  "tbl_nyuinacct"            TO  MCP-TABLE
-                   MOVE  "key35"                    TO  MCP-PATHNAME
-                   PERFORM 910-NYUINACCT-SELECT-SEC
-                   IF      FLG-NYUINACCT            =   ZERO
-                      MOVE    "tbl_nyuinacct"       TO  MCP-TABLE
-                      MOVE    "key35"               TO  MCP-PATHNAME
-                      PERFORM   910-NYUINACCT-READ-SEC
-                      PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
                          IF   (NACCT-SRYKBN         =   "90")  AND
                               (NACCT-DAY(IDX)       =   1)
       *                     該当入院行為テーブルの読み込み
@@ -2282,6 +2253,7 @@
                                            WRK-IHO-IGAI-TOKNYUINCD(IDX)
                             END-IF
                          END-IF
+      *--- AZU-ADD END   2017.05.09
                          MOVE    "tbl_nyuinacct"   TO  MCP-TABLE
                          MOVE    "key35"           TO  MCP-PATHNAME
                          PERFORM 910-NYUINACCT-READ-SEC
@@ -2292,7 +2264,7 @@
                    MOVE    "key35"                 TO  MCP-PATHNAME
                    PERFORM   900-CLOSE-SEC
                 END-IF
-      *--- AZU-ADD END   2017.05.09
+      *--- AZU-ADD END   2017.03.16
       *
       *         入院料の包括グループ番号取得
                 IF    LNK-DPCNYUIN-SRYCD(1 IDX 1)  NOT = SPACE
