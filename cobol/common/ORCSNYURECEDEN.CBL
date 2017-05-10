@@ -11653,7 +11653,8 @@
                    PERFORM   900-CLOSE-SEC
       *
                    IF   (FLG-TOKU-SHOKU        =   1)   AND
-                        (ACCT-SRYKBN           =   "97")
+                        (ACCT-SRYKBN           =   "97")  AND
+                        (ACCT-ZAIKAISU         NOT =  ZERO)
                        PERFORM    VARYING   IDX1   FROM   1   BY  1
                          UNTIL   (IDX1         >   31)     OR
                                  (LNK-NYURECEDEN-HKNCOMBI(3 IDX1)
@@ -11774,7 +11775,8 @@
                    PERFORM   900-CLOSE-SEC
       *
                    IF   (FLG-TOKU-SHOKU        =   1)   AND
-                        (ACCT-SRYKBN           =   "97")
+                        (ACCT-SRYKBN           =   "97")  AND
+                        (ACCT-ZAIKAISU         NOT =  ZERO)
                        PERFORM    VARYING   IDX1   FROM   1   BY  1
                          UNTIL   (IDX1         >   31)     OR
                                  (LNK-NYURECEDEN-HKNCOMBI(4 IDX1)
