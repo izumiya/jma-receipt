@@ -941,18 +941,6 @@
         </signal>
       </widget>
       <widget>
-        <class>GtkHSeparator</class>
-        <name>hseparator1</name>
-        <x>8</x>
-        <y>56</y>
-        <width>808</width>
-        <height>20</height>
-        <sensitive>True</sensitive>
-        <can_focus>False</can_focus>
-        <has_focus>False</has_focus>
-        <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
-      </widget>
-      <widget>
         <class>GtkPandaCombo</class>
         <name>TABOOCOB</name>
         <x>444</x>
@@ -1526,9 +1514,9 @@
         <class>GtkScrolledWindow</class>
         <name>scrolledwindow2</name>
         <x>4</x>
-        <y>76</y>
+        <y>86</y>
         <width>798</width>
-        <height>584</height>
+        <height>576</height>
         <visible>True</visible>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
@@ -1577,6 +1565,52 @@
         <accelerator>
           <modifiers>GDK_CONTROL_MASK</modifiers>
           <key>GDK_Home</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>KOHMSG</name>
+        <x>168</x>
+        <y>63</y>
+        <width>410</width>
+        <height>20</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label></label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkButton</class>
+        <name>BSH2</name>
+        <x>958</x>
+        <y>60</y>
+        <width>64</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <label>メモ</label>
+        <relief>GTK_RELIEF_NORMAL</relief>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <response_id>0</response_id>
+        <accelerator>
+          <modifiers>GDK_CONTROL_MASK</modifiers>
+          <key>GDK_F10</key>
           <signal>clicked</signal>
         </accelerator>
         <signal>

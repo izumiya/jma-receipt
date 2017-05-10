@@ -3973,6 +3973,9 @@
       *        受診履歴一覧編集
                MOVE    ZERO                TO  SPA-RRK-PAGE
                PERFORM 2002-JYURRK-SET-SEC
+      *H29.5
+      *        公費期限切れ判定
+               PERFORM 2009-KOHENDCHK-SEC
            END-IF
       *
       *    受付マスタより、診療科、ドクターの決定
