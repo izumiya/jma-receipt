@@ -35,6 +35,7 @@ bindapi	"stock1v2"	"OpenCOBOL"	"ORAPI052R1V2";
 bindapi	"okusurigetv2"	"OpenCOBOL"	"ORAPIRELR1V2";
 bindapi	"okusuriputv2"	"OpenCOBOL"	"ORAPIRELR2V2";
 bindapi	"imagegetv2"	"OpenCOBOL"	"ORAPI000R2V2";
+bindapi	"patientlst6v2"	"OpenCOBOL"	"ORAPI012R6V2";
 
 multiplex_group	api01rv2;
 
@@ -72,7 +73,8 @@ data	{
 		stock1v2;
 		okusurigetv2;
 		okusuriputv2;
-        imagegetv2;
+	        imagegetv2;
+		patientlst6v2;
 	};
 };
 db "xml2" {
@@ -143,6 +145,8 @@ db "xml2" {
  xml_okusuriputv2req;
  xml_okusuriputv2res;
  xml_imagegetv2req;
+ xml_patientlst6v2req;
+ xml_patientlst6v2res;
 };
 
 #include "orcadb.inc"
