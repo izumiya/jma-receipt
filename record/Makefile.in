@@ -520,6 +520,7 @@ RECORD_files = \
 	medicalmodv36.rec \
 	incomev3.rec \
  	Q05.rec \
+	patientlst6v2.rec \
 
 DEF_files = \
 
@@ -885,6 +886,8 @@ DB_files = \
 	xml_incomev3res01.db \
 	xml_incomev3res02.db \
 	xml_incomev3res03.db \
+	xml_patientlst6v2req.db \
+	xml_patientlst6v2res.db \
 
 
 shell.db: shell.db.in
