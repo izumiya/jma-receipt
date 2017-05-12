@@ -5350,7 +5350,7 @@
        490-GAI-TUKISKYPRT-SEC          SECTION.
       *
            IF     ( SPA-GMN-PTID   =   ZERO )
-               MOVE    "1003"      TO  SPA-ERRCD
+               MOVE    "0071"      TO  SPA-ERRCD
            ELSE
       *
                MOVE    SPACE       TO  SPA-TUKI-SRYYM
@@ -6138,7 +6138,7 @@
        460-IKKATU-NYUKIN-SEC           SECTION.
       *
            IF    ( SPA-GMN-PTID        =   ZERO )
-               MOVE    "1003"          TO  SPA-ERRCD
+               MOVE    "0071"          TO  SPA-ERRCD
                GO  TO  460-IKKATU-NYUKIN-EXT
            END-IF
       *
@@ -7814,7 +7814,7 @@
        500-SHIHARAI-SEC            SECTION.
       *
            IF       SPA-GMN-PTID   =   ZERO
-               MOVE    "1003"      TO  SPA-ERRCD
+               MOVE    "0071"      TO  SPA-ERRCD
                GO  TO  500-SHIHARAI-EXT
            END-IF
       *
