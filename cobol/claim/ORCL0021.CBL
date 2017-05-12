@@ -46,6 +46,7 @@
       *  04.05.00    NACL-多々納  10/01/XX  治験・拡張漢字対応
       *  04.06.00    NACL-多々納  10/11/16  マル長負担額を保険負担額反映
       *  04.08.00    NACL-多々納  13/01/15  診療回数テーブル１０対応
+      *  04.08.00    NACL-多々納  17/05/12  用法コード名称編集対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1276,6 +1277,11 @@
                MOVE    TNS-NAME            TO  TBL-ADMINISTRATION
                                                             (IDX-LF)
            END-IF
+      *H29.5
+      *    フリーコメントの内容セット
+           IF      SRY-INPUTNUM (IDXA)  NOT =   ZERO
+               PERFORM 200251-PTCOM-SET02-SEC
+           END-IF
       *
            .
        20025-YOUHOU-HEN-EXT.
@@ -1749,6 +1755,25 @@
        200221-PTCOM-SET-EXT.
            EXIT.
       *****************************************************************
+      *    患者コメントから編集する 
+      *****************************************************************
+       200251-PTCOM-SET02-SEC              SECTION.
+      *
+           MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
+           MOVE    SRY-PTID            TO  PTCOM-PTID
+           MOVE    SRY-ZAINUM          TO  PTCOM-ZAINUM
+           MOVE    SRY-SRYCD (IDXA)    TO  PTCOM-SRYCD
+           MOVE    SRY-INPUTNUM(IDXA)  TO  PTCOM-RENNUM
+      *主キーで検索
+           PERFORM 950-PTCOM-READ-SEC
+           IF      FLG-PTCOM           =   ZERO
+               MOVE    PTCOM-INPUTCOMENT   TO  TBL-ADMINISTRATION
+                                                            (IDX-LF)
+           END-IF
+           .
+       200251-PTCOM-SET02-EXT.
+           EXIT.
+      *****************************************************************
       *    受付メモ編集処理
       *****************************************************************
        2009-PTMEMOINF-SEC        SECTION.
@@ -1918,7 +1943,6 @@
                    MOVE    TBL-PPSFLG (IDX-LF)
                                                TO  WRK-LF02-PPSFLG
                                                              (IDX-LF)
-      *
                    PERFORM VARYING     IDX-S  FROM    1   BY  1
       *@                   UNTIL       IDX-S  >   20
                            UNTIL       IDX-S  >   30
