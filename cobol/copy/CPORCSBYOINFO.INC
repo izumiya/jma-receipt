@@ -26,6 +26,7 @@
       *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
       *                                     原疾患区分、合併症区分
       *  04.08.02    NACL-藤原    16/09/08  全ての患者病名情報の取得対応
+      *  04.08.03    NACL-藤原    17/05/15  補足コメントコード返却対応
       ************************************************************
       *
        01  ORCSBYOINFOAREA.
@@ -75,6 +76,9 @@
                    07  SBYOINFO-HOSOKUCD-G.
                        09  SBYOINFO-HOSOKUCD
                                            PIC X(20)   OCCURS   3.
+                   07  SBYOINFO-HOSOKUCD-COMMENT-G.
+                       09  SBYOINFO-HOSOKUCD-COMMENT
+                                           PIC X(80)   OCCURS   3.
       *        転帰区分
                    07  SBYOINFO-TENKIKBN   PIC X(01).
       *        転帰日

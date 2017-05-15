@@ -32,6 +32,7 @@
       *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
       *                                     原疾患区分、合併症区分
       *  04.08.02    NACL-藤原    16/09/08  全ての患者病名情報の取得対応
+      *  04.08.03    NACL-藤原    17/05/15  補足コメントコード返却対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -599,7 +600,7 @@
            EXIT.
       *
       *****************************************************************
-      *    受診履歴編集処理
+      *    患者病名編集処理
       *****************************************************************
        2002-SYORI-01-SEC           SECTION.
       *
@@ -756,6 +757,20 @@
       *    補足コメント
            MOVE    SBYOINFO-HOSOKU-COMMENT (IDX)
                                        TO  DISERES-SUPPLEMENT-NAME(IDX)
+      *    補足コメントコード
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       3
+                   OR      SBYOINFO-HOSOKUCD (IDX IDY)
+                                   =       SPACE
+               MOVE    SBYOINFO-HOSOKUCD (IDX IDY)
+                                           TO
+                                       DISERES-SUPPLEMENT-SINGLE-CODE
+                                                               (IDX IDY)
+               MOVE    SBYOINFO-HOSOKUCD-COMMENT (IDX IDY)
+                                           TO
+                                       DISERES-SUPPLEMENT-SINGLE-NAME
+                                                               (IDX IDY)
+           END-PERFORM
       *    カルテ病名
            MOVE    SBYOINFO-CHARTBYOMEI (IDX)
                                        TO  DISERES-KARTE-NAME (IDX)
