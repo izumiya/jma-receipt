@@ -29,6 +29,7 @@
       *  04.08.01    NACL-藤原    16/02/29  合併症に係わる情報追加対応
       *                                     原疾患区分、合併症区分
       *  04.08.02    NACL-藤原    16/09/08  全ての患者病名情報の取得対応
+      *  04.08.03    NACL-藤原    17/05/15  補足コメントコード返却対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -42,6 +43,7 @@
        01  FLG-AREA.
            03  FLG-PTBYOMEI        PIC 9(01).
            03  FLG-BYOMEI          PIC 9(01).
+           03  FLG-USERBYOMEI      PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
       *
@@ -51,6 +53,9 @@
            03  IDY                 PIC 9(04).
            03  IDXX                PIC 9(04).
       *
+           03  IDX1                PIC 9(04).
+           03  IDX2                PIC 9(04).
+      *
        01  WRK-AREA.
            03  WRK-YM              PIC 9(06).
       *                             
@@ -58,6 +63,8 @@
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03 WRK-INDEX            PIC 9(04).
+      *
+           03  WRK-LENGTH          PIC 9(02).
       *
        01  KEY-AREA.
            03 KEY-N-SRYYM          PIC X(06).
@@ -87,6 +94,10 @@
       *    病名
        01  BYOMEI-REC.
            COPY    "CPBYOMEI.INC".
+      *
+      *    自院病名
+       01  USERBYOMEI-REC.
+           COPY    "CPUSERBYOMEI.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -315,6 +326,7 @@
                                                                    (IDX)
                MOVE    WRK-PTBYO-HOSOKUCD-G    (IDXX)
                                            TO  SBYOINFO-HOSOKUCD-G (IDX)
+               PERFORM 20011-HOSOKUCD-COMMENT-HENSYU-SEC
                MOVE    WRK-PTBYO-TENKIYMD      (IDXX)
                                            TO  SBYOINFO-TENKIYMD   (IDX)
                MOVE    WRK-PTBYO-TENKIKBN      (IDXX)
@@ -411,6 +423,79 @@
            EXIT.
       *
       *****************************************************************
+      *    補足コメントコードからコメント内容を編集
+      *****************************************************************
+       20011-HOSOKUCD-COMMENT-HENSYU-SEC   SECTION.
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL   IDX1    >       3
+                   OR      SBYOINFO-HOSOKUCD (IDX IDX1)
+                                   =       SPACE
+               MOVE    ZERO                TO  WRK-LENGTH
+               PERFORM VARYING IDX2    FROM    10  BY  -1
+                       UNTIL   IDX2    <       1
+                   IF      SBYOINFO-HOSOKUCD (IDX IDX1) (IDX2:1)
+                                       NOT =   SPACE
+                       MOVE    IDX2            TO  WRK-LENGTH
+                       MOVE    1               TO  IDX2
+                   END-IF
+               END-PERFORM
+      *
+               IF      WRK-LENGTH          =   7
+                   MOVE    ZERO                  TO  FLG-BYOMEI
+      *
+                   INITIALIZE                  BYOMEI-REC
+                   MOVE    SBYOINFO-HOSOKUCD (IDX IDX1)
+                                               TO  BYO-BYOMEICD
+      *
+                   IF  (   BYO-BYOMEICD (1:3)  =   "ZZZ"    )
+                   AND ( ( BYO-BYOMEICD (4:1)  <   "1" ) OR 
+                         ( BYO-BYOMEICD (4:1)  =   "C" )    )
+      *                予約病名コード検索
+                       SET     TBL-BYOMEICD-IDX    TO  1
+                       SEARCH  TBL-BYOMEICD-OCC
+                                               VARYING TBL-BYOMEICD-IDX
+                           AT  END
+                               MOVE    1           TO  FLG-BYOMEI
+                           WHEN    BYO-BYOMEICD    =
+                                   TBL-YYK-BYOMEICD (TBL-BYOMEICD-IDX)
+                               MOVE    TBL-YYK-BYOMEI (TBL-BYOMEICD-IDX)
+                                                       TO
+                                   SBYOINFO-HOSOKUCD-COMMENT (IDX IDX1)
+                       END-SEARCH
+                   ELSE
+      *                病名マスタ読込
+                       IF      BYO-BYOMEICD    =   "0000999"
+                           CONTINUE
+                       ELSE
+                           PERFORM 900-BYOMEI-READ-SEC
+                           IF      FLG-BYOMEI      =   ZERO
+                               MOVE    BYO-BYOMEI      TO
+                                   SBYOINFO-HOSOKUCD-COMMENT (IDX IDX1)
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-BYOMEI          =   1 )
+               OR    ( WRK-LENGTH      NOT =   7 )
+      *            自院病名読込
+                   INITIALIZE                      USERBYOMEI-REC
+                   MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+                   MOVE    SBYOINFO-HOSOKUCD (IDX IDX1)
+                                               TO  USBYO-BYOMEIINPUTCD
+                   PERFORM 900-USERBYOMEI-READ-SEC
+                   IF      FLG-USERBYOMEI      =   ZERO
+                       MOVE    USBYO-BYOMEI        TO
+                                   SBYOINFO-HOSOKUCD-COMMENT (IDX IDX1)
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       20011-HOSOKUCD-COMMENT-HENSYU-XT.
+           EXIT.
+      *
+      *****************************************************************
       *    患者病名マスタ読込
       *****************************************************************
        900-PTBYO-READ-SEC              SECTION.
@@ -462,6 +547,39 @@
       *
            .
        900-BYOMEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自院病名読込
+      *****************************************************************
+       900-USERBYOMEI-READ-SEC         SECTION.
+      *
+           MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  USERBYOMEI-REC
+                   MOVE    ZERO                TO  FLG-USERBYOMEI
+               ELSE
+                   INITIALIZE                      USERBYOMEI-REC
+                   MOVE    1                   TO  FLG-USERBYOMEI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-USERBYOMEI
+               INITIALIZE                      USERBYOMEI-REC
+           END-IF
+      *
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-USERBYOMEI-READ-EXT.
            EXIT.
       *
       *****************************************************************

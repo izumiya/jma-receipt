@@ -83,6 +83,15 @@
                    05  DISERES-OUTCOME             PIC X(02).
       *            補足コメント
                    05  DISERES-SUPPLEMENT-NAME     PIC X(80).
+      *            補足コメントコード
+                   05  DISERES-SUPPLEMENT-SINGLE-G.
+                       07  DISERES-SUPPLEMENT-SINGLE   OCCURS   3.
+      *                    補足コメントコード
+                           09  DISERES-SUPPLEMENT-SINGLE-CODE
+                                                   PIC X(20).
+      *                    補足コメント
+                           09  DISERES-SUPPLEMENT-SINGLE-NAME
+                                                   PIC X(80).
       *            カルテ病名
                    05  DISERES-KARTE-NAME          PIC X(160).
       *            疾患区分
