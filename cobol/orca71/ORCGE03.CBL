@@ -467,9 +467,12 @@ grpsys     MOVE    WRK-PARA-TERMID   TO  EIE01PARA-TERMID.
                    MOVE    EIE01-REC(8:128)  TO  EIECSPARA-FILE-ID
                    MOVE    WK-TBL-NAME(IDX2) TO  WK-TABLE
                    MOVE    "all"             TO  WK-PATHNAME
-                   IF    ( WK-TABLE      =   "tbl_jyurrk_prv" )
+                   EVALUATE    WK-TABLE
+                   WHEN    "tbl_jyurrk_prv"
                        MOVE    "all3"        TO  WK-PATHNAME
-                   END-IF
+                   WHEN    "tbl_tsyrrk"
+                       MOVE    "all2"        TO  WK-PATHNAME
+                   END-EVALUATE
                    PERFORM UNTIL   FLG-END   NOT  =  ZERO
                        READ    EIE01-FILE
                          AT   END

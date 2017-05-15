@@ -100,3 +100,13 @@ path	all 	{
 		;
 	};
 };
+
+path	all2 	{
+	DBSELECT	{
+		DECLARE tbl_tsyrrk_all2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tsyrrk
+               WHERE   HOSPNUM      =   :HOSPNUM
+		;
+	};
+};
