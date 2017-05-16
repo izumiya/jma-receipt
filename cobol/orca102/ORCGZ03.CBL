@@ -2552,12 +2552,22 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (1)
                MOVE    "1 時間外算定可能"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (2)
-               MOVE    "2 初診料の休日に係る"
+      ****     MOVE    "2 初診料の休日に係る"
+               MOVE    "3 初診料の休日に係る"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (3)
                MOVE    3                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
-           IF      SPA-GMN-DATAKBN        =   2
-               MOVE    "0 時間外算定不可"
+           IF     (SPA-GMN-DATAKBN        =   2  )
+      *H29.5
+      *        手技料で時間区分が時間外区分である時
+           OR    ((SPA-GMN-DATAKBN        =   1   )  AND
+                  (SPA-GMN-KOKUJISKBKBN2  =   "7" )  AND
+                  (SPA-GMN-TIMEKSNKBN     <>  "0" )  AND
+                  (SPA-GMN-SRYKBN         =   "11"
+                                          OR  "12"
+                                          OR  "13"
+                                          OR  "14" ))
+               MOVE    "0 下記以外の診療行為"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (1)
                MOVE    "1 時間外加算"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (2)
@@ -2573,7 +2583,11 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (7)
                MOVE    "7 夜間加算"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (8)
-               MOVE    8                 TO  SPA-TIMEKSNKBN-MAX
+               MOVE    "8 時間外等加算（100点以上）"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (9)
+               MOVE    "9 休日加算（100点以上）"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (10)
+               MOVE    10                TO  SPA-TIMEKSNKBN-MAX
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TIMEKSNKBN-MAX
