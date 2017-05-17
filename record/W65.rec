@@ -1380,6 +1380,22 @@ W65 {
             item varchar(40)[10];
           state int;
         };
+        CMB_ZENDAY2KBNN {
+          ZENDAY2KBNN {
+            textdata varchar(80);
+          };
+          count int;
+            item varchar(80)[10];
+        };
+        CMB_ZENDAY2TAIKBNN {
+          ZENDAY2TAIKBNN {
+            textdata varchar(40);
+            state int;
+          };
+          count int;
+            item varchar(40)[10];
+          state int;
+        };
       };
     };
     YUKOSTYMD {
