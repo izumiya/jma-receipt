@@ -60,22 +60,23 @@
       *
       *    印刷用データ
        FD  PRT-FILE.
-       01  PRT-REC.
-           03  PRT-PRTID               PIC X(30).
-           03  PRT-PRTNM               PIC X(20).
-           03  PRT-OFFSET-X            PIC X(05).
-           03  PRT-OFFSET-Y            PIC X(05).
-           03  PRT-SITEKBN             PIC X(01).
-           03  PRT-PRTKBN              PIC X(01).
-           03  PRT-PSFILE-AREA.
-               05  PRT-OUT             PIC X(165).
-               05  PRT-TBL-KEY         PIC X(08).
-               05  PRT-RENNUM          PIC 9(04).
-               05  PRT-TBL-GROUP       PIC X(14).
-               05  PRT-SHORI-RENNUM    PIC 9(04).
-               05  PRT-PAGE            PIC 9(05).
-               05  PRT-UUID            PIC X(36).
-           03  PRT-PRTDATA             PIC X(20000).
+           COPY    "CPPRTALL.INC".
+      * 01  PRT-REC.
+      *     03  PRT-PRTID               PIC X(30).
+      *     03  PRT-PRTNM               PIC X(20).
+      *     03  PRT-OFFSET-X            PIC X(05).
+      *     03  PRT-OFFSET-Y            PIC X(05).
+      *     03  PRT-SITEKBN             PIC X(01).
+      *     03  PRT-PRTKBN              PIC X(01).
+      *     03  PRT-PSFILE-AREA.
+      *         05  PRT-OUT             PIC X(165).
+      *         05  PRT-TBL-KEY         PIC X(08).
+      *         05  PRT-RENNUM          PIC 9(04).
+      *         05  PRT-TBL-GROUP       PIC X(14).
+      *         05  PRT-SHORI-RENNUM    PIC 9(04).
+      *         05  PRT-PAGE            PIC 9(05).
+      *         05  PRT-UUID            PIC X(36).
+      *     03  PRT-PRTDATA             PIC X(20000).
       *
       *    エラーファイル
        FD  ML09ERR-FILE.
