@@ -83,6 +83,8 @@ for hospnum in ${HNLIST} ; do
     exit 105
   fi
 
+  ACCESSKEY=`${MONSQL} -dir ${LDDIRECTORY} -c "select access_key_1 from tbl_access_key where hospnum=${HOSPNUM};" -o CSV2`
+
 export MON_BATCH_ID=$(uuidgen)
 export MON_BATCH_NAME="master_upgrade.sh"
 export MON_BATCH_GROUPNAME="${HOSPNUM}"
@@ -90,7 +92,7 @@ export MON_BATCH_EXTRA="0000001MSTMNT"
 export MON_DIRECTORY_PATH="${LDDIRECTORY}"
 export MCP_TENANT=1
 
-  /usr/lib/panda/bin/monbatch  "execshell.sh \"allways\" \"master_upgrade.sh\"  \"${HOSPNUM}\" T \"${HOSPID}\" \"${MNTERRFS}\" 0000001 MSTMNT \"${MLIERRFS}\" 0000001 MSTMLI"
+  /usr/lib/panda/bin/monbatch  "execshell.sh \"allways\" \"master_upgrade.sh\"  \"${HOSPNUM}\" T \"${HOSPID}\" \"${MNTERRFS}\" 0000001 MSTMNT \"${MLIERRFS}\" 0000001 MSTMLI \"${ACCESSKEY}\""
   MSTMNT=$?
   if [ ${MSTMNT} -ne 0 ] ; then
     exit ${MSTMNT}
