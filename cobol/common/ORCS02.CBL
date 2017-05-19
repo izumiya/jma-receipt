@@ -432,6 +432,7 @@
       *  04.08.09    NACL-ÌçÏÆ    16/10/18  ÀßÄê³Û¤ò½õÀ®¤¹¤ëÉéÃ´¶â·×»»½¤Àµ
       *  04.08.10    NACL-ÌçÏÆ    16/11/11  ¸º³Û¡Ê±ßÄ¶¡Ë¤ÎÂÐ±þ
       *  04.08.11    NACL-ÌçÏÆ    16/11/12  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.12    NACL-ÌçÏÆ    17/04/12  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -703,6 +704,7 @@
                  06  WK-2010-KAICNTKBN-N         PIC X(01).
                  06  WK-2010-CYOKEIKBN-N         PIC X(01).
                  06  WK-2010-JIRITUKBN           PIC X(01).
+                 06  WK-2010-ZENDAY2KBN-N        PIC X(01).
       *
            03  WK-DAYTAIHI-FTNMONEY    PIC 9(07).
            03  WK-DAYTAIHI-COMPFTN     PIC 9(07).
@@ -766,6 +768,17 @@
            03  WK-TAIHI-SDAY-COMPFTN   PIC 9(7).
            03  WK-TAIHI-SDAY-COMPFTNWK PIC 9(7).
            03  WK-TAIHI-SDAY-FTNMONEY  PIC 9(7).
+      *
+           03  WK-DAYINF-ZENKOH-AREA.
+               05  WK-DAYINF-ZENKOH-OCC            OCCURS   4.
+                 06  WK-DAYINF-ZENKOH-FLG          PIC 9(1).
+                 06  WK-DAYINF-ZENKOH-ZAN-T        PIC 9(8).
+                 06  WK-DAYINF-ZENKOH-ZAN-T2       PIC 9(8).
+                 06  WK-DAYINF-ZENKOH-ZAN-T3       PIC 9(8).
+      *
+           03  WK-TAIHI-ZAN-KOHI-T     PIC 9(8).
+           03  WK-TAIHI-ZAN-KOHI-T2    PIC 9(8).
+           03  WK-TAIHI-ZAN-KOHI-T3    PIC 9(8).
       *
       *****Ï«ºÒ¡¦¼«ÇåÀÕ
       *    ¼«ÇåÀÕ¡Ê²Ã»»Î¨¡Ë
@@ -6996,6 +7009,11 @@
                END-EVALUATE
              WHEN       "1"
                      MOVE    "1"    TO  WK-2010-JIRITUKBN(IDX-CYO)
+           END-EVALUATE
+      *
+           EVALUATE  SYS-2010-ZENDAY2KBN-N
+               WHEN       "1"
+                       MOVE    "1"    TO  WK-2010-ZENDAY2KBN-N(IDX-CYO)
            END-EVALUATE
       *
            .
@@ -14315,9 +14333,10 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     IF ((SYU-DAY(IDX2) = "1" OR "2" OR "8" OR "9") AND
+                         (SDAY-HKNTEN(IDX2)          NOT =  ZERO  ))
                      OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
-                         (WK-2010-TANKIKBN(1)          =  "1")       )
+                         (WK-2010-TANKIKBN(1)          =  "1")     )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH1HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI1-TBL(IDX2)            =  ZERO
@@ -15190,9 +15209,10 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     IF ((SYU-DAY(IDX2) = "1" OR "2" OR "8" OR "9") AND
+                         (SDAY-HKNTEN(IDX2)          NOT =  ZERO  ))
                      OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
-                         (WK-2010-TANKIKBN(2)          =  "1")       )
+                         (WK-2010-TANKIKBN(2)          =  "1")     )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH2HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI2-TBL(IDX2)            =  ZERO
@@ -15902,9 +15922,10 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     IF ((SYU-DAY(IDX2) = "1" OR "2" OR "8" OR "9") AND
+                         (SDAY-HKNTEN(IDX2)          NOT =  ZERO  ))
                      OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
-                         (WK-2010-TANKIKBN(3)          =  "1")       )
+                         (WK-2010-TANKIKBN(3)          =  "1")     )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH3HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI3-TBL(IDX2)            =  ZERO
@@ -16511,9 +16532,10 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     IF ((SYU-DAY(IDX2) = "1" OR "2" OR "8" OR "9") AND
+                         (SDAY-HKNTEN(IDX2)          NOT =  ZERO  ))
                      OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
-                         (WK-2010-TANKIKBN(4)          =  "1")       )
+                         (WK-2010-TANKIKBN(4)          =  "1")     )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH4HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI4-TBL(IDX2)            =  ZERO
@@ -21209,6 +21231,7 @@
                  END-IF
            END-IF.
       *
+           INITIALIZE   WK-DAYINF-ZENKOH-AREA.
            PERFORM    VARYING   KOH-IDX    FROM   1   BY   1
                       UNTIL    (KOH-IDX    >      4)
                IF   COMB-KOHHKNNUM(KOH-IDX)  NOT =  SPACE
@@ -21217,6 +21240,19 @@
                          PERFORM   2307-KOH-KEISAN-SEC
                     ELSE
                          PERFORM   2308-KOH-KEISAN2-SEC
+                    END-IF
+      *
+      *             ÆüÊÌ¼ýÇ¼»»Äê¡ÊÁ´¹ñ¸øÈñ¡Ë
+                    IF  ((COMB-KOHHKNNUM(KOH-IDX) =
+                                            "015" OR "016" OR "021") AND
+                         (WK-JIRITU-CYUKANSOU(KOH-IDX) =  2        ))
+                    OR  ( COMB-KOHHKNNUM(KOH-IDX) =
+                          "052" OR "054" OR "024" OR "079" OR "038" )
+                      IF   (KOH-IDX               =   1     )
+                      AND  (MAX-KIN-KOHI1-M   NOT =  ZERO   )
+                      AND  (LNK-SYU-SRYYMD(1:6)  >= "201501")
+                         PERFORM   230A-DAYINF-SANTEI-ZENKOH-SEC
+                      END-IF
                     END-IF
                END-IF 
            END-PERFORM.
@@ -26352,6 +26388,16 @@
              END-IF
            END-IF.
       *
+           MOVE   ZAN-KOHI-T (KOH-IDX)
+                             TO   WK-DAYINF-ZENKOH-ZAN-T(KOH-IDX)
+                                  WK-TAIHI-ZAN-KOHI-T.
+           MOVE   ZAN-KOHI-T2(KOH-IDX)
+                             TO   WK-DAYINF-ZENKOH-ZAN-T2(KOH-IDX)
+                                  WK-TAIHI-ZAN-KOHI-T2.
+           MOVE   ZAN-KOHI-T3(KOH-IDX)
+                             TO   WK-DAYINF-ZENKOH-ZAN-T3(KOH-IDX)
+                                  WK-TAIHI-ZAN-KOHI-T3.
+      *
        2306-KOH-HKNREAD-EXT.
            EXIT.
       *
@@ -27245,7 +27291,8 @@
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                     MOVE      1            TO   WK-DAY-NYUKFTNRATE-FLG2
                ELSE
-                 IF  WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE
+                 IF  (WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE    )
+                 AND (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0")
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                  END-IF
                END-IF
@@ -28107,6 +28154,9 @@
                                           >   ZAN-KOHI-D2(IDX2 KOH-IDX)
                        MOVE   ZAN-KOHI-D2(IDX2 KOH-IDX)  TO
                                      WK-DAY-COMPFTN
+                   ELSE
+                       MOVE   WK-TAIHI-SDAY-COMPFTN      TO
+                                     WK-DAY-COMPFTN
                    END-IF
                  END-IF
       *
@@ -28190,6 +28240,38 @@
                    END-IF
                  END-IF
       *
+                 IF    (WK-DAYINF-ZENKOH-FLG(1)        =   1 )
+                 AND   (KOH-IDX                        >   1 )
+                 AND   (WK-2010-ZENDAY2KBN-N(KOH-IDX)  =  "1")
+                   IF     LNK-SDAY-FTNMONEY(IDX2 1)  <
+                                       WK-TAIHI-SDAY-FTNMONEY
+                       MOVE  LNK-SDAY-FTNMONEY(IDX2 1)
+                                     TO  WK-TAIHI-SDAY-FTNMONEY
+                   END-IF
+                   IF ( LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051"    )
+                   OR ( HKN-RECEFTNDSPKBN           = "2"      )
+                   OR ((LNK-SYU-SRYYMD(1:6)        >= "200404") AND
+                       (LNK-SYU-KOH-HKNNUM(KOH-IDX) =
+                                             "015" OR "016"   ))
+                        IF   LNK-SDAY-COMPFTN(IDX2 1)   <
+                                          WK-TAIHI-SDAY-COMPFTN
+                          MOVE    LNK-SDAY-COMPFTN(IDX2 1)
+                                        TO  WK-TAIHI-SDAY-COMPFTN
+                        END-IF
+                   ELSE
+                        IF   LNK-SDAY-FTNMONEY(IDX2 1)  <
+                                          WK-TAIHI-SDAY-COMPFTN
+                          MOVE    LNK-SDAY-FTNMONEY(IDX2 1)
+                                        TO  WK-TAIHI-SDAY-COMPFTN
+                        END-IF
+                   END-IF
+                   IF     LNK-SDAY-COMPFTNWK(IDX2 1) <
+                                       WK-TAIHI-SDAY-COMPFTNWK
+                       MOVE  LNK-SDAY-COMPFTNWK(IDX2 1)
+                                     TO  WK-TAIHI-SDAY-COMPFTNWK
+                   END-IF
+                 END-IF
+      *
                  MOVE  WK-TAIHI-SDAY-COMPFTN  
                                    TO  LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
                  MOVE  WK-TAIHI-SDAY-FTNMONEY
@@ -28255,11 +28337,6 @@
       ****                 IF    LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
       ****                               >   ZAN-KOHI-D(IDX2 KOH-IDX)
       ****                    MOVE   ZAN-KOHI-D(IDX2 KOH-IDX)   TO
-      ****                             LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
-      ****                    MOVE   ZERO   TO  ZAN-KOHI-D(IDX2 KOH-IDX)
-      ****                 ELSE
-      ****                    COMPUTE  ZAN-KOHI-D(IDX2 KOH-IDX)   =
-      ****                             ZAN-KOHI-D(IDX2 KOH-IDX)   -
       ****                             LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
       ****                 END-IF
       ****               END-IF
@@ -29821,11 +29898,6 @@
       ****                                    ZAN-KOHI-T(KOH-IDX)
       ****                  MOVE   ZAN-KOHI-T(KOH-IDX)   TO
       ****                              LNK-SYU-SKJ-FTN(KOH-IDX)
-      ****                  MOVE   ZERO      TO  ZAN-KOHI-T(KOH-IDX)
-      ****               ELSE
-      ****                  COMPUTE  ZAN-KOHI-T(KOH-IDX)    =
-      ****                           ZAN-KOHI-T(KOH-IDX)    -
-      ****                           LNK-SYU-SKJ-FTN(KOH-IDX)
       ****               END-IF
       ****             END-IF
                 WHEN   "3"
@@ -30806,7 +30878,8 @@
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                     MOVE      1            TO   WK-DAY-NYUKFTNRATE-FLG2
                ELSE
-                 IF  WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE
+                 IF  (WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE    )
+                 AND (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0")
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                  END-IF
                END-IF
@@ -30951,7 +31024,8 @@
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                     MOVE      1            TO   WK-DAY-NYUKFTNRATE-FLG2
                ELSE
-                 IF  WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE
+                 IF  (WK-DAY-NYUKFTNRATE2 > WK-NYUKFTNRATE    )
+                 AND (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0")
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE2
                  END-IF
                END-IF
@@ -31607,11 +31681,6 @@
                       MOVE   ZAN-KOHI-T(KOH-IDX)   TO
                                   LNK-SYU-SKJ-FTN(KOH-IDX)
       *                           LNK-SYU-SKJ-FTN-RECE(KOH-IDX)
-                      MOVE   ZERO      TO  ZAN-KOHI-T(KOH-IDX)
-                   ELSE
-                      COMPUTE  ZAN-KOHI-T(KOH-IDX)    =
-                               ZAN-KOHI-T(KOH-IDX)    -
-                               LNK-SYU-SKJ-FTN(KOH-IDX)
                    END-IF
                  END-IF
                  IF  (LNK-SYU-SRYYMD(1:6)  >=  "200610"      )
@@ -34516,7 +34585,8 @@
            PERFORM    VARYING   KOH-IDX2   FROM   1   BY   1
                        UNTIL    KOH-IDX2    >     4
       *
-             IF   WK-DAYINFFLG(KOH-IDX2)   =    1
+             IF  (WK-DAYINFFLG(KOH-IDX2)             =   1)
+             OR  (WK-DAYINF-ZENKOH-FLG(KOH-IDX2)     =   1)
       *
                MOVE  LNK-SYU-KOH-HKNFTNMONEY(KOH-IDX2)
                                   TO   WK-DAYTAIHI-FTNMONEY
@@ -34528,7 +34598,12 @@
                PERFORM    VARYING   KOH-IDX3   FROM   1   BY   1
                            UNTIL    KOH-IDX3    >    31
       *
-                   IF    KOHI-TBL(KOH-IDX3 KOH-IDX2)  =   9
+                 IF  ((WK-DAYINFFLG(KOH-IDX2)            =   1 ) AND
+                      (KOHI-TBL(KOH-IDX3 KOH-IDX2)       =   9 ))
+                 OR  ((WK-DAYINF-ZENKOH-FLG(KOH-IDX2)    =   1 ) AND
+                      (LNK-SYU-DAY(KOH-IDX3) =
+                                       "1" OR "2" OR "8" OR "9") AND
+                      (LNK-SDAY-HKNTEN(KOH-IDX3)     NOT = ZERO))
       *
                        IF  LNK-SDAY-FTNMONEY(KOH-IDX3 KOH-IDX2)
                                         <=    WK-DAYTAIHI-FTNMONEY
@@ -34563,12 +34638,13 @@
                          MOVE    ZERO    TO   WK-DAYTAIHI-COMPFTNWK
                        END-IF
       *
-      ***              IF  LNK-SDAY-FTNMONEY(KOH-IDX3 KOH-IDX2) = ZERO
+      ***              IF  (WK-DAYINFFLG(KOH-IDX2)               =  1  )
+      ***              AND (LNK-SDAY-FTNMONEY(KOH-IDX3 KOH-IDX2) = ZERO)
       ***                MOVE    ZERO    TO
       ***                        LNK-SDAY-SANTEIFLG(KOH-IDX3 KOH-IDX2)
       ***              END-IF
       *
-                   END-IF
+                 END-IF
       *
                END-PERFORM
       *
@@ -35064,6 +35140,197 @@
            .
       *
        23096-GENBUTU-TAISYODATA-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ÆüÊÌ¼ýÇ¼»»Äê¡ÊÁ´¹ñ¸øÈñ¡Ë
+      ******************************************************************
+       230A-DAYINF-SANTEI-ZENKOH-SEC           SECTION.
+      *
+           MOVE     1      TO    WK-DAYINF-ZENKOH-FLG(KOH-IDX)
+      *
+           MOVE    "1"     TO    LNK-SDAY-DAYINFFLG
+      *
+           MOVE  WK-DAY-NYUKFTNRATE       TO  WK-DAY-NYUKFTNRATE9
+           MOVE  WK-DAY-NYUKFTNRATE-FLG   TO  WK-DAY-NYUKFTNRATE-FLG9
+           IF    WK-NYUKFTNRATE    NOT =  ZERO
+             IF    WK-DAY-NYUKFTNRATE9      =  ZERO
+             AND   WK-DAY-NYUKFTNRATE-FLG9  =  ZERO
+                 MOVE  WK-NYUKFTNRATE     TO  WK-DAY-NYUKFTNRATE9
+             ELSE
+               IF  WK-DAY-NYUKFTNRATE9  > WK-NYUKFTNRATE
+                 MOVE  WK-NYUKFTNRATE     TO  WK-DAY-NYUKFTNRATE9
+               END-IF
+             END-IF
+           END-IF
+      *
+           COMPUTE   WK-FUTANWARI  =  WK-DAY-NYUKFTNRATE9  /  100
+      *
+           PERFORM    VARYING   IDX2   FROM   1   BY   1
+                       UNTIL    IDX2     >   31
+      *
+             IF  (LNK-SYU-DAY(IDX2) = "1" OR "2" OR "8" OR "9")
+             AND (LNK-SDAY-HKNTEN(IDX2)  NOT =  ZERO          )
+      *
+                 MOVE   99999    TO    WK-DAY-COMPFTN
+      *
+                 MOVE    1       TO    LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX)
+      *
+                 MOVE   ZERO     TO    WK-TAIHI-SDAY-COMPFTN
+                                       WK-TAIHI-SDAY-COMPFTNWK
+                                       WK-TAIHI-SDAY-FTNMONEY
+      *
+                 IF     WK-DAY-NYUKFTNRATE9    NOT =    ZERO
+                   COMPUTE   WK-TAIHI-SDAY-COMPFTN   =
+                             LNK-SDAY-HKNTEN(IDX2)   *
+                             HKN-TENTNK              *
+                             WK-FUTANWARI
+                   COMPUTE   WK-TAIHI-SDAY-COMPFTNWK =
+                            (LNK-SDAY-HKNTEN(IDX2)   *
+                             HKN-TENTNK              *
+                             WK-FUTANWARI         )  + 0.9
+                 ELSE
+                   COMPUTE   WK-TAIHI-SDAY-COMPFTN   =
+                             LNK-SDAY-HKNTEN(IDX2)   *
+                             HKN-TENTNK
+                   COMPUTE   WK-TAIHI-SDAY-COMPFTNWK =
+                             LNK-SDAY-HKNTEN(IDX2)   *
+                             HKN-TENTNK
+                 END-IF
+      *
+                 IF  (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
+                 AND (LNK-SYU-SYUCOMPFTN        =   ZERO )
+                   MOVE    ZERO  TO  WK-TAIHI-SDAY-COMPFTN
+                                     WK-TAIHI-SDAY-COMPFTNWK
+                 END-IF
+      *
+                 IF  WK-TAIHI-SDAY-COMPFTNWK
+                                           > WK-TAIHI-ZAN-KOHI-T3
+                   MOVE    WK-TAIHI-ZAN-KOHI-T3
+                                 TO  WK-TAIHI-SDAY-COMPFTNWK
+                   MOVE    ZERO  TO  WK-TAIHI-ZAN-KOHI-T3
+                 ELSE
+                   COMPUTE     WK-TAIHI-ZAN-KOHI-T3   =
+                               WK-TAIHI-ZAN-KOHI-T3   -
+                               WK-TAIHI-SDAY-COMPFTNWK
+                 END-IF
+      *
+                 IF ( LNK-SYU-KOH-HKNNUM(KOH-IDX) = "051"          )
+                 OR ( HKN-RECEFTNDSPKBN           = "2"            )
+                 OR ((LNK-SYU-SRYYMD(1:6)        >= "200404"      ) AND
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "015" OR "016"))
+                   IF    WK-TAIHI-SDAY-COMPFTN
+                                           > WK-TAIHI-ZAN-KOHI-T2
+                     MOVE  WK-TAIHI-ZAN-KOHI-T2
+                                 TO  WK-DAY-COMPFTN
+                     MOVE  ZERO  TO  WK-TAIHI-ZAN-KOHI-T2
+                   ELSE
+                     MOVE  WK-TAIHI-SDAY-COMPFTN
+                                 TO  WK-DAY-COMPFTN
+                     COMPUTE     WK-TAIHI-ZAN-KOHI-T2   =
+                                 WK-TAIHI-ZAN-KOHI-T2   -
+                                 WK-TAIHI-SDAY-COMPFTN
+                   END-IF
+                 END-IF
+      *
+                 COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                           WK-TAIHI-SDAY-COMPFTN  +   5
+                 COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                           WK-TAIHI-SDAY-COMPFTN  /  10
+                 COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                           WK-TAIHI-SDAY-COMPFTN  *  10
+                 IF  WK-TAIHI-SDAY-COMPFTN > WK-TAIHI-ZAN-KOHI-T
+                   MOVE    WK-TAIHI-ZAN-KOHI-T
+                                 TO  WK-TAIHI-SDAY-COMPFTN
+                   MOVE    ZERO  TO  WK-TAIHI-ZAN-KOHI-T
+                   IF    WK-TAIHI-FTNGAKEN(KOH-IDX)   =   1
+                     CONTINUE
+                   ELSE
+                     COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                               WK-TAIHI-SDAY-COMPFTN  +   5
+                     COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                               WK-TAIHI-SDAY-COMPFTN  /  10
+                     COMPUTE   WK-TAIHI-SDAY-COMPFTN  =
+                               WK-TAIHI-SDAY-COMPFTN  *  10
+                   END-IF
+                 ELSE
+                   COMPUTE     WK-TAIHI-ZAN-KOHI-T    =
+                               WK-TAIHI-ZAN-KOHI-T    -
+                               WK-TAIHI-SDAY-COMPFTN
+                 END-IF
+      *          ·î¾å¸Â³Û¤ËÃ£¤·¤¿Æü°Ê¹ß¡ÊÃ£¤·¤¿Æü¤ò´Þ¤à¡Ë¤Ï£²¤ò¥»¥Ã¥È
+                 IF   WK-TAIHI-ZAN-KOHI-T = ZERO
+                   MOVE    2     TO  LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX)
+                 END-IF
+      *
+                 MOVE  WK-TAIHI-SDAY-COMPFTN
+                                 TO  WK-TAIHI-SDAY-FTNMONEY
+      *
+                 IF    WK-DAY-COMPFTN  =  ALL"9"
+                   CONTINUE
+                 ELSE
+                   MOVE  WK-DAY-COMPFTN
+                                 TO  WK-TAIHI-SDAY-COMPFTN
+                 END-IF
+      *
+                 MOVE  WK-TAIHI-SDAY-COMPFTN
+                                 TO  LNK-SDAY-COMPFTN(IDX2 KOH-IDX)
+                 MOVE  WK-TAIHI-SDAY-FTNMONEY
+                                 TO  LNK-SDAY-FTNMONEY(IDX2 KOH-IDX)
+                 MOVE  WK-TAIHI-SDAY-COMPFTNWK
+                                 TO  LNK-SDAY-COMPFTNWK(IDX2 KOH-IDX)
+      *
+             END-IF
+      *
+             EVALUATE   WK-NYUSKJRYYKBN
+               WHEN      "1"
+      ***      WHEN      "2"
+      ***      WHEN      "4"
+                 MOVE  WK-DAY-SKJFTN(IDX2)
+                                 TO  LNK-SDAY-SKJFTN(IDX2 KOH-IDX)
+      *
+                 IF   LNK-SYU-SRYYMD(1:6)  >=  "200604"
+                   IF   FLG-NYUSKJJYOGAK  =  1
+                      IF  LNK-SDAY-SKJFTN(IDX2 KOH-IDX) NOT = ZERO
+                        COMPUTE LNK-SDAY-SKJFTN(IDX2 KOH-IDX) =
+                                LNK-SDAY-SKJFTN(IDX2 KOH-IDX) /  2
+                      END-IF
+                   END-IF
+                 END-IF
+             END-EVALUATE
+      *
+           END-PERFORM
+      *
+      *    ¼ýÇ¼¹àÌÜ
+      *
+           MOVE    "1"     TO    LNK-SYU-DAYINFFLG
+      *
+      ***
+      *
+           IF    WK-TAIHI-FTNGAKEN(KOH-IDX)   =   1
+             MOVE   LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                           TO    WK-DAYTAIHI-FTNMONEY
+           ELSE
+             COMPUTE  WK-DAYTAIHI-FTNMONEY          =
+                      LNK-SYU-KOH-COMPFTN(KOH-IDX)  +   5
+             COMPUTE  WK-DAYTAIHI-FTNMONEY          =
+                      WK-DAYTAIHI-FTNMONEY          /  10
+             COMPUTE  WK-DAYTAIHI-FTNMONEY          =
+                      WK-DAYTAIHI-FTNMONEY          *  10
+           END-IF
+      *
+           PERFORM    VARYING   IDX2   FROM   1   BY   1
+                       UNTIL    IDX2     >   31
+             IF  (WK-DAYTAIHI-FTNMONEY <
+                        WK-DAYINF-ZENKOH-ZAN-T(KOH-IDX))
+             AND (LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX) =  2)
+               MOVE   1    TO    LNK-SDAY-SANTEIFLG(IDX2 KOH-IDX)
+             END-IF
+           END-PERFORM
+      *
+           .
+      *
+       230A-DAYINF-SANTEI-ZENKOH-EXT.
            EXIT.
       *
       *****************************************************************
