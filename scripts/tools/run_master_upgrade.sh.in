@@ -91,6 +91,7 @@ export MON_BATCH_GROUPNAME="${HOSPNUM}"
 export MON_BATCH_EXTRA="0000001MSTMNT"
 export MON_DIRECTORY_PATH="${LDDIRECTORY}"
 export MCP_TENANT=1
+export MCP_MIDDLEWARE_NAME="panda"
 
   /usr/lib/panda/bin/monbatch  "execshell.sh \"allways\" \"master_upgrade.sh\"  \"${HOSPNUM}\" T \"${HOSPID}\" \"${MNTERRFS}\" 0000001 MSTMNT \"${MLIERRFS}\" 0000001 MSTMLI \"${ACCESSKEY}\""
   MSTMNT=$?
