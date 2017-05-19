@@ -12,7 +12,6 @@ xml_findv3req{
       Last                         varchar(7);
     };
     Result_Class                   varchar(1);
-    Base_Date                      varchar(10);
     Perform_Date{
       First                        varchar(10);
       Last                         varchar(10);
