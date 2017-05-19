@@ -28,7 +28,6 @@
              04  FINDREQ-RANGE-FROM          PIC X(7).
              04  FINDREQ-RANGE-TO            PIC X(7).
              04  FINDREQ-OUTKBN              PIC X(1).
-             04  FINDREQ-BASEYMD             PIC X(10).
              04  FINDREQ-STSRYYMD            PIC X(10).
              04  FINDREQ-EDSRYYMD            PIC X(10).
              04  FINDREQ-STBIRTHDAY          PIC X(10).

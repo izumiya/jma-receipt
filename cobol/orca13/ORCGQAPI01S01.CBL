@@ -877,18 +877,18 @@
       *****************************************************************
        2001-BASEYMD-CHK-SEC            SECTION.
       *
-           IF    ( FINDREQ-BASEYMD       =   SPACE )
+      *    IF    ( FINDREQ-BASEYMD       =   SPACE )
                MOVE    SPA-SYSYMD      TO  REQ-BASEYMD
-           ELSE
-               MOVE    FINDREQ-BASEYMD TO WRK-DATE
-               PERFORM 800-SYMD-SEC
-               PERFORM 800-HIZUKE-SEC
-               IF    ( WRK-EDTYMD1     =   SPACE )
-                   MOVE    "0210"      TO  SPA-ERRCD
-               ELSE
-                   MOVE    WRK-SYMD    TO  REQ-BASEYMD
-               END-IF
-           END-IF
+      *    ELSE
+      *        MOVE    FINDREQ-BASEYMD TO WRK-DATE
+      *        PERFORM 800-SYMD-SEC
+      *        PERFORM 800-HIZUKE-SEC
+      *        IF    ( WRK-EDTYMD1     =   SPACE )
+      *            MOVE    "0210"      TO  SPA-ERRCD
+      *        ELSE
+      *            MOVE    WRK-SYMD    TO  REQ-BASEYMD
+      *        END-IF
+      *    END-IF
       *
            .
        2001-BASEYMD-CHK-EXT.
@@ -1141,6 +1141,7 @@
       *
                IF    ( SPA-ERRCD       =   SPACE )
                    MOVE    FINDREQ-DRCD  TO  SPA-Q01-DRCD
+                   MOVE    "2"           TO  FINDREQ-NYUGAIKBN
                END-IF
            END-IF
       *
