@@ -235,6 +235,7 @@
            03  WRK-WARNING-MSG         PIC X(100).
       *
            03  WRK-PTBYO-MCP-PATHNAME  PIC X(64).
+           03  WRK-MCP-WINDOW          PIC X(62).
       *
            03  WRK-OPID                PIC X(16).
       *
@@ -389,6 +390,9 @@
       *
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
+      *
+      *    排他制御サブパラメタ
+           COPY    "CPORCSLOCK.INC".
       *
            COPY    "MCPDATA2.INC".
       *
@@ -613,10 +617,23 @@
            DISPLAY "2001=" WRK-ERRCD "#" 
       *??
            IF      WRK-ERRCD           =   SPACE
+      *        排他チェック & ロック処理
+               PERFORM 990-LOCK-IN-SEC
+               IF      SLOCK-RETURN    NOT =   ZERO
+                   MOVE    "E90"               TO  WRK-ERRCD
+                   MOVE    SPACE               TO  WRK-WARNING
+                   GO  TO  200-MAIN-EXT
+               END-IF
+      *
       *        病名更新処理
                PERFORM 2002-DISEASE-SEC
       *        不一致病名編集処理
                PERFORM 2003-DISEASES-UNMATCH-SEC
+      *
+               PERFORM 990-LOCK-OUT-SEC
+               IF      SLOCK-RETURN    NOT =   ZERO
+                   DISPLAY "ロック解除失敗"
+               END-IF
            END-IF
            .
        200-MAIN-EXT.
@@ -3871,6 +3888,49 @@
       *
            .
        900-PTRSIINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    排他制御処理
+      *****************************************************************
+       990-LOCK-IN-SEC         SECTION.
+      *
+      *    排他制御処理
+           MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
+           MOVE    "C02"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
+           MOVE    1                   TO  SLOCK-MODE
+           MOVE    WRK-PTID            TO  SLOCK-PTID
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+           IF      SLOCK-RETURN    NOT =   ZERO
+               MOVE    "9999"              TO  SPA-ERRCD
+           END-IF
+           MOVE    WRK-MCP-WINDOW      TO  MCP-WINDOW
+           .
+       990-LOCK-IN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    排他制御解除処理(削除)
+      *****************************************************************
+       990-LOCK-OUT-SEC         SECTION.
+      *
+      *    排他制御解除処理
+      *    MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
+           MOVE    "C02"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
+           MOVE    ZERO                TO  SLOCK-PTID
+           MOVE    3                   TO  SLOCK-MODE
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+           MOVE    WRK-MCP-WINDOW      TO  MCP-WINDOW
+           .
+       990-LOCK-OUT-EXT.
            EXIT.
       *
       *****************************************************************
