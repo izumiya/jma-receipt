@@ -2360,6 +2360,10 @@
        4201-ZAIDEL-CHK-SEC                 SECTION.
       *
            MOVE    1               TO  FLG-ERR
+      *H29.5
+           IF      SPA-GMN-MAX     =   ZERO
+               GO   TO  4201-ZAIDEL-CHK-EXT
+           END-IF
       *
            IF     (WRK-COM-INPUTCD(IDX + 1)(1:1)   =   "6"   )
            AND    (SPA-COM-KAIFLG (SPA-GMN-MAX)
