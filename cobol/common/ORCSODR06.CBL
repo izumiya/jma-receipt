@@ -141,7 +141,8 @@
            03  ERRCD-ERRCD             PIC X(04).
       *
        01  CONST-AREA.
-           03  CONST-ITEMNUM-MAX               PIC 9(05)   VALUE 30.
+           03  CONST-ITEMNUM-MAX       PIC 9(05)   VALUE 30.
+           03  CONST-API               PIC 9(01)   VALUE 2.
       *
       *    入院CLAIM項目IDコピー句
            COPY    "CPNCLAIMID.INC".
@@ -241,6 +242,9 @@
       *
       *    入院料加算算定可否チェックサブ
            COPY    "CPORCSI01.INC".
+      *
+      *    ユーザプログラム起動サブパラメタ
+           COPY    "CPORCSUSERCHK.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -363,6 +367,14 @@
                IF    ( FLG-END  =   ZERO )
                   PERFORM 2101-ORDER-INSERT-SEC
                END-IF
+      *
+               IF    ( FLG-END  =   ZERO )
+                   IF    ( SODR-KEYGENERATE
+                                           =   CONST-API )
+                       PERFORM 2101-USERPG-CALL-SEC
+                   END-IF
+               END-IF
+      *
            ELSE
                IF    ( SODR-PROCKBN    =   "1" )
                        CONTINUE
@@ -1447,6 +1459,29 @@
       *
            .
        2101-ORDER-INSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ユーザプログラム実行処理
+      *****************************************************************
+       2101-USERPG-CALL-SEC            SECTION.
+      *
+           INITIALIZE                      ORCSUSERCHKAREA
+           MOVE    "I01"               TO  ORCSUSERCHK-GMNPG
+           MOVE    "2"                 TO  ORCSUSERCHK-SYORI
+           MOVE    SPA-SYSYMD          TO  ORCSUSERCHK-SYSYMD
+           MOVE    TRRK-TENNYUYMD      TO  ORCSUSERCHK-SRYYMD
+           MOVE    SODR-PTID           TO  ORCSUSERCHK-PTID
+           MOVE    SODR-PTNUM          TO  ORCSUSERCHK-PTNUM
+           MOVE    TRRK-NYUINKA        TO  ORCSUSERCHK-SRYKA
+           MOVE    TRRK-HKNCOMBINUM    TO  ORCSUSERCHK-HKNCOMBI
+           MOVE    TRRK-DRCD1          TO  ORCSUSERCHK-DRCD
+           MOVE    08                  TO  ORCSUSERCHK-SYORI-FLG
+           CALL    "ORCSUSERCHK"           USING
+                                           ORCSUSERCHKAREA
+                                           SPA-AREA
+      *
+           .
+       2101-USERPG-CALL-EXT.
            EXIT.
       *****************************************************************
       *    オーダ編集処理
