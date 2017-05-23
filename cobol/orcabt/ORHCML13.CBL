@@ -1039,7 +1039,8 @@
        910-GENERICNAME-READ-SEC             SECTION.
       *
            INITIALIZE                   GENERICNAME-REC
-           MOVE    TNS-YAKKAKJNCD(1:9)  TO  GENERIC-YAKKAKJNCD
+      *     MOVE    TNS-YAKKAKJNCD(1:9)  TO  GENERIC-YAKKAKJNCD
+           MOVE    TNS-YAKKAKJNCD       TO  GENERIC-YAKKAKJNCD
       *
            MOVE    GENERICNAME-REC      TO  MCPDATA-REC
            MOVE    "DBSELECT"           TO  MCP-FUNC
