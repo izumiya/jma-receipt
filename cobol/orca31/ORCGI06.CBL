@@ -613,7 +613,7 @@
                                                            (IDX-MAX)
                    MOVE    SYS-5002-KHNKBNCD
                                        TO  SPA-NAI-BTUDEF-BRMKHNKBNCD
-                                                             (IDX-CMB)
+                                                             (IDX-MAX)
                END-IF
       *
                PERFORM 900-SYSKANRI-KEY2-FET-SEC
@@ -4202,13 +4202,15 @@
                        PERFORM 41011-TOKNYUIN-SYOKI-SEC
                    END-IF
                    PERFORM 4201-TOKNYUINLST-CHK-SEC
-                   MOVE    WRK-CMB-ITM TO  SPA-GMN-TOKNYUIN-G
-                   MOVE    SPA-GMN-TOKNYUINL2 (WRK-CMB-IDX)
-                                       TO  SPA-NAI-TOKUTEI-G
-                   MOVE    SPA-GMN-TOKNYUINL-SRYCD (WRK-CMB-IDX)
-                                       TO  SPA-NAI-TOKSRYCD
-                   MOVE    SPA-GMN-TOKNYUINL-NASRYCD (WRK-CMB-IDX)
+                   IF    ( WRK-CMB-ITM NOT =   SPACE )
+                       MOVE    WRK-CMB-ITM TO  SPA-GMN-TOKNYUIN-G
+                       MOVE    SPA-GMN-TOKNYUINL2 (WRK-CMB-IDX)
+                                           TO  SPA-NAI-TOKUTEI-G
+                       MOVE    SPA-GMN-TOKNYUINL-SRYCD (WRK-CMB-IDX)
+                                           TO  SPA-NAI-TOKSRYCD
+                       MOVE    SPA-GMN-TOKNYUINL-NASRYCD (WRK-CMB-IDX)
                                        TO  SPA-NAI-NATOKSRYCD
+                   END-IF
                END-IF
            END-IF
       *
