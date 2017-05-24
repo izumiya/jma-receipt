@@ -2076,12 +2076,35 @@
            PERFORM             UNTIL   FLG-PTBYOMEI        =   1
                IF    ( WRK-SRYKA       =   PTBYO-SRYKA     )
                AND   ( WRK-NYUGAIKBN   =   PTBYO-NYUGAIKBN )
-               AND   ( WRK-HKNCOMBI    =   PTBYO-HKNCOMBI  )
                AND   ( WRK-KOHID       =   PTBYO-KOHID     )
                AND   ( WRK-TENKIYMD    =   PTBYO-TENKIYMD  )
                AND   ( WRK-UTAGAIFLG   =   PTBYO-UTAGAIFLG )
-                   MOVE    PTBYOMEI-REC    TO  WRK-PTBYOMEI-SRYKA-REC
-                   MOVE    1               TO  FLG-PTBYOMEI-UMU
+                   IF      WRK-HKNCOMBI-X  =   "None"
+                       INITIALIZE                  HKNCOMBI-REC
+                       MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
+                       MOVE    WRK-PTID        TO  COMB-PTID
+                       MOVE    PTBYO-HKNCOMBI  TO  COMB-HKNCOMBINUM
+                       MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+                       PERFORM 900-COMB-READ-SEC
+      *                医保分以外は対象としない
+                       IF    ( COMB-HKNNUM     =   "971"   OR
+                                                   "973"   OR
+                                                   "975" )
+                       OR    ( COMB-KOHHKNNUM (1)
+                                               =   "970" )
+                           CONTINUE
+                       ELSE
+                           MOVE    PTBYOMEI-REC    TO
+                                               WRK-PTBYOMEI-SRYKA-REC
+                           MOVE    1               TO  FLG-PTBYOMEI-UMU
+                       END-IF
+                   ELSE
+                       IF      WRK-HKNCOMBI    =   PTBYO-HKNCOMBI
+                           MOVE    PTBYOMEI-REC    TO
+                                               WRK-PTBYOMEI-SRYKA-REC
+                           MOVE    1               TO  FLG-PTBYOMEI-UMU
+                       END-IF
+                   END-IF
                END-IF
       *
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
