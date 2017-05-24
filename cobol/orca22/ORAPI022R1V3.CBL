@@ -1495,10 +1495,10 @@
       *            転帰が空白の時、治癒
                    EVALUATE    DISEASEQ-TENKIKBN (IDX)
                        WHEN    SPACE
+                       WHEN    "F"
                            MOVE    "1"              TO  WRK-TENKI
                        WHEN    "D"
                            MOVE    "2"              TO  WRK-TENKI
-                       WHEN    "F"
                        WHEN    "N"
                        WHEN    "R"
                        WHEN    "S"
