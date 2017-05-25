@@ -131,6 +131,7 @@
            03  IDX-3               PIC 9(05).
            03  IDX-CNT             PIC 9(05).
            03  IDX-P               PIC 9(01).
+           03  IDX2-L              PIC 9(05).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -742,7 +743,17 @@
                    UNTIL      (IDX2    >   1000 )  OR
                               (FLG-OVR =   1    )
                COMPUTE IDX2-1          =   IDX2  +  1
-               IF     (LOG-REC(IDX2:20)    =   SPACE )
+      *H29.5
+               IF     (IDX2  +  20 )   >   1000
+                   COMPUTE IDX2-L          =   1000
+                                           -   IDX2
+                                           +   1
+               ELSE
+                   MOVE    20          TO  IDX2-L
+               END-IF
+      *H29.5
+      ****     IF     (LOG-REC(IDX2:20)    =   SPACE )
+               IF     (LOG-REC(IDX2:IDX2-L)    =   SPACE )
                    MOVE    1           TO  FLG-OVR
                ELSE
                    ADD     1           TO  IDX-1
@@ -753,6 +764,10 @@
                    END-IF
                END-IF
            END-PERFORM
+      *H29.5
+           IF      IDX-1               =  ZERO
+               GO  TO   40011-DATA-HEN-SEC-EXT
+           END-IF
       *
            IF     (IDX-1U +  WRK-CNT-U )   >=  WRK-CONS-MAX-LEN
                MOVE    1               TO  FLG-LOGF
