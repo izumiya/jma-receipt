@@ -50,6 +50,7 @@
       *  04.08.00    NACL-多々納  16/08/XX  持参薬対応
       *  04.08.00    NACL-多々納  17/02/XX  在宅実績加算２削除対応
       *  04.08.00    NACL-多々納  17/03/XX  Ｈ２９年４月改正対応他
+      *  04.08.00    NACL-多々納  17/05/XX  HAORI対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -144,6 +145,8 @@
            03  FLG-RSITEN          PIC 9(01).
       *H27.4
            03  FLG-TEIGEN30-ZAI    PIC 9(01).
+      *API(HAORI)
+           03  FLG-AUTONO          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -963,6 +966,20 @@
                    UNTIL      (IDX-1     >   SPA-MAX-LINE )  OR
                              ((SPA-GMN-INPUTCD(IDX-1) =   SPACE )
                           AND (SPA-COM-INPUTCD(IDX-1) =   SPACE ))
+      *
+      *H29.5
+      *API(HAORI)
+      *        HAORI　加算自動算定
+               IF      SPA-COM-KSNAUTO (IDX-1) =   "Y"
+      *            自動算定なし
+                   MOVE    1                   TO  FLG-AUTONO
+                   MOVE    SPACE               TO  SPA-COM-KSNAUTO
+                                                           (IDX-1)
+               ELSE
+                   MOVE    ZERO                TO  FLG-AUTONO
+               END-IF
+      *
+      *
                IF     (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "S" OR ".") OR
                       (SPA-COM-INPUTCD(IDX-1)(1:1)   =   "S"       ) OR
                       (SPA-GMN-INPUTCD(IDX-1)(1:1)   =   "*"       ) OR
@@ -1013,7 +1030,12 @@
       *H26.4
       *            精神通院の２０歳加算の自動発生なし
                    IF     (SPA-SRYYMD              >=  "20140401")
-                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+      ******          AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+      *H29.5
+      *API(HAORI)
+                      AND ((ORCSCWKSRY-SYORIFLG    =   ZERO    )
+                        OR (FLG-AUTONO             =   1       ))
+      *
                       AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
                       AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
                        IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
@@ -1030,7 +1052,12 @@
                    IF     (SPA-SRYYMD              >=  "20160401")
                       AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
                       AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
-                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+      ****            AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+      *H29.5
+      *API(HAORI)
+                      AND ((ORCSCWKSRY-SYORIFLG    =   ZERO    )
+                        OR (FLG-AUTONO             =   1       ))
+      *!!!!
                        PERFORM 10026-ZAITAKU-AUTO-SEC
                    END-IF
       *
@@ -1682,6 +1709,20 @@
                END-IF
            END-IF
       *
+      *H29.5
+      *API(HAORI)
+      *    加算自動算定なし
+           IF     (SPA-API-FLG             =   1   )
+             AND  (SPA-COM-INPUTCD(IDX2)(1:1)
+                                           =   "1"  )
+               IF     (LNK-WKSRY-INPUTCOMENT(IDX IDY)   =   "Yes" )
+                   MOVE    "Y"             TO  SPA-COM-KSNAUTO(IDX2)
+               END-IF
+               MOVE    SPACE           TO  LNK-WKSRY-INPUTCOMENT
+                                                        (IDX IDY)
+           END-IF
+      *
+      *
       *    金額入力時、金額へ
            IF      SPA-COM-INPUTCD(IDX2)(1:3)  =   "095"  OR  "096"
       *        自賠責の時、対象外
@@ -2182,8 +2223,8 @@
            END-IF
       *
       *    処方料・処方せん料は対象外とする
-           IF      LNK-WKSRY-SRYSYUKBN (IDX)  =   "250"
-                                              OR  "820"
+           IF      LNK-WKSRY-SRYSYUKBN (IDX)  =   "250"  OR
+                                                  "820"
                EVALUATE    LNK-WKSRY-SRYCD(IDX IDY)
       *            長期投与加算（処方せん）
                    WHEN    "120003270"
@@ -2462,7 +2503,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  WKSRY-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
            MOVE    SPA-PTID            TO  WKSRY-PTID
-           MOVE    SPA-NYUGAIKBN       TO  WKSRY-NYUGAIKBN
            MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
@@ -2730,11 +2770,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *APIV3
       *            APIの時、一般名記載分編集
                    IF     (FLG-SYORI           =   2  )
-                     AND  (SPA-TERMID(1:4)     =   "API+")
+      ********       AND  (SPA-TERMID(1:4)     =   "API+")
+                     AND  (SPA-API-FLG         =   1  )
                      AND  (SPA-COM-INPUTCD (IDX)(1:1) =   "6" )
                      AND  (SPA-COM-MEI-KBN(IDX)    =   "1"
                                                    OR  "3"   )
                        PERFORM 2002-API-GENEHENSYU-SEC
+                   END-IF
+      *H29.5
+      *            加算自動算定なし
+                   IF     (SPA-API-FLG         =   1  )
+                     AND  (SPA-COM-INPUTCD (IDX)(1:1)
+                                                   =   "1"     )
+                     AND  (SPA-COM-KSNAUTO(IDX)    =   "1"     )
+                       MOVE    "Yes"       TO  WKSRY-INPUTCOMENT (IDY)
                    END-IF
       *APIV3
       *!!!!
@@ -5028,7 +5077,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *980-PARA-READ-EXT.
       **** EXIT.
       *
-      *TEST
       *****************************************************************
       *    パラメタ情報読み込み
       *****************************************************************
@@ -5061,6 +5109,5 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        910-SPATMP-CALL-EXT.
            EXIT.
-      *TEST
       *
       *

@@ -29,6 +29,8 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/12/XX  ±¡Æâ¡¦±¡³°¶èÊ¬ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/05/XX  Êñ³ç¸¡ºº¿ô¡¢Ã±°Ì¥³¡¼¥ÉÂÐ±þ
+      *                                     ¥Õ¥£¥ë¥àÊ¬²è¿ôÅùÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -93,6 +95,8 @@
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-SRYSYUKBNMEI        PIC X(40).
            03  WRK-SRYCD               PIC X(09).
+      *    Êñ³ç¸¡ºº¿ô
+           03  WRK-HOUKNS-CNT          PIC 9(02).
       *
       *    È¾³ÑÁ´³ÑÊÑ´¹
        01  WRK-HENKAN-AREA.
@@ -237,6 +241,7 @@
       *    ÅêÌôÈ½Äê
            MOVE    ZERO                TO  FLG-INGAIKBN
            MOVE    ZERO                TO  FLG-INGAIKBN-ARI
+           MOVE    ZERO                TO  WRK-HOUKNS-CNT
       *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   (IDX            >   LNK-WKSRYACT-MAX)
@@ -246,6 +251,15 @@
                   OR  ((IDX            >   1    )  AND
                        (LNK-WKSRY-ZAINUM (IDX - 1)
                                    NOT =   LNK-WKSRY-ZAINUM(IDX)))
+      *H29.5
+      *            Êñ³ç¸¡ºº¤Î¸¡ºº¿ô
+                   IF     (WRK-HOUKNS-CNT      >   ZERO )
+                      AND (IDY                 >   ZERO )
+                       MOVE    WRK-HOUKNS-CNT
+                                               TO  ORAPISUB2-HKTKNSA-CNT
+                                                                 (IDY)
+                   END-IF
+                   MOVE    ZERO                TO  WRK-HOUKNS-CNT
                    ADD     1                   TO  IDY
                    IF      IDY                 >   COB-ZAI-OUTMAX
                        MOVE    1               TO  FLG-HENCHK
@@ -424,6 +438,59 @@
            MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
                                        TO  ORAPISUB2-PRSCRPT-NUMBER
                                                              (IDY IDZ)
+      *H29.5
+      *    Ã±°Ì¥³¡¼¥É
+           IF     (LNK-WKSRY-SRYCD (IDX IDW)(1:1)  =   "6"
+                                                   OR  "7" )
+      *        ÌôºÞ¡¦´ïºà
+               MOVE    TNS-TANICD      TO  ORAPISUB2-PRSCRPT-TANICD
+                                                             (IDY IDZ)
+               MOVE    TNS-TANINAME    TO  ORAPISUB2-PRSCRPT-TANICD-NAME
+                                                             (IDY IDZ)
+           END-IF
+           IF    ((LNK-WKSRY-SRYCD (IDX IDW)(1:1)  =   "1" )  OR
+                  (LNK-WKSRY-SRYCD (IDX IDW)(1:3)  =   "058"
+                                                   OR  "059"
+                                                   OR  "095"
+                                                   OR  "096"))
+               IF      TNS-TANICD          NOT =   ZERO
+                   MOVE    TNS-TANICD      TO  ORAPISUB2-PRSCRPT-TANICD
+                                                             (IDY IDZ)
+                   MOVE    TNS-TANINAME    TO
+                                           ORAPISUB2-PRSCRPT-TANICD-NAME
+                                                             (IDY IDZ)
+               END-IF
+           END-IF
+      *
+      *    Ê¬²è¿ô¤òÊÔ½¸
+           IF     (LNK-WKSRY-SRYKBN (IDX)  =   "70"   )
+              AND (LNK-WKSRY-SRYCD (IDX IDW)(1:1)  =   "7" )
+              AND (LNK-WKSRY-SRYKAISU(IDX IDW) NOT =   ZERO)
+               MOVE    LNK-WKSRY-SRYKAISU(IDX IDW) TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                       TO  ORAPISUB2-PRSCRPT-FILMNUM
+                                                             (IDY IDZ)
+           END-IF
+      *H29.5
+      *    ²Ã»»¼«Æ°»»Äê¤Ê¤·
+           IF     (LNK-WKSRY-SRYCD (IDX IDW)(1:1)  =   "1")
+             AND  (TNS-DATAKBN             =   "1"   )
+      *        ºßÂð²Ã»»Åù¤Î¼«Æ°»»Äê¤Ê¤·ÀßÄê
+               IF      (TNS-CDKBN-KBN          =   "C"   )
+                  AND  (TNS-CDKBN-KBNNUM       =   "002" )
+                   MOVE    "Yes"           TO  ORAPISUB2-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
+      *        Àº¿ÀÄÌ±¡¤Î£²£°ºÐÌ¤Ëþ²Ã»»¤Î¼«Æ°È¯À¸¤Ê¤·
+               IF      (TNS-CDKBN-KBN          =   "I"   )
+                  AND  (TNS-CDKBN-KBNNUM       =   "002" )
+                  AND  (TNS-AGEKSNSRYCD(1) NOT =   ZERO
+                                               AND SPACE )
+                   MOVE    "Yes"           TO  ORAPISUB2-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
+           END-IF
       *
       *    ¼«Èñ¶â³Û
            IF     (LNK-WKSRY-SRYKBN (IDX)  =   "96"
@@ -444,8 +511,7 @@
                MOVE    "2"        TO  ORAPISUB2-PRSCRPT-CONTKBN(IDY IDZ)
            END-IF
       *    ¼«Æ°»»Äê¶èÊ¬
-           IF      LNK-WKSRY-AUTOKBN (IDX IDW) =   "1"
-                                               OR  "2"
+           IF      LNK-WKSRY-AUTOKBN (IDX IDW) =   "2"
                                                OR  "3"
                                                OR  "4"
                                                OR  "5"
@@ -485,6 +551,15 @@
                    END-IF
                END-PERFORM
            END-IF
+      *H29.5
+      *    Êñ³ç¸¡ºº¤ÎÈ½Äê
+           IF     (LNK-WKSRY-SRYCD (IDX IDW)(1:1) =   "1" )  AND
+                  (LNK-WKSRY-SRYKBN (IDX)      =   "60" ) AND
+                  (TNS-DATAKBN                 =   1    ) AND
+                  (TNS-HOUKNSKBN           NOT =   ZERO )
+               ADD     1                   TO  WRK-HOUKNS-CNT
+           END-IF
+      *!
       *
            .
        2002342-WKSRYMEI-HEN-EXT.

@@ -128,10 +128,15 @@
                         13  MDCREQ-PRSCRPT-ATAI-G.
                             15  MDCREQ-PRSCRPT-ATAI      PIC X(08)
                                                          OCCURS   5.
+      *                 フィルム分画数
+                        13  MDCREQ-PRSCRPT-FILMNUM       PIC X(03).
       *                 継続コメント指示区分
                         13  MDCREQ-PRSCRPT-CONTKBN       PIC X(01).
       *                 内服種類数指示区分
                         13  MDCREQ-PRSCRPT-NAIFKBN       PIC X(01).
+      *                 自動算定なし区分（在宅療養実績加算）
+                        13  MDCREQ-PRSCRPT-NOAUTO        PIC X(03).
+      *
       *                 自動区分
                         13  MDCREQ-PRSCRPT-AUTOKBN       PIC X(01).
       *

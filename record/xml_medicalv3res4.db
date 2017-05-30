@@ -13,7 +13,7 @@ xml_medicalv3res4 {
 	Api_Result				varchar(3);
 	Api_Result_Message			varchar(100);
 	Reskey					varchar(100);
-#--- ÊÇ£ËÄÖÊÉÖÂ†±
+#--- ¥µº‘æ Û
 	Patient_Information {
 		Patient_ID			varchar(20);
         	WholeName			varchar(100);
@@ -21,11 +21,11 @@ xml_medicalv3res4 {
         	BirthDate			varchar(10);
         	Sex				varchar(1);
     	};
-#--- Á¢∫Ë™çÈÅ∏Êäû„ÅÇ„Çä
+#--- ≥Œ«ß¡™¬Ú§¢§Í
 	Medical_Select_Flag			varchar(05);
-#--- Ë®∫ÁôÇÊó•‰ªò
+#--- ø«Œ≈∆¸…’
 	Perform_Date				varchar(10);
-#--- ‰ºùÁ•®Áï™Âè∑
+#--- ≈¡…º»÷πÊ
 	Invoice_Number				varchar(07);
         Department_Code				varchar(2);
         Department_Name				varchar(80);
@@ -53,9 +53,9 @@ xml_medicalv3res4 {
 			Money_Outpatient		varchar(06);
             	} [4];
     	};
-#--- Èô¢ÂÜÖ„ÉªÈô¢Â§ñÂå∫ÂàÜ
+#--- ±°∆‚°¶±°≥∞∂Ë ¨
 	Outside_Class		varchar(5);
-#--- Ë®∫ÁôÇÂÜÖÂÆπ
+#--- ø«Œ≈∆‚Õ∆
 	Medical_Information  {
 		Medical_Info  {
 			Medical_Class_Group		varchar(02);
@@ -65,28 +65,37 @@ xml_medicalv3res4 {
 			Medical_Point 			varchar(08);
 			Medical_Money			varchar(08);
 			Medical_Inclusion_Class		varchar(05);
+#----->                  Ò≥Á∏°∫∫§Œ∏°∫∫øÙ
+			Medical_Examination_Count	varchar(02);
 			Medication_Info    {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
 				Medication_Number	varchar(11);
+#----->                         √±∞Ã•≥°º•…
+				Medication_Unit_Code		varchar(3);
+				Medication_Unit_Code_Name	varchar(24);
 				Medication_Money 	varchar(07);
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];
+#----->                         •’•£•Î•‡ ¨≤ËøÙ
+				Medication_Film_Comp_Number	varchar(03);
 				Medication_Continue		varchar(01);
 				Medication_Internal_Kinds	varchar(01);
+#----->                         ≤√ªªº´∆∞ªªƒÍ§ §∑
+				Medication_No_Addition_Class	varchar(03);
 				Medication_Auto_Addition 	varchar(01);
 			} [50];
 		}[120] ;
 		};
-#--- „É°„ÉÉ„Çª„Éº„Ç∏
+#--- •·•√•ª°º•∏
 	Medical_Message_Information {
         Medical_Warning_Info {
        		 Medical_Warning        	varchar(3);
        		 Medical_Warning_Message	varchar(100);
             	} [40];
 	        };
-#--- Á¢∫Ë™ç„É°„ÉÉ„Çª„Éº„Ç∏
+#--- ≥Œ«ß•·•√•ª°º•∏
 	Medical_Select_Information {
         Medical_Select			varchar(4);
         Medical_Select_Message		varchar(100);

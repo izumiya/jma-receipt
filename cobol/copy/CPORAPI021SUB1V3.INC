@@ -59,10 +59,17 @@
                        09  ORAPISUB01-ATAI-G.
                            11  ORAPISUB01-ATAI         PIC X(08)
                                                        OCCURS   5.
+      *H29.5
+      *                フィルム分画数
+                       09  ORAPISUB01-PRSCRPT-FILMNUM  PIC X(03).
       *                継続指示区分
                        09  ORAPISUB01-CONTKBN          PIC X(01).
       *                内服種類数指示区分
                        09  ORAPISUB01-NAIFKBN          PIC X(01).
+      *H29.5
+      *                自動算定なし区分（在宅療養実績加算）
+                       09  ORAPISUB01-NOAUTO           PIC X(03).
+      *
       *                自動区分
                        09  ORAPISUB01-AUTOKBN          PIC X(01).
       *

@@ -68,8 +68,12 @@ xml_medicalv3res2 {
 				Medication_Req_Input_Info {
 					Medication_Req_Input	varchar(08);
 				} [5];
+#----->                         フィルム分画数
+				Medication_Req_Film_Comp_Number	varchar(03);
 				Medication_Req_Continue		varchar(01);
 				Medication_Req_Internal_Kinds	varchar(01);
+#----->                         加算自動算定なし
+				Medication_Req_No_Addition_Class	varchar(03);
 				Medication_Req_Auto_Addition 	varchar(01);
 			} [50];
 		}[110] ;
@@ -93,19 +97,29 @@ xml_medicalv3res2 {
 			Medical_Point 			varchar(08);
 			Medical_Money			varchar(08);
 			Medical_Inclusion_Class		varchar(05);
+#----->                 包括検査の検査数
+			Medical_Examination_Count	varchar(02);
+#----->                 剤削除可能連番
 			Medical_Delete_Number		varchar(02);
 			Medication_Info    {
 				Medication_Code	varchar(09);
 				Medication_Name	varchar(80);
 				Medication_Number	varchar(11);
+#----->                         単位コード
+				Medication_Unit_Code		varchar(3);
+				Medication_Unit_Code_Name	varchar(24);
 				Medication_Money 	varchar(07);
 				Medication_Input_Info {
 					Medication_Input	varchar(08);
 				} [5];
+#----->                         フィルム分画数
+				Medication_Film_Comp_Number	varchar(03);
 				Medication_Generic		varchar(1);
      				Medication_Generic_Name		varchar(200);
 				Medication_Continue		varchar(01);
 				Medication_Internal_Kinds	varchar(01);
+#----->                         加算自動算定なし
+				Medication_No_Addition_Class	varchar(03);
 				Medication_Auto_Addition	varchar(01);
 			} [50];
 		}[120] ;

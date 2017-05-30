@@ -1174,6 +1174,8 @@
                    ELSE
                        MOVE    ZERO            TO  FLG-KASAN
                        PERFORM 2001-JIDOTUIKA-SEC
+                       MOVE    "2"                 TO  WRK-COM-AUTOKBN
+                                                           (IDX-T)
                   END-IF
               END-IF
            END-IF

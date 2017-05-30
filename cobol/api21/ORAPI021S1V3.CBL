@@ -981,6 +981,9 @@
            MOVE    WRK-PERFORM-YMD     TO  SPA-SRYYMD
       *    入外区分（外来）
            MOVE    "2"                 TO  SPA-NYUGAIKBN
+      *H29.5
+      *    HAORI処理
+           MOVE    1                   TO  SPA-API-FLG
       *
       *    入力UID
            MOVE    MDCREQ-ORCA-UID     TO  MDCRES-ORCA-UID

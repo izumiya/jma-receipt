@@ -48,6 +48,9 @@
                     09  ORAPISUB2-MDC-MONEY             PIC X(08).
       *             剤区分（１：包括剤）
                     09  ORAPISUB2-MDC-CODE              PIC X(01).
+      *H29.5
+      *             包括検査の検査数
+                    09  ORAPISUB2-HKTKNSA-CNT           PIC X(02).
       *
       *             剤削除可能連番
                     09  ORAPISUB2-DEL-NUMBER            PIC X(02).
@@ -62,12 +65,20 @@
                         11  ORAPISUB2-PRSCRPT-NAME          PIC X(80).
       *                 数量
                         11  ORAPISUB2-PRSCRPT-NUMBER        PIC X(11).
+      *H29.5
+      *                 単位コード
+                        11  ORAPISUB2-PRSCRPT-TANICD        PIC X(03).
+      *                 単位名称
+                        11  ORAPISUB2-PRSCRPT-TANICD-NAME   PIC X(24).
       *                 自費金額
                         11  ORAPISUB2-PRSCRPT-MONEY         PIC X(07).
       *                 コメント埋め込み値
                         11  ORAPISUB2-PRSCRPT-ATAI-G.
                             13  ORAPISUB2-PRSCRPT-ATAI      PIC X(08)
                                                          OCCURS   5.
+      *H29.5
+      *                 フィルム分画数
+                        11  ORAPISUB2-PRSCRPT-FILMNUM       PIC X(03).
       *                 一般名記載区分
                         11  ORAPISUB2-PRSCRPT-GENERIC       PIC X(01).
       *                 一般名
@@ -76,6 +87,9 @@
                         11  ORAPISUB2-PRSCRPT-CONTKBN       PIC X(01).
       *                 内服種類数指示区分
                         11  ORAPISUB2-PRSCRPT-NAIFKBN       PIC X(01).
+      *H29.5
+      *                 自動算定なし区分（在宅療養実績加算）
+                        11  ORAPISUB2-PRSCRPT-NOAUTO        PIC X(03).
       *                 自動区分
                         11  ORAPISUB2-PRSCRPT-AUTOKBN       PIC X(01).
       *

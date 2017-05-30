@@ -126,6 +126,9 @@
       *             包括区分（True：包括剤）
                     09  MDCRES-INCLUSION-CLASS       PIC X(05).
       *
+      *             包括検査の検査数
+                    09  MDCRES-HKTKNSA-CNT           PIC X(02).
+      *
       *             剤削除可能連番
                     09  MDCRES-DEL-NUMBER            PIC X(02).
       *
@@ -140,12 +143,18 @@
                         11  MDCRES-PRSCRPT-NAME          PIC X(80).
       *                 数量
                         11  MDCRES-PRSCRPT-NUMBER        PIC X(11).
+      *                 単位コード
+                        11  MDCRES-PRSCRPT-TANICD        PIC X(03).
+      *                 単位名称
+                        11  MDCRES-PRSCRPT-TANICD-NAME   PIC X(24).
       *                 自費金額
                         11  MDCRES-PRSCRPT-MONEY         PIC X(07).
       *                 コメント埋め込み値
                         11  MDCRES-PRSCRPT-ATAI-G.
                             13  MDCRES-PRSCRPT-ATAI      PIC X(08)
                                                          OCCURS   5.
+      *                 フィルム分画数
+                        11  MDCRES-PRSCRPT-FILMNUM       PIC X(03).
       *                 一般名記載区分（１：一般名、３：処方名（一般名）
                         11  MDCRES-PRSCRPT-GENERIC       PIC X(01).
       *                 一般名名称
@@ -154,6 +163,8 @@
                         11  MDCRES-PRSCRPT-CONTKBN       PIC X(01).
       *                 内服種類数指示区分
                         11  MDCRES-PRSCRPT-NAIFKBN       PIC X(01).
+      *                 自動算定なし区分（在宅療養実績加算）
+                        11  MDCRES-PRSCRPT-NOAUTO        PIC X(03).
       *                 自動区分
                         11  MDCRES-PRSCRPT-AUTOKBN       PIC X(01).
       *

@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  17/05/XX  包括検査数、単位コード対応
+      *                                     フィルム分画数等対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -213,6 +215,8 @@
       *    一般名
            03  WRK-GENECHG-KBN         PIC X(01).
            03  WRK-IPN-KISAIKBN        PIC X(01).
+      *    包括検査数
+           03  WRK-HOUKNS-CNT          PIC 9(02).
       *
        01  WRK-XML-AREA.
            03  WRK-PERFORM-DATE        PIC X(10).
@@ -1349,6 +1353,15 @@
                    MOVE    MDCREQ-PRSCRPT-AUTOKBN (IDX IDY)
                                        TO  MDCRES-REQ-PRSCRPT-AUTOKBN
                                                            (IDX IDY)
+      *H29.5
+      *            フィルム分画数
+                   MOVE    MDCREQ-PRSCRPT-FILMNUM (IDX IDY)
+                                       TO  MDCRES-REQ-PRSCRPT-FILMNUM
+                                                           (IDX IDY)
+      *            自動算定なし区分（在宅療養実績加算）
+                    MOVE    MDCREQ-PRSCRPT-NOAUTO (IDX IDY)
+                                       TO MDCRES-REQ-PRSCRPT-NOAUTO
+                                                           (IDX IDY)
                END-PERFORM
            END-PERFORM
       *
@@ -1577,7 +1590,7 @@
            END-IF
       *
       *    診療行為内容アウト作成
-           PERFORM 20021-WKSRYACT-SYORI-SEC
+      **** PERFORM 20021-WKSRYACT-SYORI-SEC
       *
       *    ワーク診療行為データレイアウト作成
            PERFORM 20021-WKSRYACT-SYORI-SEC
@@ -2044,6 +2057,15 @@
                    MOVE    MDCREQ-PRSCRPT-AUTOKBN (IDX IDY)
                                        TO  ORAPISUB01-AUTOKBN
                                                            (IDX IDY)
+      *H29.5
+      *            フィルム分画数
+                   MOVE    MDCREQ-PRSCRPT-FILMNUM (IDX IDY)
+                                       TO  ORAPISUB01-PRSCRPT-FILMNUM
+                                                           (IDX IDY)
+      *            自動算定なし区分（在宅療養実績加算）
+                   MOVE    MDCREQ-PRSCRPT-NOAUTO (IDX IDY)
+                                       TO  ORAPISUB01-NOAUTO
+                                                           (IDX IDY)
                END-PERFORM
            END-PERFORM
       *
@@ -2338,6 +2360,8 @@
       *****************************************************************
        510-TBLHEN-SYORI-SEC            SECTION.
       *
+           MOVE     SPA-SYOHOKBN     TO  SPA-INGAIKBN
+      *
       *    腫瘍マーカー一覧展開しないとする
            MOVE    ZERO                TO  SPA-AKUSEIHYOFLG
       *    診療行為、計計算処理、編集
@@ -2614,6 +2638,7 @@
                    MOVE    SPA-COM-SRYKBN (IDX)    TO  WRK-SRYKBN
                    MOVE    SPA-COM-SRYSYUKBN(IDX)  TO  WRK-SRYSYUKBN
                    MOVE    ZERO                    TO  WRK-KINGAK
+                   MOVE    ZERO                    TO  WRK-HOUKNS-CNT
       *            エラー・警告
                    IF     (SPA-COM-CUR (IDX)   =   "1"  )
                      OR   (SPA-COM-GYOU(IDX)   >   ZERO )
@@ -2636,7 +2661,8 @@
                             MOVE    WRK-SRYSYUKBN   TO SPA-COM-SRYSYUKBN
                                                                   (IDX) 
                        END-IF
-                       MOVE    ZERO                    TO  WRK-KINGAK
+                       MOVE    ZERO                TO  WRK-KINGAK
+                       MOVE    ZERO                TO  WRK-HOUKNS-CNT
                    END-IF
                    ADD     1                   TO  IDZ
                    IF      IDZ                 >   50
@@ -2740,6 +2766,46 @@
            PERFORM 810-NUMHENKAN-SEC
            MOVE    WRK-SURYO-HX(1:WRK-S-MAX)   TO  MDCRES-PRSCRPT-NUMBER
                                                              (IDY IDZ)
+      *H29.5
+      *    単位コード
+           IF     (SPA-COM-INPUTCD (IDX)(1:1) =   "6"
+                                              OR  "7"
+                                              OR  "1" )
+             OR   (SPA-COM-INPUTCD (IDX)(1:3) =   "058"
+                                              OR  "059"
+                                              OR  "095"
+                                              OR  "096" )
+               PERFORM 20022211-TANICD-MEI-SEC
+           END-IF
+      *    フィルム分画数
+           IF     (SPA-COM-SRYKBN (IDX)    =   "70" )
+              AND (SPA-COM-DATAKBN(IDX)    =   "3"  )
+              AND (SPA-COM-BUNGSU (IDX)    >   ZERO )
+               MOVE    SPA-COM-BUNGSU(IDX)     TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDCRES-PRSCRPT-FILMNUM
+                                                             (IDY IDZ)
+           END-IF
+      *H29.5
+      *    加算自動算定なし（在宅加算、精神通院）
+           IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "1" )
+              AND (SPA-COM-KSNAUTO(IDX)    =   "1"  )
+      *        精神通院の２０歳未満加算の自動発生なし
+               IF      (SPA-COM-CDKBN-KBN (IDX)    =   "I"  )
+                  AND  (SPA-COM-CDKBN-KBNNUM(IDX)  =   "002")
+                  AND  (SPA-COM-AGEKSNSRYCD(IDX 1) NOT =   ZERO
+                                                        AND SPACE )
+                   MOVE    "Yes"           TO  MDCRES-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
+      *        在宅加算等の自動算定なし設定
+               IF     (SPA-COM-CDKBN-KBN (IDX)     =   "C"  )
+                  AND (SPA-COM-CDKBN-KBNNUM(IDX)   =   "002")
+                   MOVE    "Yes"           TO  MDCRES-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
+           END-IF
       *
       *    自費金額
            IF     (SPA-COM-SRYKBN (IDX)    =   "96"
@@ -2791,6 +2857,15 @@
            IF      SPA-COM-KEIFLG (IDX)   =   "1"  OR  "2"
                ADD      SPA-COM-JIHIMONEY (IDX)    TO  WRK-KINGAK
            END-IF
+      *H29.5
+      *    包括検査の判定
+           IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                  (SPA-COM-SRYKBN (IDX)        =   "60" ) AND
+                  (SPA-COM-DATAKBN (IDX)       =   1    ) AND
+                  (SPA-COM-HOUKNSKBN (IDX) NOT =   ZERO )
+               ADD     1                   TO  WRK-HOUKNS-CNT
+           END-IF
+      *!
       *
            IF     (IDX                     <   SPA-GMN-MAX) AND
                   (SPA-GMN-INPUTCD (IDX + 1)(1:1)
@@ -2812,6 +2887,37 @@
       *
            .
        2002221-MEISAI-HEN-EXT.
+           EXIT.
+      *
+      *H29.5
+      *****************************************************************
+      *    単位コード編集処理
+      *****************************************************************
+       20022211-TANICD-MEI-SEC          SECTION.
+      *
+           IF     (SPA-COM-INPUTCD (IDX)(1:1) =   "6"
+                                              OR  "7")
+               MOVE    SPA-COM-TANICD (IDX)    TO  MDCRES-PRSCRPT-TANICD
+                                                             (IDY IDZ)
+           END-IF
+           IF      SPA-COM-TANICD (IDX)    =   SPACE
+                                           OR  ZERO
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  TNS-TENSU-REC
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    SPA-COM-INPUTCD (IDX)
+                                           TO  TNS-SRYCD
+               PERFORM 910-TENSU-READ-SEC
+               MOVE    TNS-TANINAME
+                                       TO  MDCRES-PRSCRPT-TANICD-NAME
+                                                             (IDY IDZ)
+               MOVE    SPA-COM-TANICD (IDX)    TO  MDCRES-PRSCRPT-TANICD
+                                                             (IDY IDZ)
+           END-IF
+      *
+           .
+       20022211-TANICD-MEI-EXT.
            EXIT.
       *
       *!!!!不使用
@@ -2982,6 +3088,12 @@
            MOVE    WRK-SRYSYUKBN       TO  MDCRES-MDC-CLASS     (IDY)
            PERFORM 510-SRYKBN-MEI-SEC
            MOVE    WRK-SRYSYUKBNMEI    TO  MDCRES-MDC-CLASS-NAME(IDY)
+      *H29.5
+      *    包括検査の検査数
+           IF      WRK-HOUKNS-CNT      >   ZERO
+               MOVE    WRK-HOUKNS-CNT      TO  MDCRES-HKTKNSA-CNT(IDY)
+           END-IF
+      *
            .
        2002221-ZAIHENSYU-EXT.
            EXIT.
@@ -3095,6 +3207,7 @@
            MOVE    SPA-NYUHKT-G        TO  ORCSCHKTCHK-NYUHKT-G
            MOVE    "6"                 TO  ORCSCHKTCHK-SYORI
            MOVE    "K02"               TO  ORCSCHKTCHK-PG
+           MOVE    SPA-K02-TEISEI-AREA TO  LNK-ORCSC-TEISEI-AREA
            CALL    "ORCSCHKTCHK"       USING
                                        ORCSCHKTCHKAREA
                                        SPA-AREA
@@ -3320,6 +3433,8 @@
            ELSE
       *        明細編集（画面）
                PERFORM 200222-MEDICAL-HEN-SEC
+      *        リクエスト＝０２へ
+               MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
            END-IF
       *
            .
@@ -3678,6 +3793,14 @@
                END-IF
                MOVE    ORAPISUB2-DEL-NUMBER (IDX)
                                            TO  MDCRES-DEL-NUMBER(IDX)
+      *H29.5
+      *        包括検査の検査数
+               IF      ORAPISUB2-HKTKNSA-CNT (IDX) >   ZERO
+                   MOVE    ORAPISUB2-HKTKNSA-CNT (IDX)
+                                               TO  MDCRES-HKTKNSA-CNT
+                                                                (IDX)
+               END-IF
+      *
       *        剤内容
                PERFORM VARYING IDY     FROM    1   BY  1
                        UNTIL   (IDY            >   50    )
@@ -3713,6 +3836,23 @@
                    MOVE    ORAPISUB2-PRSCRPT-AUTOKBN (IDX IDY)
                                        TO  MDCRES-PRSCRPT-AUTOKBN
                                                             (IDX IDY)
+      *H29.5
+      *            単位コード
+                   MOVE    ORAPISUB2-PRSCRPT-TANICD (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-TANICD
+                                                            (IDX IDY)
+                   MOVE    ORAPISUB2-PRSCRPT-TANICD-NAME (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-TANICD-NAME
+                                                            (IDX IDY)
+      *            フィルム分画数
+                   MOVE    ORAPISUB2-PRSCRPT-FILMNUM (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-FILMNUM
+                                                            (IDX IDY)
+      *            加算自動算定なし
+                   MOVE    ORAPISUB2-PRSCRPT-NOAUTO (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-NOAUTO
+                                                            (IDX IDY)
+      *
                END-PERFORM
            END-PERFORM
            IF     (ORAPISUB2-ERRCD NOT =   SPACE )

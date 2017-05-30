@@ -1688,6 +1688,14 @@
                END-IF
                MOVE    ORAPISUB2-DEL-NUMBER (IDX)
                                            TO  MDCRES-DEL-NUMBER(IDX)
+      *H29.5
+      *        包括検査の検査数
+               IF      ORAPISUB2-HKTKNSA-CNT (IDX) >   ZERO
+                   MOVE    ORAPISUB2-HKTKNSA-CNT (IDX)
+                                               TO  MDCRES-HKTKNSA-CNT
+                                                                (IDX)
+               END-IF
+      *
       *        剤内容
                PERFORM VARYING IDY     FROM    1   BY  1
                        UNTIL   (IDY            >   50    )
@@ -1714,12 +1722,12 @@
                    MOVE    ORAPISUB2-PRSCRPT-GENNAME (IDX IDY)
                                        TO  MDCRES-PRSCRPT-GENNAME
                                                             (IDX IDY)
-      *            一般名称があれば、名称は削除
-                   IF      ORAPISUB2-PRSCRPT-GENNAME (IDX IDY)
-                                           NOT =   SPACE
-                       MOVE    SPACE   TO  MDCRES-PRSCRPT-NAME
-                                                            (IDX IDY)
-                   END-IF
+      *H29.5 削除  一般名称があれば、名称は削除
+      *            IF      ORAPISUB2-PRSCRPT-GENNAME (IDX IDY)
+      *                                    NOT =   SPACE
+      *                MOVE    SPACE   TO  MDCRES-PRSCRPT-NAME
+      *                                                     (IDX IDY)
+      *****        END-IF
                    MOVE    ORAPISUB2-PRSCRPT-CONTKBN (IDX IDY)
                                        TO  MDCRES-PRSCRPT-CONTKBN
                                                             (IDX IDY)
@@ -1729,6 +1737,23 @@
                    MOVE    ORAPISUB2-PRSCRPT-AUTOKBN (IDX IDY)
                                        TO  MDCRES-PRSCRPT-AUTOKBN
                                                             (IDX IDY)
+      *H29.5
+      *            単位コード
+                   MOVE    ORAPISUB2-PRSCRPT-TANICD (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-TANICD
+                                                            (IDX IDY)
+                   MOVE    ORAPISUB2-PRSCRPT-TANICD-NAME (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-TANICD-NAME
+                                                            (IDX IDY)
+      *            フィルム分画数
+                   MOVE    ORAPISUB2-PRSCRPT-FILMNUM (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-FILMNUM
+                                                            (IDX IDY)
+      *            加算自動算定なし
+                   MOVE    ORAPISUB2-PRSCRPT-NOAUTO (IDX IDY)
+                                       TO  MDCRES-PRSCRPT-NOAUTO
+                                                            (IDX IDY)
+      *
                END-PERFORM
       *        剤削除区分
                IF      ORAPISUB2-DEL-INF (IDX) =   "1"
