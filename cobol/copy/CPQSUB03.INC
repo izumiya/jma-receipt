@@ -144,7 +144,7 @@
                    07  QSUB03-HKNNUMLST                    OCCURS  50.
                        09  QSUB03-HKNNUML                  PIC X(03).
                        09  QSUB03-HKNNUMFLL                PIC X(01).
-                       09  QSUB03-HKNNUMMEIL               PIC X(16).
+                       09  QSUB03-HKNNUMMEIL               PIC X(26).
                05  QSUB03-KOHNUMLST-G.
                    07  QSUB03-KOHNUMLST-MAX                PIC 9(05).
                    07  QSUB03-KOHNUMLST-OCC                OCCURS 150.

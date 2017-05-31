@@ -3836,9 +3836,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>KIGO1</name>
-            <x>424</x>
+            <x>496</x>
             <y>108</y>
-            <width>285</width>
+            <width>236</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3862,9 +3862,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>KIGO2</name>
-            <x>424</x>
+            <x>496</x>
             <y>136</y>
-            <width>285</width>
+            <width>236</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3888,9 +3888,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>KIGO3</name>
-            <x>424</x>
+            <x>496</x>
             <y>164</y>
-            <width>285</width>
+            <width>236</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3914,9 +3914,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>KIGO4</name>
-            <x>424</x>
+            <x>496</x>
             <y>192</y>
-            <width>285</width>
+            <width>236</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3940,9 +3940,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>KIGO5</name>
-            <x>424</x>
+            <x>496</x>
             <y>220</y>
-            <width>285</width>
+            <width>236</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3966,9 +3966,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>NUM1</name>
-            <x>712</x>
+            <x>736</x>
             <y>108</y>
-            <width>285</width>
+            <width>260</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3992,9 +3992,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>NUM2</name>
-            <x>712</x>
+            <x>736</x>
             <y>136</y>
-            <width>285</width>
+            <width>260</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -4018,9 +4018,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>NUM3</name>
-            <x>712</x>
+            <x>736</x>
             <y>164</y>
-            <width>285</width>
+            <width>260</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -4044,9 +4044,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>NUM4</name>
-            <x>712</x>
+            <x>736</x>
             <y>192</y>
-            <width>285</width>
+            <width>260</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -4070,9 +4070,9 @@
           <widget>
             <class>GtkPandaEntry</class>
             <name>NUM5</name>
-            <x>712</x>
+            <x>736</x>
             <y>220</y>
-            <width>285</width>
+            <width>260</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -4390,7 +4390,7 @@
             <name>CMB_HKNNUM1</name>
             <x>228</x>
             <y>108</y>
-            <width>160</width>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -4426,7 +4426,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label533</name>
-            <x>224</x>
+            <x>228</x>
             <y>84</y>
             <width>76</width>
             <height>24</height>
@@ -4444,7 +4444,7 @@
           <widget>
             <class>GtkPandaCombo</class>
             <name>CMB_JKNHKNNUM</name>
-            <x>304</x>
+            <x>364</x>
             <y>84</y>
             <width>84</width>
             <height>24</height>
@@ -4552,7 +4552,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label527</name>
-            <x>32</x>
+            <x>24</x>
             <y>84</y>
             <width>76</width>
             <height>24</height>
@@ -4700,7 +4700,7 @@
             <name>CMB_HKNNUM2</name>
             <x>228</x>
             <y>136</y>
-            <width>160</width>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -4738,7 +4738,7 @@
             <name>CMB_HKNNUM3</name>
             <x>228</x>
             <y>164</y>
-            <width>160</width>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -4776,7 +4776,7 @@
             <name>CMB_HKNNUM4</name>
             <x>228</x>
             <y>192</y>
-            <width>160</width>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -4814,7 +4814,7 @@
             <name>CMB_HKNNUM5</name>
             <x>228</x>
             <y>220</y>
-            <width>160</width>
+            <width>220</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -4904,7 +4904,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label534</name>
-            <x>404</x>
+            <x>476</x>
             <y>108</y>
             <width>20</width>
             <height>24</height>
@@ -4922,7 +4922,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label475</name>
-            <x>424</x>
+            <x>496</x>
             <y>84</y>
             <width>36</width>
             <height>24</height>
@@ -4940,7 +4940,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label463</name>
-            <x>712</x>
+            <x>736</x>
             <y>84</y>
             <width>40</width>
             <height>24</height>
@@ -4958,7 +4958,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label535</name>
-            <x>404</x>
+            <x>476</x>
             <y>136</y>
             <width>20</width>
             <height>24</height>
@@ -4976,7 +4976,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label536</name>
-            <x>404</x>
+            <x>476</x>
             <y>164</y>
             <width>20</width>
             <height>24</height>
@@ -4994,7 +4994,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label537</name>
-            <x>404</x>
+            <x>476</x>
             <y>192</y>
             <width>20</width>
             <height>24</height>
@@ -5012,7 +5012,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label538</name>
-            <x>404</x>
+            <x>476</x>
             <y>220</y>
             <width>20</width>
             <height>24</height>
@@ -5030,7 +5030,7 @@
           <widget>
             <class>GtkVSeparator</class>
             <name>vseparator1</name>
-            <x>388</x>
+            <x>454</x>
             <y>80</y>
             <width>16</width>
             <height>172</height>
@@ -5549,7 +5549,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label1</name>
-            <x>224</x>
+            <x>228</x>
             <y>48</y>
             <width>76</width>
             <height>24</height>

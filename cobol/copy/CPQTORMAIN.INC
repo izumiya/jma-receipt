@@ -31,9 +31,13 @@
            03  QTORM-GIHO-CNT          PIC 9(06).
            03  QTORM-GRSI-CNT          PIC 9(06).
            03  QTORM-GJBI-CNT          PIC 9(06).
+           03  QTORM-GJBIR-CNT         PIC 9(06).
+           03  QTORM-GJBIK-CNT         PIC 9(06).
            03  QTORM-NIHO-CNT          PIC 9(06).
            03  QTORM-NRSI-CNT          PIC 9(06).
            03  QTORM-NJBI-CNT          PIC 9(06).
+           03  QTORM-NJBIR-CNT         PIC 9(06).
+           03  QTORM-NJBIK-CNT         PIC 9(06).
            03  QTORM-GKGI-CNT          PIC 9(06).
            03  QTORM-NKGI-CNT          PIC 9(06).
            03  QTORM-GDI3-CNT          PIC 9(06).

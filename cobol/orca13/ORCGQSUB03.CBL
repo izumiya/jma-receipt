@@ -90,6 +90,7 @@
            COPY    "CPSK1010.INC".
            COPY    "CPSK1018.INC".
            COPY    "CPSK1026.INC".
+           COPY    "CPSK4001.INC".
       *
       *    ¿ÇÎÅ²Ê
            COPY    "CPSK1005.INC".
@@ -893,11 +894,22 @@
            MOVE    "¹ñÊÝ"          TO  QSUB03-HKNNUMMEIL(IDXL + 2)
            IF    ( QSUB03-BASEYMD      >=  CONST-H200401 )
                MOVE    "KOU"       TO  QSUB03-HKNNUML   (IDXL + 3)
-               MOVE    "¹­°è"      TO QSUB03-HKNNUMMEIL(IDXL + 3)
+               MOVE    "¹­°è"      TO  QSUB03-HKNNUMMEIL(IDXL + 3)
                COMPUTE IDXL    =   IDXL + 3
            ELSE
                COMPUTE IDXL    =   IDXL + 2
            END-IF
+      *
+           MOVE    "JB0"           TO  QSUB03-HKNNUML   (IDXL + 1)
+           MOVE    "¼«ÇåÀÕ¡Ê¥·¥¹¥Æ¥àÀßÄê¡Ë"
+                                   TO  QSUB03-HKNNUMMEIL(IDXL + 1)
+           MOVE    "JB1"           TO  QSUB03-HKNNUML   (IDXL + 2)
+           MOVE    "¼«ÇåÀÕ¡Ê´µ¼ÔÏ«ºÒÀßÄê¡Ë"
+                                   TO  QSUB03-HKNNUMMEIL(IDXL + 2)
+           MOVE    "JB2"           TO  QSUB03-HKNNUML   (IDXL + 3)
+           MOVE    "¼«ÇåÀÕ¡Ê´µ¼Ô·òÊÝÀßÄê¡Ë"
+                                   TO  QSUB03-HKNNUMMEIL(IDXL + 3)
+           COMPUTE IDXL    =   IDXL + 3
       *
            MOVE    IDXL            TO QSUB03-HKNNUMLST-MAX
       *

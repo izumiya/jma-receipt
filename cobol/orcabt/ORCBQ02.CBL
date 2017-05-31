@@ -123,11 +123,15 @@
            03  CNT-GIHO                PIC 9(05).
            03  CNT-GRSI                PIC 9(05).
            03  CNT-GJBI                PIC 9(05).
+           03  CNT-GJBIR               PIC 9(05).
+           03  CNT-GJBIK               PIC 9(05).
            03  CNT-GKGI                PIC 9(05).
            03  CNT-GDI3                PIC 9(05).
            03  CNT-NIHO                PIC 9(05).
            03  CNT-NRSI                PIC 9(05).
            03  CNT-NJBI                PIC 9(05).
+           03  CNT-NJBIR               PIC 9(05).
+           03  CNT-NJBIK               PIC 9(05).
            03  CNT-NKGI                PIC 9(05).
            03  CNT-NDI3                PIC 9(05).
       *    °ì»þÎÎ°è
@@ -425,11 +429,15 @@
            MOVE    SS001-GIHO-FLG  TO  QTORS-GIHO-FLG
            MOVE    SS001-GRSI-FLG  TO  QTORS-GRSI-FLG
            MOVE    SS001-GJBI-FLG  TO  QTORS-GJBI-FLG
+           MOVE    SS001-GJBIR-FLG TO  QTORS-GJBIR-FLG
+           MOVE    SS001-GJBIK-FLG TO  QTORS-GJBIK-FLG
            MOVE    SS001-GKGI-FLG  TO  QTORS-GKGI-FLG
            MOVE    SS001-GDI3-FLG  TO  QTORS-GDI3-FLG
            MOVE    SS001-NIHO-FLG  TO  QTORS-NIHO-FLG
            MOVE    SS001-NRSI-FLG  TO  QTORS-NRSI-FLG
            MOVE    SS001-NJBI-FLG  TO  QTORS-NJBI-FLG
+           MOVE    SS001-NJBIR-FLG TO  QTORS-NJBIR-FLG
+           MOVE    SS001-NJBIK-FLG TO  QTORS-NJBIK-FLG
            MOVE    SS001-NKGI-FLG  TO  QTORS-NKGI-FLG
            MOVE    SS001-NDI3-FLG  TO  QTORS-NDI3-FLG
       *
@@ -443,6 +451,14 @@
       *
            IF    ( QTORS-GJBI-FLG      =   1 )
                COMPUTE CNT-GJBI    =   CNT-GJBI    +   1
+           END-IF
+      *
+           IF    ( QTORS-GJBIR-FLG     =   1 )
+               COMPUTE CNT-GJBIR   =   CNT-GJBIR    +   1
+           END-IF
+      *
+           IF    ( QTORS-GJBIK-FLG     =   1 )
+               COMPUTE CNT-GJBIK   =   CNT-GJBIK    +   1
            END-IF
       *
            IF    ( QTORS-GKGI-FLG      =   1 )
@@ -463,6 +479,14 @@
       *
            IF    ( QTORS-NJBI-FLG      =   1 )
                COMPUTE CNT-NJBI    =   CNT-NJBI    +   1
+           END-IF
+      *
+           IF    ( QTORS-NJBIR-FLG     =   1 )
+               COMPUTE CNT-NJBIR   =   CNT-NJBIR    +   1
+           END-IF
+      *
+           IF    ( QTORS-NJBIK-FLG     =   1 )
+               COMPUTE CNT-NJBIK   =   CNT-NJBIK    +   1
            END-IF
       *
            IF    ( QTORS-NKGI-FLG      =   1 )
@@ -553,11 +577,15 @@
                MOVE    CNT-GIHO            TO  QTORM-GIHO-CNT
                MOVE    CNT-GRSI            TO  QTORM-GRSI-CNT
                MOVE    CNT-GJBI            TO  QTORM-GJBI-CNT
+               MOVE    CNT-GJBIR           TO  QTORM-GJBIR-CNT
+               MOVE    CNT-GJBIK           TO  QTORM-GJBIK-CNT
                MOVE    CNT-GKGI            TO  QTORM-GKGI-CNT
                MOVE    CNT-GDI3            TO  QTORM-GDI3-CNT
                MOVE    CNT-NIHO            TO  QTORM-NIHO-CNT
                MOVE    CNT-NRSI            TO  QTORM-NRSI-CNT
                MOVE    CNT-NJBI            TO  QTORM-NJBI-CNT
+               MOVE    CNT-NJBIR           TO  QTORM-NJBIR-CNT
+               MOVE    CNT-NJBIK           TO  QTORM-NJBIK-CNT
                MOVE    CNT-NKGI            TO  QTORM-NKGI-CNT
                MOVE    CNT-NDI3            TO  QTORM-NDI3-CNT
       *

@@ -32,6 +32,8 @@
                05  SS001-NIHO-FLG                  PIC 9(01).
                05  SS001-NRSI-FLG                  PIC 9(01).
                05  SS001-NJBI-FLG                  PIC 9(01).
+               05  SS001-NJBIR-FLG                 PIC 9(01).
+               05  SS001-NJBIK-FLG                 PIC 9(01).
                05  SS001-NKGI-FLG                  PIC 9(01).
                05  SS001-NSYA-FLG                  PIC 9(01).
                05  SS001-NKOK-FLG                  PIC 9(01).
@@ -43,6 +45,8 @@
                05  SS001-GIHO-FLG                  PIC 9(01).
                05  SS001-GRSI-FLG                  PIC 9(01).
                05  SS001-GJBI-FLG                  PIC 9(01).
+               05  SS001-GJBIR-FLG                 PIC 9(01).
+               05  SS001-GJBIK-FLG                 PIC 9(01).
                05  SS001-GKGI-FLG                  PIC 9(01).
                05  SS001-GSYA-FLG                  PIC 9(01).
                05  SS001-GKOK-FLG                  PIC 9(01).
@@ -55,6 +59,8 @@
                    07  SS001-IHO-FLG               PIC 9(01).
                    07  SS001-RSI-FLG               PIC 9(01).
                    07  SS001-JBI-FLG               PIC 9(01).
+                   07  SS001-JBIR-FLG              PIC 9(01).
+                   07  SS001-JBIK-FLG              PIC 9(01).
                    07  SS001-KGI-FLG               PIC 9(01).
                    07  SS001-SYA-FLG               PIC 9(01).
                    07  SS001-KOK-FLG               PIC 9(01).
@@ -70,6 +76,8 @@
                        09  SS001-SRYKA-IHO-FLG     PIC 9(01).
                        09  SS001-SRYKA-RSI-FLG     PIC 9(01).
                        09  SS001-SRYKA-JBI-FLG     PIC 9(01).
+                       09  SS001-SRYKA-JBIR-FLG    PIC 9(01).
+                       09  SS001-SRYKA-JBIK-FLG    PIC 9(01).
                        09  SS001-SRYKA-KGI-FLG     PIC 9(01).
                        09  SS001-SRYKA-SYA-FLG     PIC 9(01).
                        09  SS001-SRYKA-KOK-FLG     PIC 9(01).

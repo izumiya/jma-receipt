@@ -130,6 +130,8 @@
                05  WRK-SKBT-EDYMD                  PIC X(8).
                05  WRK-SKBT-SEL-STYMD              PIC X(8).
                05  WRK-SKBT-SEL-EDYMD              PIC X(8).
+           03  WRK-JIBAIKBN1                       PIC X(1).
+           03  WRK-JIBAIKBN2                       PIC X(1).
       *
       *    ∏«ƒÍ√ÕŒŒ∞Ë
        01  CONST-AREA.
@@ -886,7 +888,7 @@
                                                    DELIMITED  BY  SIZE
                            ",AA.HKNID,BB.KIGO,BB.NUM,AA.HKNCOMBINUM "
                                                    DELIMITED  BY  SIZE
-                           ",BB.TEKEDYMD "
+                           ",BB.TEKEDYMD,CC.JIBAIKBN "
                                                    DELIMITED  BY  SIZE
                            "FROM TBL_HKNCOMBI AA"
                                                    DELIMITED  BY  SIZE
@@ -894,7 +896,12 @@
                                                    DELIMITED  BY  SIZE
                            "(AA.HOSPNUM=BB.HOSPNUM AND AA.PTID=BB.PTID"
                                                    DELIMITED  BY  SIZE
-                           " AND AA.HKNID = BB.HKNID)) D"
+                           " AND AA.HKNID = BB.HKNID)"
+                           " LEFT JOIN TBL_PTRSIINF CC ON "
+                                                   DELIMITED  BY  SIZE
+                           "(AA.HOSPNUM=CC.HOSPNUM AND AA.PTID=CC.PTID"
+                                                   DELIMITED  BY  SIZE
+                           " AND AA.HKNID = CC.HKNID)) D"
                                                    DELIMITED  BY  SIZE
                    INTO    WRK-SQL
                    WITH    POINTER WRK-SQL-PNT
@@ -2789,6 +2796,49 @@
                        WITH    POINTER WRK-SQL-PNT
                        END-STRING
                        IF    ( SPA-Q01-HKNNUM-JKN    =   CONST-NOT )
+                           STRING  "or ("          DELIMITED   BY  SIZE
+                               WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                               ".HKNNUM "          DELIMITED   BY  SIZE
+                               "is null"           DELIMITED   BY  SIZE
+                               ")"                 DELIMITED   BY  SIZE
+                           INTO    WRK-SQL
+                           WITH    POINTER WRK-SQL-PNT
+                           END-STRING
+                       END-IF
+                       STRING  ")"                 DELIMITED   BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+                       END-STRING
+                   WHEN    "JB0"
+                   WHEN    "JB1"
+                   WHEN    "JB2"
+                       EVALUATE    SPA-Q01-HKNNUM (IDX1)
+                       WHEN    "JB0"
+                           MOVE    " "         TO      WRK-JIBAIKBN1
+                           MOVE    "0"         TO      WRK-JIBAIKBN2
+                       WHEN    "JB1"
+                           MOVE    "1"         TO      WRK-JIBAIKBN1
+                           MOVE    "1"         TO      WRK-JIBAIKBN2
+                       WHEN    "JB2"
+                           MOVE    "2"         TO      WRK-JIBAIKBN1
+                           MOVE    "2"         TO      WRK-JIBAIKBN2
+                       END-EVALUATE
+                       STRING  "("             DELIMITED   BY  SIZE
+                           WRK-NOT             DELIMITED   BY  SPACE
+                           "("                 DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".HKNNUM "          DELIMITED   BY  SIZE
+                           "= '973' AND "      DELIMITED   BY  SIZE
+                           WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
+                           ".JIBAIKBN IN ('"   DELIMITED   BY  SIZE
+                           WRK-JIBAIKBN1       DELIMITED   BY  SPACE
+                           "','"               DELIMITED   BY  SIZE
+                           WRK-JIBAIKBN2       DELIMITED   BY  SPACE
+                           "'))"               DELIMITED   BY  SIZE
+                       INTO    WRK-SQL
+                       WITH    POINTER WRK-SQL-PNT
+                       END-STRING
+                       IF    ( SPA-Q01-HKNNUM-JKN  =   CONST-NOT )
                            STRING  "or ("          DELIMITED   BY  SIZE
                                WRK-SQL-TBL-NAME    DELIMITED   BY  SPACE
                                ".HKNNUM "          DELIMITED   BY  SIZE
