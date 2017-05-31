@@ -128,6 +128,8 @@
       *  04.08.03    NACL-ÃÁœ∆    16/03/28   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
       *  04.08.04    NACL-ÃÁœ∆    17/02/07  œ´∫“ ›∏±≈–œøª˛§Œœ´∆Ø¥Ω‡¥∆∆ƒ
       *                                     Ω•≥°º•…§Œ ‘Ω∏ ˝À° —ππ§À»º§¶Ω§¿µ
+      *  04.08.05    NACL-∆£∏∂    17/04/10  ¥µº‘√±∞Ã§«§Œ≈¿øÙªªƒÍ¿ﬂƒÍ
+      *                                     ° œ´∫“Ω‡µÚÀÙ§œ∑Ú ›Ω‡µÚ°À¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -263,6 +265,7 @@
            03  WRK-TAXKBN                              PIC  X(01).      
            03  WRK-KOTEIKBN                            PIC  X(01).
            03  WRK-JIBAIKBN                            PIC  X(01).
+           03  WRK-4001-JIBAIKBN                       PIC  X(01).
            03  WRK-SYUTENTANKA                         PIC  9(02).
            03  WRK-YKZTENTANKA                         PIC  9(02).
            03  WRK-KOMUKBN                             PIC  X(01).
@@ -441,6 +444,8 @@
                                PIC 9(06)   VALUE   200804.
            03  WRK-CONS-SRYYM-201109
                                PIC 9(06)   VALUE   201109.
+           03  WRK-CONS-SRYYM-201707
+                               PIC 9(06)   VALUE   201707.
       *
       *---------------------------------------------------------------
       *
@@ -769,6 +774,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                                                  TO    WRK-YKZTENTANKA
                       END-IF
                   END-IF
+                  MOVE   WRK-JIBAIKBN      TO  WRK-4001-JIBAIKBN
                   IF     SYS-4001-KOMUKBN  =    SPACE
                     MOVE "1"               TO    WRK-KOMUKBN
                   ELSE
@@ -796,6 +802,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                                            TO    WRK-KOMURSITANKAKBN
                   MOVE   SYS-4001-KOMURSITANKA-G
                                            TO    WRK-KOMURSITANKA-G
+      *
+                  DISPLAY "WRK-4001-JIBAIKBN=" WRK-4001-JIBAIKBN
               ELSE
                   MOVE    "œ´∫“º´«Â∞ÂŒ≈µ°¥ÿæ Û§¨ºË∆¿§«§≠§ﬁ§ª§Û§«§∑§ø"     
                                               TO  WRK-RECEERR
@@ -891,6 +899,17 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *     ‘Ω∏ΩËÕ˝
       *****************************************************************
        210-HENSYU-SEC                   SECTION.
+      *
+      *    º´«Â¿’∂Ë ¨° ¥µº‘ Ã¿ﬂƒÍ°À
+           IF      RECE40-SRYYM        >=  WRK-CONS-SRYYM-201707
+               IF     WRK-PARA-RECEKBN     =   "8"
+                   CONTINUE
+               ELSE
+                   DISPLAY "RECE40-JIBAIKBN=" RECE40-JIBAIKBN
+                   MOVE    RECE40-JIBAIKBN     TO  WRK-JIBAIKBN
+               END-IF
+           END-IF
+           DISPLAY "WRK-JIBAIKBN=" WRK-JIBAIKBN
       *
       *    æ√»Ò¿«∑◊ªª§Œ∑∏øÙ¿ﬂƒÍ
            IF  RECE40-SRYYM >= "201404"
@@ -3547,9 +3566,11 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    ADD     1     TO    CNT-IN
                                        CNT-IN-CANCEL
       *
-                   DISPLAY "RECE40  PTID=" RECE40-PTID
-      *
                    PERFORM 910-SYSKANRI-HENSYU-SEC
+      *
+                   DISPLAY "RECE40  PTID=" RECE40-PTID
+                           " SRYYM="       RECE40-SRYYM
+                           " JIBAIKBN="    WRK-JIBAIKBN
       *
            END-READ
            .
@@ -3562,7 +3583,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
        910-SYSKANRI-HENSYU-SEC         SECTION.
       *
            IF   WRK-PARA-SRYYM    NOT =  ZERO
-              CONTINUE
+              MOVE    WRK-4001-JIBAIKBN  TO  WRK-JIBAIKBN
            ELSE
       *       ∞ÂŒ≈µ°¥ÿ£…£ƒ ‘Ω∏
               MOVE  ZERO           TO  FLG-SET

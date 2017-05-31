@@ -26,6 +26,10 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    13/09/20  第三者行為対応
+      *
+      *  04.08.01    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
+      *                                     保険区分検索用項目の追加
       ************************************************************
        01  SKYETC-REC.
       *ＫＥＹ
@@ -64,12 +68,12 @@
                    07  SKYETC-ETC-JNISSU   PIC  9(02)   OCCURS  4.
       *記載外公費−合計点数
                05  SKYETC-ETC-TOTALTENINF.
-                   07  SKYETC-ETC-TOTALTEN PIC  9(08)   OCCURS  4.
+                   07  SKYETC-ETC-TOTALTEN PIC S9(08)   OCCURS  4.
       *記載外公費−負担金額
                05  SKYETC-ETC-FTNMONEYINF               OCCURS  4.
-                   07  SKYETC-ETC-FTNMONEY     PIC  9(09).
-                   07  SKYETC-ETC-FTNMONEY-FTN PIC  9(09).
-                   07  SKYETC-ETC-FTNMONEY-KOJ PIC  9(09).
+                   07  SKYETC-ETC-FTNMONEY     PIC S9(09).
+                   07  SKYETC-ETC-FTNMONEY-FTN PIC S9(09).
+                   07  SKYETC-ETC-FTNMONEY-KOJ PIC S9(09).
       *記載外公費−薬剤一部負担金情報
                05  SKYETC-ETC-YKZFTNINF.
                    07  SKYETC-ETC-YKZFTN   PIC  9(05)   OCCURS  4.
@@ -86,3 +90,5 @@
            03  SKYETC-XXTEISYUTUSAKI      PIC 9(01).
       *保険番号検索用項目
            03  SKYETC-XXHKNNUM            PIC X(03).
+      *保険区分検索用項目
+           03  SKYETC-XXHKNKBN-RSI        PIC X(01).

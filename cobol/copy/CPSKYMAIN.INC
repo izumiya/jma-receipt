@@ -35,6 +35,10 @@
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *                                     直接請求フラグの追加
+      *
+      *  04.08.01    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
+      *                                     保険区分（自賠責用）の追加
       ************************************************************
        01  SKYMAIN-REC.
       *ＫＥＹ
@@ -124,15 +128,15 @@
       *合計点数情報
            03  SKYMAIN-TOTALTENINF.
       *合計点数
-               05  SKYMAIN-TOTALTEN        PIC  9(08).
+               05  SKYMAIN-TOTALTEN        PIC S9(08).
       *負担金額情報
            03  SKYMAIN-FTNMONEYINF.
       *負担金額
-               05  SKYMAIN-FTNMONEY        PIC  9(09).
+               05  SKYMAIN-FTNMONEY        PIC S9(09).
       *負担金額（一部負担額）
-               05  SKYMAIN-FTNMONEY-FTN    PIC  9(09).
+               05  SKYMAIN-FTNMONEY-FTN    PIC S9(09).
       *負担金額（控除額）
-               05  SKYMAIN-FTNMONEY-KOJ    PIC  9(09).
+               05  SKYMAIN-FTNMONEY-KOJ    PIC S9(09).
       *
       *食事療養費情報
            03  SKYMAIN-SHOKUJIINF.
@@ -157,14 +161,14 @@
                05  SKYMAIN-SKYIRYO-NISSU   PIC 9(02).
       *請求点
                05  SKYMAIN-SKYIRYO-TOTALTEN
-                                           PIC 9(08).
+                                           PIC S9(08).
       *患者負担
                05  SKYMAIN-SKYIRYO-ICHIBUFTN
-                                           PIC 9(09).
+                                           PIC S9(09).
       *保険者負担
-               05  SKYMAIN-SKYIRYO-HOKENJA PIC 9(09).
+               05  SKYMAIN-SKYIRYO-HOKENJA PIC S9(09).
       *公費負担
-               05  SKYMAIN-SKYIRYO-KOHFTN  PIC 9(09).
+               05  SKYMAIN-SKYIRYO-KOHFTN  PIC S9(09).
       *
       *請求額情報（食事）
            03  SKYMAIN-SKYSKJ-INF.
@@ -204,6 +208,8 @@
       *
       *レセプト記載外公費情報作成フラグ（1:記載外公費情報作成）
            03  SKYMAIN-ETCCREATEFLG        PIC  9(01).
+      *保険区分（５：自賠責（労災準拠）、６：自賠責（健保準拠））
+           03  SKYMAIN-HKNKBN-RSI          PIC X(01).
       *(総括表用)
       *主保険−保険番号
            03  SKYMAIN-HKNNUM-S            PIC  X(03).

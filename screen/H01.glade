@@ -12976,7 +12976,7 @@
         <name>HRECESYUBETU</name>
         <x>500</x>
         <y>23</y>
-        <width>90</width>
+        <width>93</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -12985,7 +12985,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>１２３４５６</label>
+        <label>１２３４５６７</label>
         <justify>GTK_JUSTIFY_LEFT</justify>
         <wrap>False</wrap>
       </widget>
@@ -13046,9 +13046,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>HHKNJANUM</name>
-        <x>588</x>
+        <x>593</x>
         <y>23</y>
-        <width>115</width>
+        <width>110</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -13064,9 +13064,9 @@
       <widget>
         <class>GtkLabel</class>
         <name>TITLE_HKNJANUM</name>
-        <x>588</x>
+        <x>593</x>
         <y>4</y>
-        <width>115</width>
+        <width>110</width>
         <height>18</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>

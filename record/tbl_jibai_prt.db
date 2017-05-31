@@ -15,6 +15,7 @@ RENNUM				number(3);
 PTNUM				char(20);
 HKNNUM          		char(3);
 RECEKBN 			char(1);
+HKNKBN				char(1);
 PRTKBN				char(3);
 CREYMD				char(8);
 CREHMS				char(6);
@@ -92,6 +93,81 @@ path	all2	{
 		FROM tbl_jibai_prt
                 WHERE   HOSPNUM      =   :HOSPNUM
                 AND   SRYYM       =   :SRYYM
+		;
+	};
+};
+
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_jibai_prt
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND ( HKNKBN       =   :HKNKBN  OR
+                        HKNKBN        =   '' )
+		;
+	};
+};
+
+path	del4 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_jibai_prt
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   KOHID_KEY    =   :KOHID_KEY
+		  AND   PTID         =   :PTID
+		;
+	};
+};
+
+path	del5 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_jibai_prt
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+		  AND   PTID         =   :PTID
+                  AND ( HKNKBN       =   :HKNKBN  OR
+                        HKNKBN        =   '' )
+		;
+	};
+};
+
+path	del6 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_jibai_prt
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   HKNKBN       =   :HKNKBN
+		;
+	};
+};
+
+path	del7 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_jibai_prt
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+		  AND   PTID         =   :PTID
+                  AND   HKNKBN       =   :HKNKBN
 		;
 	};
 };

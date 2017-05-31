@@ -30,6 +30,10 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    13/09/20  第三者行為対応
+      *
+      *  04.08.01    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
+      *                                     保険区分検索用項目の追加
       ************************************************************
        01  SKYKOH-REC.
       *ＫＥＹ
@@ -82,15 +86,15 @@
       *合計点数情報
            03  SKYKOH-TOTALTENINF.
       *合計点数
-               05  SKYKOH-TOTALTEN        PIC  9(08).
+               05  SKYKOH-TOTALTEN        PIC S9(08).
       *負担金額情報
            03  SKYKOH-FTNMONEYINF.
       *負担金額
-               05  SKYKOH-FTNMONEY        PIC  9(09).
+               05  SKYKOH-FTNMONEY        PIC S9(09).
       *負担金額（一部負担額）
-               05  SKYKOH-FTNMONEY-FTN    PIC  9(09).
+               05  SKYKOH-FTNMONEY-FTN    PIC S9(09).
       *負担金額（控除額）
-               05  SKYKOH-FTNMONEY-KOJ    PIC  9(09).
+               05  SKYKOH-FTNMONEY-KOJ    PIC S9(09).
       *
       *食事療養費情報
            03  SKYKOH-SHOKUJIINF.
@@ -109,3 +113,5 @@
            03  SKYKOH-XXTEISYUTUSAKI      PIC 9(01).
       *保険番号検索用項目
            03  SKYKOH-XXHKNNUM            PIC X(03).
+      *保険区分検索用項目
+           03  SKYKOH-XXHKNKBN-RSI        PIC X(01).

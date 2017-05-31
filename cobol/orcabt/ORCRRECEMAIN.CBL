@@ -69,6 +69,8 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    16/07/20  ＥＦファイル作成対応
+      *  04.08.03    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1788,8 +1790,9 @@
                                            WRK-ARG
            END-IF
       *
-      *    労災準拠のとき（新様式）
-           IF      WRK-PARA-A3     =   "1"
+      *    労災準拠のとき又は平成２９年７月診療分以降のとき（新様式）
+           IF    ( WRK-PARA-A3     =   "1"      )
+           OR    ( WRK-PARA0-A8    >=  "201707" )
                PERFORM 100-DBOPEN-SEC
                IF      WRK-PARA-SHORI-KBN  NOT  =  ZERO
                    PERFORM 20011-REAL-DB-MAKE-SEC
@@ -2233,8 +2236,9 @@
                                            WRK-ARG
            END-IF
       *
-      *    労災準拠のとき（新様式）
-           IF      WRK-PARA-A3     =   "1"
+      *    労災準拠のとき又は平成２９年７月診療分以降のとき（新様式）
+           IF    ( WRK-PARA-A3     =   "1"      )
+           OR    ( WRK-PARA0-A8    >=  "201707" )
                PERFORM 100-DBOPEN-SEC
                IF      WRK-PARA-SHORI-KBN  NOT  =  ZERO
                    PERFORM 20011-REAL-DB-MAKE-SEC

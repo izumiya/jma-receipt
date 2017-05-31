@@ -71,6 +71,10 @@
       *                                     支払機関請求対応
       *                                     直接請求フラグの追加
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
+      *
+      *  04.08.01    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
+      *                                     保険区分（自賠責用）の追加
       ************************************************************
        01  RECE10-REC.
       *ＫＥＹ
@@ -164,15 +168,15 @@
       *合計点数情報
            03  RECE10-TOTALTENINF         OCCURS  5.
       *合計点数
-               05  RECE10-TOTALTEN        PIC  9(08).
+               05  RECE10-TOTALTEN        PIC S9(08).
       *負担金額情報
            03  RECE10-FTNMONEYINF         OCCURS  5.
       *負担金額
-               05  RECE10-FTNMONEY        PIC  9(09).
+               05  RECE10-FTNMONEY        PIC S9(09).
       *負担金額（一部負担額）
-               05  RECE10-FTNMONEY-FTN    PIC  9(09).
+               05  RECE10-FTNMONEY-FTN    PIC S9(09).
       *負担金額（控除額）
-               05  RECE10-FTNMONEY-KOJ    PIC  9(09).
+               05  RECE10-FTNMONEY-KOJ    PIC S9(09).
       *
       *食事療養費情報
            03  RECE10-SHOKUJIINF          OCCURS  5.
@@ -200,12 +204,12 @@
                    07  RECE10-ETC-JNISSU   PIC  9(02)   OCCURS  4.
       *記載外公費−合計点数
                05  RECE10-ETC-TOTALTENINF.
-                   07  RECE10-ETC-TOTALTEN PIC  9(08)   OCCURS  4.
+                   07  RECE10-ETC-TOTALTEN PIC S9(08)   OCCURS  4.
       *記載外公費−負担金額
                05  RECE10-ETC-FTNMONEYINF               OCCURS  4.
-                   07  RECE10-ETC-FTNMONEY     PIC  9(09).
-                   07  RECE10-ETC-FTNMONEY-FTN PIC  9(09).
-                   07  RECE10-ETC-FTNMONEY-KOJ PIC  9(09).
+                   07  RECE10-ETC-FTNMONEY     PIC S9(09).
+                   07  RECE10-ETC-FTNMONEY-FTN PIC S9(09).
+                   07  RECE10-ETC-FTNMONEY-KOJ PIC S9(09).
       *記載外公費−薬剤一部負担金情報
                05  RECE10-ETC-YKZFTNINF.
                    07  RECE10-ETC-YKZFTN   PIC  9(05)   OCCURS  4.
@@ -224,14 +228,14 @@
       *実日数
                05  RECE10-SKYIRYO-NISSU    PIC 9(02).
       *請求点
-               05  RECE10-SKYIRYO-TOTALTEN PIC 9(08).
+               05  RECE10-SKYIRYO-TOTALTEN PIC S9(08).
       *患者負担
                05  RECE10-SKYIRYO-ICHIBUFTN
-                                           PIC 9(09).
+                                           PIC S9(09).
       *保険者負担
-               05  RECE10-SKYIRYO-HOKENJA  PIC 9(09).
+               05  RECE10-SKYIRYO-HOKENJA  PIC S9(09).
       *公費負担
-               05  RECE10-SKYIRYO-KOHFTN   PIC 9(09).
+               05  RECE10-SKYIRYO-KOHFTN   PIC S9(09).
       *
       *請求額情報（食事）
            03  RECE10-SKYSKJ-INF.
@@ -256,7 +260,8 @@
                05  RECE10-TOKKINM          PIC X(12)   OCCURS  5.
       *労災情報
            03  RECE10-RSIINF.
-      *保険区分（１：短期、２：傷病、３：アフターケア、４：公務災害）
+      *保険区分（１：短期、２：傷病、３：アフターケア、４：公務災害
+      *          ５：自賠責（労災準拠）、６：自賠責（健保準拠））
                05  RECE10-HKNKBN           PIC X(01).
       *様式区分（４：新様式、５：従来様式、６：第三者行為）
                05  RECE10-RECEKBN          PIC X(01).
@@ -279,6 +284,8 @@
            03  RECE10-HENREI-SIJI-FLG      PIC 9(01).
       *直接請求フラグ
            03  RECE10-DIRECT-FLG           PIC X(01).
+      *保険区分（５：自賠責（労災準拠）、６：自賠責（健保準拠））
+           03  RECE10-HKNKBN-RSI           PIC X(01).
       *(総括表用)
       *主保険−保険番号
            03  RECE10-HKNNUM-S             PIC X(03).

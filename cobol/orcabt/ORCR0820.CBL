@@ -80,11 +80,6 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE88-KEY
                                    FILE    STATUS  IS  STS-RECE88.
-           SELECT  RECE88X-FILE    ASSIGN  RECE88PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  RECE88X-KEY
-                                   FILE    STATUS  IS  STS-RECE88.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -99,11 +94,6 @@
        FD  RECE88-FILE.
        01  RECE88-REC. 
            COPY    "CPRCF088.INC".
-      *
-       FD  RECE88X-FILE.
-       01  RECE88X-REC. 
-           COPY    "CPRCF088.INC"  REPLACING  //RECE88//
-                                   BY         //RECE88X//.
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -340,8 +330,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            OPEN    I-O                 RECE82-FILE
       *
-           OPEN    OUTPUT              RECE88X-FILE
-           CLOSE                       RECE88X-FILE
+           OPEN    OUTPUT              RECE88-FILE
+           CLOSE                       RECE88-FILE
            OPEN    I-O                 RECE88-FILE
       *
            PERFORM 900-RECE82-READ-SEC
