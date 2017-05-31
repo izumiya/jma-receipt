@@ -850,8 +850,15 @@
            PERFORM 1501-SYS5000-GET-SEC
       *
            IF    ( HCM34S01-HKNNUM     =   "973" )
-            AND  ( SYS-4001-JIBAIKBN   =   "2" )
-               MOVE    1               TO  FLG-KENPO
+               IF    ( PTRSI-JIBAIKBN  =   SPACE OR ZERO )
+                   IF  ( SYS-4001-JIBAIKBN =   "2" )
+                       MOVE    1       TO  FLG-KENPO
+                   END-IF
+               ELSE
+                   IF    ( PTRSI-JIBAIKBN  =   "2" )
+                       MOVE    1       TO  FLG-KENPO
+                   END-IF
+               END-IF
            END-IF
       *
            IF    ( HCM34S01-HKNNUM     =   "971" )

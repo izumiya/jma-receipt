@@ -371,38 +371,38 @@ Q01 {
         };
         CMB_HKNNUM1 {
           HKNNUM1 {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[50];
+            item varchar(30)[50];
         };
         CMB_HKNNUM2 {
           HKNNUM2 {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[50];
+            item varchar(30)[50];
         };
         CMB_HKNNUM3 {
           HKNNUM3 {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[50];
+            item varchar(30)[50];
         };
         CMB_HKNNUM4 {
           HKNNUM4 {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[50];
+            item varchar(30)[50];
         };
         CMB_HKNNUM5 {
           HKNNUM5 {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[50];
+            item varchar(30)[50];
         };
         KIGO1 {
           textdata varchar(40);

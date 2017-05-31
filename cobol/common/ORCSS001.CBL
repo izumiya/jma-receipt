@@ -47,6 +47,8 @@
            03  FLG-NYUINACCT       PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-PTNYUINRRK      PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-HOKEN-G.
                05  FLG-SYAHO       PIC 9(01).
                05  FLG-KOKUHO      PIC 9(01).
@@ -107,6 +109,14 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
+      *
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK4001.INC".
+      *
+      *    患者労災保険情報
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
       *
       *    入院診療会計マスター
        01  NYUINACCT-REC.
@@ -184,6 +194,19 @@ grpsys     COPY  "COMMON-SPA".
            ELSE
                MOVE    1           TO  WRK-STDAY
                MOVE    31          TO  WRK-EDDAY
+           END-IF
+      *
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "4001"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    SS001-SRYYM         TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC        TO  SYS-4001-REC
+           IF    ( SYS-4001-JIBAIKBN   =   SPACE )
+               MOVE    "1"             TO  SYS-4001-JIBAIKBN
            END-IF
       *
            .
@@ -513,6 +536,11 @@ grpsys     COPY  "COMMON-SPA".
                        MOVE    1           TO  SS001-RSI-FLG(IDX-NYUGAI)
                WHEN    CONST-JIBAI
                        MOVE    1           TO  SS001-JBI-FLG(IDX-NYUGAI)
+                       IF    ( COMB-HOJOKBN    =   "1" )
+                           MOVE    1       TO SS001-JBIR-FLG(IDX-NYUGAI)
+                       ELSE
+                           MOVE    1       TO SS001-JBIK-FLG(IDX-NYUGAI)
+                       END-IF
                WHEN    CONST-KOUGAI
                        MOVE    1           TO  SS001-KGI-FLG(IDX-NYUGAI)
                WHEN    "060"
@@ -598,6 +626,13 @@ grpsys     COPY  "COMMON-SPA".
                    WHEN    CONST-JIBAI
                        MOVE    1       TO  SS001-SRYKA-JBI-FLG
                                                   (IDX-SRYKA IDX-NYUGAI)
+                       IF    ( COMB-HOJOKBN    =   "1" )
+                           MOVE    1       TO  SS001-SRYKA-JBIR-FLG
+                                                  (IDX-SRYKA IDX-NYUGAI)
+                       ELSE
+                           MOVE    1       TO  SS001-SRYKA-JBIK-FLG
+                                                  (IDX-SRYKA IDX-NYUGAI)
+                       END-IF
                    WHEN    CONST-KOUGAI
                        MOVE    1       TO  SS001-SRYKA-KGI-FLG
                                                   (IDX-SRYKA IDX-NYUGAI)
@@ -654,6 +689,8 @@ grpsys     COPY  "COMMON-SPA".
            DISPLAY "GIHO-FLG   = " SS001-GIHO-FLG
            DISPLAY "GRSI-FLG   = " SS001-GRSI-FLG
            DISPLAY "GJBI-FLG   = " SS001-GJBI-FLG
+           DISPLAY "GJBIR-FLG  = " SS001-GJBIR-FLG
+           DISPLAY "GJBIK-FLG  = " SS001-GJBIK-FLG
            DISPLAY "GSYA-FLG   = " SS001-GSYA-FLG
            DISPLAY "GKOK-FLG   = " SS001-GKOK-FLG
            DISPLAY "GJHI-FLG   = " SS001-GJHI-FLG
@@ -664,6 +701,8 @@ grpsys     COPY  "COMMON-SPA".
            DISPLAY "NIHO-FLG   = " SS001-NIHO-FLG
            DISPLAY "NRSI-FLG   = " SS001-NRSI-FLG
            DISPLAY "NJBI-FLG   = " SS001-NJBI-FLG
+           DISPLAY "NJBIR-FLG  = " SS001-NJBIR-FLG
+           DISPLAY "NJBIK-FLG  = " SS001-NJBIK-FLG
            DISPLAY "NSYA-FLG   = " SS001-NSYA-FLG
            DISPLAY "NKOK-FLG   = " SS001-NKOK-FLG
            DISPLAY "NJHI-FLG   = " SS001-NJHI-FLG
@@ -694,6 +733,16 @@ grpsys     COPY  "COMMON-SPA".
                         SS001-SRYKA-JBI-FLG (IDX0 1)
                DISPLAY       "SRYKA-JBI-FLG ( " IDX0 "2 )="
                         SS001-SRYKA-JBI-FLG (IDX0 2)
+      *
+               DISPLAY       "SRYKA-JBIR-FLG ( " IDX0 "1 )="
+                        SS001-SRYKA-JBIR-FLG (IDX0 1)
+               DISPLAY       "SRYKA-JBIR-FLG ( " IDX0 "2 )="
+                        SS001-SRYKA-JBIR-FLG (IDX0 2)
+      *
+               DISPLAY       "SRYKA-JBIK-FLG ( " IDX0 "1 )="
+                        SS001-SRYKA-JBIK-FLG (IDX0 1)
+               DISPLAY       "SRYKA-JBIK-FLG ( " IDX0 "2 )="
+                        SS001-SRYKA-JBIK-FLG (IDX0 2)
       *
                DISPLAY       "SRYKA-SYA-FLG ( " IDX0 "1 )="
                         SS001-SRYKA-SYA-FLG (IDX0 1)
@@ -733,7 +782,6 @@ grpsys     COPY  "COMMON-SPA".
                         SS001-SRYKA-NYURRK-DAY-G (IDX0)
       *
            END-PERFORM
-           
       *
            .
        800-DISPLAY-EXT.
@@ -836,6 +884,16 @@ grpsys         MOVE    SS001-HOSPNUM       TO  COMB-HOSPNUM
                PERFORM 910-DBSELECT-SEC
                IF    ( MCP-RC              =   ZERO )
                    MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+                   IF    ( COMB-HKNNUM     =   "973" )
+                       PERFORM 900-PTRSIINF-KEY-SEL-SEC
+                       IF    ( PTRSI-JIBAIKBN  =   "1" OR "2" )
+                           MOVE    PTRSI-JIBAIKBN
+                                           TO  COMB-HOJOKBN
+                       ELSE
+                           MOVE    SYS-4001-JIBAIKBN
+                                           TO  COMB-HOJOKBN
+                       END-IF
+                   END-IF
                    IF    ( CONST-TBLCOMBI-MAX  >   TBLCOMBI-MAX )
                        COMPUTE TBLCOMBI-MAX
                            =   TBLCOMBI-MAX    +   1
@@ -937,6 +995,62 @@ grpsys         MOVE    SS001-HOSPNUM       TO  COMB-HOSPNUM
       *
            .
        900-PTNYUINRRK-KEY41-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索処理(KEY10)
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSKANRI
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者労災情報検索処理
+      *****************************************************************
+       900-PTRSIINF-KEY-SEL-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTRSIINF
+      *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+           MOVE    COMB-PTID           TO  PTRSI-PTID
+           MOVE    COMB-HKNID          TO  PTRSI-HKNID
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+               MOVE    ZERO            TO  FLG-PTRSIINF
+           ELSE
+               MOVE    1               TO  FLG-PTRSIINF
+               INITIALIZE                  PTRSIINF-REC
+           END-IF
+     *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-PTRSIINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

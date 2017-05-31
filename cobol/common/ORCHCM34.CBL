@@ -196,6 +196,7 @@
            03  FLG-RECECOM                         PIC 9(01).
            03  FLG-TAJYUSHIN                       PIC 9(01).
            03  FLG-COMB-CHANGED                    PIC 9(01).
+           03  FLG-KENPO                           PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -4170,6 +4171,11 @@
                MOVE    COMB-KOHHKNNUM (1)  TO  WRK-KOHNUM
                MOVE    HKNCOMBI-REC        TO  WKCOMB-REC
                MOVE    1                   TO  FLG-COMB-CHANGED
+               IF    ( WKCOMB-HKNNUM   =   "971" OR "973" )
+                   PERFORM 900-PTRSIINF-KEY-SEL-SEC
+               ELSE
+                   INITIALIZE          PTRSIINF-REC
+               END-IF
            WHEN  ( IDX1                >   1 )
                IF    ( ACCT-HKNCOMBI   NOT =   WRK-HKNCOMBI-KEY )
       *
@@ -4202,6 +4208,11 @@
                                            TO  WRK-KOHNUM
                    MOVE    HKNCOMBI-REC    TO  WKCOMB-REC
                    MOVE    1               TO  FLG-COMB-CHANGED
+                   IF    ( WKCOMB-HKNNUM   =   "971" OR "973" )
+                       PERFORM 900-PTRSIINF-KEY-SEL-SEC
+                   ELSE
+                       INITIALIZE          PTRSIINF-REC
+                   END-IF
       *
                    MOVE    1               TO  FLG-LINE
       *
@@ -4532,7 +4543,19 @@
       *****************************************************************
        200111-JBI-RYOYO-TEATE-HEN-SEC  SECTION.
       *
-           IF    ( SYS-4001-JIBAIKBN           =   "1" )
+           MOVE    ZERO                    TO  FLG-KENPO
+      *
+           IF    ( PTRSI-JIBAIKBN  =   SPACE OR ZERO )
+               IF  ( SYS-4001-JIBAIKBN =   "2" )
+                   MOVE    1       TO  FLG-KENPO
+               END-IF
+           ELSE
+               IF    ( PTRSI-JIBAIKBN  =   "2" )
+                   MOVE    1       TO  FLG-KENPO
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-KENPO           =   ZERO )
                IF    ( WRK-JBI-RYOYO-TEATE-KBN     =   "1" )
                    MOVE    120             TO  WRK-ZAITEN
                ELSE
@@ -6119,7 +6142,6 @@
            MOVE    ZERO                    TO  FLG-AFTER-CARE
       *
            IF    ( WKCOMB-HKNNUM           =   "971" )
-               PERFORM 900-PTRSIINF-KEY-SEL-SEC
                IF    ( PTRSI-HKNKBN    =   '3' )
                    MOVE    1       TO  FLG-AFTER-CARE
                END-IF

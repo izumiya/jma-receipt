@@ -167,9 +167,9 @@
                     07  Q01-HKNJANUM           PIC X(08)   OCCURS 5.
                   06  Q01-CMB-HKNNUM-TBL.
                     07  Q01-CMB-HKNNUM-OCC                 OCCURS 5.
-                      08  Q01-HKNNUM           PIC X(20).
+                      08  Q01-HKNNUM           PIC X(30).
                       08  Q01-CMB-HKNNUM-COUNT PIC S9(9)   BINARY.
-                      08  Q01-CMB-HKNNUM-ITEM  PIC X(20)   OCCURS  50.
+                      08  Q01-CMB-HKNNUM-ITEM  PIC X(30)   OCCURS  50.
                   06  Q01-KIGO-TBL.
                     07  Q01-KIGO               PIC X(40)   OCCURS 5.
                   06  Q01-NUM-TBL.
