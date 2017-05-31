@@ -98,7 +98,8 @@
            03  WRK-HKNCOMBI            PIC X(100).
       *
            03  WRK-HKNCOMBINUM         PIC X(04).
-           03  WRK-HKNKBN-MEI          PIC X(02).
+      **   03  WRK-HKNKBN-MEI          PIC X(02).
+           03  WRK-HKNKBN-MEI          PIC X(06).
       *
            03  WRK-JIBAISEKIKBN        PIC X(01).
       *
@@ -639,12 +640,26 @@
       *        ÊÝ¸±¶èÊ¬
                MOVE    2                   TO  ORCSHKN-NAI-HKNKBN(IDX)
            END-IF
+      *H29.5
+      *    ¼«ÇåÀÕÅÀ¿ô¶èÊ¬¤È¥·¥¹¥Æ¥à´ÉÍýÈ½Äê
+           MOVE    SPACE               TO  WRK-HKNKBN-MEI
+           IF      COMB-HKNNUM         =   "973"
+               IF      (PTRSI-JIBAIKBN     =   "1"  )
+      *            Ï«ºÒ½àµò
+                   MOVE   "[Ï«]"             TO  WRK-HKNKBN-MEI
+               END-IF
+               IF      (PTRSI-JIBAIKBN     =   "2"  )
+      *            ·òÊÝ½àµò
+                   MOVE   "[·ò]"             TO  WRK-HKNKBN-MEI
+               END-IF
+           END-IF
+      *
       *    Ï«ºÒ¤Î»þ¡¢¥³¥á¥ó¥È¤ÎÄÉ²Ã
            IF      COMB-HKNNUM         =   "971"  OR  "973"
       *        ÊÝ¸±¶èÊ¬
                MOVE    1                   TO  ORCSHKN-NAI-HKNKBN(IDX)
       *
-               MOVE    SPACE               TO  WRK-HKNKBN-MEI
+      **       MOVE    SPACE               TO  WRK-HKNKBN-MEI
                EVALUATE    PTRSI-HKNKBN
                    WHEN    "1"
                        MOVE    "Ã»"        TO  WRK-HKNKBN-MEI

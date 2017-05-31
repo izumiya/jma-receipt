@@ -592,6 +592,7 @@
                         08  P02-P024-TSYLHKNKBN PIC X(12).
                         08  P02-P024-TSYLNINYMD PIC X(10).
                         08  P02-P024-TSYLSKJGNSTYMD PIC X(10).
+                        08  P02-P024-TSYLKYOUKAI PIC X(20).
                       07  P02-P024-TSYLIST-SELECT PIC X
                                                 OCCURS  20 TIMES.
                   05  P02-SC105.
@@ -606,6 +607,7 @@
                         08  P02-P024-TNKLHKNKBN PIC X(12).
                         08  P02-P024-TNKLNINYMD PIC X(10).
                         08  P02-P024-TNKLFUKUSHI PIC X(10).
+                        08  P02-P024-TNKLKYOUKAI  PIC X(20).
                       07  P02-P024-TNKLIST-SELECT PIC X
                                                OCCURS  20 TIMES.
                   05  P02-P024-FUKUSHI-COMB.
@@ -622,6 +624,12 @@
                     06  P02-P024-TSYTEKK-COUNT   PIC S9(9)   BINARY.
                     06  P02-P024-TSYTEKK-ITEM
                             PIC X(30)   OCCURS  5 TIMES.
+                  05  P02-P024-TSYKYOUKAI-COB.
+                    06  P02-P024-TSYKYOUKAI.
+                      07  P02-TEXTDATA    PIC X(30).
+                    06  P02-P024-TSYKYOUKAI-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P024-TSYKYOUKAI-ITEM
+                            PIC X(30)   OCCURS  5 TIMES.
                   05  P02-P024-TNKNINSTYMD.
                     06  P02-VALUE   PIC X(10).
                   05  P02-P024-TNKTEKK-COB.
@@ -629,6 +637,12 @@
                       07  P02-VALUE   PIC X(30).
                     06  P02-P024-TNKTEKK-COUNT   PIC S9(9)   BINARY.
                     06  P02-P024-TNKTEKK-ITEM
+                            PIC X(30)   OCCURS  5 TIMES.
+                  05  P02-P024-TNKKYOUKAI-COB.
+                    06  P02-P024-TNKKYOUKAI.
+                      07  P02-TEXTDATA    PIC X(30).
+                    06  P02-P024-TNKKYOUKAI-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P024-TNKKYOUKAI-ITEM
                             PIC X(30)   OCCURS  5 TIMES.
                   05  P02-P024-FTNTEKSTYMD.
                     06  P02-VALUE   PIC X(10).

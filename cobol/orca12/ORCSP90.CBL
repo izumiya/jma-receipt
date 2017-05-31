@@ -1032,6 +1032,16 @@
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "2424"
+                   STRING  "低所得者２ 境界層該当入力エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "2425"
+                   STRING  "低所得者１ 境界層該当入力エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "2430"
                    MOVE    "公費負担選択番号入力エラー"

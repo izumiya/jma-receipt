@@ -62,6 +62,7 @@
       * 04.08.00     NACL-¬ø°π«º  16/11/21  £—£“•≥°º•…ver.2.1¬–±˛
       * 05.00.00     NACL-¬ø°π«º  16/12/15  ¥µº‘∏ƒøÕ»÷πÊ¬–±˛
       * 05.00.00     NACL-¬ø°π«º  16/12/XX  ¥…Õ˝Œ¡≈˘º´∆∞»Ø¿∏¬–±˛
+      * 04.08.00     NACL-¬ø°π«º  17/05/XX  ∂≠≥¶¡ÿ≥∫≈ˆ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1480,6 +1481,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "4 √œ ˝∏¯»Ò°‹ø©ªˆ…∏Ω‡…È√¥≥€¬–æ›"
                                        TO  SPA-GMN24-TNKTEKKBN-LST (5)
            MOVE    5                   TO  SPA-GMN24-TNKTEKKBN-MAX
+      *H29.6
+      *    ΩÍ∆¿º‘£±° ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨°À
+           MOVE    "0 ∂≠≥¶¡ÿ»Û≥∫≈ˆ"
+                                       TO  SPA-GMN24-TNKKYOUKAI-LST(1)
+           MOVE    "1 ∂≠≥¶¡ÿ≥∫≈ˆ"
+                                       TO  SPA-GMN24-TNKKYOUKAI-LST(2)
+           MOVE    2                   TO  SPA-GMN24-TNKKYOUKAI-MAX
+      *    ΩÍ∆¿º‘£≤° ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨°À
+           MOVE    "0 ∂≠≥¶¡ÿ»Û≥∫≈ˆ"
+                                       TO  SPA-GMN24-TSYKYOUKAI-LST(1)
+           MOVE    "1 ∂≠≥¶¡ÿ≥∫≈ˆ"
+                                       TO  SPA-GMN24-TSYKYOUKAI-LST(2)
+           MOVE    2                   TO  SPA-GMN24-TSYKYOUKAI-MAX
       *
       *ver.4.7
       *    ¥µº‘∏ƒ Ã¿ﬂƒÍ
@@ -4795,6 +4809,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  P02-P024-TNKLNINYMD(IDY)
                  MOVE    SPA-GMN24-TNKLHKNKBN (IDX)
                                            TO  P02-P024-TNKLHKNKBN(IDY)
+      *H29.6
+      *          ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+                 MOVE    SPA-GMN24-TNKLKYOUKAI (IDX)
+                                           TO  P02-P024-TNKLKYOUKAI(IDY)
       *
                  IF      IDX           =   SPA-NAI24-TNKSELNUM
                      MOVE    "T"           TO  P02-P024-TNKLIST-SELECT
@@ -4819,6 +4837,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                    (IDX)
            END-PERFORM
            MOVE    SPA-GMN24-TNKTEKKBN-MAX   TO  P02-P024-TNKTEKK-COUNT
+      *
+      *    ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+           MOVE    SPA-GMN24-TNKKYOUKAI-G  TO  P02-P024-TNKKYOUKAI
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL      IDX     >   SPA-GMN24-TNKKYOUKAI-MAX
+               MOVE    SPA-GMN24-TNKKYOUKAI-LST (IDX)
+                                           TO  P02-P024-TNKKYOUKAI-ITEM
+                                                                  (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN24-TNKKYOUKAI-MAX
+                                       TO  P02-P024-TNKKYOUKAI-COUNT
       *
            MOVE    SPA-GMN24-FUKUSHI-G TO  P02-P024-FUKUSHI
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -4850,6 +4879,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  P02-P024-TSYLNINYMD(IDY)
                  MOVE    SPA-GMN24-TSYLHKNKBN (IDX)
                                            TO  P02-P024-TSYLHKNKBN(IDY)
+      *          ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+                 MOVE    SPA-GMN24-TSYLKYOUKAI (IDX)
+                                           TO  P02-P024-TSYLKYOUKAI(IDY)
       *
                  IF      IDX           =   SPA-NAI24-TSYSELNUM
                      MOVE    "T"           TO  P02-P024-TSYLIST-SELECT
@@ -4876,6 +4908,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                    (IDX)
            END-PERFORM
            MOVE    SPA-GMN24-TSYTEKKBN-MAX   TO  P02-P024-TSYTEKK-COUNT
+      *
+      *    ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+           MOVE    SPA-GMN24-TSYKYOUKAI-G   TO  P02-P024-TSYKYOUKAI
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL      IDX     >   SPA-GMN24-TSYKYOUKAI-MAX
+               MOVE    SPA-GMN24-TSYKYOUKAI-LST (IDX)
+                                           TO  P02-P024-TSYKYOUKAI-ITEM
+                                                                  (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN24-TSYKYOUKAI-MAX
+                                       TO  P02-P024-TSYKYOUKAI-COUNT
       *
       *    ∏¯»Ò…È√¥
            MOVE    ZERO                TO  IDY
