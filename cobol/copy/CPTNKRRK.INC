@@ -40,6 +40,8 @@
       *保険適用区分（０：全て対象　１：地方公費は対象外
       *              ２：地方公費のみ対象）
            03  TNKRRK-HKNTEKKBN            PIC  X(01).
+      *境界層該当区分（空白又は０：境界層非該当　１：境界層該当
+           03  TNKRRK-KYOUKAISOUKBN        PIC  X(01).
       *端末ＩＤ
            03  TNKRRK-TERMID               PIC  X(16).
       *オペーレータＩＤ

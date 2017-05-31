@@ -92,12 +92,12 @@
            03  PTRSI-KAISU                 PIC  9(03).
       *労働基準監督署コード
            03  PTRSI-SYOCD                 PIC  X(05).
-      *
       *第三者　現物給付計算区分
            03  PTRSI-DAISAN-GENBTKBN       PIC  X(01).
       *第三者　特記事項区分
            03  PTRSI-DAISAN-TOKKIKBN       PIC  X(01).
-      *
+      *自賠責区分
+           03  PTRSI-JIBAIKBN              PIC  X(01).
       *端末ＩＤ
            03  PTRSI-TERMID                PIC  X(16).
       *オペーレータＩＤ

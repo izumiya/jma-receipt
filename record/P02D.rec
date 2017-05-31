@@ -172,5 +172,12 @@ P02D {
       count int;
         item varchar(30)[5];
     };
+    JIBAIKBN_COMB {
+      JIBAIKBN {
+        textdata varchar(40);
+      };
+      count int;
+        item varchar(40)[5];
+      };
   };
 };

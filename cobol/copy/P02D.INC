@@ -143,6 +143,12 @@
                 04  P02D-DAI3-TOKKIKBN-COUNT  PIC S9(9)   BINARY.
                 04  P02D-DAI3-TOKKIKBN-ITEM
                         PIC X(30)   OCCURS  5 TIMES.
+              03  P02D-JIBAIKBN-COMB.
+                04  P02D-JIBAIKBN.
+                  05  P02D-TEXTDATA   PIC X(40).
+                04  P02D-JIBAIKBN-COUNT  PIC S9(9)   BINARY.
+                04  P02D-JIBAIKBN-ITEM
+                        PIC X(40)   OCCURS  5 TIMES.
 
 
 

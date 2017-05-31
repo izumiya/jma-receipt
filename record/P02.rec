@@ -847,6 +847,7 @@ P02 {
                 column4 varchar(12);
                 column5 varchar(10);
                 column6 varchar(10);
+                column7 varchar(20);
               }[20];
               selectdata bool[20];
           };
@@ -863,6 +864,7 @@ P02 {
                 column4 varchar(12);
                 column5 varchar(10);
                 column6 varchar(10);
+                column7 varchar(20);
               }[20];
               selectdata bool[20];
           };
@@ -884,11 +886,25 @@ P02 {
           count int;
             item varchar(30)[5];
         };
+        P024_TSYKYOUKAI_COB {
+          P024_TSYKYOUKAI {
+            textdata varchar(30);
+          };
+          count int;
+            item varchar(30)[5];
+        };
         P024_TNKNINSTYMD {
           textdata varchar(10);
         };
         P024_TNKTEKK_COB {
           P024_TNKTEKK {
+            textdata varchar(30);
+          };
+          count int;
+            item varchar(30)[5];
+        };
+        P024_TNKKYOUKAI_COB {
+          P024_TNKKYOUKAI {
             textdata varchar(30);
           };
           count int;
