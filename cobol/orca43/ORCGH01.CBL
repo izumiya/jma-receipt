@@ -111,6 +111,8 @@
       *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
       *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.05    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -202,7 +204,7 @@
       *
            03  WRK-NYUGAIKBN       PIC X(06).
            03  WRK-TEISYUTUSAKI    PIC X(10).
-           03  WRK-RECESYUBETU     PIC X(12).
+           03  WRK-RECESYUBETU     PIC X(14).
            03  WRK-YM              PIC X(07). 
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
@@ -4985,7 +4987,17 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                            WHEN    "4"
                               MOVE    "新様式"     TO  WRK-RECESYUBETU
                            WHEN    "5"
-                               MOVE    "従来様式"  TO  WRK-RECESYUBETU
+                               EVALUATE    RECE10-HKNKBN
+                                   WHEN    "5"
+                                       MOVE    "従来様式・労災"
+                                                   TO  WRK-RECESYUBETU
+                                   WHEN    "6"
+                                       MOVE    "従来様式・健保"
+                                                   TO  WRK-RECESYUBETU
+                                   WHEN    OTHER
+                                       MOVE    "従来様式"
+                                                   TO  WRK-RECESYUBETU
+                               END-EVALUATE
                            WHEN    "6"
                                MOVE    "第三者行為"
                                                    TO  WRK-RECESYUBETU

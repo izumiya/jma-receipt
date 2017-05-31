@@ -76,6 +76,8 @@
       *
       *  04.08.01    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *  04.08.02    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -657,7 +659,17 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
                            WHEN    "4"
                               MOVE    "新様式"     TO  WRK-RECESYUBETU
                            WHEN    "5"
-                               MOVE    "従来様式"  TO  WRK-RECESYUBETU
+                               EVALUATE    RECE10-HKNKBN
+                                   WHEN    "5"
+                                       MOVE    "従来様式・労災"
+                                                   TO  WRK-RECESYUBETU
+                                   WHEN    "6"
+                                       MOVE    "従来様式・健保"
+                                                   TO  WRK-RECESYUBETU
+                                   WHEN    OTHER
+                                       MOVE    "従来様式"
+                                                   TO  WRK-RECESYUBETU
+                               END-EVALUATE
                            WHEN    "6"
                                MOVE    "第三者行為"
                                                    TO  WRK-RECESYUBETU

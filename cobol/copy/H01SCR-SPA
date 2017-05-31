@@ -66,6 +66,8 @@
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
       *  04.08.05    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.08    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -97,7 +99,7 @@
                    07  SPA-H01GMN-KOUMOKU.
                        09  SPA-H01GMN-HNYUGAIKBN      PIC X(06).
                        09  SPA-H01GMN-HTEISYUTUSAKI   PIC X(10).
-                       09  SPA-H01GMN-HRECESYUBETU    PIC X(12).
+                       09  SPA-H01GMN-HRECESYUBETU    PIC X(14).
                        09  SPA-H01GMN-HHKNJANUM       PIC X(14).
                        09  SPA-H01GMN-HHOJOKBN        PIC X(08).
                        09  SPA-H01GMN-HKIGO           PIC X(20).

@@ -219,6 +219,7 @@ RESERVE_AREA			char(50);
 HENREI_SIJI_FLG			number(1,0);
 DIRECT_FLG			char(1);
 ETCCREATEFLG			number(1,0);
+HKNKBN_RSI			char(1);
 HKNNUM_S			char(3); 
 HKNJANUM_S			char(8);
 CREYMD				char(8);
@@ -2791,5 +2792,132 @@ path	key91	{
                   AND (      NYUGAIKBN   LIKE   :NYUGAIKBN  )
 		;
 	};
+};
+
+path	del11 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM       =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   SKYKBN       <>  '0' 
+                  AND   HKNNUM       =   :HKNNUM
+                  AND ( HKNKBN_RSI   =   :HKNKBN_RSI  OR
+                        HKNKBN_RSI   =   '' )
+		;
+	};
+};
+
+path    del12    {
+        DBDELETE        {
+                DELETE
+                FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   KOHID_KEY    =   :KOHID_KEY
+                ;
+        };
+};
+
+path	del13 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   SKYKBN      <>  '0' 
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND ( HKNKBN_RSI   =   :HKNKBN_RSI  OR
+                        HKNKBN_RSI   =   '' )
+		;
+	};
+};
+
+path    del14    {
+        DBDELETE        {
+                DELETE
+                FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND ( HKNKBN_RSI   =   :HKNKBN_RSI  OR
+                        HKNKBN_RSI   =   '' )
+                ;
+        };
+};
+
+path	del15 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   SKYKBN      <>  '0' 
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   HKNKBN_RSI   =   :HKNKBN_RSI
+		;
+	};
+};
+
+path	del16 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM       =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   PTID         =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   HKNKBN_RSI   =   :HKNKBN_RSI
+		;
+	};
+};
+
+
+path    del17    {
+        DBDELETE        {
+                DELETE
+                FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   SKYKBN       <>  '0' 
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   HKNKBN_RSI   =   :HKNKBN_RSI
+                ;
+        };
+};
+
+path	key92	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key92_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+                  AND   HKNNUM       =   :HKNNUM
+                  AND   KOHID_KEY    =   :KOHID_KEY
+                ;
+        };
 };
 

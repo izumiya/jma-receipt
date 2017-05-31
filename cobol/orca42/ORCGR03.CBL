@@ -135,6 +135,8 @@
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    16/08/24  持参薬対応
+      *  04.08.04    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *
       *  04.09.01    NACL-藤原    16/12/12  ＨＡＯＲＩ対応
       *****************************************************************
@@ -1897,6 +1899,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            PERFORM 45011-PARA-HENSYU-SEC
       *
       *    自賠責（新様式）のとき健保準拠か労災準拠のチェック
+      *    平成２９年７月診療分以降または個別作成時はエラーとしない
            IF    ( SPA-R01-RECEKBN     =   "4" )
                EVALUATE    SPA-R01-FILEKBN
                    WHEN    "1"
@@ -1917,7 +1920,8 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  SYS-4001-HOSPNUM
                        ELSE
                            INITIALIZE                  SYS-4001-REC
                        END-IF
-                       IF      SYS-4001-JIBAIKBN   =   "2"
+                       IF    ( SYS-4001-JIBAIKBN   =   "2"    )
+                       AND   ( SPA-NAI-SRYYM       <   201707 )
                            MOVE    "0009"              TO  SPA-ERRCD
                            GO  TO  450-TOUROKU-EXT
                        END-IF
@@ -1954,10 +1958,10 @@ grpsys                 PERFORM 900-DBSELECT-SEC
                        MOVE    "key8"              TO  MCP-PATHNAME
                        PERFORM 900-CLOSE-SEC
       *
-                       IF      FLG-4001-JIBAIKBN   =   ZERO
-                           MOVE    "0010"              TO  SPA-ERRCD
-                           GO  TO  450-TOUROKU-EXT
-                       END-IF
+      *****            IF      FLG-4001-JIBAIKBN   =   ZERO
+      *****                MOVE    "0010"              TO  SPA-ERRCD
+      *****                GO  TO  450-TOUROKU-EXT
+      *****            END-IF
                END-EVALUATE           
            END-IF
       *

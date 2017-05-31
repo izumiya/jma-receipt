@@ -139,7 +139,7 @@
                 04  H01-HTEISYUTUSAKI-VALUE   PIC X(10).
               03  H01-HRECESYUBETU.
                 04  H01-HRECESYUBETU-STYLE   PIC X(20).
-                04  H01-HRECESYUBETU-VALUE   PIC X(12).
+                04  H01-HRECESYUBETU-VALUE   PIC X(14).
               03  H01-HHKNJANUM.
                 04  H01-HHKNJANUM-STYLE   PIC X(20).
                 04  H01-HHKNJANUM-VALUE   PIC X(14).

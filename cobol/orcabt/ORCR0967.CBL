@@ -37,6 +37,8 @@
       *                                     対応
       *  04.08.03    NACL-門脇    16/01/12  点検用レセプト院外処方一般名記載対応
       *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.05    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -153,6 +155,7 @@
            03  FLG-SHOKUJI-ETC     PIC 9(01).
            03  FLG-RECECOM-SJKBN   PIC 9(01).
            03  FLG-STS             PIC 9(01).
+           03  FLG-DB-DELETE       PIC 9(01).
       *
            03  FLG-NEXT            PIC 9(01).
            03  FLG-MARK            PIC 9(01).
@@ -217,7 +220,12 @@
        01  TBL-SYS1900-T.
            03  TBL-SYS1900-OCC         OCCURS  100.
                05  TBL-SYS1900         PIC  X(610).
-      *    
+      *
+      *    労災自賠医療機関退避用領域
+       01  TBL-SYS4001-T.
+           03  TBL-SYS4001-OCC     OCCURS  100.
+               05  TBL-SYS4001     PIC X(610).
+      *
        01  SUM-AREA                          VALUE   ZERO.          
            03  SUM-NYUKHNNISSU         PIC 9(03).
            03  SUM-NYUKHNKEI           PIC 9(07).
@@ -267,6 +275,9 @@
            03  WRK-STYMDW          PIC X(07).
            03  WRK-EDYMDW          PIC X(07).
            03  WRK-CREYMDW         PIC X(07).
+      *
+           03  WRK-DEL-PTID        PIC 9(10).
+           03  WRK-DEL-SRYYM       PIC X(06).
       *
            03  WRK-SINRYO-MM.
                05  WRK-SINRYO-MM2  PIC 9(02).
@@ -426,6 +437,9 @@
                                    PIC 9(02)   VALUE   86.
            03  WRK-CONS-RECECOM-LENGTH-MAX
                                    PIC 9(04)   VALUE   2400.
+           03  WRK-CONS-SRYYM-201707-X.
+               05  WRK-CONS-SRYYM-201707
+                                   PIC 9(06)   VALUE   201707.
       *
        01  WRK-BYOMEI-AREA.     
       *    傷病名最大文字数（傷病名欄）
@@ -478,6 +492,9 @@
       *
       *    レセプト作成指示（個別指示）コード
            COPY    "CPSK2002.INC".
+      *
+      *    労災自賠医療機関情報
+           COPY    "CPSK4001.INC".
       *
            COPY    "CPRCF008.INC".
       *
@@ -943,7 +960,69 @@
               MOVE    "key8"              TO  MCP-PATHNAME
               PERFORM 900-CLOSE-SEC
            END-IF 
-      *         
+      *
+      *    自賠責区分取得
+           IF      WRK-PARA-SRYYM  NOT =   ZERO
+               INITIALIZE                   SYSKANRI-REC
+               MOVE    "4001"           TO  SYS-KANRICD
+               MOVE    "*"              TO  SYS-KBNCD
+               MOVE    WRK-PARA-SRYYM   TO  SYS-STYUKYMD (1:6)
+               MOVE    "01"             TO  SYS-STYUKYMD (7:2)
+               MOVE    SYS-STYUKYMD     TO  SYS-EDYUKYMD
+               MOVE    "tbl_syskanri"   TO  WRK-MCP-TABLE
+               MOVE    "key10"          TO  WRK-MCP-PATHNAME
+               PERFORM 960-KANRIMST-READ-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    MCPDATA-REC         TO  SYS-4001-REC
+                   IF     SYS-4001-JIBAIKBN    =   SPACE
+                       MOVE    "1"                 TO  SYS-4001-JIBAIKBN
+                   END-IF
+               ELSE
+                   MOVE   "労災自賠医療機関情報が取得できませんでした"
+                                                   TO  WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+                   MOVE    1                   TO  FLG-END
+               END-IF
+           ELSE
+               MOVE     ZERO               TO  SYSKAN-IDX
+               MOVE     SPACE              TO  TBL-SYS4001-T
+               INITIALIZE                      TBL-SYS4001-T
+      *
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    "4001"              TO  SYS-KANRICD
+               MOVE    "*"                 TO  SYS-KBNCD
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key8"              TO  MCP-PATHNAME
+                   PERFORM  900-KANRIMST-NEXT-SEC
+                   PERFORM UNTIL ( FLG-SYSKANRI    =   1   )
+                           OR    ( SYSKAN-IDX      >=  100 )
+                       MOVE    MCPDATA-REC         TO  SYS-4001-REC
+                       ADD     1                   TO  SYSKAN-IDX
+                       MOVE    SYS-4001-REC        TO
+                                                TBL-SYS4001 (SYSKAN-IDX)
+      *
+                       MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                       MOVE    "key8"              TO  MCP-PATHNAME
+                       PERFORM  900-KANRIMST-NEXT-SEC
+                   END-PERFORM
+               ELSE
+                   MOVE    "労災自賠医療機関情報が取得できませんでした"
+                                               TO  WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+                   MOVE    1                   TO  FLG-END
+              END-IF
+      *
+              MOVE    "tbl_syskanri"       TO  MCP-TABLE
+              MOVE    "key8"               TO  MCP-PATHNAME
+              PERFORM 900-CLOSE-SEC
+           END-IF
+      *
       *    レセプト編集区分情報
            MOVE    SPACE           TO  SYSKANRI-REC
            INITIALIZE                  SYSKANRI-REC
@@ -2870,7 +2949,15 @@
            MOVE    RECE82-COMMENT      TO  RECE10-COMMENT
       *
            MOVE    "4"                 TO  RECE10-RECEKBN
-      * 
+      *
+      *    平成２９年７月以降で第三者行為以外のとき
+           IF    ( RECE82-SRYYM        >=  WRK-CONS-SRYYM-201707 )
+           AND   ( WRK-PARA-RECEKBN
+                                   NOT =   "8"                   )
+               MOVE    "5"                 TO  RECE10-HKNKBN
+                                               RECE10-HKNKBN-RSI
+           END-IF
+      *
            COMPUTE RECE10-TOTALTEN (1) =   RECE82-TOTALTEN     +
                                            RECE82-TOTALTEN-YAK
            COMPUTE RECE10-FTNMONEY-FTN (1)
@@ -3016,6 +3103,13 @@
            MOVE    "973"               TO  JIBAI-PRT-HKNNUM
            MOVE    "4"                 TO  JIBAI-PRT-RECEKBN
            MOVE    "rk2"               TO  JIBAI-PRT-PRTKBN
+      *
+      *    平成２９年７月以降で第三者行為以外のとき
+           IF    ( RECE82-SRYYM        >=  WRK-CONS-SRYYM-201707 )
+           AND   ( WRK-PARA-RECEKBN
+                                   NOT =   "8"                   )
+               MOVE    "5"                 TO  JIBAI-PRT-HKNKBN
+           END-IF
       *
            MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
            MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
@@ -3230,10 +3324,19 @@
                MOVE    "1"                 TO  RECE10-NYUGAIKBN
                MOVE    4                   TO  RECE10-TEISYUTUSAKI
                MOVE    "973"               TO  RECE10-HKNNUM
+               MOVE    "5"                 TO  RECE10-HKNKBN-RSI
                MOVE    RECE10-REC          TO  MCPDATA-REC
                MOVE    "DBDELETE"          TO  MCP-FUNC
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
-               MOVE    "del8"              TO  MCP-PATHNAME
+               IF      WRK-PARA-SRYYM      >=  WRK-CONS-SRYYM-201707-X
+                   IF      SYS-4001-JIBAIKBN   =   "2"
+                       MOVE    "del15"             TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del11"             TO  MCP-PATHNAME
+                   END-IF
+               ELSE
+                   MOVE    "del8"              TO  MCP-PATHNAME
+               END-IF
                PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC           NOT =   ZERO
                    DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
@@ -3250,10 +3353,19 @@
                MOVE    "1"                 TO  JIBAI-PRT-NYUGAIKBN
                MOVE    4                   TO  JIBAI-PRT-TEISYUTUSAKI
                MOVE    "973"               TO  JIBAI-PRT-HKNNUM
+               MOVE    "5"                 TO  JIBAI-PRT-HKNKBN
                MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
                MOVE    "DBDELETE"          TO  MCP-FUNC
                MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
-               MOVE    "del1"              TO  MCP-PATHNAME
+               IF      WRK-PARA-SRYYM      >=  WRK-CONS-SRYYM-201707-X
+                   IF      SYS-4001-JIBAIKBN   =   "2"
+                       MOVE    "del6"              TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del3"              TO  MCP-PATHNAME
+                   END-IF
+               ELSE
+                   MOVE    "del1"              TO  MCP-PATHNAME
+               END-IF
                PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC           NOT =   ZERO
                    DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
@@ -3263,6 +3375,11 @@
                    PERFORM 500-ERR-HENSYU-SEC
                    GO  TO  5001-DB-DELETE-EXT
                END-IF      
+      *        対象レセプトの健保準拠分を削除処理
+               IF      WRK-PARA-SRYYM      >=  WRK-CONS-SRYYM-201707-X
+                  PERFORM 50011-HKNKBN-DB-DELETE-SEC
+               END-IF
+      *
       *        診療年月レセプト管理削除処理（一括分）
                INITIALIZE                  RECE07-REC
                MOVE    WRK-PARA-HOSPNUM    TO  RECE07-HOSPNUM
@@ -3379,60 +3496,18 @@
                PERFORM            UNTIL       FLG-SYSKANRI    =   1
                    MOVE    MCPDATA-REC         TO  SYS-2002-REC
       *
-                   DISPLAY "DELETE PTNUM=" SYS-2002-PTNUM
-                           " SRYYM=" SYS-2002-SRYYM
+                   DISPLAY "DELETE 2002 PTNUM=" SYS-2002-PTNUM
+                                      " SRYYM=" SYS-2002-SRYYM
       *
-      *            診療年月の請求管理削除処理
-                   INITIALIZE                  RECE10-REC
-                   MOVE    SYS-1001-HOSPNUM    TO  RECE10-HOSPNUM
-                   MOVE    SYS-2002-PTID       TO  RECE10-PTID
-                   MOVE    SYS-2002-SRYYM      TO  RECE10-SRYYM
-                   MOVE    SYS-2002-NYUGAIKBN  TO  RECE10-NYUGAIKBN
-                   MOVE    4                   TO  RECE10-TEISYUTUSAKI
-                                                   RECE10-XXTEISYUTUSAKI 
-                   MOVE    "973"               TO  RECE10-HKNNUM
-                   MOVE    RECE10-REC          TO  MCPDATA-REC
-                   MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   IF      WRK-PARA-DLTKBN     =   "0"
-                       MOVE    "del9"          TO  MCP-PATHNAME
-                   ELSE
-                       MOVE    "del10"         TO  MCP-PATHNAME
-                   END-IF
-                   MOVE    "DBDELETE"          TO  MCP-FUNC
-                   PERFORM   900-ORCDBMAIN-SEC
-                   IF      MCP-RC           NOT =   ZERO
-                     DISPLAY "TABLE=" MCP-TABLE "PATHNAME=" MCP-PATHNAME
-                     DISPLAY " MCP-RC=" MCP-RC
-                       MOVE
-                       "請求管理削除処理（個別分）でエラーとなりました"
-                                                   TO    WRK-RECEERR
-                        PERFORM 500-ERR-HENSYU-SEC
-                       GO  TO  5001-DB-DELETE-EXT
-                   END-IF
+      *            該当診療年月の労災自賠医療機関情報
+                   MOVE  SYS-2002-SRYYM TO  WRK-SYS-SRYYMD(1:6)
+                   MOVE  "01"           TO  WRK-SYS-SRYYMD(7:2)
+                   PERFORM 50012-SYSKANRI-HENSYU-SEC
       *
-      *            診療年月の自賠責ＰＤＦ削除処理
-                   INITIALIZE                  JIBAI-PRT-REC
-                   MOVE    WRK-PARA-HOSPNUM    TO  JIBAI-PRT-HOSPNUM
-                   MOVE    SYS-2002-PTID       TO  JIBAI-PRT-PTID
-                   MOVE    SYS-2002-SRYYM      TO  JIBAI-PRT-SRYYM
-                   MOVE    SYS-2002-NYUGAIKBN  TO  JIBAI-PRT-NYUGAIKBN
-                   MOVE    4                   TO
-                                               JIBAI-PRT-TEISYUTUSAKI
-                   MOVE    "973"               TO  JIBAI-PRT-HKNNUM
-                   MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
-                   MOVE    "DBDELETE"          TO  MCP-FUNC
-                   MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
-                   MOVE    "del2"              TO  MCP-PATHNAME
-                   PERFORM 900-ORCDBMAIN-SEC
-                   IF      MCP-RC           NOT =   ZERO
-                       DISPLAY "DBPATH=" MCP-TABLE " "  MCP-PATHNAME
-                                       " MCP-RC=" MCP-RC
-                       MOVE
-                    "自賠責ＰＤＦ削除処理（個別分）でエラーとなりました"
-                                                   TO    WRK-RECEERR
-                       PERFORM 500-ERR-HENSYU-SEC
-                       GO  TO  5001-DB-DELETE-EXT
-                   END-IF
+      *            診療年月の削除処理
+                   MOVE    SYS-2002-PTID       TO  WRK-DEL-PTID
+                   MOVE    SYS-2002-SRYYM      TO  WRK-DEL-SRYYM
+                   PERFORM 50011-DB-DELETE-KOBETU-SEC
       *
                    MOVE    "tbl_syskanri"      TO  MCP-TABLE
                    MOVE    "key2"              TO  MCP-PATHNAME
@@ -3442,10 +3517,252 @@
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
+      *
+      *        対象レセプトの健保準拠分を削除処理
+               PERFORM 50011-HKNKBN-DB-DELETE-SEC
            END-IF
            .
        5001-DB-DELETE-EXT.
            EXIT.    
+      *
+      *****************************************************************
+      *    請求管理、自賠責ＰＤＦ削除処理（個別処理時）
+      *****************************************************************
+       50011-DB-DELETE-KOBETU-SEC      SECTION.
+      *
+           DISPLAY "DELETE PTID="  WRK-DEL-PTID
+                        " SRYYM=" WRK-DEL-SRYYM
+                        " JIBAIKBN=" SYS-4001-JIBAIKBN
+      *
+      *    診療年月の請求管理削除処理
+           INITIALIZE                      RECE10-REC
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
+           MOVE    WRK-DEL-PTID        TO  RECE10-PTID
+           MOVE    WRK-DEL-SRYYM       TO  RECE10-SRYYM
+           MOVE    "1"                 TO  RECE10-NYUGAIKBN
+           MOVE    4                   TO  RECE10-TEISYUTUSAKI
+                                           RECE10-XXTEISYUTUSAKI 
+           MOVE    "973"               TO  RECE10-HKNNUM
+           MOVE    "5"                 TO  RECE10-HKNKBN-RSI
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           IF      WRK-DEL-SRYYM       >=  WRK-CONS-SRYYM-201707-X
+               IF      SYS-4001-JIBAIKBN   =   "2"
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del17"             TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del16"             TO  MCP-PATHNAME
+                   END-IF
+               ELSE
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del13"             TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del14"             TO  MCP-PATHNAME
+                   END-IF
+               END-IF
+           ELSE
+               IF      WRK-PARA-DLTKBN     =   "0"
+                   MOVE    "del9"              TO  MCP-PATHNAME
+               ELSE
+                   MOVE    "del10"             TO  MCP-PATHNAME
+               END-IF
+           END-IF
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "DBPATH=" MCP-TABLE " "  MCP-PATHNAME
+                       " MCP-RC=" MCP-RC
+               MOVE    "請求管理削除処理（個別分）でエラーとなりました"
+                                           TO  WRK-RECEERR
+               MOVE    WRK-RECEERR         TO  WRK-ERRMSG
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+      *    診療年月の自賠責ＰＤＦ削除処理
+           INITIALIZE                      JIBAI-PRT-REC
+           MOVE    WRK-PARA-HOSPNUM    TO  JIBAI-PRT-HOSPNUM
+           MOVE    WRK-DEL-PTID        TO  JIBAI-PRT-PTID
+           MOVE    WRK-DEL-SRYYM       TO  JIBAI-PRT-SRYYM
+           MOVE    "1"                 TO  JIBAI-PRT-NYUGAIKBN
+           MOVE    4                   TO  JIBAI-PRT-TEISYUTUSAKI
+           MOVE    "973"               TO  JIBAI-PRT-HKNNUM
+           MOVE    "5"                 TO  JIBAI-PRT-HKNKBN
+           MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+           IF      WRK-DEL-SRYYM       >=  WRK-CONS-SRYYM-201707-X
+               IF      SYS-4001-JIBAIKBN   =   "2"
+                   MOVE    "del7"              TO  MCP-PATHNAME
+               ELSE
+                   MOVE    "del5"              TO  MCP-PATHNAME
+               END-IF
+           ELSE
+               MOVE    "del2"              TO  MCP-PATHNAME
+           END-IF
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "DBPATH=" MCP-TABLE " "  MCP-PATHNAME
+                       " MCP-RC=" MCP-RC
+               MOVE
+                   "自賠責ＰＤＦ削除処理（個別分）でエラーとなりました"
+                                           TO  WRK-RECEERR
+               MOVE    WRK-RECEERR         TO  WRK-ERRMSG
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+           .
+       50011-DB-DELETE-KOBETU-EXT.
+           EXIT.    
+      *
+      *****************************************************************
+      *    対象レセプトの健保準拠分を削除処理（平成２９年７月診療分以降）
+      *****************************************************************
+       50011-HKNKBN-DB-DELETE-SEC      SECTION.
+      *
+      *    対象レセプトの健保準拠分を削除する（請求区分は関係なし）
+           MOVE    ZERO                TO  FLG-RECE82
+           OPEN    INPUT               RECE82-FILE
+           IF      STS-RECE82          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE82PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE82          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+           PERFORM 900-RECE82-READ-NEXT-SEC
+           PERFORM         UNTIL       FLG-RECE82  =   1
+      *        診療年月の請求管理削除処理
+               MOVE    ZERO                TO  FLG-DB-DELETE
+      *
+               INITIALIZE                      RECE10-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
+               MOVE    RECE82-PTID         TO  RECE10-PTID
+               MOVE    RECE82-SRYYM        TO  RECE10-SRYYM
+               MOVE    RECE82-NYUGAIKBN    TO  RECE10-NYUGAIKBN
+               MOVE    4                   TO  RECE10-TEISYUTUSAKI
+                                               RECE10-XXTEISYUTUSAKI
+               MOVE    "973"               TO  RECE10-HKNNUM
+               MOVE    RECE82-HKNID        TO  RECE10-KOHID-KEY
+      *
+               MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
+               MOVE    "key92"             TO  WRK-MCP-PATHNAME
+               PERFORM 900-SEIKYU-INV-SEC
+               IF      FLG-RECE10          =   ZERO
+                   MOVE    MCPDATA-REC         TO  RECE10-REC
+      *
+      *            個別作成時に請求しないを削除する設定のときは無条件に削除
+                   IF    ( WRK-PARA-SYOKBN     =   "2" )
+                   AND   ( WRK-PARA-DLTKBN     =   "1" )
+                       MOVE    1                   TO  FLG-DB-DELETE
+                   ELSE
+      *                健保準拠で請求しないのときは削除しない
+      *****************IF    ( RECE10-HKNKBN-RSI   =   "5" )
+      *****************AND   ( RECE10-SKYKBN       =   "0" )
+                       IF    ( RECE10-SKYKBN       =   "0" )
+                           CONTINUE
+                       ELSE 
+                           MOVE    1                   TO  FLG-DB-DELETE
+                       END-IF
+                   END-IF
+      *
+                   IF      FLG-DB-DELETE        =   1
+                       DISPLAY "HKNKBN DELETE PTNUM=" RECE82-PTNUM
+      *
+                       MOVE    RECE10-REC          TO  MCPDATA-REC
+                       MOVE    "DBDELETE"          TO  MCP-FUNC
+                       MOVE    "tbl_seikyu"        TO  MCP-TABLE
+                       MOVE    "del12"             TO  MCP-PATHNAME
+                       PERFORM 900-ORCDBMAIN-SEC
+                       IF      MCP-RC           NOT =   ZERO
+                           DISPLAY "DBPATH=" MCP-TABLE " "  MCP-PATHNAME
+                                           " MCP-RC=" MCP-RC
+                           MOVE   "請求管理削除処理でエラーとなりました"
+                                                   TO  WRK-RECEERR
+                           PERFORM 500-ERR-HENSYU-SEC
+                           PERFORM 900-DB-ERR-ABORT-SEC
+                       END-IF
+                   END-IF
+      *
+      *            診療年月の自賠責ＰＤＦ削除処理
+                   INITIALIZE                      JIBAI-PRT-REC
+                   MOVE    WRK-PARA-HOSPNUM    TO  JIBAI-PRT-HOSPNUM
+                   MOVE    RECE82-PTID         TO  JIBAI-PRT-PTID
+                   MOVE    RECE82-SRYYM        TO  JIBAI-PRT-SRYYM
+                   MOVE    RECE82-NYUGAIKBN    TO  JIBAI-PRT-NYUGAIKBN
+                   MOVE    4                   TO
+                                               JIBAI-PRT-TEISYUTUSAKI
+                   MOVE    "973"               TO  JIBAI-PRT-HKNNUM
+                   MOVE    RECE82-HKNID        TO  JIBAI-PRT-KOHID-KEY
+                   MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_jibai_prt"     TO  MCP-TABLE
+                   MOVE    "del4"              TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                       DISPLAY "DBPATH=" MCP-TABLE " "  MCP-PATHNAME
+                                       " MCP-RC=" MCP-RC
+                       MOVE   "自賠責ＰＤＦ削除処理でエラーとなりました"
+                                               TO  WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 900-DB-ERR-ABORT-SEC
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-RECE82-READ-NEXT-SEC
+           END-PERFORM
+      *
+           CLOSE    RECE82-FILE
+           MOVE    ZERO            TO  FLG-RECE82
+      *
+           .
+       50011-HKNKBN-DB-DELETE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療年月の対象となるシス管理を取得（個別処理のみ）
+      *****************************************************************
+       50012-SYSKANRI-HENSYU-SEC       SECTION.
+      *
+      *    該当診療年月の労災自賠医療機関情報
+           MOVE    ZERO            TO  FLG-SET
+      *
+           PERFORM VARYING SYSKAN-IDX  FROM  1  BY  1
+                   UNTIL ( SYSKAN-IDX  >   100   )
+                   OR    ( TBL-SYS4001 (SYSKAN-IDX)
+                                       =   SPACE )
+                   OR    ( FLG-SET     =   1     )
+               MOVE    TBL-SYS4001 (SYSKAN-IDX)
+                                           TO  SYS-4001-REC
+               IF    ( SYS-4001-STYUKYMD   <=  WRK-SYS-SRYYMD    )
+               AND   ( WRK-SYS-SRYYMD      <=  SYS-4001-EDYUKYMD )
+                   MOVE     1                  TO  FLG-SET
+                   IF      SYS-4001-JIBAIKBN   =   SPACE
+                       MOVE    "1"                 TO  SYS-4001-JIBAIKBN
+                   END-IF
+               END-IF
+           END-PERFORM
+           IF      FLG-SET         =   ZERO
+               STRING
+               "労災自賠医療機関情報が取得できませんでした。診療年月＝"
+                                          DELIMITED  BY  SIZE 
+                   WRK-SYS-SRYYMD(1:6)    DELIMITED  BY  SIZE
+                                          INTO    WRK-RECEERR
+               END-STRING
+               MOVE    WRK-RECEERR     TO  WRK-ERRMSG
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+           DISPLAY "SYS-4001-JIBAIKBN=" SYS-4001-JIBAIKBN
+           .
+      *
+       50012-SYSKANRI-HENSYU-EXT.
+           EXIT.
       *
       *****************************************************************
       *    終了　　処理
@@ -3529,6 +3846,43 @@
       *
            .
        990-RECE82-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプトデータ順検索処理（削除用）
+      *****************************************************************
+       900-RECE82-READ-NEXT-SEC           SECTION.
+      *
+           READ    RECE82-FILE       NEXT
+               AT  END
+                   MOVE    1                   TO  FLG-RECE82
+               NOT AT  END
+                   IF      STS-RECE82          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE82PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE82      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
+                   MOVE    ZERO                TO  FLG-RECE82
+      *
+      *            平成２９年７月診療分以降のみ対象
+                   IF      RECE82-SRYYM    <   WRK-CONS-SRYYM-201707-X
+                       GO  TO  900-RECE82-READ-NEXT-SEC
+                   END-IF
+      *
+                   DISPLAY "DELETE RECE82-PTNUM=" RECE82-PTNUM
+                           " SRYYM=" RECE82-SRYYM
+                           " HKNID=" RECE82-HKNID
+      *
+           END-READ
+      *
+           .
+       900-RECE82-READ-NEXT-EXT.
            EXIT.
       *
       ****************************************************************

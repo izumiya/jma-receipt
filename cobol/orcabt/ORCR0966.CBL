@@ -70,6 +70,8 @@
       *                                     対応
       *  04.08.05    NACL-門脇    16/04/15  平成２８年４月改正対応
       *  04.08.04    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.05    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -448,6 +450,9 @@
                                    PIC 9(02)   VALUE   48.
            03  WRK-CONS-RECECOM-LENGTH-MAX
                                    PIC 9(04)   VALUE   2400.
+           03  WRK-CONS-SRYYM-201707-X.
+               05  WRK-CONS-SRYYM-201707
+                                   PIC 9(06)   VALUE   201707.
       *
        01  WRK-BYOMEI-AREA.
       *    傷病名最大文字数（傷病名欄）
@@ -3220,7 +3225,21 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            ELSE
                MOVE    "5"                 TO  RECE10-RECEKBN
            END-IF
-      * 
+      *
+      *    平成２９年７月以降で第三者行為以外のとき
+           IF    ( RECE82-SRYYM        >=  WRK-CONS-SRYYM-201707 )
+           AND   ( WRK-PARA-RECEKBN
+                                   NOT =   "8"                   )
+               EVALUATE    RECE82-JIBAIKBN
+                   WHEN    "1"
+                       MOVE    "5"         TO  RECE10-HKNKBN
+                                               RECE10-HKNKBN-RSI
+                   WHEN    "2"
+                       MOVE    "6"         TO  RECE10-HKNKBN
+                                               RECE10-HKNKBN-RSI
+               END-EVALUATE
+           END-IF
+      *
            MOVE    RECE82-TOTALTEN     TO  RECE10-TOTALTEN         (1)
            COMPUTE RECE10-FTNMONEY-KOJ (1) 
                                        =   RECE82-SONOTAKIN-JYU    +
@@ -3382,6 +3401,18 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    "973"               TO  JIBAI-PRT-HKNNUM
                MOVE    "5"                 TO  JIBAI-PRT-RECEKBN
                MOVE    "rj1"               TO  JIBAI-PRT-PRTKBN
+           END-IF
+      *
+      *    平成２９年７月以降で第三者行為以外のとき
+           IF    ( RECE82-SRYYM        >=  WRK-CONS-SRYYM-201707 )
+           AND   ( WRK-PARA-RECEKBN
+                                   NOT =   "8"                   )
+               EVALUATE    RECE82-JIBAIKBN
+                   WHEN    "1"
+                       MOVE    "5"         TO  JIBAI-PRT-HKNKBN
+                   WHEN    "2"
+                       MOVE    "6"         TO  JIBAI-PRT-HKNKBN
+               END-EVALUATE
            END-IF
       *
            MOVE    JIBAI-PRT-REC       TO  MCPDATA-REC

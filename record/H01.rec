@@ -2120,7 +2120,7 @@ H01 {
     };
     HRECESYUBETU {
       style varchar(20);
-      textdata varchar(12);
+      textdata varchar(14);
     };
     HHKNJANUM {
       style varchar(20);

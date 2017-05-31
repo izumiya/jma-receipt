@@ -181,6 +181,8 @@
       *  04.08.06    NACL-藤原    16/10/10  個別作成の最大を２０００に変更
       *  04.08.07    NACL-藤原    17/04/20  ＥＦファイル、連携基盤のときの
       *                                     診療会計のチェックを変更
+      *  04.08.08    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *
       *  04.09.01    NACL-藤原    16/12/12  ＨＡＯＲＩ対応
       *****************************************************************
@@ -255,6 +257,7 @@
            03  FLG-BTPARA          PIC 9(01).
            03  FLG-SYUKA           PIC 9(01).
            03  FLG-SEIKYU          PIC 9(01).
+           03  FLG-PTRSIINF        PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
            03  FLG-ERR             PIC 9(01).
@@ -516,6 +519,10 @@
       *    ＳＰＡ一時テーブル
        01  SPATMP-REC.
            COPY    "CPSPA-TMP.INC".
+      *
+      *    患者労災保険情報
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1521,6 +1528,7 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                        MOVE    PTINF-NAME      TO
                                            SPA-NAI-R01-BTPARA-TNAME(IDX)
       *
+                       MOVE    ZERO            TO  FLG-CHK
                        EVALUATE    SPA-R01-NYUGAIKBN
                                        ALSO    SPA-R01-RECEKBN
                            WHEN    "1" ALSO    "0"
@@ -1533,7 +1541,22 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                                    MOVE    1       TO
                                        SPA-NAI-R01-BTPARA-TTAISYO (IDX)
                                END-IF          
-                           WHEN    "1" ALSO    "4"     
+                           WHEN    "1" ALSO    "4"
+                               IF      SPA-NAI-R01-BTPARA-SRYYMH
+                                                           >=  "201707"
+      *                            自賠責（新様式）のとき健保準拠かチェック
+                                   IF      QTORS-NJBIR-FLG  =   1
+                                       MOVE    1            TO
+                                          SPA-NAI-R01-BTPARA-TTAISYO
+                                                                   (IDX)
+                                   END-IF
+                               ELSE
+                                   IF      QTORS-NJBI-FLG      =   1
+                                       MOVE    1       TO
+                                           SPA-NAI-R01-BTPARA-TTAISYO 
+                                                                   (IDX)
+                                   END-IF
+                               END-IF
                            WHEN    "1" ALSO    "5"
                                IF      QTORS-NJBI-FLG      =   1
                                    MOVE    1       TO
@@ -1560,6 +1583,21 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                                        SPA-NAI-R01-BTPARA-TTAISYO (IDX)
                                END-IF          
                            WHEN    "2" ALSO    "4"     
+                               IF      SPA-NAI-R01-BTPARA-SRYYMH
+                                                           >=  "201707"
+      *                            自賠責（新様式）のとき健保準拠かチェック
+                                   IF      QTORS-GJBIR-FLG  =   1
+                                       MOVE    1            TO
+                                          SPA-NAI-R01-BTPARA-TTAISYO
+                                                                   (IDX)
+                                   END-IF
+                               ELSE
+                                   IF      QTORS-GJBI-FLG      =   1
+                                       MOVE    1       TO
+                                           SPA-NAI-R01-BTPARA-TTAISYO
+                                                                   (IDX)
+                                   END-IF
+                               END-IF
                            WHEN    "2" ALSO    "5"
                                IF      QTORS-GJBI-FLG      =   1
                                    MOVE    1       TO
@@ -2277,6 +2315,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
       *****END-IF
       *
       *    自賠責（新様式）のとき健保準拠かチェック
+      *    平成２９年７月診療分以降はエラーとしない 
            IF    ( SPA-R01-RECEKBN     =   "4" )
                INITIALIZE                  SYS-4001-REC
                MOVE    "4001"              TO  SYS-4001-KANRICD
@@ -2292,12 +2331,13 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
                ELSE
                   INITIALIZE                   SYS-4001-REC
                END-IF
-               IF      SYS-4001-JIBAIKBN   =   "2"
+               IF    ( SYS-4001-JIBAIKBN   =   "2"    )
+               AND   ( SPA-NAI-R01-SRYYM   <   201707 )
                    MOVE    "0036"              TO  SPA-ERRCD
                    MOVE    5                   TO  SPA-GMN-R01-CUR
                    GO  TO  4203-KOMOKUCHK-EXT
-               END-IF             
-            END-IF    
+               END-IF
+           END-IF
       *
       *    診療会計チェック
            MOVE    SPA-NAI-R01-PTID    TO  WRK-ACCT-PTID
@@ -2311,16 +2351,21 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
            AND   ( SPA-R01-NYUGAIKBN   =   "1"  )
                PERFORM 42032-NYUINACCT-CHK-SEC
            END-IF
-      *          
+      *
            IF      FLG-ERR             =   1
                MOVE    "0008"              TO  SPA-ERRCD
            ELSE 
                IF      FLG-CHK             =   ZERO
                    MOVE    "0006"              TO  SPA-ERRCD
                ELSE 
-                   IF    ( SPA-R01-NYUGAIKBN   =   "1"  )
-                   AND   ( FLG-ZAISKBKBN       =   ZERO )
-                       MOVE    "0014"              TO  SPA-ERRCD
+                   IF      FLG-CHK             =   2
+                       MOVE    "0043"              TO  SPA-ERRCD
+                       MOVE    5                   TO  SPA-GMN-R01-CUR
+                   ELSE
+                       IF    ( SPA-R01-NYUGAIKBN   =   "1"  )
+                       AND   ( FLG-ZAISKBKBN       =   ZERO )
+                           MOVE    "0014"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -2492,6 +2537,12 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                                MOVE    1           TO  FLG-CHK
                            END-IF
                        WHEN    "4"
+                           IF      COMB-HKNNUM =
+                                           WRK-CONS-JIBAISEKI-HKNNUM
+                               MOVE    1           TO  FLG-CHK
+      *                        自賠責（新様式）のとき健保準拠かチェック
+                               PERFORM 420311-JIBAI-CHK-SEC
+                           END-IF
                        WHEN    "5"
                            IF      COMB-HKNNUM =
                                            WRK-CONS-JIBAISEKI-HKNNUM
@@ -2511,7 +2562,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                    END-EVALUATE
                ELSE
                    MOVE    1                   TO  FLG-ERR
-               END-IF        
+               END-IF
       *
                PERFORM UNTIL   FLG-SRYACCT     =   1
                        OR      FLG-CHK         =   1
@@ -2530,6 +2581,30 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
            PERFORM 900-CLOSE-SEC
            .
        42031-SRYACCT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自賠責（新様式）のとき健保準拠のチェック処理
+      *****************************************************************
+       420311-JIBAI-CHK-SEC            SECTION.
+      *
+           IF      WRK-ACCT-SRYYM   >=  "201707"
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+               MOVE    WRK-ACCT-PTID       TO  PTRSI-PTID
+               MOVE    COMB-HKNID          TO  PTRSI-HKNID
+               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+               PERFORM 900-PTRSIINF-INV-SEC
+      *
+               IF      PTRSI-JIBAIKBN      =   SPACE   OR  "0"
+                   MOVE    SYS-4001-JIBAIKBN   TO  PTRSI-JIBAIKBN
+               END-IF
+               IF      PTRSI-JIBAIKBN      =   "2"
+                   MOVE    2                   TO  FLG-CHK
+               END-IF
+           END-IF
+           .
+       420311-JIBAI-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2592,6 +2667,12 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                                    MOVE    1           TO  FLG-CHK
                                END-IF
                            WHEN    "4"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+      *                            自賠責（新様式）のとき健保準拠かチェック
+                                   PERFORM 420311-JIBAI-CHK-SEC
+                               END-IF
                            WHEN    "5"
                                IF      COMB-HKNNUM =
                                                WRK-CONS-JIBAISEKI-HKNNUM
@@ -2651,7 +2732,7 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                        MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
                                                    TO  COMB-HKNCOMBINUM 
                        MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-                       PERFORM  910-HKNCOMBI-INV-SEC
+                       PERFORM 910-HKNCOMBI-INV-SEC
       *
                        IF      FLG-HKNCOMBI        =   ZERO
                          EVALUATE    SPA-R01-RECEKBN
@@ -2672,6 +2753,12 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                                    MOVE    1           TO  FLG-CHK
                                END-IF
                            WHEN    "4"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+      *                            自賠責（新様式）のとき健保準拠かチェック
+                                   PERFORM 420311-JIBAI-CHK-SEC
+                               END-IF
                            WHEN    "5"
                                IF      COMB-HKNNUM =
                                                WRK-CONS-JIBAISEKI-HKNNUM
@@ -5640,6 +5727,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0042"
                    MOVE    "前回とはレセプトの種類が違います"
                                                        TO  SPA-ERRMSG
+               WHEN    "0043"
+                   STRING  "該当診療年月に労災準拠の算定がありませんの"
+                                           DELIMITED   BY  SIZE  
+                           "で、自賠責（新様式）では処理できません"
+                                           DELIMITED   BY  SIZE  
+                                           INTO        SPA-ERRMSG
+                   END-STRING
                WHEN    "1001"
                    MOVE    "レセプト指示コード（個別）が削除できません"
                                                        TO  SPA-ERRMSG
@@ -6211,6 +6305,41 @@ grpsys     PERFORM 900-DBFETCH-SEC
            EXIT.
       *
       *****************************************************************
+      *    患者労災保険情報マスタ読込
+      *****************************************************************
+       900-PTRSIINF-INV-SEC         SECTION.
+      *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTRSIINF
+                   MOVE    MCPDATA-REC         TO  PTRSIINF-REC
+                   IF      PTRSI-SAKUJOKBN     =   "1"
+                       MOVE    1               TO  FLG-PTRSIINF
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-PTRSIINF
+                   INITIALIZE                      PTRSIINF-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTRSIINF
+               INITIALIZE                      PTRSIINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-PTRSIINF-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    請求マスター読込（対象請求管理データの存在チェック）
       *****************************************************************
        900-SEIKYU-READ-SEC         SECTION.
@@ -6420,7 +6549,6 @@ grpsys     PERFORM 900-DBFETCH-SEC
            .
        900-SPATMP-DBDELETE-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    一時保存テーブル検索処理

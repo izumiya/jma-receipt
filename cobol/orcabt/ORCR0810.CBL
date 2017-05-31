@@ -80,6 +80,8 @@
       *                                     署コードの編集方法変更に伴う修正
       *  04.08.06    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
       *                                     レセ電請求が不可となる事に伴う対応
+      *  04.08.07    NACL-藤原    17/04/10  患者単位での点数算定設定
+      *                                     （労災準拠又は健保準拠）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -284,6 +286,9 @@
                                PIC 9(06)   VALUE   200804.
            03  WRK-CONS-SRYYM-201109
                                PIC 9(06)   VALUE   201109.
+           03  WRK-CONS-SRYYM-201707-X.
+               05  WRK-CONS-SRYYM-201707
+                               PIC 9(06)   VALUE   201707.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -936,13 +941,27 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
            PERFORM 900-PTRSIINF-INV-SEC
            IF      FLG-PTRSIINF    =   1
                MOVE    "1"             TO  WRK-ROUSAIKBN
-           END-IF                
+           END-IF
+      *
+           DISPLAY "WRK-ROUSAIKBN="     WRK-ROUSAIKBN
+                   " PTRSI-JIBAIKBN="   PTRSI-JIBAIKBN
+      *
+           IF      PTRSI-JIBAIKBN  =   SPACE   OR  "0"
+               MOVE    WRK-JIBAIKBN    TO  PTRSI-JIBAIKBN
+           END-IF
       *
       *    労災・自賠責保険以外のとき処理しない
            IF      WRK-ROUSAIKBN       =   "1"
                GO  TO  200111-SRYACCT-HENSYU-EXT
            END-IF
-      *                  
+      *
+      *    新様式で健保準拠のときは処理しない
+           IF    ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201707-X )
+           AND   ( WRK-PARA-RECEKBN    =   "4"                     )
+           AND   ( PTRSI-JIBAIKBN      =   "2"                     )
+               GO  TO  200111-SRYACCT-HENSYU-EXT
+           END-IF
+      *
            IF      WRK-UPDKBN          =   "1"
       *    保険の訂正がされているか
                IF      COMB-TEKSTYMD(1:6)  =   WRK-STYMD (1:6)
@@ -1221,6 +1240,28 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
            MOVE    "tbl_ptrsiinf"  TO  WRK-MCP-TABLE
            MOVE    "key"           TO  WRK-MCP-PATHNAME
            PERFORM 900-PTRSIINF-INV-SEC
+           IF      FLG-PTRSIINF    =   "1"
+               MOVE    "1"             TO  WRK-ROUSAIKBN
+           END-IF
+      *??
+           DISPLAY "WRK-ROUSAIKBN="     WRK-ROUSAIKBN
+                   " PTRSI-JIBAIKBN="   PTRSI-JIBAIKBN
+      *
+           IF      PTRSI-JIBAIKBN  =   SPACE   OR  "0"
+               MOVE    WRK-JIBAIKBN    TO  PTRSI-JIBAIKBN
+           END-IF
+      *
+      *    労災・自賠責保険以外のとき処理しない
+           IF      WRK-ROUSAIKBN       =   "1"
+               GO  TO  200122-NYUINACCT-HENSYU-EXT
+           END-IF
+      *
+      *    新様式で健保準拠のときは処理しない
+           IF    ( WRK-STYMD (1:6)     >=  WRK-CONS-SRYYM-201707-X )
+           AND   ( WRK-PARA-RECEKBN    =   "4"                     )
+           AND   ( PTRSI-JIBAIKBN      =   "2"                     )
+               GO  TO  200122-NYUINACCT-HENSYU-EXT
+           END-IF
       *
            PERFORM 20011-FILE-HENSYU-SEC
            .
@@ -1441,6 +1482,15 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            MOVE    SYS-4001-ROUKAISU     TO   WRK-RECE82-ROUKAISU
       *    自賠責区分
            MOVE    WRK-JIBAIKBN          TO   WRK-RECE82-JIBAIKBN
+           IF      WRK-RECE82-SRYYM      >=  WRK-CONS-SRYYM-201707
+               IF     WRK-PARA-RECEKBN       =   "8"
+                   CONTINUE
+               ELSE
+      *            自賠責区分（患者別設定）
+                   MOVE    PTRSI-JIBAIKBN      TO  WRK-RECE82-JIBAIKBN
+               END-IF
+           END-IF
+      *
       *    技術点単価
            MOVE    WRK-SYUTENTANKA       TO   WRK-RECE82-SYUTENTANKA
       *    薬剤等点単価
@@ -1454,7 +1504,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            IF      WRK-RECE82-HKNKBN     =   "4" OR  "6"
                MOVE    "0"               TO   WRK-RECE82-RSIIRYOKBN
            END-IF
-      *
            IF    WRK-RECE82-SYOCD        =   SPACE
            AND   PTRSI-RYOSTYMD(1:6)    <=  "201403"
              EVALUATE  WRK-RECE82-HKNKBN
@@ -1542,6 +1591,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
       *            負担割合セット処理
                    PERFORM 2001121-FTNRATE-SET-SEC
            END-EVALUATE
+      *??
+           DISPLAY "WRK-RECE82-JIBAIKBN=" WRK-RECE82-JIBAIKBN "#"
       *
            MOVE    WRK-RECE82-REC      TO  RECE82-REC
            WRITE   RECE82-REC
