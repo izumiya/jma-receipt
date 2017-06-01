@@ -58,6 +58,7 @@
            03  FLG-APIPARA             PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-ERR2                PIC 9(01).
            03  FLG-DAYERR              PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
            03  FLG-HKNEND              PIC 9(01).
@@ -1457,6 +1458,9 @@
            MOVE    "02"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
+      *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -3561,6 +3565,7 @@
        880-HALF-ZENCNG-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-ERR
+           MOVE    ZERO                TO  FLG-ERR2
       *    拡張漢字有無
            INITIALIZE                  ORCSSTRINGAREA
            MOVE    "check"             TO  ORCSSTR-COMMAND
@@ -3568,7 +3573,7 @@
            CALL    "orcsstring"        USING
                                        ORCSSTRINGAREA
            IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
+               MOVE    1                   TO  FLG-ERR2
            END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
@@ -3643,7 +3648,8 @@
                MOVE    "漢字氏名は全角で入力して下さい"
                                                TO  WRK-ERRMSG
            WHEN    "15"
-               MOVE    "カナ氏名は全角で入力して下さい"
+      ****     MOVE    "カナ氏名は全角で入力して下さい"
+               MOVE    "カナ氏名にエラーがあります"
                                                TO  WRK-ERRMSG
            WHEN    "16"
                MOVE    "性別は１：男２：女で入力して下さい"
@@ -3786,10 +3792,10 @@
                MOVE    "労災・自賠責は処理できません。"
                                                TO  WRK-ERRMSG
            WHEN    "AP06"
-               MOVE    "記号全角エラー"
+               MOVE    "記号エラー"
                                                TO  WRK-ERRMSG
            WHEN    "AP07"
-               MOVE    "番号全角エラー"
+               MOVE    "番号エラー"
                                                TO  WRK-ERRMSG
            WHEN    "AP08"
                MOVE    "開始日暦日エラー"

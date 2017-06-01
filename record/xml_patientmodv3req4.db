@@ -30,6 +30,8 @@ xml_patientmodv3req4 {
             	Income_Long_Period_Date			varchar(10);
 #---            Ç§ÄêÈÏ°Ï¶èÊ¬
             	Income_Certificate_Code			varchar(01);
+#---            ¶­³¦ÁØ³ºÅö¶èÊ¬
+            	Income_Boundary_Code			varchar(01);
             	} [20];
         };
 #---    Äã½êÆÀ¼Ô£±¾ğÊó¡ÊÇ¯¶âÍúÎò¡Ë
@@ -45,6 +47,8 @@ xml_patientmodv3req4 {
             	Pension_Welfare_Code			varchar(01);
 #---            Ç§ÄêÈÏ°Ï¶èÊ¬
             	Pension_Certificate_Code		varchar(01);
+#---            ¶­³¦ÁØ³ºÅö¶èÊ¬
+            	Pension_Boundary_Code			varchar(01);
             	} [20];
         };
 #---    µìÀ«ÍúÎò

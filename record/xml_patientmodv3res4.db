@@ -34,6 +34,9 @@ xml_patientmodv3res4 {
 #---            «ßƒÍ»œ∞œ∂Ë ¨
             	Income_Certificate_Code			varchar(01);
             	Income_Certificate_Code_Name		varchar(40);
+#---            ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+            	Income_Boundary_Code			varchar(01);
+            	Income_Boundary_Code_Name		varchar(20);
 #---            •®•È°º•≥°º•…
 		Patient_Result			varchar(4);
 		Patient_Result_Message		varchar(100);
@@ -52,6 +55,9 @@ xml_patientmodv3res4 {
 #---            «ßƒÍ»œ∞œ∂Ë ¨
             	Pension_Certificate_Code		varchar(01);
             	Pension_Certificate_Code_Name		varchar(40);
+#---            ∂≠≥¶¡ÿ≥∫≈ˆ∂Ë ¨
+            	Pension_Boundary_Code			varchar(01);
+            	Pension_Boundary_Code_Name		varchar(20);
 #---            •®•È°º•≥°º•…
 		Patient_Result			varchar(4);
 		Patient_Result_Message		varchar(100);

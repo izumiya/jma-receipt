@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  17/05/XX  境界層該当対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -62,6 +63,7 @@
            03  FLG-APIPARA             PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-ERR2                PIC 9(01).
            03  FLG-DAYERR              PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
            03  FLG-HKNEND              PIC 9(01).
@@ -189,6 +191,10 @@
            03  WRK-MCP-WINDOW          PIC X(62).
       *    MCP-TERMID
            03  WRK-MCP-TERM            PIC X(64).
+      *H29.6
+      *    境界層該当区分
+           03  WRK-KYOUKAI             PIC X(01).
+           03  WRK-KYOUKAI-MEI         PIC X(20).
       *
       *
       *    半角全角変換
@@ -1383,6 +1389,9 @@
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
+      *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_api_para"      TO  MCP-TABLE
@@ -1556,6 +1565,19 @@
                                         TO  PTMODRES-TSYRRK-HKNTEK-NAME
                                                                   (IDX)
            END-IF
+      *H29.6
+      *    境界層該当区分
+           IF      TSYRRK-KYOUKAISOUKBN    =   SPACE
+               MOVE    "0"                 TO  TSYRRK-KYOUKAISOUKBN
+           END-IF
+           MOVE    TSYRRK-KYOUKAISOUKBN
+                                       TO  PTMODRES-TSYRRK-KYOUKAISOU
+                                                                  (IDX)
+           MOVE    TSYRRK-KYOUKAISOUKBN    TO  WRK-KYOUKAI
+           PERFORM 41003-KYOUKAI-HEN-SEC
+           MOVE    WRK-KYOUKAI-MEI     TO  PTMODRES-TSYRRK-KYOUKAI-NAME
+                                                                  (IDX)
+      *
       *
            .
        20013-TSYRRK-PTMODRES-EXT.
@@ -1645,9 +1667,37 @@
                                         TO  PTMODRES-TNKRRK-HKNTEK-NAME
                                                                   (IDX)
            END-IF
+      *H29.6
+      *    境界層該当区分
+           IF      TNKRRK-KYOUKAISOUKBN    =   SPACE
+               MOVE    "0"             TO  TNKRRK-KYOUKAISOUKBN
+           END-IF
+           MOVE    TNKRRK-KYOUKAISOUKBN
+                                       TO  PTMODRES-TNKRRK-KYOUKAISOU
+                                                                  (IDX)
+           MOVE    TNKRRK-KYOUKAISOUKBN    TO  WRK-KYOUKAI
+           PERFORM 41003-KYOUKAI-HEN-SEC
+           MOVE    WRK-KYOUKAI-MEI     TO  PTMODRES-TNKRRK-KYOUKAI-NAME
+                                                                  (IDX)
       *
            .
        20014-TNKRRK-PTMODRES-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    境界層該当区分編集処理
+      *****************************************************************
+       41003-KYOUKAI-HEN-SEC              SECTION.
+      *
+           MOVE    SPACE               TO  WRK-KYOUKAI-MEI
+           EVALUATE    WRK-KYOUKAI
+               WHEN    "0"
+                   MOVE    "境界層非該当"  TO  WRK-KYOUKAI-MEI
+               WHEN    "1"
+                   MOVE    "境界層該当"    TO  WRK-KYOUKAI-MEI
+           END-EVALUATE
+           .
+       41003-KYOUKAI-HEN-EXT.
            EXIT.
       *
       ****************************************************************
@@ -1857,12 +1907,14 @@
                    PERFORM 2900-SYORI-END-SEC
                END-IF
            ELSE
+               IF      PTMODRES-RESPONSE-NUMBER    =   SPACE
+                   MOVE    "02"            TO  PTMODRES-RESPONSE-NUMBER
+               END-IF
                IF      FLG-CANSEL      =   ZERO
       *            SPA再編集
                    PERFORM 2901-PARA-INS-SEC
                    PERFORM 2008-SPATMP-INS-SEC
                END-IF
-               MOVE    "02"            TO  PTMODRES-RESPONSE-NUMBER
            END-IF
       *
            .
@@ -2036,6 +2088,9 @@
                MOVE    PTMODREQ-TSYRRK-HKNTEKKBN (IDX)
                                        TO  PTMODRES-TSYRRK-HKNTEKKBN
                                                                 (IDX)
+               MOVE    PTMODREQ-TSYRRK-KYOUKAISOU (IDX)
+                                       TO  PTMODRES-TSYRRK-KYOUKAISOU
+                                                                (IDX)
       *        認定開始年月日
                IF      PTMODREQ-TSYRRK-NINSTYMD (IDX)  =   SPACE
                    CONTINUE
@@ -2083,6 +2138,10 @@
       *        認定範囲区分
                MOVE    PTMODREQ-TSYRRK-HKNTEKKBN(IDX)
                                            TO  TBL-TSYRRK-HKNTEKKBN(IDX)
+      *H29.6   境界層該当区分
+               MOVE    PTMODREQ-TSYRRK-KYOUKAISOU(IDX)
+                                           TO  TBL-TSYRRK-KYOUKAISOUKBN
+                                                                (IDX)
       *        必須項目チェック（認定開始年月日）
                IF      PTMODREQ-TSYRRK-NINSTYMD (IDX)  =   SPACE
       *            他項目は空白であること
@@ -2223,6 +2282,27 @@
                                                                  (IDX)
                        MOVE    1               TO  FLG-ERR-01
                    END-IF
+               END-IF
+      *H29.6   境界層該当区分
+               IF      TBL-TSYRRK-KYOUKAISOUKBN(IDX)   =   SPACE
+                   MOVE    "0"             TO  TBL-TSYRRK-KYOUKAISOUKBN
+                                                                 (IDX)
+                   MOVE    "0"         TO  PTMODRES-TSYRRK-KYOUKAISOU
+                                                                  (IDX)
+               END-IF
+               MOVE    TBL-TSYRRK-KYOUKAISOUKBN(IDX)   TO  WRK-KYOUKAI
+               PERFORM 41003-KYOUKAI-HEN-SEC
+               IF      WRK-KYOUKAI-MEI     =   SPACE
+      *            エラー
+                   IF      PTMODRES-TSYRRK-ERRCD (IDX) =   SPACE
+                       MOVE    "2424"          TO  PTMODRES-TSYRRK-ERRCD
+                                                                 (IDX)
+                       MOVE    1               TO  FLG-ERR-01
+                   END-IF
+               ELSE
+                   MOVE    WRK-KYOUKAI-MEI     TO
+                                           PTMODRES-TSYRRK-KYOUKAI-NAME
+                                                                 (IDX)
                END-IF
            END-PERFORM
       *
@@ -2417,6 +2497,9 @@
                MOVE    PTMODREQ-TNKRRK-HKNTEKKBN (IDX)
                                        TO  PTMODRES-TNKRRK-HKNTEKKBN
                                                                 (IDX)
+               MOVE    PTMODREQ-TNKRRK-KYOUKAISOU (IDX)
+                                       TO  PTMODRES-TNKRRK-KYOUKAISOU
+                                                                (IDX)
       *        認定開始年月日
                IF      PTMODREQ-TNKRRK-STYMD (IDX)  =   SPACE
                    CONTINUE
@@ -2457,6 +2540,10 @@
       *        認定範囲区分
                MOVE    PTMODREQ-TNKRRK-HKNTEKKBN(IDX)
                                            TO  TBL-TNKRRK-HKNTEKKBN(IDX)
+      *H29.6   境界層該当区分
+               MOVE    PTMODREQ-TNKRRK-KYOUKAISOU(IDX)
+                                           TO  TBL-TNKRRK-KYOUKAISOUKBN
+                                                                 (IDX)
       *        必須項目チェック（認定開始年月日）
                IF      PTMODREQ-TNKRRK-STYMD (IDX)  =   SPACE
       *            他項目は空白であること
@@ -2570,6 +2657,27 @@
                                                                  (IDX)
                        MOVE    1               TO  FLG-ERR-01
                    END-IF
+               END-IF
+      *H29.6   境界層該当区分
+               IF      TBL-TNKRRK-KYOUKAISOUKBN(IDX)   =   SPACE
+                   MOVE    "0"             TO  TBL-TNKRRK-KYOUKAISOUKBN
+                                                                 (IDX)
+                   MOVE    "0"         TO  PTMODRES-TNKRRK-KYOUKAISOU
+                                                                  (IDX)
+               END-IF
+               MOVE    TBL-TNKRRK-KYOUKAISOUKBN(IDX)   TO  WRK-KYOUKAI
+               PERFORM 41003-KYOUKAI-HEN-SEC
+               IF      WRK-KYOUKAI-MEI     =   SPACE
+      *            エラー
+                   IF      PTMODRES-TNKRRK-ERRCD (IDX) =   SPACE
+                       MOVE    "2425"          TO  PTMODRES-TNKRRK-ERRCD
+                                                                 (IDX)
+                       MOVE    1               TO  FLG-ERR-01
+                   END-IF
+               ELSE
+                   MOVE    WRK-KYOUKAI-MEI     TO
+                                           PTMODRES-TNKRRK-KYOUKAI-NAME
+                                                                 (IDX)
                END-IF
            END-PERFORM
       *
@@ -4035,6 +4143,7 @@
        880-HALF-ZENCNG-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-ERR
+           MOVE    ZERO                TO  FLG-ERR2
       *    拡張漢字有無
            INITIALIZE                  ORCSSTRINGAREA
            MOVE    "check"             TO  ORCSSTR-COMMAND
@@ -4042,7 +4151,7 @@
            CALL    "orcsstring"        USING
                                        ORCSSTRINGAREA
            IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
+               MOVE    1                   TO  FLG-ERR2
            END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
@@ -4112,7 +4221,7 @@
                MOVE    "漢字氏名は全角で入力して下さい"
                                                TO  WRK-ERRMSG
            WHEN    "15"
-               MOVE    "カナ氏名は全角で入力して下さい"
+               MOVE    "カナ氏名にエラーがあります"
                                                TO  WRK-ERRMSG
            WHEN    "16"
                MOVE    "性別は１：男２：女で入力して下さい"

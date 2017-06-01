@@ -124,13 +124,12 @@
       *极清勒
       *            极清勒懒滇惰尸
                    07  PTMODREQ-JIBAISEIKBN            PIC X(01).
-      **           07  PTMODREQ-JIBAISEIKBN-NAME       PIC X(20).
       *            极清勒瘦副柴家叹
                    07  PTMODREQ-HOKENNAME              PIC X(80).
       *            极清勒么碰板
                    07  PTMODREQ-RSI-DRCD               PIC X(05).
-      *            极清勒么碰板叹疚
-      **           07  PTMODREQ-RSI-DRCD-NAME          PIC X(100).
+      *            极清勒惰尸
+                   07  PTMODREQ-JIBAIKBN               PIC  X(01).
       *アフタ〖ケア
       *            夫汞瓷妄缄蘑戎规
                    07  PTMODREQ-KANRITCHO-NUMBER       PIC X(13).

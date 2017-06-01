@@ -266,7 +266,7 @@
            COPY    "CPORAPIV3SUB01.INC".
       *
       *    保険組合せ決定関数サブ
-           COPY    "CPORCSAPIHKN.INC".
+      **** COPY    "CPORCSAPIHKN.INC".
       *ver.4.7
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
@@ -1118,6 +1118,7 @@
                IF      SPA-ERRCD           =   SPACE
                    MOVE    ORCSP01-PTNUM       TO  SPA-GMN-PTNUM
                    MOVE    ORCSP01-PTNUM       TO  SPA-PTNUM
+                   MOVE    SPA-PTNUM           TO  WRK-PTNUM
                ELSE
                    MOVE    "P1"                TO  WRK-ERRCD
                END-IF
@@ -1226,6 +1227,7 @@
                    MOVE    ORCSP01-PTNUM       TO  SPA-PTNUM
                    MOVE    ORCSP01-PTID        TO  SPA-PTID
                    MOVE    ORCSP01-PTID        TO  SPA-GMN-PTID
+                   MOVE    SPA-PTNUM           TO  WRK-PTNUM
                ELSE
                    MOVE    "P1"                TO  WRK-ERRCD
                END-IF
@@ -1425,6 +1427,9 @@
            MOVE    "01"                TO  WRK-PARA-SYORIPG
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
+      *
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -2243,8 +2248,9 @@
                MOVE    40                  TO  WRK-LEN
                PERFORM 890-HALF-ZEN-SEC
                MOVE    WRK-ATO-INPUT       TO  SPA-GMN21-JOB
-               IF      FLG-ERR2            =   1
-      *            拡張文字エラー
+               IF      FLG-ERR             =   1
+      ***      IF      FLG-ERR2            =   1
+      ****         拡張文字エラー
                    MOVE    "A022"              TO  SPA-ERRCD
                    PERFORM 290-ERROR-HEN-SEC
                END-IF
@@ -2313,16 +2319,17 @@
       *****************************************************************
        200211-EMAIL-CHK-SEC         SECTION.
       *
-           IF      SPA-GMN21-EMAIL     NOT =   SPACE
+      * 画面チェックなし
+      *    IF      SPA-GMN21-EMAIL     NOT =   SPACE
       *        拡張文字チェック
-               MOVE    SPA-GMN21-EMAIL     TO  WRK-MAE-INPUT
-               MOVE    50                  TO  WRK-MAX
-               PERFORM 890-HALF-ZEN-SEC
-               IF      FLG-ERR2            =   1
-                   MOVE    "A023"              TO  SPA-ERRCD
-                   PERFORM 290-ERROR-HEN-SEC
-               END-IF
-           END-IF
+      *        MOVE    SPA-GMN21-EMAIL     TO  WRK-MAE-INPUT
+      *        MOVE    50                  TO  WRK-MAX
+      *        PERFORM 890-HALF-ZEN-SEC
+      *        IF      FLG-ERR2            =   1
+      *            MOVE    "A023"              TO  SPA-ERRCD
+      *            PERFORM 290-ERROR-HEN-SEC
+      *        END-IF
+      ***  END-IF
            .
        200211-EMAIL-CHK-EXT.
            EXIT.
@@ -2406,23 +2413,27 @@
                   (WRK-ERRCD               =   SPACE )
                MOVE    SPA-GMN-COMMENT-1   TO  WRK-MAE-INPUT
                MOVE    100                 TO  WRK-LEN
-               PERFORM 880-HALF-ZENCNG-SEC
+      ****     PERFORM 880-HALF-ZENCNG-SEC
+      ****     MOVE    WRK-ATO-INPUT       TO  SPA-GMN-COMMENT-1
+               PERFORM 890-HALF-ZEN-SEC
                MOVE    WRK-ATO-INPUT       TO  SPA-GMN-COMMENT-1
-               IF      FLG-ERR             =   1
-                   MOVE    "A030"              TO  SPA-ERRCD
-                   PERFORM 290-ERROR-HEN-SEC
-               END-IF
+      *        IF      FLG-ERR             =   1
+      *            MOVE    "A030"              TO  SPA-ERRCD
+      *            PERFORM 290-ERROR-HEN-SEC
+      *        END-IF
            END-IF
            IF     (SPA-GMN-COMMENT-2   NOT =   SPACE ) AND
                   (WRK-ERRCD               =   SPACE )
                MOVE    SPA-GMN-COMMENT-2   TO  WRK-MAE-INPUT
                MOVE    100                 TO  WRK-LEN
-               PERFORM 880-HALF-ZENCNG-SEC
+      ****     PERFORM 880-HALF-ZENCNG-SEC
+      ****     MOVE    WRK-ATO-INPUT       TO  SPA-GMN-COMMENT-2
+               PERFORM 890-HALF-ZEN-SEC
                MOVE    WRK-ATO-INPUT       TO  SPA-GMN-COMMENT-2
-               IF      FLG-ERR             =   1
-                   MOVE    "A031"              TO  SPA-ERRCD
-                   PERFORM 290-ERROR-HEN-SEC
-               END-IF
+      *        IF      FLG-ERR             =   1
+      *            MOVE    "A031"              TO  SPA-ERRCD
+      *            PERFORM 290-ERROR-HEN-SEC
+      *        END-IF
            END-IF
            .
        200211-COMMENT-CHK-EXT.
@@ -4085,7 +4096,7 @@
                                        ORCSSTRINGAREA
            IF      ORCSSTR-NUM2    NOT =   ZERO
                MOVE    1                   TO  FLG-ERR2
-               MOVE    1                   TO  FLG-ERR
+      **       MOVE    1                   TO  FLG-ERR
            END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
@@ -4152,6 +4163,7 @@
        880-HALF-ZENCNG-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-ERR
+           MOVE    ZERO                TO  FLG-ERR2
       *    拡張漢字有無
            INITIALIZE                  ORCSSTRINGAREA
            MOVE    "check"             TO  ORCSSTR-COMMAND
@@ -4159,7 +4171,7 @@
            CALL    "orcsstring"        USING
                                        ORCSSTRINGAREA
            IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
+               MOVE    1                   TO  FLG-ERR2
            END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
@@ -4258,7 +4270,7 @@
                MOVE    "漢字氏名は全角で入力して下さい"
                                                TO  WRK-ERRMSG
            WHEN    "15"
-               MOVE    "カナ氏名は全角で入力して下さい"
+               MOVE    "カナ氏名にエラーがあります"
                                                TO  WRK-ERRMSG
            WHEN    "16"
                MOVE    "性別は１：男２：女で入力して下さい"
@@ -4448,9 +4460,9 @@
            WHEN    "A022"
                MOVE    "職業エラー"
                                                TO  WRK-ERRMSG
-           WHEN    "A023"
-               MOVE    "電子メールアドレスエラー"
-                                               TO  WRK-ERRMSG
+      **   WHEN    "A023"
+      *        MOVE    "電子メールアドレスエラー"
+      **                                       TO  WRK-ERRMSG
            WHEN    "A024"
                MOVE    "禁忌１エラー"
                                                TO  WRK-ERRMSG
@@ -4469,12 +4481,12 @@
            WHEN    "A029"
                MOVE    "感染症２エラー"
                                                TO  WRK-ERRMSG
-           WHEN    "A030"
-               MOVE    "コメント１エラー"
-                                               TO  WRK-ERRMSG
-           WHEN    "A031"
-               MOVE    "コメント２エラー"
-                                               TO  WRK-ERRMSG
+      **   WHEN    "A030"
+      *        MOVE    "コメント１エラー"
+      *                                        TO  WRK-ERRMSG
+      *    WHEN    "A031"
+      *        MOVE    "コメント２エラー"
+      ***                                      TO  WRK-ERRMSG
            WHEN    "A032"
                MOVE    "テスト患者区分エラー"
                                                TO  WRK-ERRMSG

@@ -77,6 +77,10 @@
                    07  PTMODRES-TSYRRK-HKNTEKKBN   PIC X(01).
       *            Ç§ÄêÈÏ°Ï¶èÊ¬Ì¾¾Î
                    07  PTMODRES-TSYRRK-HKNTEK-NAME PIC X(40).
+      *H29.6       ¶­³¦ÁØ³ºÅö¶èÊ¬
+                   07  PTMODRES-TSYRRK-KYOUKAISOU   PIC X(01).
+      *            ¶­³¦ÁØ³ºÅö¶èÊ¬Ì¾¾Î
+                   07  PTMODRES-TSYRRK-KYOUKAI-NAME PIC X(20).
       *            ¥¨¥é¡¼¥³¡¼¥É
                    07  PTMODRES-TSYRRK-ERRCD       PIC X(04).
                    07  PTMODRES-TSYRRK-ERRCD-MSG   PIC X(100).
@@ -96,6 +100,10 @@
                    07  PTMODRES-TNKRRK-HKNTEKKBN   PIC X(01).
       *            Ç§ÄêÈÏ°Ï¶èÊ¬Ì¾¾Î
                    07  PTMODRES-TNKRRK-HKNTEK-NAME PIC X(40).
+      *H29.6       ¶­³¦ÁØ³ºÅö¶èÊ¬
+                   07  PTMODRES-TNKRRK-KYOUKAISOU   PIC X(01).
+      *            ¶­³¦ÁØ³ºÅö¶èÊ¬Ì¾¾Î
+                   07  PTMODRES-TNKRRK-KYOUKAI-NAME PIC X(20).
       *            ¥¨¥é¡¼¥³¡¼¥É
                    07  PTMODRES-TNKRRK-ERRCD       PIC X(04).
                    07  PTMODRES-TNKRRK-ERRCD-MSG   PIC X(100).
