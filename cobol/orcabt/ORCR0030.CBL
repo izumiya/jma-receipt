@@ -769,6 +769,7 @@
       *  04.08.42    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *  04.08.43    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
       *                                     （レセプト分割に関わる修正）
+      *  04.08.44    NACL-門脇    17/06/01  湿布薬用法レセプト記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12230,8 +12231,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE     "2"       TO    RECE04-COMCDFLG
                     END-IF
                END-IF
-               IF    (SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
-                     (SRY-SRYCD    (IDX2)(1:3)     =   "008")
+               IF   ( SRY-SRYCD(IDX2)(1:1)  =   "8"   )
+               OR   ( SRY-SRYCD(IDX2)(1:3)  =   "008" )
+               OR   ((FLG-SIPPU-ARI         =    1   ) AND
+                     (SRY-SRYCD(IDX2)(1:3)  =   "001"))
                     IF    RECE04-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE04-COMCDFLG
                     END-IF
