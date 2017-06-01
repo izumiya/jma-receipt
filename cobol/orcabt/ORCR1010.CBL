@@ -145,6 +145,7 @@
       *  04.08.14    NACL-門脇    16/12/07  遠隔モニタリング加算の前回算定年月
       *                                     コメント記載修正
       *  04.08.15    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
+      *  04.08.16    NACL-門脇    17/06/01  湿布薬用法レセプト記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2888,8 +2889,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE     "2"       TO    RECE120-COMCDFLG
                     END-IF
                END-IF
-               IF    (SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
-                     (SRY-SRYCD    (IDX2)(1:3)     =   "008")
+               IF   ( SRY-SRYCD(IDX2)(1:1)  =   "8"   )
+               OR   ( SRY-SRYCD(IDX2)(1:3)  =   "008" )
+               OR   ((FLG-SIPPU-ARI         =    1   ) AND
+                     (SRY-SRYCD(IDX2)(1:3)  =   "001"))
                     IF    RECE120-COMCDFLG   NOT =   "2"
                         MOVE     "1"       TO    RECE120-COMCDFLG
                     END-IF

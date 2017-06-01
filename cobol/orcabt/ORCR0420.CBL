@@ -309,6 +309,7 @@
       *  04.08.16    NACL-門脇    17/02/24  未コード化特定器材コードを使用した
       *                                     レセ電請求が不可となる事に伴う対応
       *  04.08.17    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
+      *  04.08.18    NACL-門脇    17/06/01  湿布薬用法レセプト記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3851,8 +3852,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE     "3"       TO    RECE44-COMCDFLG
                     END-IF
                END-IF
-               IF    (SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
-                     (SRY-SRYCD    (IDX2)(1:3)     =   "008")
+               IF   ( SRY-SRYCD(IDX2)(1:1)  =   "8"   )
+               OR   ( SRY-SRYCD(IDX2)(1:3)  =   "008" )
+               OR   ((FLG-SIPPU-ARI         =    1   ) AND
+                     (SRY-SRYCD(IDX2)(1:3)  =   "001"))
                     IF    RECE44-COMCDFLG   NOT =   "3"
                         MOVE     "1"       TO    RECE44-COMCDFLG
                     END-IF
