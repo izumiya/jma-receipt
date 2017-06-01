@@ -8932,15 +8932,11 @@
                        PERFORM 200112111-HEIYOU-T-SET-CHK-SEC
                    END-IF
                END-PERFORM
-           ELSE
-               MOVE    ZERO        TO  FLG-THEIYOU-SET
            END-IF
       *
            IF    ( FLG-SRYHEI1-DAY-G       =   ZERO )
             OR   ( FLG-SRYHEI2-DAY-G       =   ZERO )
-                MOVE    ZERO       TO  FLG-THEIYOU-SET
-           ELSE
-                MOVE    1          TO  FLG-THEIYOU-SET
+               MOVE    ZERO        TO  FLG-THEIYOU-SET
            END-IF
       *
            .
@@ -8951,12 +8947,14 @@
       *****************************************************************
        200112111-HEIYOU-T-SET-CHK-SEC   SECTION.
       *
+           MOVE    1               TO  FLG-TARGET
+      *
            IF    ( IDX-TSRYCD  =   IDX0 )
                IF    ( TSRYCD-DENPNUM-KAISU (IDX0 IDXI)
                                    >   1 )
                    CONTINUE
                ELSE
-                   MOVE    ZERO    TO  FLG-THEIYOU-SET
+                   MOVE    ZERO    TO  FLG-TARGET
                END-IF
            ELSE
                IF    ( TSRYCD-DENPNUM-KAISU (IDX-TSRYCD IDXI)
@@ -8965,7 +8963,7 @@
                                    >   ZERO )
                            CONTINUE
                ELSE
-                   MOVE    ZERO    TO  FLG-THEIYOU-SET
+                   MOVE    ZERO    TO  FLG-TARGET
                END-IF
            END-IF
       *
@@ -8975,10 +8973,10 @@
                                            =   1 )
                     CONTINUE
            ELSE
-               MOVE    ZERO        TO  FLG-THEIYOU-SET
+               MOVE    ZERO        TO  FLG-TARGET
            END-IF
       *
-           IF    ( FLG-THEIYOU-SET     =   1 )
+           IF    ( FLG-TARGET     =   1 )
                MOVE    TSRYCD-DENPNUM-DAY (IDX-TSRYCD IDXI)
                                TO  IDX-DAY
                MOVE    1       TO  FLG-SRYHEI1-DAY (IDX-DAY)
