@@ -82,6 +82,8 @@ xml_patientmodv3req3 {
 		Liability_Insurance_Office_Name	varchar(80);
 #-----> 	极清勒么碰板
 		Liability_Physician_Code	varchar(05);
+#-----> 	极清勒爬眶换年惰尸
+		Liability_Class			varchar(01);
 #-----> 	アフタ〖ケア  夫汞瓷妄缄蘑戎规
 		PersonalHealthRecord_Number	varchar(13);
 		Damage_Class	{

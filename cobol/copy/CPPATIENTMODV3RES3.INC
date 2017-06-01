@@ -147,6 +147,10 @@
                    07  PTMODRES-RSI-DRCD               PIC X(05).
       *            极清勒么碰板叹疚
                    07  PTMODRES-RSI-DRCD-NAME          PIC X(100).
+      *            极清勒惰尸
+                   07  PTMODRES-JIBAIKBN               PIC  X(01).
+      *            极清勒惰尸叹疚
+                   07  PTMODRES-JIBAIKBN-NAME          PIC  X(30).
       *アフタ〖ケア
       *            夫汞瓷妄缄蘑戎规
                    07  PTMODRES-KANRITCHO-NUMBER       PIC X(13).

@@ -69,6 +69,8 @@
                    07  PTMODREQ-TSYRRK-SKJGNSTYMD  PIC X(10).
       *            認定範囲区分
                    07  PTMODREQ-TSYRRK-HKNTEKKBN   PIC X(01).
+      *H29.6       境界層該当区分
+                   07  PTMODREQ-TSYRRK-KYOUKAISOU  PIC X(01).
       *
       *       低所得者１情報（年金履歴）
               03  PTMODREQ-TNKRRK-INFO-G.
@@ -85,6 +87,8 @@
                    07  PTMODREQ-TNKRRK-FUKUSHI-KBN PIC X(01).
       *            認定範囲区分
                    07  PTMODREQ-TNKRRK-HKNTEKKBN   PIC X(01).
+      *H29.6       境界層該当区分
+                   07  PTMODREQ-TNKRRK-KYOUKAISOU  PIC X(01).
       *
       *       旧姓履歴
               03  PTMODREQ-KYUSEIRRK-INFO-G.
