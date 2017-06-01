@@ -30,6 +30,7 @@
       * 01.00.01     NACL-Â¿¡¹Ç¼  02/11/20  ¼«ÇåÀÕ´ïºàÄÉ²Ã
       * 01.00.02     NACL-Â¿¡¹Ç¼  03/04/30  ºÞÊÌÅÀ¿ôÄÉ²Ã
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/10/03  ¾ÃÈñÀÇ·×»»¡÷¡¢.961ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  17/06/XX  ¾¦ÉÊ¥³¡¼¥ÉÂÐ±þÂ¾
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -76,6 +77,8 @@
            03  WRK-KISOTEN         PIC 9(08)V99.
       *
            03  WRK-ZEIRITU         PIC 9(01)V99.
+      *
+           03  WRK-TENSIKIBETU     PIC 9(01).
       *
       *¾ÃÈñÀÇÎ¨
        01  CONS-ZEI1               PIC 9(01)V99   VALUE   0.05.
@@ -365,6 +368,12 @@
       *****************************************************************
        10021-JIHI-KEI-SEC                  SECTION.
       *
+      *H29.6
+      *    ¾¦ÉÊ¥³¡¼¥ÉÂÐ¾Ý³°
+           IF      WRK-COM-INPUTCD(IDX-Z)(1:3) =   "058"
+               GO  TO  10021-JIHI-KEI-EXT
+           END-IF
+      *
       *H26.10
       *    ¶â³Û¡÷¡¡¤Ç¾ÃÈñÀÇ·×»»
            IF     (WRK-COM-AUTOFLG2 (IDX-Z)    =   "1"   )
@@ -518,7 +527,38 @@
                MOVE    WRK-COM-TEN(IDX-Z)  TO  WRK-COM-KISOTEN(IDX-Z)
            END-IF
       *
-           EVALUATE    WRK-COM-TENSIKIBETU(IDX-Z)
+      *H29.6
+      *    ¶â³Û¡¦ÅÀ¿ôÈ½Äê
+           MOVE    ZERO                TO  WRK-TENSIKIBETU
+           IF      WRK-COM-INPUTCD(IDX-Z)(1:1) =   "1"
+               EVALUATE    WRK-COM-TENSIKIBETU(IDX-Z)
+      *        ¶â³Û
+               WHEN    1
+                   MOVE    1           TO  WRK-TENSIKIBETU
+      *        ÅÀ¿ô
+               WHEN    3
+      *        ÅÔÆ»ÉÜ¸©¹ØÆþ²Á³Ê
+               WHEN    4
+                   MOVE    3           TO  WRK-TENSIKIBETU
+               END-EVALUATE
+           END-IF
+           IF     (WRK-COM-INPUTCD(IDX-Z)(1:1) =   "7"
+                                               OR  "6" )
+             OR   (WRK-COM-INPUTCD(IDX-Z)(1:3) =   "059")
+               EVALUATE    WRK-COM-TENSIKIBETU(IDX-Z)
+      *        ¶â³Û
+               WHEN    1
+      *        ÅÔÆ»ÉÜ¸©¹ØÆþ²Á³Ê
+               WHEN    2
+                   MOVE    1           TO  WRK-TENSIKIBETU
+      *        ¶â³Û¡ÊÀ°¿ô)¡Ê¶â³Û¤Ï·×»»ºÑ¤ß¡Ë
+               WHEN    4
+                   MOVE    1           TO  WRK-TENSIKIBETU
+               END-EVALUATE
+           END-IF
+      *
+      ***  EVALUATE    WRK-COM-TENSIKIBETU(IDX-Z)
+           EVALUATE    WRK-TENSIKIBETU
       *        ¶â³Û
                WHEN    1
       *            ¾ÃÈñÀÇ·×»»
@@ -553,7 +593,6 @@
                    END-IF
       *        ÅÀ¿ô
                WHEN    3
-               WHEN    4
                    COMPUTE WRK-KISOTEN     =   WRK-COM-KISOTEN (IDX-Z)
                                            *   10
                    IF      (SPA-SRYYMD     >=  "20070401" )  AND
