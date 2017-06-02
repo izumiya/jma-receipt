@@ -365,7 +365,7 @@
                05  WRK-KEI         PIC Z(07).
       *
            03  WRK-MEISYO          PIC X(40).
-           03  WRK-TUSAN           PIC 9(08).
+           03  WRK-TUSAN           PIC S9(08).
            03  WRK-MEISYO-G        PIC X(100).
       *    ¿ÇÎÅÆü
            03  WRK-SRYYM.
@@ -1618,16 +1618,33 @@
       *****************************************************************
        3103-91DAYS-EDIT-SEC            SECTION.
       *
+      **     DISPLAY "3103-91DAYS-EDIT-SEC"
            MOVE  "black"    TO   SPA-GMN-IJYOU91-STYLE
            IF    ( STUSAN-RRK-FLG-OVER NOT =   ZERO )
                MOVE    "********"  TO  SPA-GMN-IJYOU91
                GO  TO  3103-91DAYS-EDIT-EXT
            END-IF
       *
+      **     DISPLAY "STUSAN-KJNYMD = " STUSAN-KJNYMD
            MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
+      **     DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
+      **     DISPLAY "STUSAN-RRK-CNT = " STUSAN-RRK-CNT
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
+      **         DISPLAY "IDX10 = " IDX10
+      **         DISPLAY "STUSAN-RRK-JTIKBN (IDX10) = "
+      **                  STUSAN-RRK-JTIKBN (IDX10)
+      **         DISPLAY "STUSAN-RRK-TAINRELKBN (IDX10) = "
+      **                  STUSAN-RRK-TAINRELKBN (IDX10)
+      **         DISPLAY "STUSAN-RRK-NYUINYMD (IDX10) = "
+      **                  STUSAN-RRK-NYUINYMD (IDX10)
+      **         DISPLAY "STUSAN-RRK-TAIINYMD (IDX10) = "
+      **                  STUSAN-RRK-TAIINYMD (IDX10)
+      **         DISPLAY "STUSAN-RRK-DJKBN (IDX10) = "
+      **                  STUSAN-RRK-DJKBN (IDX10)
+      **         DISPLAY "STUSAN-RRK-NISSU (IDX10) = "
+      **                  STUSAN-RRK-NISSU (IDX10)
                IF    ( STUSAN-RRK-JTIKBN (IDX10)
                                            NOT = "5" )
                    IF (STUSAN-RRK-NYUINYMD (IDX10)  NOT =  SPACE)  AND
@@ -1652,12 +1669,20 @@
                                              TO  LNK-DAY5-END
                      CALL    "ORCSDAY"   USING   STS-AREA-DAY
                                                  LNK-DAY5-AREA
+      **               DISPLAY "====  KIKAN-KEISAN ===="
+      **               DISPLAY "STUSAN-RRK-NYUINYMD (IDX10) = "
+      **                        STUSAN-RRK-NYUINYMD (IDX10)
+      **               DISPLAY "STUSAN-RRK-TAIINYMD (IDX10) = "
+      **                        STUSAN-RRK-TAIINYMD (IDX10)
+      **               DISPLAY "LNK-DAY5-NISSU2 = " LNK-DAY5-NISSU2
                      MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX10)
                     END-IF
                    END-IF
       *
+      **             DISPLAY "COM-MAE WRK-TUSAN = " WRK-TUSAN
                    COMPUTE WRK-TUSAN
                        =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
+      **             DISPLAY "COM-ATO WRK-TUSAN = " WRK-TUSAN
                    IF    ( WRK-TUSAN  <    91 )
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
@@ -1666,12 +1691,28 @@
                                                TO  LNK-DAY6-KIJUN
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                        IF    ( STUSAN-RRK-DJKBN (IDX10) = SPACE OR "2" )
+      **                     DISPLAY "91 - WRK-TUSAN"
                            COMPUTE LNK-DAY6-ZOGEN
                                =   91   -          WRK-TUSAN
                        ELSE
+      **                     DISPLAY "92 - WRK-TUSAN"
                            COMPUTE LNK-DAY6-ZOGEN
                                =   92   -          WRK-TUSAN
                        END-IF
+      **                 DISPLAY "LNK-DAY6-KIJUN = " LNK-DAY6-KIJUN
+      **                 DISPLAY "LNK-DAY6-ZOGEN = " LNK-DAY6-ZOGEN
+      *AZU-ADD START
+                       IF     WRK-TUSAN   <=    ZERO
+                            MOVE   91     TO    LNK-DAY6-ZOGEN
+                       END-IF
+      *AZU-ADD END
+      *
+      *AZU-ADD START
+                       IF    (STUSAN-RRK-CNT     =   1 )   AND
+                             (STUSAN-RRK-TAIINYMD (IDX10) = "99999999")
+                            MOVE   91     TO    LNK-DAY6-ZOGEN
+                       END-IF
+      *AZU-ADD END
                        CALL    "ORCSDAY"   USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
                        MOVE    LNK-DAY6-KOYOMI TO  SPA-GMN-IJYOU91
@@ -1697,16 +1738,24 @@
       *****************************************************************
        3103-180DAYS-EDIT-SEC           SECTION.
       *
+           DISPLAY "3103-180DAYS-EDIT-SEC"
            IF    ( STUSAN-RRK-FLG-OVER NOT =   ZERO )
                MOVE    "********"  TO  SPA-GMN-IJYOU180
                GO  TO  3103-180DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU04  TO  WRK-TUSAN
+      **     MOVE    STUSAN-NISSU04  TO  WRK-TUSAN
+      **     DISPLAY "STUSAN-NISSU04 = " STUSAN-NISSU04
+           MOVE    STUSAN-NISSU02  TO  WRK-TUSAN
+           COMPUTE   WRK-TUSAN  =  WRK-TUSAN -   1
+      **     DISPLAY "STUSAN-NISSU02 = " STUSAN-NISSU02
+      **     DISPLAY "WRK-TUSAN = " WRK-TUSAN
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
                IF    WRK-TUSAN     NOT =    ZERO
+      **            DISPLAY "STUSAN-RRK-NISSU (IDX10) = "
+      **                     STUSAN-RRK-NISSU (IDX10)
                   COMPUTE WRK-TUSAN
                        =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
                END-IF
@@ -1722,11 +1771,19 @@
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                        IF    ( STUSAN-RRK-DJKBN (IDX10) = SPACE OR "2")
                            COMPUTE LNK-DAY6-ZOGEN
-                               =   180   -         WRK-TUSAN
+                               =   179   -         WRK-TUSAN
                        ELSE
                            COMPUTE LNK-DAY6-ZOGEN
-                               =   181   -         WRK-TUSAN
+                               =   180   -         WRK-TUSAN
                        END-IF
+      **                 DISPLAY "MAE WRK-TUSAN = " WRK-TUSAN
+      *AZU-ADD START
+                       IF     WRK-TUSAN   <=    ZERO
+                            MOVE   180      TO    LNK-DAY6-ZOGEN
+                       END-IF
+      *AZU-ADD END
+      **                 DISPLAY "ATO WRK-TUSAN = " WRK-TUSAN
+      **                 DISPLAY "LNK-DAY6-ZOGEN = "  LNK-DAY6-ZOGEN
                        CALL    "ORCSDAY"   USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
                        MOVE    LNK-DAY6-KOYOMI TO  SPA-GMN-IJYOU180
@@ -1737,6 +1794,7 @@
                    MOVE    STUSAN-RRK-CNT      TO  IDX10
                END-IF
            END-PERFORM
+           DISPLAY "3103-180DAYS-EDIT-EXT"
       *
            .
        3103-180DAYS-EDIT-EXT.
