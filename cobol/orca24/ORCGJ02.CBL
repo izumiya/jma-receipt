@@ -12098,13 +12098,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                            OR (SPA-ERRCD   NOT =   SPACE )
       *
                MOVE    TBL-SYUNOU-REC(IDX) TO  SYUNOU-REC
+      *
                ADD     1                   TO  SPA-J025-MAX
                IF      SPA-J025-MAX        <=  100
                    PERFORM 490122-J025-HENSYU-SEC
                END-IF
       *
       *        追加分
-               IF      TBL-SYU-ACCT-UPDKBN(IDX)    =   "2"
+      *H29.6   修正
+      *****    IF      TBL-SYU-ACCT-UPDKBN(IDX)    =   "2"
                    MOVE    SYUNOU-REC          TO  MCPDATA-REC
                    MOVE    "tbl_syunou"        TO  MCP-TABLE
                    MOVE    "key"               TO  MCP-PATHNAME
@@ -12121,6 +12123,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "tbl_syunou"        TO  MCP-TABLE
                    MOVE    "key"               TO  MCP-PATHNAME
                    PERFORM 990-DBCLOSE-SEC
+      *
+               IF      TBL-SYU-ACCT-UPDKBN(IDX)    =   "2"
       *            新規分追加
                    PERFORM 4901219-SYUNOU-MEI-OUT-SEC
                END-IF
