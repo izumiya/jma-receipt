@@ -130,6 +130,8 @@
       *                                     署コードの編集方法変更に伴う修正
       *  04.08.05    NACL-藤原    17/04/10  患者単位での点数算定設定
       *                                     （労災準拠又は健保準拠）対応
+      *  04.08.06    NACL-門脇    17/06/08  アフターケアの「前回の検査年月日」
+      *                                     の編集条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2929,15 +2931,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE40-HOSPNUM       TO      ACCT-HOSPNUM
            MOVE    RECE40-NYUGAIKBN     TO      ACCT-NYUGAIKBN
            MOVE    RECE40-PTID          TO      ACCT-PTID
-           MOVE    RECE40-SRYKA(IDX)    TO      ACCT-SRYKA
            MOVE    RECE40-HKNCOMBI      TO      ACCT-HKNCOMBI
            MOVE    SRYACCT-REC          TO      MCPDATA-REC
            MOVE    "tbl_sryacct"        TO      MCP-TABLE
-           MOVE    "key25"              TO      MCP-PATHNAME
+           MOVE    "key69"              TO      MCP-PATHNAME
 grpsys     PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key25"             TO  MCP-PATHNAME
+               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM  800-SRYACCT-READ-SEC
                PERFORM  UNTIL
                               FLG-SRYACCT        =    1
@@ -2954,13 +2955,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
       *                 
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key25"             TO  MCP-PATHNAME
+                   MOVE    "key69"             TO  MCP-PATHNAME
                    PERFORM   800-SRYACCT-READ-SEC
                END-PERFORM
            END-IF
       *
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key25"             TO  MCP-PATHNAME
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            .

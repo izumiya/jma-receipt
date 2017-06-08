@@ -1613,3 +1613,20 @@ path	tmpupd2 	{
 		;
 	};
 };
+
+path	key69 	{
+	DBSELECT	{
+		DECLARE tbl_sryacct_main_key69_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryacct_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   HKNCOMBI    =   :HKNCOMBI
+			ORDER   BY      SRYYM,
+                                        SRYKBN,
+                                        ZAINUM
+		;
+	};
+};
+
