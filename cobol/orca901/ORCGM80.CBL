@@ -788,7 +788,13 @@
       *            LINK
                    MOVE    PLUGIN-DATA     TO  SPA-NAI-TLINK (IDY)
                    IF      SPA-NAI-TLINK(IDY)  =   "ERROR"
-                       MOVE    "NOT FOUND"     TO  SPA-GMN-TLINK(IDY)
+                       IF      SPA-MW          =   SPA-GINBEE
+                           MOVE    "-"             TO
+                                               SPA-GMN-TLINK(IDY)
+                       ELSE
+                           MOVE    "NOT FOUND"     TO
+                                               SPA-GMN-TLINK(IDY)
+                       END-IF
                    ELSE
                        IF      SPA-NAI-TLINK (IDY) =   "FALSE"
                            MOVE    "-"         TO  SPA-GMN-TLINK (IDY)
@@ -923,7 +929,13 @@
       *            LINK
                    MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK(1)
                    IF      WRK-NAI-TLINK(1)    =   "ERROR"
-                       MOVE    "NOT FOUND"     TO  WRK-GMN-TLINK(1)
+                       IF      SPA-MW          =   SPA-GINBEE
+                           MOVE    "-"             TO
+                                               WRK-GMN-TLINK(1)
+                       ELSE
+                           MOVE    "NOT FOUND"     TO
+                                               WRK-GMN-TLINK(1)
+                       END-IF
                    ELSE
                        IF      WRK-NAI-TLINK(1)    =   "FALSE"
                            MOVE    "-"             TO  WRK-GMN-TLINK(1)
@@ -1018,7 +1030,13 @@
       *            LINK
                    MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK(IDX)
                    IF      WRK-NAI-TLINK(IDX)  =   "ERROR"
-                       MOVE    "NOT FOUND"     TO  WRK-GMN-TLINK(IDX)
+                       IF      SPA-MW          =   SPA-GINBEE
+                           MOVE    "-"             TO
+                                               WRK-GMN-TLINK(IDX)
+                       ELSE
+                           MOVE    "NOT FOUND"     TO
+                                               WRK-GMN-TLINK(IDX)
+                       END-IF
                    ELSE
                        IF      WRK-NAI-TLINK(IDX)  =   "FALSE"
                            MOVE    "-"         TO  WRK-GMN-TLINK(IDX)

@@ -1102,7 +1102,8 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *****************************************************************
        221-DELKEY-SEC              SECTION.
       *
-           IF     (SPA-HOSPID(4:2) NOT =   "50")   AND
+           IF     (SPA-HOSPID(4:2) NOT =   "50")       AND
+                  (SPA-MW              =   SPA-PANDA)  AND
                   (M96-B05-LABEL       =   SPACE)
                MOVE    "0404"              TO  SPA-MMID1CD
                MOVE    1                   TO  SPA-M96-CUR
@@ -1515,7 +1516,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                M96-B12-VISIBLE
            END-IF
       *
-           IF      SPA-HOSPID(4:2)     =   "50"
+           IF    ( SPA-HOSPID(4:2)     =   "50" )  OR
+                 ( SPA-MW              =   SPA-GINBEE )
                MOVE    SPACE               TO  M96-B05-LABEL
            ELSE
                PERFORM 900-ACCESSKEY-READ-SEC
