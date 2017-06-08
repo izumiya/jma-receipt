@@ -196,6 +196,8 @@
       *  04.08.09    NACL-藤原    16/08/24  持参薬対応
       *  04.08.10    NACL-藤原    16/09/21  １５円以下薬剤のレセプト記載対応
       *  04.08.11    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
+      *  04.08.12    NACL-藤原    17/05/26  直接請求する保険者に地方職員
+      *                                     共済組合を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7329,8 +7331,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                PERFORM 900-HKNJAINF-READ-SEC
                IF      FLG-HKNJAINF        =   ZERO
                    MOVE    HKNJA-HKNJANAME     TO  SPA-GMN-HKNJANAME1
-      *            健康保険組合かチェック
-                   IF      HKNJA-HKNJANUM(1:2) =   "06"
+      *            健康保険組合か地方職員共済組合かチェック
+                   IF      HKNJA-HKNJANUM(1:2) =   "06"    OR  "32"
                        CONTINUE
                    ELSE
                        MOVE    69                  TO  SPA-GMN-CUR
@@ -7354,20 +7356,22 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                            END-IF
                        END-PERFORM
                    END-IF
-      *            特定健康保険組合の存在チェック
-                   IF      SPA-GMN-HKNJAnUM1-63    =   SPACE
+      *            特定健康保険組合の存在チェック（健康保険組合のみ）
+                   IF      SPA-GMN-HKNJANUM1-63    =   SPACE
                        MOVE    SPACE               TO  HKNJAINF-REC
                        INITIALIZE                      HKNJAINF-REC
                        MOVE    SPA-HOSPNUM         TO  HKNJA-HOSPNUM
                        MOVE    SPA-GMN-HKNJANUM1   TO  HKNJA-HKNJANUM
-                       MOVE    "63"                TO  HKNJA-HKNJANUM
-                                                                  (1:2)
-                       MOVE    HKNJAINF-REC        TO  MCPDATA-REC
-                       PERFORM 900-HKNJAINF-READ-SEC
-                       IF      FLG-HKNJAINF        =   ZERO
-                           MOVE    HKNJA-HKNJANUM      TO
+                       IF      HKNJA-HKNJANUM(1:2) =   "06"
+                           MOVE    "63"                TO
+                                                   HKNJA-HKNJANUM (1:2)
+                           MOVE    HKNJAINF-REC        TO  MCPDATA-REC
+                           PERFORM 900-HKNJAINF-READ-SEC
+                           IF      FLG-HKNJAINF        =   ZERO
+                               MOVE    HKNJA-HKNJANUM      TO
                                                    SPA-GMN-HKNJANUM1-63
-                       END-IF 
+                           END-IF 
+                       END-IF
                    END-IF
                END-IF
            END-IF
