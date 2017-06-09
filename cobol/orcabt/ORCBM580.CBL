@@ -47,6 +47,7 @@
       *                                     Æ±°Õ¤Ê¤·¤Ï½ÐÎÏ¤·¤Ê¤¤
       *  05.00.00    NACL-¿¹ÏÆ    17.02.09  ½ýÉÂÌ¾¾ÎÁ´µ­Ï¿
       *  04.08.08    NACL-Æ£¸¶    17/03/24  Æþ±¡¤Î¥Õ¥¡¥¤¥ëÌ¾½¤Àµ
+      *  05.00.01    NACL-¿¹ÏÆ    17/06/01  ¿ÇÎÅ¹Ô°Ù¡¢°åÌôÉÊ¥ì¥³¡¼¥ÉÌ¾¾ÎÅÐÏ¿
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -111,6 +112,9 @@
            03  FLG-SRYACT              PIC 9(01).
            03  FLG-PTCOM               PIC 9(01).
            03  FLG-SRYKBN              PIC 9(01).
+      *----(05.00.01)--ADD-START---
+           03  FLG-TENSU               PIC 9(01).
+      *----(05.00.01)--ADD-END-----
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -289,6 +293,10 @@
       *    ´µ¼Ô¥³¥á¥ó¥È
        01  PTCOM-REC.
            COPY    "CPPTCOM.INC".
+      *----(05.00.01)--ADD-START---
+      *    ÅÀ¿ô¥Þ¥¹¥¿
+           COPY    "CPTENSU.INC".
+      *----(05.00.01)--ADD-END-----
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -1485,6 +1493,54 @@
        2002-BYOMEI-HENSYU-EXT.
            EXIT.
       *----(05.00.00)--ADD-END-----
+      *----(05.00.01)--ADD-START---
+      *****************************************************************
+      *    Ì¾¾ÎÊÔ½¸½èÍý
+      *****************************************************************
+       2002-NAME-HENSYU-SEC      SECTION.
+      *
+           INITIALIZE                      ORCSDIVCSV-AREA
+           MOVE    RECEDEN-RECEDATA    TO  ORCSDIVCSV-REC
+           MOVE    4                   TO  ORCSDIVCSV-ELE-C
+           MOVE    ","                 TO  ORCSDIVCSV-DELI
+           MOVE    ZERO                TO  ORCSDIVCSV-DQ
+           CALL    "ORCSDIVCSV"            USING
+                                           ORCSDIVCSV-AREA
+           IF      ORCSDIVCSV-RC       NOT =   ZERO
+               GO  TO  2002-NAME-HENSYU-EXT
+           END-IF
+      *
+           INITIALIZE                      TNS-TENSU-REC
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    LNK-PRTKANRI-SRYYM  TO  TNS-YUKOSTYMD (1:6)
+           MOVE    "01"                TO  TNS-YUKOSTYMD (7:2)
+           MOVE    TNS-YUKOSTYMD       TO  TNS-YUKOEDYMD
+           MOVE    ORCSDIVCSV-D(4)     TO  TNS-SRYCD
+      *
+           PERFORM 900-TENSU-READ-SEC
+           IF      FLG-TENSU       =   ZERO
+               PERFORM VARYING WRK-REC-LENGTH  FROM    1  BY  1
+                       UNTIL ( WRK-REC-LENGTH  >   2500 )
+                       OR    ( RECEDEN-RECEDATA(WRK-REC-LENGTH:1)
+                                               =   WRK-KAIGYO )
+                   CONTINUE
+               END-PERFORM
+               COMPUTE WRK-REC-LENGTH  =   WRK-REC-LENGTH - 1
+               MOVE    SPACE           TO  WRK-REC
+               STRING  RECEDEN-RECEDATA(1:WRK-REC-LENGTH)
+                                       DELIMITED   BY  SIZE
+                       ","             DELIMITED   BY  SIZE
+                       TNS-NAME        DELIMITED   BY  SPACE
+                       WRK-KAIGYO      DELIMITED   BY  SIZE
+                                       INTO        WRK-REC
+               END-STRING
+               MOVE    WRK-REC         TO  RECEDEN-RECEDATA
+           END-IF
+      *
+           .
+       2002-NAME-HENSYU-EXT.
+           EXIT.
+      *----(05.00.01)--ADD-END-----
       *****************************************************************
       *    ½ªÎ»½èÍý
       *****************************************************************
@@ -1963,7 +2019,13 @@
                    MOVE    WRK-REC         TO  RECEDEN-RECEDATA
                    MOVE    ZERO            TO  FLG-SRYKBN
                END-IF
-      *
+      *----(05.00.01)--ADD-START---
+               IF    ( SYS-9101-NMREC      =   "T" )
+                   IF    ( RECEDEN-RECEDATA (1:2)  =   "SI"  OR  "IY" )
+                       PERFORM 2002-NAME-HENSYU-SEC
+                   END-IF
+               END-IF
+      *----(05.00.01)--ADD-END-----
                EVALUATE    RECEDEN-RECEDATA (1:2)
                    WHEN    "RE"
                    WHEN    "HO"
@@ -2249,7 +2311,40 @@
            .
        900-PTCOM-READ-EXT.
            EXIT.
+      *----(05.00.01)--ADD-START---
+      *****************************************************************
+      *    ÅÀ¿ô¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       900-TENSU-READ-SEC          SECTION.
       *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-TENSU
+                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+               ELSE
+                   INITIALIZE                      TNS-TENSU-REC
+                   MOVE    1                   TO  FLG-TENSU
+               END-IF
+           ELSE
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-TENSU-READ-EXT.
+           EXIT.
+      *----(05.00.01)--ADD-END-----
       *****************************************************************
       *    £Ä£Â£Ó£Å£Ì£Å£Ã£Ô½èÍý
       *****************************************************************
