@@ -49,8 +49,11 @@
                05  SYS-9101-PTNUM       PIC X(01).
       *½ýÉÂÌ¾Ì¾¾ÎÁ´µ­Ï¿
                05  SYS-9101-SYBYO       PIC X(01).
+      *¿ÇÎÅ¹Ô°Ù¡¢°åÌôÉÊ¥ì¥³¡¼¥É¤ËÌ¾¾Îµ­Ï¿
+               05  SYS-9101-NMREC       PIC X(01).
       *Í½È÷
-               05  SYS-9101-YOBI        PIC X(295).
+               05  SYS-9101-YOBI        PIC X(294).
+      *         05  SYS-9101-YOBI        PIC X(295).
       *         05  SYS-9101-YOBI        PIC X(296).
       *Ã¼Ëö£É£Ä
            03  SYS-9101-TERMID          PIC  X(16).

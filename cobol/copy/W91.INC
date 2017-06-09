@@ -29,3 +29,6 @@
               04  W91-CHKSYBYO.
                 06  W91-CHKSYBYO-VALUE   PIC X.
                 06  W91-CHKSYBYO-STATE   PIC S9(9)   BINARY.
+              04  W91-CHKNMREC.
+                06  W91-CHKNMREC-VALUE   PIC X.
+                06  W91-CHKNMREC-STATE   PIC S9(9)   BINARY.
