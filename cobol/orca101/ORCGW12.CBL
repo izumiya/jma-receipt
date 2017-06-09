@@ -7332,7 +7332,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                IF      FLG-HKNJAINF        =   ZERO
                    MOVE    HKNJA-HKNJANAME     TO  SPA-GMN-HKNJANAME1
       *            健康保険組合か地方職員共済組合かチェック
-                   IF      HKNJA-HKNJANUM(1:2) =   "06"    OR  "32"
+                   IF    ( HKNJA-HKNJANUM(1:2) =   "06"    OR  "32"  )
+                   AND   ( HKNJA-HKNNUM        =   "006"   OR  "032" )
                        CONTINUE
                    ELSE
                        MOVE    69                  TO  SPA-GMN-CUR
@@ -12377,7 +12378,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "これ以上保険者を追加できません"
                                                TO  SPA-ERRMSG
                WHEN    "0074"
-                   MOVE    "健康保険組合ではありません"
+                   MOVE    "健康保険組合、地方共済組合ではありません"
                                                TO  SPA-ERRMSG
                WHEN    "0075"
                    MOVE    "既に入力済の保険者番号です"

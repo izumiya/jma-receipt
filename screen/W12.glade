@@ -1855,8 +1855,8 @@
             <name>label730</name>
             <x>540</x>
             <y>460</y>
-            <width>160</width>
-            <height>19</height>
+            <width>150</width>
+            <height>57</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
@@ -1864,8 +1864,10 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>直接請求を行う健保組合</label>
-            <justify>GTK_JUSTIFY_CENTER</justify>
+            <label>直接請求を行う保険者
+　　　　・健保組合
+　　　　・地方共済組合</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
           <widget>
