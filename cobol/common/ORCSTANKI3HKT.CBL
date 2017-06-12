@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/04/XX  ¸¡ÂÎ¸¡ºº´ÉÍý²Ã»»Êñ³çÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/06/XX  À¸²½¡Ê£²¡ËÈ½ÃÇÎÁÊñ³çÂÐ±þ
       *****************************************************************
       *
       *
@@ -204,12 +205,14 @@
                WHEN    CONS-TANKI3HKT-SRYCD(1)
                WHEN    CONS-TANKI3HKT-SRYCD(2)
                WHEN    CONS-TANKI3HKT-SRYCD(3)
+      *H29.6   À¸²½¡Ê£²¡ËÊñ³çÂÐ¾Ý
+               WHEN    CONS-HKTNO2
                    MOVE    SPACE               TO  LNK-TANKI3HKT-KBN2
                    PERFORM 2001-MAIN-CHK-SEC
       *
       *        ¸¡ººÈ½ÃÇÎÁÊñ³çÂÐ¾Ý³°
                WHEN    CONS-HKTNO1
-               WHEN    CONS-HKTNO2
+      *****    WHEN    CONS-HKTNO2
                WHEN    CONS-HKTNO3
                    MOVE    SPACE               TO  LNK-TANKI3HKT-KBN
                    MOVE    "1"                 TO  LNK-TANKI3HKT-KBN2
