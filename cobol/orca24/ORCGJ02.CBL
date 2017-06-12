@@ -12279,7 +12279,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SYU-SKYMONEY        =   ZERO
                MOVE    SPACE               TO  SYU-DENPJTIKBN
            ELSE
-               MOVE    "1"                 TO  SYU-DENPJTIKBN
+      ******   MOVE    "1"                 TO  SYU-DENPJTIKBN
+      *H29.6   Ì¤¼ýÈ½Äê
+               IF      SYU-SKYMONEY        <=  SYU-NYUKIN-TOTAL
+                   MOVE    "1"                 TO  SYU-DENPJTIKBN
+               ELSE
+                   MOVE    "2"                 TO  SYU-DENPJTIKBN
+               END-IF
            END-IF
            IF      FLG-ERR             =   ZERO
       *        ²ñ·×ÊÑ¹¹¶èÊ¬
