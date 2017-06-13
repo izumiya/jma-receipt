@@ -114,6 +114,7 @@
       *
            03  WRK-API-HOSPNAME        PIC X(120)  OCCURS 3.
            03  WRK-API-HOSPADRS        PIC X(200)  OCCURS 3.
+           03  WRK-API-POST            PIC X(07).
       *
            03  WRK-YYKYMD              PIC X(08).
            03  WRK-SYSYMD              PIC X(08).
@@ -445,6 +446,7 @@
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
                                            WRK-API-HOSPADRS (1)
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
+           MOVE    SYS-1002-POST       TO  WRK-API-POST
       *    医療機関編集
            PERFORM 1010-HOSPHENSYU-SEC
       *
@@ -878,7 +880,7 @@
            MOVE    WRK-API-HOSPADRS(2) TO  FMYH-HOSP-ADRS (2)
            MOVE    WRK-API-HOSPADRS(3) TO  FMYH-HOSP-ADRS (3)
       *
-           MOVE    SYS-1002-POST       TO  FMYH-HOSP-POST
+           MOVE    WRK-API-POST        TO  FMYH-HOSP-POST
            MOVE    WRK-HOSPTEL         TO  FMYH-HOSP-TEL
       *    プログラムオプション編集
            IF     (PARA-YUKOSTYMD      <=  SPA-SYSYMD )
@@ -1073,6 +1075,7 @@
                MOVE    SYS-1902-ADRS1      TO  WRK-API-HOSPADRS(1)
                MOVE    SYS-1902-ADRS2      TO  WRK-API-HOSPADRS(2)
                MOVE    SYS-1902-ADRS3      TO  WRK-API-HOSPADRS(3)
+               MOVE    SYS-1902-POST       TO  WRK-API-POST
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF
