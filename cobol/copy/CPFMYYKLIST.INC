@@ -25,8 +25,8 @@
               05  FMYL-FORM-ID               PIC X(30).
               05  FMYL-CUSTOM-ID               PIC X(30).
               05  FMYL-PRINTER                 PIC X(20).
-              05  FMYL-PRTYMD                  PIC X(10).
               05  FMYL-SRYYMD                  PIC X(10).
+              05  FMYL-PRTYMD                  PIC X(10).
       *       ½èÍý¶èÊ¬¡Ê£±¡§Í½Ìó°ìÍ÷¡¢£²¡§Ì¤±¡°ìÍ÷¡Ë
               05  FMYL-HAKKOKBN                PIC X(01).
               05  FMYL-SRYNAIYO-AREA.
