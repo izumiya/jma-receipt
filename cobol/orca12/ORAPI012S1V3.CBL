@@ -1121,6 +1121,8 @@
                    MOVE    SPA-PTNUM           TO  WRK-PTNUM
                ELSE
                    MOVE    "P1"                TO  WRK-ERRCD
+                   PERFORM 290-ERROR-HEN-SEC
+                   MOVE    "18"                TO  WRK-ERRCD
                END-IF
            END-IF
            .
@@ -1230,6 +1232,8 @@
                    MOVE    SPA-PTNUM           TO  WRK-PTNUM
                ELSE
                    MOVE    "P1"                TO  WRK-ERRCD
+                   PERFORM 290-ERROR-HEN-SEC
+                   MOVE    "18"                TO  WRK-ERRCD
                END-IF
            END-IF
            .
@@ -1338,14 +1342,15 @@
                    END-EVALUATE
                END-IF
            END-IF
-           IF     (PTMODREQ-REQUEST-NUMBER =   "01" )
-              OR  (FLG-PTINF-JFK           =   ZERO )
+           IF    ((PTMODREQ-REQUEST-NUMBER =   "01" )
+              OR  (FLG-PTINF-JFK           =   ZERO ))
+             AND  (WRK-ERRCD               =   SPACE )
                MOVE    2                   TO  FLG-PTINF-JFK
                PERFORM 20022-JUFUKU-HEN-SEC
                IF      IDX-JF          >   ZERO
       *            二重登録疑いあり
-                   MOVE    "S"             TO  WRK-ERRKBN
                    IF      WRK-ERRCD       =   SPACE
+                       MOVE    "S"             TO  WRK-ERRKBN
                        MOVE    "20"            TO  WRK-ERRCD
                    END-IF
       *            確認メッセージ
@@ -4279,7 +4284,8 @@
                MOVE    "生年月日暦日エラー"
                                                TO  WRK-ERRMSG
            WHEN    "18"
-               MOVE    "患者番号採番エラー"
+      ****     MOVE    "患者番号採番エラー"
+               MOVE    "患者番号にエラーがあります"
                                                TO  WRK-ERRMSG
            WHEN    "19"
                STRING  "前回と処理区分が違います。"
@@ -4302,7 +4308,6 @@
                                                TO  WRK-ERRMSG
       *エラー
            WHEN    "P1"
-           WHEN    "H1"
            WHEN    "K2"
                PERFORM 8901-PTERRCD-SET-SEC
       *新規

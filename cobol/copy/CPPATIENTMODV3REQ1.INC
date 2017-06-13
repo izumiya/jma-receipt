@@ -148,7 +148,8 @@
                     07  PTMODREQ-CONDITION-KBN    PIC  X(02)
                                                   OCCURS   3.
       *
-      *         µìÀ«ÍúÎòÅÐÏ¿¶èÊ¬
-                05  PTMODREQ-KYUSEI-MODE          PIC  X(05).
+             03  PTMODREQ-MODE-AREA.
+      *          µìÀ«ÍúÎòÅÐÏ¿¶èÊ¬
+                 05  PTMODREQ-KYUSEI-MODE          PIC  X(05).
       *
       *

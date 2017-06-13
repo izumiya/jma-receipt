@@ -1338,8 +1338,8 @@
                PERFORM 20021-PTMODRES-HEN-SEC
            END-IF
       *
-           IF     (FLG-SYORI       NOT =   1    )
-             AND  (WRK-ERRCD           =   SPACE)
+      *****IF     (FLG-SYORI       NOT =   1    )
+           IF     (WRK-ERRCD           =   SPACE)
       *        氏名・性別・生年月日の一致
                IF     ((PTMODREQ-NAME  NOT =    SPACE        )  AND
                        (PTMODREQ-NAME  NOT =    PTMODRES-NAME))
@@ -3687,7 +3687,6 @@
       *エラー
            WHEN    "P1"
            WHEN    "H1"
-           WHEN    "K2"
                PERFORM 8901-PTERRCD-SET-SEC
            WHEN    "P2"
                PERFORM 8902-PTPIDCD-SET-SEC
