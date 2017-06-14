@@ -2743,6 +2743,17 @@
                    END-IF
       *
                END-IF
+      *H29.6
+      *        ¿ÇÎÅ¼ïÊÌÆþÎÏ¤Ç½ªÎ»
+               IF     (SPA-GMN-INPUTCD (IDX-KEN)(1:1)  =   "."
+                                                       OR  "*" )
+                    IF      IDX             >   IDX-KEN
+                        MOVE    ZERO        TO  WRK-KENSA-CNT
+                    ELSE
+                        MOVE    SPA-MAX-LINE    TO  IDX-KEN
+                    END-IF
+               END-IF
+      *
            END-PERFORM
            IF      WRK-KENSA-MAX       =   ZERO
                CONTINUE
@@ -2759,6 +2770,7 @@
       ******** IF     (SPA-NYUGAIKBN       =   "1" )  AND
                IF     (IDX                 <   SPA-MAX-LINE )  AND
                       (SPA-GMN-INPUTCD (IDX + 1)(1:1) =   "*" )
+                 AND  (ID2                 >   ZERO  )
                    MOVE    9               TO  TBL-HOUKNARI (ID2)
       *            ·Ù¹ð
                    MOVE    1               TO  LNK-SC93-ERRCD
