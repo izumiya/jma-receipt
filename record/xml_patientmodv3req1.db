@@ -76,6 +76,8 @@ xml_patientmodv3req1 {
 		Condition3		varchar(02);
         };
 #--- µìÀ«ÍúÎòÅĞÏ¿
-	Former_Name_Mode		varchar(5);
+	Modify_Option	{
+		Former_Name_Mode	varchar(5);
+    		};
     	};
 };

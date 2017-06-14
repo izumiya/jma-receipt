@@ -329,7 +329,7 @@
                ELSE
       *            ÂÐ¾Ý
                    ADD     1               TO  IDY
-                   IF      IDY             >   100
+                   IF      IDY             >   200
                        MOVE    1               TO  FLG-PARA
                    ELSE
                        MOVE    HKNCOMBI-REC    TO  TBL-HKNCOMBI-REC
