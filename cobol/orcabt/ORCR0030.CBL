@@ -770,6 +770,7 @@
       *  04.08.43    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
       *                                     （レセプト分割に関わる修正）
       *  04.08.44    NACL-門脇    17/06/01  湿布薬用法レセプト記載修正
+      *  04.08.45    NACL-門脇    17/06/02  点数欄の第四公費の集計
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6487,11 +6488,11 @@ grpsys          MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
                                              TO  PTKOH-KOHNUM
                 MOVE    PTKOHINF-REC         TO  MCPDATA-REC
                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                MOVE    "key4"               TO  MCP-PATHNAME
+                MOVE    "key14"              TO  MCP-PATHNAME
 grpsys          PERFORM 900-DBSELECT-SEC
                 IF      MCP-RC               =       ZERO
                   MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                  MOVE    "key4"               TO  MCP-PATHNAME
+                  MOVE    "key14"              TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
                      IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -6530,13 +6531,13 @@ grpsys          PERFORM 900-DBSELECT-SEC
                          MOVE     1      TO  FLG-PTKOHINF
                      ELSE
                          MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                         MOVE    "key4"               TO  MCP-PATHNAME
+                         MOVE    "key14"              TO  MCP-PATHNAME
                          PERFORM  900-PTKOHINF-READ-SEC
                      END-IF
                   END-PERFORM
                 END-IF
                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                MOVE    "key4"               TO  MCP-PATHNAME
+                MOVE    "key14"              TO  MCP-PATHNAME
                 PERFORM 900-CLOSE-SEC
            END-PERFORM
       *
@@ -8471,11 +8472,11 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
            MOVE  "966"                 TO  PTKOH-KOHNUM
            MOVE  PTKOHINF-REC          TO  MCPDATA-REC
            MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-           MOVE  "key4"                TO  MCP-PATHNAME
+           MOVE  "key14"               TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =       ZERO
              MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-             MOVE    "key4"            TO  MCP-PATHNAME
+             MOVE    "key14"           TO  MCP-PATHNAME
              PERFORM  900-PTKOHINF-READ-SEC
              PERFORM  UNTIL   FLG-PTKOHINF    =   1
                 IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -8495,13 +8496,13 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                   MOVE     1      TO  FLG-PTKOHINF
                 ELSE
                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                  MOVE    "key4"           TO  MCP-PATHNAME
+                  MOVE    "key14"          TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                 END-IF
              END-PERFORM
            END-IF
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-           MOVE    "key4"               TO  MCP-PATHNAME
+           MOVE    "key14"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            IF    FLG-TOKUSITU  =  ZERO
@@ -8511,16 +8512,19 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              MOVE  "967"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
                     IF  RECE02-TEISYOTOKU  =  SPACE
                         MOVE    2    TO   FLG-TOKUSITU
                         IF  RECE02-SRYYM  >= "201501"
@@ -8539,13 +8543,13 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                     MOVE        1    TO   FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -8558,11 +8562,11 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              MOVE  "956"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
                   IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -8582,13 +8586,13 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                     MOVE     1      TO  FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -8599,16 +8603,19 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
              MOVE  "957"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
                     IF  RECE02-TEISYOTOKU  =  SPACE
                         MOVE    2    TO   FLG-TOKUSITU
                         IF  RECE02-SRYYM  >= "201501"
@@ -8627,13 +8634,13 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                     MOVE        1    TO   FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -8652,27 +8659,30 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
            MOVE  "957"                 TO  PTKOH-KOHNUM
            MOVE  PTKOHINF-REC          TO  MCPDATA-REC
            MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-           MOVE  "key4"                TO  MCP-PATHNAME
+           MOVE  "key14"               TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =       ZERO
              MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-             MOVE    "key4"            TO  MCP-PATHNAME
+             MOVE    "key14"           TO  MCP-PATHNAME
              PERFORM  900-PTKOHINF-READ-SEC
              PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                    (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                    (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
                   MOVE    1    TO   FLG-KISAIOK
                   MOVE    1    TO   FLG-PTKOHINF
                 ELSE
                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                  MOVE    "key4"           TO  MCP-PATHNAME
+                  MOVE    "key14"          TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                 END-IF
              END-PERFORM
            END-IF
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-           MOVE    "key4"               TO  MCP-PATHNAME
+           MOVE    "key14"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            .
@@ -14989,6 +14999,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                   RECE02-TENSU(1 BUN-IDX4)  +
                        (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE02-TENSU(1 BUN-IDX5)  =
+                                  RECE02-TENSU(1 BUN-IDX5)  +
+                       (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE    RECE02-SYUTANTEN(1)  =
                                   RECE02-SYUTANTEN(1)  +
@@ -15034,6 +15049,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                             COMPUTE    RECE02-TENSU(2 BUN-IDX4)  =
                                        RECE02-TENSU(2 BUN-IDX4)  +
+                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                            COMPUTE    RECE02-TENSU(2 BUN-IDX5)  =
+                                       RECE02-TENSU(2 BUN-IDX5)  +
                             (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15275,6 +15295,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                        RECE02-TENSU(2 BUN-IDX4)  +
                             (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                            COMPUTE    RECE02-TENSU(2 BUN-IDX5)  =
+                                       RECE02-TENSU(2 BUN-IDX5)  +
+                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                             COMPUTE    RECE02-SYUTANTEN(2)  =
                                        RECE02-SYUTANTEN(2)  +
@@ -15310,6 +15335,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         IF    BUN-IDX4       =   4
                             COMPUTE    RECE02-TENSU(3 BUN-IDX4)  =
                                        RECE02-TENSU(3 BUN-IDX4)  +
+                            (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                        END-IF
+                        IF    BUN-IDX5       =   5
+                            COMPUTE    RECE02-TENSU(3 BUN-IDX5)  =
+                                       RECE02-TENSU(3 BUN-IDX5)  +
                             (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                         END-IF
                         IF    BUN-IDX6       =   6
@@ -15373,6 +15403,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                   IF    BUN-IDX4       =   4
                                      COMPUTE RECE02-TENSU(4 BUN-IDX4) =
                                              RECE02-TENSU(4 BUN-IDX4) +
+                                     (WRK-TNS-TEN(IDX3)   
+                                                     *   ACCT-ZAIKAISU)
+                                  END-IF
+                                  IF    BUN-IDX5       =   5
+                                     COMPUTE RECE02-TENSU(4 BUN-IDX5) =
+                                             RECE02-TENSU(4 BUN-IDX5) +
                                      (WRK-TNS-TEN(IDX3)   
                                                      *   ACCT-ZAIKAISU)
                                   END-IF
@@ -15441,6 +15477,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     (WRK-TNS-TEN(IDX3)   
                                                      *   ACCT-ZAIKAISU)
                                   END-IF
+                                  IF    BUN-IDX5       =   5
+                                    COMPUTE  RECE02-TENSU(5 BUN-IDX5) =
+                                             RECE02-TENSU(5 BUN-IDX5) +
+                                    (WRK-TNS-TEN(IDX3)   
+                                                     *   ACCT-ZAIKAISU)
+                                  END-IF
                                   IF    BUN-IDX6       =   6
                                     COMPUTE  RECE02-SYUTANTEN(5)  =
                                              RECE02-SYUTANTEN(5)  +
@@ -15506,6 +15548,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                     (WRK-TNS-TEN(IDX3)   
                                                     *   ACCT-ZAIKAISU)
                                   END-IF
+                                  IF    BUN-IDX5       =   5
+                                    COMPUTE  RECE02-TENSU(6 BUN-IDX5) =
+                                             RECE02-TENSU(6 BUN-IDX5) +
+                                    (WRK-TNS-TEN(IDX3)   
+                                                    *   ACCT-ZAIKAISU)
+                                  END-IF
                                   IF    BUN-IDX6       =   6
                                     COMPUTE  RECE02-SYUTANTEN(6)  =
                                              RECE02-SYUTANTEN(6)  +
@@ -15535,6 +15583,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                             COMPUTE    RECE2G-TENSU(2 BUN-IDX4)  =
                                        RECE2G-TENSU(2 BUN-IDX4)  +
+                                      (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                            COMPUTE    RECE2G-TENSU(2 BUN-IDX5)  =
+                                       RECE2G-TENSU(2 BUN-IDX5)  +
                                       (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15567,6 +15620,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                   RECE2G-TENSU(7 BUN-IDX4)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE2G-TENSU(7 BUN-IDX5)  =
+                                  RECE2G-TENSU(7 BUN-IDX5)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE    RECE2G-SYUTANTEN(7)  =
                                   RECE2G-SYUTANTEN(7)  +
@@ -15591,6 +15649,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE02-TENSU(7 BUN-IDX4)  =
                                   RECE02-TENSU(7 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE02-TENSU(7 BUN-IDX5)  =
+                                  RECE02-TENSU(7 BUN-IDX5)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -15620,6 +15683,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE2G-TENSU(12 BUN-IDX4)  =
                                   RECE2G-TENSU(12 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE2G-TENSU(12 BUN-IDX5)  =
+                                  RECE2G-TENSU(12 BUN-IDX5)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -15653,6 +15721,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(8 BUN-IDX4)  +
                                     (WK-SYUTEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(8 BUN-IDX5)  =
+                                     RECE02-TENSU(8 BUN-IDX5)  +
+                                    (WK-SYUTEN   *   WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(8)  =
                                      RECE02-SYUTANTEN(8)  +
@@ -15683,6 +15756,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(9 BUN-IDX4)  +
                                     (WK-SYUTEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(9 BUN-IDX5)  =
+                                     RECE02-TENSU(9 BUN-IDX5)  +
+                                    (WK-SYUTEN   *   WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(9)  =
                                      RECE02-SYUTANTEN(9)  +
@@ -15711,6 +15789,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(10 BUN-IDX4)  =
                                      RECE02-TENSU(10 BUN-IDX4)  +
+                                    (WK-SYUTEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(10 BUN-IDX5)  =
+                                     RECE02-TENSU(10 BUN-IDX5)  +
                                     (WK-SYUTEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15775,6 +15858,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(11 BUN-IDX4)  +
                            (WK-SYUTEN            *  WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(11 BUN-IDX5)  =
+                                     RECE02-TENSU(11 BUN-IDX5)  +
+                           (WK-SYUTEN            *  WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(11)  =
                                      RECE02-SYUTANTEN(11)  +
@@ -15801,6 +15889,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(12 BUN-IDX4)  =
                                      RECE02-TENSU(12 BUN-IDX4)  +
+                                    (WK-SYUTEN     *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(12 BUN-IDX5)  =
+                                     RECE02-TENSU(12 BUN-IDX5)  +
                                     (WK-SYUTEN     *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15831,6 +15924,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(13 BUN-IDX4)  =
                                  RECE02-TENSU(13 BUN-IDX4)  +
+                                (WK-KIZAITEN *   WK-ZAIKAISU)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(13 BUN-IDX5)  =
+                                 RECE02-TENSU(13 BUN-IDX5)  +
                                 (WK-KIZAITEN *   WK-ZAIKAISU)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
@@ -15873,6 +15972,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(14 BUN-IDX4)  -
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(14 BUN-IDX5)  =
+                                     RECE02-TENSU(14 BUN-IDX5)  -
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(14)  =
                                      RECE02-SYUTANTEN(14)  +
@@ -15898,6 +16002,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(14 BUN-IDX4)  =
                                      RECE02-TENSU(14 BUN-IDX4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(14 BUN-IDX5)  =
+                                     RECE02-TENSU(14 BUN-IDX5)  +
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15927,6 +16036,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(14 BUN-IDX4)  =
                                      RECE02-TENSU(14 BUN-IDX4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(14 BUN-IDX5)  =
+                                     RECE02-TENSU(14 BUN-IDX5)  +
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -15964,6 +16078,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(15 BUN-IDX4)  +
                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(15 BUN-IDX5)  =
+                                     RECE02-TENSU(15 BUN-IDX5)  +
+                          (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(15)  =
                                      RECE02-SYUTANTEN(15)  +
@@ -15995,6 +16114,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(16 BUN-IDX4)  -
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(16 BUN-IDX5)  =
+                                 RECE02-TENSU(16 BUN-IDX5)  -
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(16)  =
                                  RECE02-SYUTANTEN(16)  +
@@ -16020,6 +16144,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(16 BUN-IDX4)  =
                                  RECE02-TENSU(16 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(16 BUN-IDX5)  =
+                                 RECE02-TENSU(16 BUN-IDX5)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16058,6 +16187,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      RECE02-TENSU(17 BUN-IDX4)  -
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(17 BUN-IDX5)  =
+                                     RECE02-TENSU(17 BUN-IDX5)  -
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE02-SYUTANTEN(17)  =
                                      RECE02-SYUTANTEN(17)  +
@@ -16083,6 +16217,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(17 BUN-IDX4)  =
                                      RECE02-TENSU(17 BUN-IDX4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(17 BUN-IDX5)  =
+                                     RECE02-TENSU(17 BUN-IDX5)  +
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -16119,6 +16258,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE02-TENSU(18 BUN-IDX4)  =
                                      RECE02-TENSU(18 BUN-IDX4)  +
+                          (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE02-TENSU(18 BUN-IDX5)  =
+                                     RECE02-TENSU(18 BUN-IDX5)  +
                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -16173,6 +16317,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(19 BUN-IDX4)  +
                                 (WK-ZAITEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(19 BUN-IDX5)  =
+                                 RECE02-TENSU(19 BUN-IDX5)  +
+                                (WK-ZAITEN   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(19)  =
                                  RECE02-SYUTANTEN(19)  +
@@ -16211,6 +16360,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(20 BUN-IDX4)  +
                       (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(20 BUN-IDX5)  =
+                                 RECE02-TENSU(20 BUN-IDX5)  +
+                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(20)  =
                                  RECE02-SYUTANTEN(20)  +
@@ -16236,6 +16390,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(21 BUN-IDX4)  =
                                  RECE02-TENSU(21 BUN-IDX4)  +
+                      (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(21 BUN-IDX5)  =
+                                 RECE02-TENSU(21 BUN-IDX5)  +
                       (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16266,6 +16425,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(22 BUN-IDX4)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(22 BUN-IDX5)  =
+                                 RECE02-TENSU(22 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(22)  =
                                  RECE02-SYUTANTEN(22)  +
@@ -16294,6 +16458,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(23 BUN-IDX4)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(23 BUN-IDX5)  =
+                                 RECE02-TENSU(23 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(23)  =
                                  RECE02-SYUTANTEN(23)  +
@@ -16320,6 +16489,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(24 BUN-IDX4)  =
                                  RECE02-TENSU(24 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(24 BUN-IDX5)  =
+                                 RECE02-TENSU(24 BUN-IDX5)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16352,6 +16526,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(25 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(25 BUN-IDX5)  =
+                                 RECE02-TENSU(25 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(25)  =
                                  RECE02-SYUTANTEN(25)  +
@@ -16375,6 +16554,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(26 BUN-IDX4)  =
                                  RECE02-TENSU(26 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(26 BUN-IDX5)  =
+                                 RECE02-TENSU(26 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16408,6 +16592,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(27 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(27 BUN-IDX5)  =
+                                 RECE02-TENSU(27 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(27)  =
                                  RECE02-SYUTANTEN(27)  +
@@ -16431,6 +16620,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(28 BUN-IDX4)  =
                                  RECE02-TENSU(28 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(28 BUN-IDX5)  =
+                                 RECE02-TENSU(28 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16462,6 +16656,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(29 BUN-IDX4)  =
                                  RECE02-TENSU(29 BUN-IDX4)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(29 BUN-IDX5)  =
+                                 RECE02-TENSU(29 BUN-IDX5)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16503,6 +16702,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(30 BUN-IDX4)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(30 BUN-IDX5)  =
+                                 RECE02-TENSU(30 BUN-IDX5)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(30)  =
                                  RECE02-SYUTANTEN(30)  +
@@ -16533,6 +16737,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                  RECE02-TENSU(31 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(31 BUN-IDX5)  =
+                                 RECE02-TENSU(31 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE02-SYUTANTEN(31)  =
                                  RECE02-SYUTANTEN(31)  +
@@ -16556,6 +16765,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(32 BUN-IDX4)  =
                                  RECE02-TENSU(32 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(32 BUN-IDX5)  =
+                                 RECE02-TENSU(32 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -16709,6 +16923,36 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                          END-IF
                        END-IF
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
+                                                 CONS-SHOHOSEN2 OR
+                                                 CONS-SHOHOSEN3 OR
+                                                 CONS-SHOHOSEN4 OR
+                                                 CONS-SHOHOSEN5 OR
+                                                 CONS-SHOHOKSN1 OR
+                                                 CONS-SHOHOKSN2 OR
+                                                 CONS-SHOHOKSN3 OR
+                                                 CONS-SHOHOKSN4 OR
+                                                 CONS-SHOHOKSN5 OR
+                                                 CONS-SHOHOKSN6 OR
+                                                 CONS-SHOHOKSN7
+                           COMPUTE   RECE02-TENSU(33 BUN-IDX5)  =
+                                     RECE02-TENSU(33 BUN-IDX5)  +
+                                    (WK-ZAITEN  *   ACCT-ZAIKAISU)
+                       ELSE
+                         COMPUTE     RECE02-TENSU(34 BUN-IDX5)  =
+                                     RECE02-TENSU(34 BUN-IDX5)  +
+                                    (WK-SYUTEN  *   ACCT-ZAIKAISU)
+                         IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
+                           COMPUTE   RECE02-TENSU(7 BUN-IDX5)  =
+                                     RECE02-TENSU(7 BUN-IDX5)  +
+                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE02-TENSU(34 BUN-IDX5) =
+                                     RECE02-TENSU(34 BUN-IDX5) -
+                           (WRK-TNS-TEN(IDX3)   *   ACCT-ZAIKAISU)
+                         END-IF
+                       END-IF
+                   END-IF
                    IF    BUN-IDX6       =   6
                        IF   SRY-SRYCD(IDX3)   =  CONS-SHOHOSEN1 OR
                                                  CONS-SHOHOSEN2 OR
@@ -16756,6 +17000,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE02-TENSU(35 BUN-IDX4)  =
                                  RECE02-TENSU(35 BUN-IDX4)  +
+                                (WK-YKZTEN   *   ACCT-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE02-TENSU(35 BUN-IDX5)  =
+                                 RECE02-TENSU(35 BUN-IDX5)  +
                                 (WK-YKZTEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -22472,6 +22721,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE   ZERO   TO   RECE02-TENSU(HKN-IDX 4)
                END-PERFORM
            END-IF
+      *    インデックス５
+           IF (RECE02-HENTOTALTEN(5)   NOT =  ZERO)           AND
+              (RECE02-HENTOTALTEN(1)   NOT =  RECE02-HENTOTALTEN(5))
+               CONTINUE
+           ELSE
+               PERFORM    VARYING    HKN-IDX    FROM   1   BY   1
+                          UNTIL      HKN-IDX    >      50
+                       MOVE   ZERO   TO   RECE02-TENSU(HKN-IDX 5)
+               END-PERFORM
+           END-IF
       *
            .
        2108-BUNTENSU-CLEAR-EXT.
@@ -27258,6 +27517,12 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            ELSE
              MOVE     ZERO    TO   RECE02-TENSU(2 4)
            END-IF
+           IF   RECE02-TENSU(2 5)  >=  RECE2G-TENSU(2 5)
+             COMPUTE  RECE02-TENSU(2 5)  =
+                      RECE02-TENSU(2 5)  -  RECE2G-TENSU(2 5)
+           ELSE
+             MOVE     ZERO    TO   RECE02-TENSU(2 5)
+           END-IF
            IF   RECE02-SYUTANTEN(2)  >=  RECE2G-SYUTANTEN(2)
              COMPUTE  RECE02-SYUTANTEN(2)  =
                       RECE02-SYUTANTEN(2)  -  RECE2G-SYUTANTEN(2)
@@ -27290,6 +27555,12 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            ELSE
              MOVE     ZERO    TO   RECE02-TENSU(7 4)
            END-IF
+           IF   RECE02-TENSU(7 5)  >=  RECE2G-TENSU(7 5)
+             COMPUTE  RECE02-TENSU(7 5)  =
+                      RECE02-TENSU(7 5)  -  RECE2G-TENSU(7 5)
+           ELSE
+             MOVE     ZERO    TO   RECE02-TENSU(7 5)
+           END-IF
            IF   RECE02-SYUTANTEN(7)  >=  RECE2G-SYUTANTEN(7)
              COMPUTE  RECE02-SYUTANTEN(7)  =
                       RECE02-SYUTANTEN(7)  -  RECE2G-SYUTANTEN(7)
@@ -27321,6 +27592,12 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                       RECE02-TENSU(12 4)  -  RECE2G-TENSU(12 4)
            ELSE
              MOVE     ZERO    TO   RECE02-TENSU(12 4)
+           END-IF
+           IF   RECE02-TENSU(12 5)  >=  RECE2G-TENSU(12 5)
+             COMPUTE  RECE02-TENSU(12 5)  =
+                      RECE02-TENSU(12 5)  -  RECE2G-TENSU(12 5)
+           ELSE
+             MOVE     ZERO    TO   RECE02-TENSU(12 5)
            END-IF
            IF   RECE02-SYUTANTEN(12)  >=  RECE2G-SYUTANTEN(12)
              COMPUTE  RECE02-SYUTANTEN(12)  =
@@ -27386,8 +27663,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
            END-IF
       *
            PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
-      ***              UNTIL    KOHFTN-IDX     >    5
-                       UNTIL    KOHFTN-IDX     >    4
+                       UNTIL    KOHFTN-IDX     >    5
       *
              IF   RECE02-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
                 IF   (RECE02-KOHNUM(1)   = "972" OR "974")
