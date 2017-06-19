@@ -738,6 +738,7 @@
       *  04.08.33    NACL-ÌçÏÆ    17/03/27  ÀÁµá¶â³Û£°±ß¥ì¥»¥×¥ÈºîÀ®ÂÐ±þ
       *  04.08.34    NACL-ÌçÏÆ    17/03/28  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *                                     ¡Ê¥ì¥»¥×¥ÈÊ¬³ä¤Ë´Ø¤ï¤ë½¤Àµ¡Ë
+      *  04.08.35    NACL-ÌçÏÆ    17/06/02  ÅÀ¿ôÍó¤ÎÂè»Í¸øÈñ¤Î½¸·×
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10342,6 +10343,11 @@
                                   RECE62-TENSU(1 BUN-IDX4)  +
                                  (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE62-TENSU(1 BUN-IDX5)  =
+                                  RECE62-TENSU(1 BUN-IDX5)  +
+                                 (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE    RECE62-SYUTANTEN(1)  =
                                   RECE62-SYUTANTEN(1)  +
@@ -10409,6 +10415,33 @@
                                    (WK-ZAITEN   *   WK-ZAIKAISU)
                      END-EVALUATE
                    END-IF
+                   IF    BUN-IDX5       =   5
+                     COMPUTE        RECE62-NYUSAI-TENSU(BUN-IDX5) =
+                                    RECE62-NYUSAI-TENSU(BUN-IDX5) +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-NYUKHNKEI2(BUN-IDX5)   =
+                                    RECE62-NYUKHNKEI2(BUN-IDX5)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-NYUTOKKEI2(BUN-IDX5)   =
+                                    RECE62-NYUTOKKEI2(BUN-IDX5)   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
+                   END-IF
+                   IF    BUN-IDX6       =   6
+                     EVALUATE  WRK-NYUSAI-SRYKBN
+                       WHEN      "90"
+                         COMPUTE    RECE62-SYUTANTEN-NYUKHN2   =
+                                    RECE62-SYUTANTEN-NYUKHN2   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       WHEN      "92"
+                         COMPUTE    RECE62-SYUTANTEN-NYUTOK2   =
+                                    RECE62-SYUTANTEN-NYUTOK2   +
+                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     END-EVALUATE
+                   END-IF
       *    »ØÆ³¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "13"
                  IF  ACCT-ZAIKBN   =    2
@@ -10430,6 +10463,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE6G-TENSU(2 BUN-IDX4)  =
                                   RECE6G-TENSU(2 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE6G-TENSU(2 BUN-IDX5)  =
+                                  RECE6G-TENSU(2 BUN-IDX5)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10456,6 +10494,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE62-TENSU(2 BUN-IDX4)  =
                                   RECE62-TENSU(2 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE62-TENSU(2 BUN-IDX5)  =
+                                  RECE62-TENSU(2 BUN-IDX5)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10487,6 +10530,11 @@
                                   RECE6G-TENSU(3 BUN-IDX4)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE6G-TENSU(3 BUN-IDX5)  =
+                                  RECE6G-TENSU(3 BUN-IDX5)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE    RECE6G-SYUTANTEN(3)  =
                                   RECE6G-SYUTANTEN(3)  +
@@ -10511,6 +10559,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE    RECE62-TENSU(3 BUN-IDX4)  =
                                   RECE62-TENSU(3 BUN-IDX4)  +
+                                 (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE    RECE62-TENSU(3 BUN-IDX5)  =
+                                  RECE62-TENSU(3 BUN-IDX5)  +
                                  (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10548,6 +10601,11 @@
                                      RECE62-TENSU(4 BUN-IDX4)  -
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE62-TENSU(4 BUN-IDX5)  =
+                                     RECE62-TENSU(4 BUN-IDX5)  -
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
                        IF    BUN-IDX6       =   6
                            COMPUTE   RECE62-SYUTANTEN(4)  =
                                      RECE62-SYUTANTEN(4)  +
@@ -10573,6 +10631,11 @@
                        IF    BUN-IDX4       =   4
                            COMPUTE   RECE62-TENSU(4 BUN-IDX4)  =
                                      RECE62-TENSU(4 BUN-IDX4)  +
+                                    (WK-ZAITEN   *   WK-ZAIKAISU)
+                       END-IF
+                       IF    BUN-IDX5       =   5
+                           COMPUTE   RECE62-TENSU(4 BUN-IDX5)  =
+                                     RECE62-TENSU(4 BUN-IDX5)  +
                                     (WK-ZAITEN   *   WK-ZAIKAISU)
                        END-IF
                        IF    BUN-IDX6       =   6
@@ -10604,6 +10667,11 @@
                                       RECE62-TENSU(4 BUN-IDX4)  +
                                      (WK-ZAITEN   *   WK-ZAIKAISU)
                         END-IF
+                        IF    BUN-IDX5       =   5
+                            COMPUTE   RECE62-TENSU(4 BUN-IDX5)  =
+                                      RECE62-TENSU(4 BUN-IDX5)  +
+                                     (WK-ZAITEN   *   WK-ZAIKAISU)
+                        END-IF
                         IF    BUN-IDX6       =   6
                             COMPUTE   RECE62-SYUTANTEN(4)  =
                                       RECE62-SYUTANTEN(4)  +
@@ -10633,6 +10701,11 @@
                                  RECE62-TENSU(5 BUN-IDX4)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(5 BUN-IDX5)  =
+                                 RECE62-TENSU(5 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(5)  =
                                  RECE62-SYUTANTEN(5)  +
@@ -10658,6 +10731,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(6 BUN-IDX4)  =
                                  RECE62-TENSU(6 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(6 BUN-IDX5)  =
+                                 RECE62-TENSU(6 BUN-IDX5)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10694,6 +10772,11 @@
                                  RECE62-TENSU(7 BUN-IDX4)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(7 BUN-IDX5)  =
+                                 RECE62-TENSU(7 BUN-IDX5)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(7)  =
                                  RECE62-SYUTANTEN(7)  +
@@ -10728,6 +10811,11 @@
                                  RECE62-TENSU(8 BUN-IDX4)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(8 BUN-IDX5)  =
+                                 RECE62-TENSU(8 BUN-IDX5)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(8)  =
                                  RECE62-SYUTANTEN(8)  +
@@ -10753,6 +10841,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(9 BUN-IDX4)  =
                                  RECE62-TENSU(9 BUN-IDX4)  +
+                                (TNS-TEN   *   ACCT-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(9 BUN-IDX5)  =
+                                 RECE62-TENSU(9 BUN-IDX5)  +
                                 (TNS-TEN   *   ACCT-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10793,6 +10886,14 @@
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                        COMPUTE   RECE6C-TENSU(10 BUN-IDX4) =
                                  RECE6C-TENSU(10 BUN-IDX4) +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(10 BUN-IDX5)  =
+                                 RECE62-TENSU(10 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-TENSU(10 BUN-IDX5) =
+                                 RECE6C-TENSU(10 BUN-IDX5) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10838,6 +10939,14 @@
                                  RECE6C-TENSU(11 BUN-IDX4) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(11 BUN-IDX5)  =
+                                 RECE62-TENSU(11 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-TENSU(11 BUN-IDX5) =
+                                 RECE6C-TENSU(11 BUN-IDX5) +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(11)  =
                                  RECE62-SYUTANTEN(11)  +
@@ -10867,6 +10976,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE6G-TENSU(12 BUN-IDX4)  =
                                  RECE6G-TENSU(12 BUN-IDX4)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE6G-TENSU(12 BUN-IDX5)  =
+                                 RECE6G-TENSU(12 BUN-IDX5)  +
                                 (WK-ZAITEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10908,6 +11022,14 @@
                                  RECE6C-TENSU(12 BUN-IDX4) +
                                 (WK-YKZTEN2  *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(12 BUN-IDX5)  =
+                                 RECE62-TENSU(12 BUN-IDX5)  +
+                                (WK-ZAITEN   *   WK-ZAIKAISU)
+                       COMPUTE   RECE6C-TENSU(12 BUN-IDX5) =
+                                 RECE6C-TENSU(12 BUN-IDX5) +
+                                (WK-YKZTEN2  *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(12)  =
                                  RECE62-SYUTANTEN(12)  +
@@ -10942,6 +11064,11 @@
                                  RECE62-TENSU(13 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(13 BUN-IDX5)  =
+                                 RECE62-TENSU(13 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(13)  =
                                  RECE62-SYUTANTEN(13)  +
@@ -10965,6 +11092,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(14 BUN-IDX4)  =
                                  RECE62-TENSU(14 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(14 BUN-IDX5)  =
+                                 RECE62-TENSU(14 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -10998,6 +11130,11 @@
                                  RECE62-TENSU(15 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(15 BUN-IDX5)  =
+                                 RECE62-TENSU(15 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(15)  =
                                  RECE62-SYUTANTEN(15)  +
@@ -11021,6 +11158,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(16 BUN-IDX4)  =
                                  RECE62-TENSU(16 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(16 BUN-IDX5)  =
+                                 RECE62-TENSU(16 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -11052,6 +11194,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(17 BUN-IDX4)  =
                                  RECE62-TENSU(17 BUN-IDX4)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(17 BUN-IDX5)  =
+                                 RECE62-TENSU(17 BUN-IDX5)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -11093,6 +11240,11 @@
                                  RECE62-TENSU(18 BUN-IDX4)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(18 BUN-IDX5)  =
+                                 RECE62-TENSU(18 BUN-IDX5)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(18)  =
                                  RECE62-SYUTANTEN(18)  +
@@ -11123,6 +11275,11 @@
                                  RECE62-TENSU(19 BUN-IDX4)  +
                                 (WK-SYUTEN   *   WK-ZAIKAISU)
                    END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(19 BUN-IDX5)  =
+                                 RECE62-TENSU(19 BUN-IDX5)  +
+                                (WK-SYUTEN   *   WK-ZAIKAISU)
+                   END-IF
                    IF    BUN-IDX6       =   6
                        COMPUTE   RECE62-SYUTANTEN(19)  =
                                  RECE62-SYUTANTEN(19)  +
@@ -11146,6 +11303,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(20 BUN-IDX4)  =
                                  RECE62-TENSU(20 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(20 BUN-IDX5)  =
+                                 RECE62-TENSU(20 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -11207,6 +11369,19 @@
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
+                   IF    BUN-IDX5       =   5
+                         COMPUTE     RECE62-TENSU(21 BUN-IDX5) =
+                                     RECE62-TENSU(21 BUN-IDX5) +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
+                         IF    TNS-NYUTENTTLKBN   =    130
+                           COMPUTE   RECE62-TENSU(2 BUN-IDX5)  =
+                                     RECE62-TENSU(2 BUN-IDX5)  +
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-TENSU(21 BUN-IDX5) =
+                                     RECE62-TENSU(21 BUN-IDX5) -
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
+                         END-IF
+                   END-IF
                    IF    BUN-IDX6       =   6
                          COMPUTE     RECE62-SYUTANTEN(21)  =
                                      RECE62-SYUTANTEN(21)  +
@@ -11238,6 +11413,11 @@
                    IF    BUN-IDX4       =   4
                        COMPUTE   RECE62-TENSU(22 BUN-IDX4)  =
                                  RECE62-TENSU(22 BUN-IDX4)  +
+                                (WK-YKZTEN   *   WK-ZAIKAISU)
+                   END-IF
+                   IF    BUN-IDX5       =   5
+                       COMPUTE   RECE62-TENSU(22 BUN-IDX5)  =
+                                 RECE62-TENSU(22 BUN-IDX5)  +
                                 (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
                    IF    BUN-IDX6       =   6
@@ -14848,6 +15028,11 @@
            IF    BUN-IDX4       =   4
                    COMPUTE   RECE62-TENSU(21 BUN-IDX4)  =
                              RECE62-TENSU(21 BUN-IDX4)  +
+                            (NACCT-ZAITEN   *   CNT-DAY21)
+           END-IF
+           IF    BUN-IDX5       =   5
+                   COMPUTE   RECE62-TENSU(21 BUN-IDX5)  =
+                             RECE62-TENSU(21 BUN-IDX5)  +
                             (NACCT-ZAITEN   *   CNT-DAY21)
            END-IF
            IF    BUN-IDX6       =   6
@@ -18618,6 +18803,14 @@
                            (RECE64-ZAITEN  *  RECE64-ZAIKAISU)
                  COMPUTE   RECE6C-TENSU(12 BUN-IDX4) =
                            RECE6C-TENSU(12 BUN-IDX4) +
+                           (RECE64-YKZTEN  *  RECE64-ZAIKAISU)
+           END-IF
+           IF    BUN-IDX5       =   5
+                 COMPUTE   RECE62-TENSU(12 BUN-IDX5)  =
+                           RECE62-TENSU(12 BUN-IDX5)  +
+                           (RECE64-ZAITEN  *  RECE64-ZAIKAISU)
+                 COMPUTE   RECE6C-TENSU(12 BUN-IDX5) =
+                           RECE6C-TENSU(12 BUN-IDX5) +
                            (RECE64-YKZTEN  *  RECE64-ZAIKAISU)
            END-IF
            IF    BUN-IDX6       =   6
@@ -30733,11 +30926,11 @@
                                             TO  PTKOH-KOHNUM
                 MOVE    PTKOHINF-REC        TO  MCPDATA-REC
                 MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-                MOVE    "key4"              TO  MCP-PATHNAME
+                MOVE    "key14"             TO  MCP-PATHNAME
                 PERFORM   900-DBSELECT-SEC
                 IF      MCP-RC               =       ZERO
                   MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                  MOVE    "key4"            TO  MCP-PATHNAME
+                  MOVE    "key14"           TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                   PERFORM  UNTIL   FLG-PTKOHINF    =   1
                      IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -30776,13 +30969,13 @@
                          MOVE     1      TO  FLG-PTKOHINF
                      ELSE
                          MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                         MOVE    "key4"           TO  MCP-PATHNAME
+                         MOVE    "key14"          TO  MCP-PATHNAME
                          PERFORM  900-PTKOHINF-READ-SEC
                      END-IF
                   END-PERFORM
                 END-IF
                 MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
-                MOVE    "key4"              TO  MCP-PATHNAME
+                MOVE    "key14"             TO  MCP-PATHNAME
                 PERFORM   900-CLOSE-SEC
            END-PERFORM
       *
@@ -32179,11 +32372,11 @@
            MOVE  "966"                 TO  PTKOH-KOHNUM
            MOVE  PTKOHINF-REC          TO  MCPDATA-REC
            MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-           MOVE  "key4"                TO  MCP-PATHNAME
+           MOVE  "key14"               TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =       ZERO
              MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-             MOVE    "key4"            TO  MCP-PATHNAME
+             MOVE    "key14"           TO  MCP-PATHNAME
              PERFORM  900-PTKOHINF-READ-SEC
              PERFORM  UNTIL   FLG-PTKOHINF    =   1
                 IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -32203,13 +32396,13 @@
                   MOVE     1      TO  FLG-PTKOHINF
                 ELSE
                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                  MOVE    "key4"           TO  MCP-PATHNAME
+                  MOVE    "key14"          TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                 END-IF
              END-PERFORM
            END-IF
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-           MOVE    "key4"               TO  MCP-PATHNAME
+           MOVE    "key14"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            IF    FLG-TOKUSITU  =  ZERO
@@ -32219,16 +32412,19 @@
              MOVE  "967"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
                     IF  RECE62-TEISYOTOKU  =  SPACE
                          MOVE    2    TO   FLG-TOKUSITU
                          IF  RECE62-SRYYM  >= "201501"
@@ -32247,13 +32443,13 @@
                     MOVE         1    TO   FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -32266,11 +32462,11 @@
              MOVE  "956"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
                   IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
@@ -32290,13 +32486,13 @@
                     MOVE     1      TO  FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -32307,16 +32503,19 @@
              MOVE  "957"                 TO  PTKOH-KOHNUM
              MOVE  PTKOHINF-REC          TO  MCPDATA-REC
              MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-             MOVE  "key4"                TO  MCP-PATHNAME
+             MOVE  "key14"               TO  MCP-PATHNAME
              PERFORM 900-DBSELECT-SEC
              IF      MCP-RC               =       ZERO
                MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-               MOVE    "key4"            TO  MCP-PATHNAME
+               MOVE    "key14"           TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
                     IF  RECE62-TEISYOTOKU  =  SPACE
                          MOVE    2    TO   FLG-TOKUSITU
                          IF  RECE62-SRYYM  >= "201501"
@@ -32335,13 +32534,13 @@
                     MOVE         1    TO   FLG-PTKOHINF
                   ELSE
                     MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                    MOVE    "key4"           TO  MCP-PATHNAME
+                    MOVE    "key14"          TO  MCP-PATHNAME
                     PERFORM  900-PTKOHINF-READ-SEC
                   END-IF
                END-PERFORM
              END-IF
              MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-             MOVE    "key4"               TO  MCP-PATHNAME
+             MOVE    "key14"              TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -32371,9 +32570,12 @@
                MOVE    "key4"            TO  MCP-PATHNAME
                PERFORM  900-PTKOHINF-READ-SEC
                PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                  IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                  AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                  AND (PTKOH-SAKJOKBN   =   SPACE         )
+                  IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                      (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
+                  OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                      (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                      (PTKOH-SAKJOKBN   =   SPACE         ))
                     MOVE     1      TO  FLG-TOKUSITU-TASU
                     MOVE     1      TO  FLG-PTKOHINF
                   ELSE
@@ -32403,27 +32605,30 @@
            MOVE  "957"                 TO  PTKOH-KOHNUM
            MOVE  PTKOHINF-REC          TO  MCPDATA-REC
            MOVE  "tbl_ptkohinf"        TO  MCP-TABLE
-           MOVE  "key4"                TO  MCP-PATHNAME
+           MOVE  "key14"               TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC               =       ZERO
              MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-             MOVE    "key4"            TO  MCP-PATHNAME
+             MOVE    "key14"           TO  MCP-PATHNAME
              PERFORM  900-PTKOHINF-READ-SEC
              PERFORM  UNTIL   FLG-PTKOHINF    =   1
-                IF  (PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD )
-                AND (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD)
-                AND (PTKOH-SAKJOKBN   =   SPACE         )
+                IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                    (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                    (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
                   MOVE    1    TO   FLG-KISAIOK
                   MOVE    1    TO   FLG-PTKOHINF
                 ELSE
                   MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                  MOVE    "key4"           TO  MCP-PATHNAME
+                  MOVE    "key14"          TO  MCP-PATHNAME
                   PERFORM  900-PTKOHINF-READ-SEC
                 END-IF
              END-PERFORM
            END-IF
            MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-           MOVE    "key4"               TO  MCP-PATHNAME
+           MOVE    "key14"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
            .
@@ -32713,6 +32918,12 @@
            ELSE
              MOVE     ZERO    TO   RECE62-TENSU(2 4)
            END-IF
+           IF   RECE62-TENSU(2 5)  >=  RECE6G-TENSU(2 5)
+             COMPUTE  RECE62-TENSU(2 5)  =
+                      RECE62-TENSU(2 5)  -  RECE6G-TENSU(2 5)
+           ELSE
+             MOVE     ZERO    TO   RECE62-TENSU(2 5)
+           END-IF
            IF   RECE62-SYUTANTEN(2)  >=  RECE6G-SYUTANTEN(2)
              COMPUTE  RECE62-SYUTANTEN(2)  =
                       RECE62-SYUTANTEN(2)  -  RECE6G-SYUTANTEN(2)
@@ -32744,6 +32955,12 @@
                       RECE62-TENSU(3 4)  -  RECE6G-TENSU(3 4)
            ELSE
              MOVE     ZERO    TO   RECE62-TENSU(3 4)
+           END-IF
+           IF   RECE62-TENSU(3 5)  >=  RECE6G-TENSU(3 5)
+             COMPUTE  RECE62-TENSU(3 5)  =
+                      RECE62-TENSU(3 5)  -  RECE6G-TENSU(3 5)
+           ELSE
+             MOVE     ZERO    TO   RECE62-TENSU(3 5)
            END-IF
            IF   RECE62-SYUTANTEN(3)  >=  RECE6G-SYUTANTEN(3)
              COMPUTE  RECE62-SYUTANTEN(3)  =
@@ -32861,6 +33078,33 @@
                END-IF
              END-IF
            END-IF
+           IF   RECE6C-TENSU(12 5)  >=  RECE6G-TENSU(12 5)
+             COMPUTE  RECE62-TENSU(12 5)  =
+                      RECE62-TENSU(12 5)  -  RECE6G-TENSU(12 5)
+           ELSE
+             COMPUTE  RECE62-TENSU(12 5)  =
+                      RECE62-TENSU(12 5)  -  RECE6C-TENSU(12 5)
+             COMPUTE  RECE6G-TENSU(12 5) =
+                      RECE6G-TENSU(12 5) -
+                      RECE6C-TENSU(12 5)
+             IF  RECE6C-TENSU(11 5)  >=   RECE6G-TENSU(12 5)
+               COMPUTE  RECE62-TENSU(11 5)  =
+                        RECE62-TENSU(11 5)  -  RECE6G-TENSU(12 5)
+             ELSE
+               COMPUTE  RECE62-TENSU(11 5)  =
+                        RECE62-TENSU(11 5)  -  RECE6C-TENSU(11 5)
+               COMPUTE  RECE6G-TENSU(12 5) =
+                        RECE6G-TENSU(12 5) -
+                        RECE6C-TENSU(11 5)
+               IF  RECE6C-TENSU(10 5)  >=   RECE6G-TENSU(12 5)
+                 COMPUTE  RECE62-TENSU(10 5)  =
+                          RECE62-TENSU(10 5)  -  RECE6G-TENSU(12 5)
+               ELSE
+                 COMPUTE  RECE62-TENSU(10 5)  =
+                          RECE62-TENSU(10 5)  -  RECE6C-TENSU(10 5)
+               END-IF
+             END-IF
+           END-IF
            IF   RECE6C-SYUTANTEN(12)  >=  RECE6G-SYUTANTEN(12)
              COMPUTE  RECE62-SYUTANTEN(12)  =
                       RECE62-SYUTANTEN(12)  -  RECE6G-SYUTANTEN(12)
@@ -32924,8 +33168,7 @@
            END-IF
       *
            PERFORM    VARYING   KOHFTN-IDX   FROM   3   BY   1
-      ***              UNTIL    KOHFTN-IDX     >    5
-                       UNTIL    KOHFTN-IDX     >    4
+                       UNTIL    KOHFTN-IDX     >    5
       *
              IF   RECE62-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
                 IF   (RECE62-KOHNUM(1)   = "972" OR "974")
