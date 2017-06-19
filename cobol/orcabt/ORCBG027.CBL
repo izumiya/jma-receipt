@@ -78,6 +78,7 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-TOKEI               PIC 9(01).
            03  FLG-SRYACT              PIC 9(01).
+           03  FLG-SRYACCT             PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -248,6 +249,10 @@
       *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿
        01  SRYACT-REC.
            COPY    "CPSRYACT.INC".
+      *
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
       *
       *    °åÎÅµ¡´Ø¾ðÊó
            COPY    "CPSK1001.INC".
@@ -494,6 +499,10 @@
       *****************************************************************
        220-MAIN-HEN-SEC            SECTION.
       *
+           IF    ( SRY-SRYKBN      NOT =   "13" )
+               GO  TO  220-MAIN-HEN-EXT
+           END-IF
+      *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL ( IDX     >   5 )
                    OR    ( SRY-SRYCD(IDX)      =   SPACE )
@@ -513,22 +522,32 @@
       *****************************************************************
        220-TOKEI-SET-SEC           SECTION.
       *
+      *    ¿ÇÎÅ²ñ·×ÆÉ¤ß¹þ¤ß
+           PERFORM 900-SRYACCT-READ-SEC
+           IF      FLG-SRYACCT        =   1
+               GO  TO  220-TOKEI-SET-EXT
+           END-IF
+      *
       *    Åý·×¥Ç¡¼¥¿¸¡º÷
            INITIALIZE                  TOKEI-REC
            MOVE    SRY-PTID        TO  TOKEI-PTID
            PERFORM 900-TOKEI-READ-SEC
       *
+           MOVE    SRY-PTID        TO  TOKEI-PTID
       *    ½é²ó
            IF    ( SRY-SRYCD(IDX)  =   "113008310" )
-               COMPUTE TOKEI-KAISU(1)  =   TOKEI-KAISU(1)  +   1
+               COMPUTE TOKEI-KAISU(1)  =   TOKEI-KAISU(1)
+                                       +   ACCT-ZAIKAISU
            END-IF
       *    £²¡Á£´²óÌÜ
            IF    ( SRY-SRYCD(IDX)  =   "113008410" )
-               COMPUTE TOKEI-KAISU(2)  =   TOKEI-KAISU(2)  +   1
+               COMPUTE TOKEI-KAISU(2)  =   TOKEI-KAISU(2)
+                                       +   ACCT-ZAIKAISU
            END-IF
       *    £µ²óÌÜ
            IF    ( SRY-SRYCD(IDX)  =   "113008510" )
-               COMPUTE TOKEI-KAISU(3)  =   TOKEI-KAISU(3)  +   1
+               COMPUTE TOKEI-KAISU(3)  =   TOKEI-KAISU(3)
+                                       +   ACCT-ZAIKAISU
            END-IF
       *
            IF      FLG-TOKEI       =   1
@@ -871,6 +890,39 @@ grpsys                                     SPA-AREA
       *
            .
        900-SRYACT-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¸¡º÷
+      *****************************************************************
+       900-SRYACCT-READ-SEC        SECTION.
+      *
+      *    ³ºÅö¤Î¿ÇÎÅ²ñ·×¥Ç¡¼¥¿¤ò¸¡º÷
+           INITIALIZE                  SRYACCT-REC
+           MOVE    SPA-HOSPNUM     TO  ACCT-HOSPNUM
+           MOVE    SRY-NYUGAIKBN   TO  ACCT-NYUGAIKBN
+           MOVE    SRY-PTID        TO  ACCT-PTID
+           MOVE    SRY-SRYKA       TO  ACCT-SRYKA
+           MOVE    SRY-SRYYM       TO  ACCT-SRYYM
+           MOVE    SRY-SRYKBN      TO  ACCT-SRYKBN
+           MOVE    SRY-ZAINUM      TO  ACCT-ZAINUM
+           MOVE    SRYACCT-REC     TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-SRYACCT
+               MOVE    MCPDATA-REC     TO  SRYACCT-REC
+           ELSE
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           MOVE    "tbl_sryacct"   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SRYACCT-READ-EXT.
            EXIT.
       *
       *****************************************************************
