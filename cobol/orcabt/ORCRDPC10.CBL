@@ -171,6 +171,8 @@
       *                                     F-19（行為明細区分情報）２桁目の
       *                                     入院料包括項目区分を再セットする
       *                                     （17/03/16の修正に追加）
+      *              NACL-小豆沢  17/06/12  特定入院料を算定しないとした場合の
+      *                                     入院料（包括入力分）の記録方法変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -339,6 +341,7 @@
            03  FLG-ETENSU2             PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-NYUINACT            PIC 9(01).
+           03  FLG-HOUKATU-SET         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -491,6 +494,11 @@
            03  WRK-SJ-KBN              PIC X(02).
            03  WRK-RECECOM-SJKBN       PIC X(02).
            03  WRK-SJ-CHK              PIC 9(01).
+           03  WRK-TOTALTEN-X.
+               05  WRK-SRYYMD-X        PIC X(04).
+               05  WRK-RENNUM-X        PIC 9(04).
+           03  WRK-TOTALTEN            REDEFINES  WRK-TOTALTEN-X
+                                       PIC 9(08).
       *
       *    1桁目:生保 2桁目:結核 3桁目:精神
            03  WRK-3SYU-KBN.
@@ -2566,7 +2574,12 @@
                        PERFORM 20074-ZAI-KOUI-SORT-SEC
                        PERFORM 20072-ZAI-HENSYU-SEC
       *                包括入院分
-                       PERFORM 20073-ZAI-HENSYU-SEC
+      *                //入院料入力分の包括記録は、平成２９年３月分までは
+      *                //特定入院料の下に記録だが、平成２９年４月分からは
+      *                //短期滞在未算定日と同様の記録とする
+                       IF     RECE62-SRYYM   <=   "201703"
+                           PERFORM 20073-ZAI-HENSYU-SEC
+                       END-IF
                    END-IF
                END-IF
       *   AZU-DEL START 2017.5.2
@@ -3731,6 +3744,11 @@
                            WHEN    "8"
                                CONTINUE
                            WHEN    OTHER
+      *--- AZU-ADD END   2017.06.12
+      *                //入院料入力分の包括記録は、平成２９年３月分までは
+      *                //特定入院料の下に記録だが、平成２９年４月分からは
+      *                //短期滞在未算定日と同様の記録とする
+                             IF    RECE62-SRYYM   <=   "201703"
                                IF   LNK-NYUINDAY-TANKI2-KBN(IDXX) =
                                                             "1" OR "2"
       ****                         ADD       1     TO   WRK-RENNUM
@@ -3757,6 +3775,73 @@
                                ELSE
                                   CONTINUE
                                END-IF
+                             ELSE
+                                  MOVE      1     TO   FLG-HOUKATU-SET
+      ****                        ADD       1     TO   WRK-RENNUM
+      *                           順序番号の取り込み
+                                  INITIALIZE        RECE900-REC
+                                  MOVE    RECE62-HOSPNUM   TO
+                                                       RECE900-HOSPNUM
+                                  MOVE    RECE62-SRYYM  TO
+                                                       RECE900-SRYYM
+                                  MOVE    RECE62-PTID      TO
+                                                       RECE900-PTID
+                                  MOVE    "90"     TO  RECE900-SRYKBN
+                                  PERFORM   900-RECE900-READ-SEC
+                                  IF      FLG-RECE900         =   1
+                                      MOVE    ZERO      TO  WRK-RENNUM
+                                  ELSE
+                                      MOVE    RECE900-RENNUM
+                                                        TO  WRK-RENNUM
+                                  END-IF
+                                  IF     (IDX               =  1)  AND
+                                         (WRK-FEDT-1ST-FLG  =  ZERO)
+                                      MOVE    1    TO   WRK-FEDT-1ST-FLG
+                                      MOVE    "90"  TO  RECE641-SRYKBN
+                                      IF     FLG-TOKUTEINYUIN-SET  =  0
+                                          MOVE    1    TO   WRK-RENNUM
+                                          MOVE    1    TO   
+                                                  FLG-TOKUTEINYUIN-SET
+                                      ELSE
+                                          ADD     1    TO   WRK-RENNUM
+                                      END-IF
+      *                                ADD   1  TO   WRK-RENNUM-E
+                                      PERFORM 200721-ZAI-E-HENSYU-SEC
+                                      PERFORM 5001-FILE-WRITE-SEC
+                                  END-IF
+      *                            DISPLAY  "###  F-SET"
+      *                            DISPLAY  "WRK-RENNUM = " WRK-RENNUM
+                                  MOVE   "90"   TO   WRK-FEDT-SRYKBN
+                                  PERFORM 200721-ZAI-F-HENSYU-SEC
+                                  PERFORM 5001-FILE-F-WRITE-SEC
+      *
+                                  MOVE    ZERO   TO   FLG-HOUKATU-SET
+      *
+      *                           順序番号ファイルの更新
+                                  INITIALIZE               RECE900-REC
+                                  MOVE    RECE62-HOSPNUM   TO
+                                                       RECE900-HOSPNUM
+                                  MOVE    RECE62-SRYYM     TO
+                                                       RECE900-SRYYM
+                                  MOVE    RECE62-PTID  TO 
+                                                       RECE900-PTID
+                                  MOVE    "90"     TO  RECE900-SRYKBN
+                                  PERFORM   900-RECE900-READ-SEC
+                                  IF      FLG-RECE900         =   1
+                                    MOVE    RECE62-HOSPNUM   TO
+                                                        RECE900-HOSPNUM
+                                    MOVE    RECE62-SRYYM  TO
+                                                        RECE900-SRYYM
+                                    MOVE    RECE62-PTID   TO
+                                                        RECE900-PTID
+                                    MOVE    "90"    TO  RECE900-SRYKBN
+                                    MOVE    WRK-RENNUM TO RECE900-RENNUM
+                                    WRITE      RECE900-REC
+                                  ELSE
+                                    MOVE    WRK-RENNUM TO RECE900-RENNUM
+                                    REWRITE    RECE900-REC
+                                  END-IF
+                             END-IF
                        END-EVALUATE
                      END-IF
                    END-PERFORM
@@ -6208,6 +6293,36 @@
            MOVE    WRK-RENNUM-E        TO  RECEDEN-RENNUM
            MOVE    WRK-REC             TO  RECEDEN-RECEDATA
       *
+      *    包括分判定用
+           MOVE    WRK-FEDT-SRYKBN     TO  RECEDEN-SJKBN
+           MOVE    WRK-FEDT-YMD (5:4)  TO  WRK-TOTALTEN-X (1:4)
+           MOVE    WRK-RENNUM          TO  WRK-TOTALTEN-X (5:4)
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    WRK-TOTALTEN        TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+           IF    ( SNUM-RC             =   ZERO  )
+           AND   ( SNUM-MINKBN         =   SPACE )
+           AND   ( SNUM-SYOKBN         =   SPACE )
+               MOVE    SNUM-OUTNUM         TO  RECEDEN-TOTALTEN
+           ELSE
+               DISPLAY "WRK-TOTALTEN-X=" WRK-TOTALTEN-X
+      *
+               STRING   "データの作成ができませんでした　患者番号＝"
+                                       DELIMITED  BY  SIZE
+                        RECE62-PTNUM   DELIMITED  BY  SIZE
+                                       INTO  WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               STRING  "ORCRDPC10 "    DELIMITED   BY  SIZE
+                       WRK-RECEERR     DELIMITED   BY  SPACE
+                       LOW-VALUE       DELIMITED   BY  SIZE
+                                       INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+      *
            PERFORM 50012-DBINSERT-SEC
       *
            ADD     1                   TO  CNT-OUT-E
@@ -6235,6 +6350,35 @@
            MOVE    "F"                 TO  RECEDEN-RECKBN
            MOVE    WRK-RENNUM-F        TO  RECEDEN-RENNUM
            MOVE    WRK-REC             TO  RECEDEN-RECEDATA
+      *
+      *    包括分判定用
+           MOVE    WRK-FEDT-SRYKBN     TO  RECEDEN-SJKBN
+           MOVE    WRK-FEDT-YMD (5:4)  TO  WRK-TOTALTEN-X (1:4)
+           MOVE    WRK-RENNUM          TO  WRK-TOTALTEN-X (5:4)
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    WRK-TOTALTEN        TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                           ORCSNUMAREA
+           IF    ( SNUM-RC             =   ZERO  )
+           AND   ( SNUM-MINKBN         =   SPACE )
+           AND   ( SNUM-SYOKBN         =   SPACE )
+               MOVE    SNUM-OUTNUM         TO  RECEDEN-TOTALTEN
+           ELSE
+               DISPLAY "WRK-TOTALTEN-X=" WRK-TOTALTEN-X
+      *
+               STRING   "データの作成ができませんでした　患者番号＝"
+                                       DELIMITED  BY  SIZE
+                        RECE62-PTNUM   DELIMITED  BY  SIZE
+                                       INTO  WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               STRING  "ORCRDPC10 "    DELIMITED   BY  SIZE
+                       WRK-RECEERR     DELIMITED   BY  SPACE
+                       LOW-VALUE       DELIMITED   BY  SIZE
+                                       INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
+           END-IF
       *
            PERFORM 50012-DBINSERT-SEC
       *

@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.02    NACL-藤原    17/06/13  包括分の記録の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -39,6 +40,11 @@
                                    ORGANIZATION    IS  LINE
                                                        SEQUENTIAL
                                    FILE    STATUS  IS  STS-EFFILE.
+      *    ＥＦファイル（入院）
+           SELECT  EFFILE-F-FILE   ASSIGN  EFFILEFPARA
+                                   ORGANIZATION    IS  LINE
+                                                       SEQUENTIAL
+                                   FILE    STATUS  IS  STS-EFFILEF.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -49,6 +55,10 @@
       *    ＥＦファイル  
        FD  EFFILE-FILE.
        01  EFFILE-R                    PIC X(2500).
+      *
+      *    ＥＦファイル  
+       FD  EFFILE-F-FILE.
+       01  EFFILE-F-R                  PIC X(2500).
       *     
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -61,6 +71,9 @@
       *    ＥＦファイル名称領域 
            COPY    "CPTEMPFL.INC"  REPLACING  //TEMPFLPARA//
                                    BY         //EFFILEPARA//.
+      *
+           COPY    "CPTEMPFL.INC"  REPLACING  //TEMPFLPARA//
+                                   BY         //EFFILEFPARA//.
       *
       *01  CSVPARA.
       *****03  FILLER              PIC X(05) VALUE "/tmp/".
@@ -78,6 +91,7 @@
       *
        01  STS-AREA.
            03  STS-EFFILE              PIC X(02).
+           03  STS-EFFILEF             PIC X(02).
            03  STS-RECEERR             PIC X(02).
       *
        01  FLG-AREA.
@@ -87,13 +101,20 @@
        01  CNT-AREA.
            03  CNT-IN                  PIC 9(06).
            03  CNT-OUT                 PIC 9(06).
+           03  CNT-OUT1                PIC 9(06).
            03  CNT-OUT-ALL             PIC 9(06).
       *
        01  KEY-AREA.
            03  KEY-NEW.
                05  KEY-N-RECKBN        PIC X(01).
+               05  KEY-N-PTID          PIC 9(10).
+               05  KEY-N-SJKBN         PIC X(02).
+               05  KEY-N-TOTALTEN      PIC 9(08).
            03  KEY-OLD.
                05  KEY-O-RECKBN        PIC X(01).
+               05  KEY-O-PTID          PIC 9(10).
+               05  KEY-O-SJKBN         PIC X(02).
+               05  KEY-O-TOTALTEN      PIC 9(08).
       *
        01  WRK-AREA.
       *    パラメタエリア
@@ -107,6 +128,25 @@
            05  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-NYUGAIKBN           PIC X(01).
+      *
+           03  WRK-RENNUM              PIC 9(04).
+      *
+           03  WRK-MCP-TABLE           PIC X(64).
+           03  WRK-MCP-PATHNAME        PIC X(64).
+      *
+       01  WRK-EF-REC.
+           03  WRK-EF-CD               PIC X(9).
+           03  FILLER                  PIC X(1).
+           03  WRK-EF-NUM              PIC X(10).
+           03  FILLER                  PIC X(1).
+           03  WRK-EF-NYUINYMD         PIC X(8).
+           03  FILLER                  PIC X(1).
+           03  WRK-EF-TAIINYMD         PIC X(8).
+           03  FILLER                  PIC X(1).
+           03  WRK-EF-SRYKBN           PIC X(2).
+           03  FILLER                  PIC X(1).
+           03  WRK-EF-RENNUM           PIC 9(04).
+           03  FILLER                  PIC X(2000).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR             PIC X(200).
@@ -182,6 +222,7 @@
                                    FLG-AREA
                                    STS-AREA
                                    SPA-AREA
+                                   KEY-AREA
            INITIALIZE              RECEERR
       *
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
@@ -245,6 +286,7 @@
        200-MAIN-SEC                SECTION.
       *
       *    入院外分
+           INITIALIZE                  KEY-AREA
            IF      WRK-PARA-NYUGAIKBN
                                    =   "0" OR  "2"
                MOVE    "2"             TO  WRK-NYUGAIKBN
@@ -255,22 +297,25 @@
                END-PERFORM
       *
                MOVE    "tbl_efout"     TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
            END-IF
       *
       *    入院分
+           INITIALIZE                  KEY-AREA
            IF      WRK-PARA-NYUGAIKBN
                                    =   "0" OR  "1"
                MOVE    "1"             TO  WRK-NYUGAIKBN
                PERFORM 900-EFOUT-SELECT-SEC
       *
                PERFORM         UNTIL   FLG-EFOUT   =   1
-                   PERFORM 2001-HENSYU-SEC
+                   PERFORM 2002-HENSYU-SEC
                END-PERFORM
       *
                MOVE    "tbl_efout"     TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
            END-IF
       *
@@ -280,7 +325,7 @@
            EXIT.             
       * 
       *****************************************************************
-      *    ＥＦファイル編集処理
+      *    ＥＦファイル編集処理（入院外）
       *****************************************************************
        2001-HENSYU-SEC             SECTION.
       *
@@ -353,6 +398,187 @@
            DISPLAY "EFFILE   OUT  " CNT-OUT
            .
        2001-HENSYU-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    ＥＦファイル編集処理（入院）
+      *****************************************************************
+       2002-HENSYU-SEC             SECTION.
+      *
+           MOVE    ZERO            TO  CNT-OUT
+                                       WRK-RENNUM
+           MOVE    KEY-NEW         TO  KEY-OLD 
+      *
+           MOVE    SPA-HOSPNUM     TO  EFFILEPARA-HOSPNUM
+           MOVE    "E"             TO  EFFILEPARA-FILENM-1
+           MOVE    "n"             TO  EFFILEPARA-NYUGAIKBN
+           MOVE    WRK-PARA-HOSPCD TO  EFFILEPARA-FILENM-2
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    EFFILEPARA-BASENAME
+                                   TO  SGETTEMP-BASENAME
+           CALL    "ORCSGETTEMP"   USING   SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAME
+                                   TO  EFFILEPARA
+      *??
+           DISPLAY "PARA=" EFFILEPARA "#"
+      *??
+      *
+           OPEN    OUTPUT              EFFILE-FILE
+      *
+           IF      STS-EFFILE          =   "00"
+               CONTINUE
+           ELSE
+               CALL "coblog" USING   "file open err " EFFILEPARA
+               MOVE    SPACE               TO  WRK-RECEERR
+               STRING "ファイル オープンエラー STS="
+                                               DELIMITED  BY  SIZE
+                       STS-EFFILE              DELIMITED  BY  SIZE
+                                       INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+           MOVE    SPA-HOSPNUM     TO  EFFILEPARA-HOSPNUM
+           MOVE    "F"             TO  EFFILEPARA-FILENM-1
+           MOVE    "n"             TO  EFFILEPARA-NYUGAIKBN
+           MOVE    WRK-PARA-HOSPCD TO  EFFILEPARA-FILENM-2
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    EFFILEPARA-BASENAME
+                                   TO  SGETTEMP-BASENAME
+           CALL    "ORCSGETTEMP"   USING   SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAME
+                                   TO  EFFILEFPARA
+      *??
+           DISPLAY "PARA=" EFFILEFPARA "#"
+      *??
+      *
+           OPEN    OUTPUT              EFFILE-F-FILE
+      *
+           IF      STS-EFFILEF         =   "00"
+               CONTINUE
+           ELSE
+               CALL "coblog" USING   "file open err " EFFILEFPARA
+               MOVE    SPACE               TO  WRK-RECEERR
+               STRING "ファイル オープンエラー STS="
+                                               DELIMITED  BY  SIZE
+                       STS-EFFILEF             DELIMITED  BY  SIZE
+                                       INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+      *
+           PERFORM         UNTIL   FLG-EFOUT   =   1
+               PERFORM 20021-EF-HENSYU-SEC
+           END-PERFORM
+      *
+           CLOSE   EFFILE-FILE
+                   EFFILE-F-FILE
+      *
+           DISPLAY "EFFILE E OUT  " CNT-OUT
+           DISPLAY "EFFILE F OUT  " CNT-OUT1
+           .
+       2002-HENSYU-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    ＥＦファイル順序番号編集処理（入院）
+      *****************************************************************
+       20021-EF-HENSYU-SEC                SECTION.
+      *
+      *    患者毎に順序番号をクリア
+           MOVE    ZERO            TO  WRK-RENNUM
+      *
+           MOVE    KEY-NEW         TO  KEY-OLD
+           PERFORM         UNTIL   FLG-EFOUT   =   1
+                           OR      KEY-N-PTID
+                                           NOT =   KEY-O-PTID
+               MOVE    KEY-NEW         TO  KEY-OLD
+               PERFORM         UNTIL   FLG-EFOUT   =   1
+                               OR      KEY-N-PTID
+                                               NOT =   KEY-O-PTID
+                               OR      KEY-N-SJKBN
+                                               NOT =   KEY-O-SJKBN
+      *            実施日毎に順序番号を設定しなおす（診療区分９０）
+                   IF      KEY-N-SJKBN     =   "90"
+                       ADD     1               TO  WRK-RENNUM
+                   END-IF
+      *
+                   MOVE    KEY-NEW         TO  KEY-OLD
+                   PERFORM         UNTIL   FLG-EFOUT   =   1
+                                   OR      KEY-NEW NOT =   KEY-OLD
+                       IF      KEY-N-SJKBN     =   "90"
+                           MOVE    RECEDEN-RECEDATA
+                                                   TO  WRK-EF-REC
+                           MOVE    WRK-RENNUM      TO  WRK-EF-RENNUM
+                           MOVE    WRK-EF-REC      TO  RECEDEN-RECEDATA
+                       END-IF
+                       PERFORM 200211-EF-WRITE-SEC
+      *
+                       PERFORM 900-EFOUT-READ-SEC
+                   END-PERFORM
+               END-PERFORM
+           END-PERFORM
+      *
+           .
+       20021-EF-HENSYU-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    ＥＦファイル出力処理（入院）
+      *****************************************************************
+       200211-EF-WRITE-SEC          SECTION.
+      *
+           EVALUATE    RECEDEN-RECKBN
+               WHEN    "E"
+                   MOVE    RECEDEN-RECEDATA    TO  EFFILE-R
+                   WRITE   EFFILE-R
+      *
+                   IF      STS-EFFILE          =   "00"
+                       CONTINUE
+                   ELSE
+                       CALL   "coblog" USING
+                                           "file write err " EFFILEPARA
+                       MOVE    SPACE           TO  WRK-RECEERR
+                       STRING "ファイル 書き込みエラー STS="
+                                               DELIMITED  BY  SIZE
+                               STS-EFFILE      DELIMITED  BY  SIZE
+                                               INTO    WRK-RECEERR
+                       END-STRING
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+      *
+                   ADD     1                   TO  CNT-OUT
+                                                   CNT-OUT-ALL
+               WHEN    "F"
+                   MOVE    RECEDEN-RECEDATA    TO  EFFILE-F-R
+                   WRITE   EFFILE-F-R
+      *
+                   IF      STS-EFFILEF         =   "00"
+                       CONTINUE
+                   ELSE
+                       CALL   "coblog" USING
+                                           "file write err " EFFILEFPARA
+                       MOVE    SPACE           TO  WRK-RECEERR
+                       STRING "ファイル 書き込みエラー STS="
+                                               DELIMITED  BY  SIZE
+                               STS-EFFILE      DELIMITED  BY  SIZE
+                                               INTO    WRK-RECEERR
+                       END-STRING
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+      *
+                   ADD     1                   TO  CNT-OUT1
+                                                   CNT-OUT-ALL
+           END-EVALUATE
+      *
+           .
+       200211-EF-WRITE-EXT.
            EXIT. 
       *
       *****************************************************************
@@ -517,7 +743,12 @@
       *
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
            MOVE    "tbl_efout"         TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           IF      WRK-NYUGAIKBN       =   "1"
+               MOVE    "key4"              TO  WRK-MCP-PATHNAME
+           ELSE
+               MOVE    "key2"              TO  WRK-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                PERFORM 900-EFOUT-READ-SEC
@@ -534,17 +765,43 @@
        900-EFOUT-READ-SEC              SECTION.
       *
            MOVE    "tbl_efout"         TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-EFOUT
                MOVE    MCPDATA-REC         TO  RECEDEN-REC
       *
-               MOVE    RECEDEN-RECKBN      TO  KEY-N-RECKBN
+               IF      WRK-NYUGAIKBN       =   "1"
+      *            入院分で診療区分未設定のとき
+                   IF      RECEDEN-SJKBN       =   SPACE
+                       MOVE   "作成処理を再度実行して下さい"
+                                                   TO  WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       STRING  "ORCRDPC10 "        DELIMITED   BY  SIZE
+                               WRK-RECEERR         DELIMITED   BY  SPACE
+                               LOW-VALUE           DELIMITED   BY  SIZE
+                                                   INTO    WRK-ERRMSG
+                       END-STRING
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+               END-IF
+      *
+               IF      WRK-NYUGAIKBN       =   "1"
+                   MOVE    RECEDEN-PTID        TO  KEY-N-PTID
+                   MOVE    RECEDEN-SJKBN       TO  KEY-N-SJKBN
+      *            診療区分９０のときだけ実施月日＋順序番号を設定
+                   IF      KEY-N-SJKBN         =   "90"
+                       MOVE    RECEDEN-TOTALTEN    TO  KEY-N-TOTALTEN
+                   ELSE
+                       MOVE    ZERO                TO  KEY-N-TOTALTEN
+                   END-IF
+               ELSE
+                   MOVE    RECEDEN-RECKBN      TO  KEY-N-RECKBN
+               END-IF
                ADD     1                   TO  CNT-IN
            ELSE
                MOVE    1                   TO  FLG-EFOUT
-               MOVE    HIGH-VALUE          TO  KEY-N-RECKBN
+               MOVE    HIGH-VALUE          TO  KEY-NEW
            END-IF
       *
            .
