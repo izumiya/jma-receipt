@@ -35,6 +35,8 @@
       *  04.08.05    NACL-藤原    17/04/19  特別療養費は対象外とする
       *  04.08.06    NACL-藤原    17/04/21  特別療養費は対象外ではなく
       *                                     ３とする 
+      *  04.08.07    NACL-藤原    17/06/21  入院年月日を履歴から取得する
+      *                                     ときの条件を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1194,7 +1196,9 @@
       *
            IF      FLG-PTNYUINRRK  =   ZERO
       *        入院年月日
-               MOVE    PTNYUINRRK-NYUINYMD  TO  WRK-PTNRRK-NYUINYMD
+               IF      PTNYUINRRK-NYUINYMD <    WRK-PTNRRK-NYUINYMD
+                   MOVE    PTNYUINRRK-NYUINYMD  TO  WRK-PTNRRK-NYUINYMD
+               END-IF 
            END-IF
       *
            MOVE    WRK-PTNRRK-REC TO  PTNYUINRRK-REC
