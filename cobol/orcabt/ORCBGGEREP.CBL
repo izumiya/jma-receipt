@@ -794,6 +794,7 @@
            PERFORM 990-DBCLOSE-SEC
       *
            IF    IDX-TBL               >   ZERO
+           AND  (FLG-SYOHOU        =   1    )
       *        伝票番号毎処理
                PERFORM 2002-HENSYU-SYORI-SEC
            END-IF
