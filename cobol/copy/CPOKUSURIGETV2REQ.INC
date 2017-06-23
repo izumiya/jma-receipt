@@ -27,8 +27,6 @@
            03  OKUSURIGETREQ-OKUSURIGETV2REQ.
       *        患者番号
                05  OKUSURIGETREQ-PATIENTID   PIC X(20).
-      *        基準日
-               05  OKUSURIGETREQ-BASE-DATE   PIC X(10).
       *        連番
                05  OKUSURIGETREQ-RENNUM      PIC X(04).
       *        グループ

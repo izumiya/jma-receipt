@@ -366,8 +366,8 @@
       *        エラー・警告メッセージ
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD           TO  OKUSURIPUTRES-API-RESULT
-               MOVE    WRK-ERRMSG
-                                       TO  OKUSURIPUTRES-API-RESULT-MSG
+               MOVE    WRK-ERRMSG          TO
+                                           OKUSURIPUTRES-API-RESULT-MSG
            END-IF
       *
            IF      APILST29-BODY   NOT =   LOW-VALUE

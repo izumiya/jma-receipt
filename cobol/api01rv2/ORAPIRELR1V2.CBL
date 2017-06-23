@@ -82,7 +82,6 @@
            03  WRK-KEICD               PIC X(02).
       *
        01  WRK-XML-AREA.
-           03  WRK-BASE-YMD            PIC X(08).
            03  WRK-PTNUM               PIC X(20).
            03  WRK-XML                 PIC X(30000).
            03  WRK-XML-LEN             PIC 9(05).
@@ -350,7 +349,7 @@
            ELSE
       *        エラー・警告メッセージ
                PERFORM 890-ERRCD-MSG-SEC
-               MOVE    WRK-ERRCD           TO  OKUSURIGETRES-API-RESULT
+               MOVE    WRK-ERRCD       TO  OKUSURIGETRES-API-RESULT
                MOVE    WRK-ERRMSG      TO  OKUSURIGETRES-API-RESULT-MSG
            END-IF
       *
@@ -415,10 +414,6 @@
                                        =   LOW-VALUE
                MOVE    SPACE               TO  OKUSURIGETREQ-PATIENTID
            END-IF
-           IF      OKUSURIGETREQ-BASE-DATE
-                                       =   LOW-VALUE
-               MOVE    SPACE               TO  OKUSURIGETREQ-BASE-DATE
-           END-IF
            IF      OKUSURIGETREQ-RENNUM
                                        =   LOW-VALUE
                MOVE    SPACE               TO  OKUSURIGETREQ-RENNUM
@@ -452,10 +447,6 @@
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20011-PTNUM-CHK-SEC
            END-IF
-      *    基準日チェック
-           IF      WRK-ERRCD           =   SPACE
-               PERFORM 20011-BASEYMD-CHK-SEC
-           END-IF
            .
        2001-INPUT-CHK-EXT.
            EXIT.
@@ -468,23 +459,6 @@
       *    患者番号
            MOVE    OKUSURIGETREQ-PATIENTID
                                        TO  WRK-PTNUM
-      *    基準日
-           MOVE    OKUSURIGETREQ-BASE-DATE
-                                       TO  OKUSURIGETRES-BASE-DATE
-      *    数字のみに編集
-           MOVE    OKUSURIGETREQ-BASE-DATE
-                                       TO  WRK-HEN-DATE
-           MOVE    SPACE               TO  WRK-HEN-TIME
-           PERFORM 802-DAYHEN02-SEC
-           MOVE    WRK-SYMD            TO  WRK-BASE-YMD
-      *    予約日未設定はシステム日付
-           IF      WRK-BASE-YMD        =   SPACE
-               MOVE    SPA-SYSYMD          TO  WRK-BASE-YMD
-               MOVE    WRK-BASE-YMD        TO  WRK-SYMD
-               MOVE    ZERO                TO  WRK-THMS
-               PERFORM 801-DAYHEN01-SEC
-               MOVE    WRK-HEN-DATE        TO  OKUSURIGETRES-BASE-DATE
-           END-IF
       *
       *    必須入力チェック
       *    患者番号
@@ -529,26 +503,6 @@
            EXIT.
       *
       *****************************************************************
-      *    基準日チェック
-      *****************************************************************
-       20011-BASEYMD-CHK-SEC       SECTION.
-      *
-      *    日付チェックサブ
-           MOVE    SPACE               TO  STS-AREA-DAY
-           INITIALIZE  STS-AREA-DAY
-           MOVE    SPACE               TO  LNK-DAY2-AREA
-           MOVE    "21"                TO  LNK-DAY2-IRAI
-           MOVE    WRK-BASE-YMD        TO  LNK-DAY2-YMD
-           CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                           LNK-DAY2-AREA
-           IF      STS-DAY-RC1     NOT =   ZERO
-               MOVE    "11"                TO  WRK-ERRCD
-           END-IF
-           .
-       20011-BASEYMD-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    お薬手帳管理情報編集処理
       *****************************************************************
        2002-MNOTE-KANRI-SEC        SECTION.
@@ -568,6 +522,10 @@
                                        TO  OKUSURIGETRES-TBL-UUID (IDX)
                MOVE    MNOTE-H-SHORI-RENNUM
                                    TO  OKUSURIGETRES-SHORI-RENNUM (IDX)
+               MOVE    MNOTE-H-SRYYMD  TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE
+                                   TO  OKUSURIGETRES-PERFORM-DATE (IDX)
       *
                PERFORM 900-MNOTE-H-KEY8-FET-SEC
            END-PERFORM
@@ -701,9 +659,6 @@
                                                TO  WRK-ERRMSG
                WHEN    "10"
                    MOVE    "患者番号に該当する患者が存在しません"
-                                               TO  WRK-ERRMSG
-               WHEN    "11"
-                   MOVE    "基準日が暦日ではありません"
                                                TO  WRK-ERRMSG
       *共通エラー
                WHEN    "89"
