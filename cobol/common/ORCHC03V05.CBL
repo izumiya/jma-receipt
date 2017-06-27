@@ -76,35 +76,20 @@
            03  FLG-SYORI           PIC 9(01).
            03  FLG-DOUJI           PIC 9(01).
            03  FLG-HENPARA         PIC 9(01).
+           03  FLG-HKNTEN          PIC 9(01).
+           03  FLG-FTNKIN          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
-           03  IDX-Z               PIC 9(04).
-           03  IDX-S               PIC 9(04).
-           03  IDX-MAX             PIC 9(04).
-           03  IDXA                PIC 9(04).
-           03  IDX-ACT             PIC 9(02).
-           03  IDX-REN             PIC 9(04).
-           03  IDX-JYU             PIC 9(04).
-           03  IDX-JIHI            PIC 9(04).
-      *
            03  IDX-SYU             PIC 9(04).
            03  IDX-SYU2            PIC 9(04).
            03  IDH3                PIC 9(04).
-      *
            03  IDX2                PIC 9(02).
            03  IDX3                PIC 9(04).
-           03  IDXP                PIC 9(02).
-           03  IDXM                PIC 9(02).
-           03  IDK                 PIC 9(04).
-           03  IDX2-1              PIC 9(01).
-           03  IDX-MEMO            PIC 9(04).
-      *
            03  IDX-H               PIC 9(04).
            03  IDX-TBL             PIC 9(04).
-      *H26.10
            03  IDXC                PIC 9(04).
            03  IDX-CM              PIC 9(04).
       *
@@ -135,11 +120,14 @@
            03  WRK-GOKTEN          PIC S9(11).
            03  WRK-SKYMONEY-TAX-SAI        PIC S9(11).
       *
-           03  WRK-TOTAL-HKNTEN            PIC S9(11).
-           03  WRK-HKNTEKMONEY             PIC S9(11).
-           03  WRK-KOH-FTN                 PIC S9(11).
-           03  WRK-GOK-JIHI                PIC S9(11).
-           03  WRK-CHOSEI                  PIC S9(11).
+           03  WRK-TOTAL-HKNTEN        PIC S9(11).
+           03  WRK-HKNTEKMONEY         PIC S9(11).
+           03  WRK-KOH-FTN             PIC S9(11).
+           03  WRK-GOK-JIHI            PIC S9(11).
+           03  WRK-CHOSEI              PIC S9(11).
+      *
+           03  WRK-HKNTEN-G.
+               05  WRK-HKNTEN          PIC S9(11) OCCURS 15.
       *
            03  WRK-HEAD-DENPNUM        PIC 9(07).
            03  WRK-HEAD-HKNCOMBIMEI    PIC X(40).
@@ -172,11 +160,7 @@
       *    ¼«Èñ½¸·×
            03  WRK-JIHI-TOTAL          PIC S9(08).
       *
-      *    Ê£¿ô²Ê¤Þ¤È¤á½¸·×
-           03  WRK-HKNTEN-KIN              PIC 9(07).
-           03  WRK-HKNTEN-KEI              PIC 9(07)V99.
            03  WRK-NYUKIN                  PIC S9(07).
-      *
            03  WRK-NYUKIN-TOTAL            PIC S9(07).
            03  WRK-ZENMISYU                PIC S9(07).
       *
@@ -470,6 +454,10 @@
       *
       *    ³Æ£Ä£ÂÆÉ¹þ
            PERFORM 100-SYORI-SEC
+      *
+           IF     ( SPA-API-FLG    NOT =   ZERO )
+               MOVE    "1"             TO  PARA-API-DATA
+           END-IF
       *
            EVALUATE    TRUE
            WHEN  ( PARA-API-DATA       =   "1" )
@@ -1022,75 +1010,21 @@
       *
       *    Ï«ºÒ¡¦¼«Çå¤Ç´µ¼ÔÀÁµá¤¬Ìµ¤¤¾ì¹ç¡¢ÅÀ¿ôÉ½¼¨¤Ê¤·
            IF    ( COMB-HKNNUM             =    "971"
-               AND PTRSI-HKNKBN        NOT =    "5"
-               AND SYS-4001-RSIIRYOKBN     =    "1" )
-            OR   ( COMB-HKNNUM             =    "971"
-               AND PTRSI-HKNKBN            =    "5"
-               AND SYU-PTFTNRATE           =    ZERO )
-            OR   ( COMB-HKNNUM             =    "973"
-               AND SYU-PTFTNRATE           =    ZERO )
+              AND  PTRSI-HKNKBN        NOT =    "5"
+              AND  SYS-4001-RSIIRYOKBN     =    "1" )
+              OR   ( COMB-HKNNUM             =    "971"
+              AND PTRSI-HKNKBN             =    "5"
+              AND SYU-PTFTNRATE            =    ZERO )
+             OR   ( COMB-HKNNUM             =    "973"
+                AND SYU-PTFTNRATE           =    ZERO )
                MOVE    ALL "*"             TO  HCM03V05-GOKTEN
            ELSE
-      *        ¿ÇÎÅ²Ê
-               MOVE    SYU-HKNTEN (01)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(1)
-      *        »ØÆ³²Ê
-               MOVE    SYU-HKNTEN (02)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(2)
-      *        ºßÂð²Ê
-               MOVE    SYU-HKNTEN (03)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(3)
-      *        ÅêÌô²Ê
-               MOVE    SYU-HKNTEN (04)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(4)
-      *        Ãí¼Í²Ê
-               MOVE    SYU-HKNTEN (05)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(5)
-      *        ½èÃÖ²Ê
-               MOVE    SYU-HKNTEN (06)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(6)
-      *        ¼ê½Ñ²Ê
-               MOVE    SYU-HKNTEN (07)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(7)
-      *        Ëã¿ì
-               MOVE    SYU-HKNTEN (08)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(8)
-      *        ¸¡ºº²Ê
-               MOVE    SYU-HKNTEN (09)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(9)
-      *        £ØÀþ²Ê
-               MOVE    SYU-HKNTEN (10)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(10)
-      *        ¥ê¥Ï¥Ó¥ê
-               MOVE    SYU-HKNTEN (11)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(11)
-      *        Àº¿À²ÊÀìÌç
-               MOVE    SYU-HKNTEN (12)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(12)
-      *        Êü¼ÍÀþ¼£ÎÅ
-               MOVE    SYU-HKNTEN (13)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(13)
-      *        ÉÂÍý¿ÇÃÇ
-               MOVE    SYU-HKNTEN (14)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(14)
-      *        Æþ±¡ÎÁ
-               MOVE    SYU-HKNTEN (15)     TO  WRK-Z72
-               PERFORM 800-HENKAN-SEC
-               MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(15)
+               PERFORM VARYING IDY FROM 1 BY 1
+                       UNTIL   IDY >   15 
+                   MOVE    WRK-HKNTEN(IDY)     TO  WRK-Z72
+                   PERFORM 800-HENKAN-SEC
+                   MOVE    WRK-Z7-G            TO  HCM03V05-HKNRYO(IDY)
+               END-PERFORM
       *        ¹ç·×ÅÀ¿ô
                MOVE    WRK-TOTAL-HKNTEN    TO  WRK-Z72
                PERFORM 800-HENKAN-SEC
@@ -1101,33 +1035,6 @@
            MOVE    WRK-HKNTEKMONEY     TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z7-G            TO  HCM03V05-FTNKIN
-      *
-           IF    ( COMB-HKNNUM             =    "971"
-                                           OR   "973" )
-            OR   ( COMB-KOHHKNNUM (1)      =    "970"
-              AND  SYU-PTFTNRATE       NOT =     ZERO )
-      *        Ï«ºÒ¡¦¼«Çå¤Î»þ¡¢ÅÀ¿ôÉ½¼¨¤Ê¤·
-               IF    ( COMB-HKNNUM             =    "971"
-                   AND PTRSI-HKNKBN        NOT =    "5"
-                   AND SYS-4001-RSIIRYOKBN     =    "1" )
-                OR   ( COMB-HKNNUM             =    "971"
-                   AND PTRSI-HKNKBN            =    "5"
-                   AND SYU-PTFTNRATE           =    ZERO )
-                OR   ( COMB-HKNNUM             =    "973"
-                   AND SYU-PTFTNRATE           =    ZERO )
-                   MOVE    SPACE               TO  HCM03V05-FTNKIN
-               ELSE
-                   COMPUTE WRK-HKNTEKMONEY =   SYU-HKNTEKMONEY
-                                           +   SYU-RSISHOSHIN-MONEY
-                                           +   SYU-RSISAISHIN-MONEY
-                                           +   SYU-RSISDO-MONEY
-                                           +   SYU-RSIETC-MONEY
-                                           +   SYU-KOH-FTN
-                   MOVE    WRK-HKNTEKMONEY     TO  WRK-Z72
-                   PERFORM 800-HENKAN-SEC
-                   MOVE    WRK-Z7-G            TO  HCM03V05-FTNKIN
-               END-IF
-           END-IF
       *
       *    ¼«Èñ¹ç·×
            MOVE    WRK-GOK-JIHI        TO  WRK-Z72
@@ -1479,10 +1386,8 @@
            MOVE    ORCHC03-DENPNUM     TO  WRK-DENPNUM
       *    ÅÁÉ¼ÈÖ¹æËè¤Î°õºþ
            PERFORM 2100-DENPNUM-SYORI-SEC
-      *??  IF      IDX-H               >   ZERO
-      *       °õºþ½èÍý
-              PERFORM 400-PRINT-SYORI-SEC
-      *??  END-IF
+      *    °õºþ½èÍý
+           PERFORM 400-PRINT-SYORI-SEC
            .
        201-ONLY-SYUNOU-EXT.
            EXIT.
@@ -1635,6 +1540,38 @@
                MOVE    WRK-JIHI-TOTAL      TO  WRK-GOKTEN
            END-IF
            MOVE    WRK-GOKTEN          TO  WRK-GOK-JIHI
+      *
+           INITIALIZE                      WRK-HKNTEN-G
+           PERFORM VARYING IDY FROM 1 BY 1
+                   UNTIL   IDY >   15 
+               MOVE    SYU-HKNTEN(IDY)     TO  WRK-HKNTEN(IDY)
+           END-PERFORM
+      *
+      *
+           IF    ( COMB-HKNNUM             =    "971"
+                                           OR   "973" )
+            OR   ( COMB-KOHHKNNUM (1)      =    "970"
+              AND  SYU-PTFTNRATE       NOT =     ZERO )
+      *        Ï«ºÒ¡¦¼«Çå¤Î»þ¡¢ÅÀ¿ôÉ½¼¨¤Ê¤·
+               IF    ( COMB-HKNNUM             =    "971"
+                   AND PTRSI-HKNKBN        NOT =    "5"
+                   AND SYS-4001-RSIIRYOKBN     =    "1" )
+                OR   ( COMB-HKNNUM             =    "971"
+                   AND PTRSI-HKNKBN            =    "5"
+                   AND SYU-PTFTNRATE           =    ZERO )
+                OR   ( COMB-HKNNUM             =    "973"
+                   AND SYU-PTFTNRATE           =    ZERO )
+                   MOVE    0               TO  WRK-HKNTEKMONEY 
+               ELSE
+                   COMPUTE WRK-HKNTEKMONEY      =    SYU-HKNTEKMONEY
+                                           +    SYU-RSISHOSHIN-MONEY
+                                           +    SYU-RSISAISHIN-MONEY
+                                           +    SYU-RSISDO-MONEY
+                                           +    SYU-RSIETC-MONEY
+                                           +    SYU-KOH-FTN
+               END-IF
+           END-IF
+      *
            .
        21001-HAED-KEISAN-EXT.
            EXIT.
@@ -1776,10 +1713,8 @@
                    PERFORM 2100-DENPNUM-SYORI-SEC
                END-PERFORM
       *
-      *??      IF      IDX-H               >   ZERO
-      *            °õºþ½èÍý
-                   PERFORM 400-PRINT-SYORI-SEC
-      *??      END-IF
+      *        °õºþ½èÍý
+               PERFORM 400-PRINT-SYORI-SEC
            END-PERFORM
       *
            .
@@ -2272,10 +2207,8 @@
                    END-IF
                END-PERFORM
       *
-      *??      IF      IDX-H               >   ZERO
-      *            °õºþ½èÍý
-                   PERFORM 400-PRINT-SYORI-SEC
-      *??      END-IF
+      *        °õºþ½èÍý
+               PERFORM 400-PRINT-SYORI-SEC
       *
                PERFORM 900-PARA-KEY5-FET-SEC
       *
