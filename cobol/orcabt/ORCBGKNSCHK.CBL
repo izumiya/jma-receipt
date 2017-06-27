@@ -594,7 +594,7 @@
       *    処理開始年月
            MOVE    "20170626"          TO  WRK-STR-YMD
       *    処理終了年月
-           MOVE    "20170730"          TO  WRK-END-YMD
+           MOVE    "20170731"          TO  WRK-END-YMD
       *
       *    IF      WRK-PARA-SYORIKBN   =   "1"
       *        MOVE    "（処理１）"        TO  PRT-MIDASI
@@ -785,6 +785,7 @@
            MOVE    ZERO            TO  CNT-PAGE
       *
            MOVE    "（入院）"          TO  PRT-MIDASI
+           MOVE    ZERO            TO  FLG-SYOHOU
       *
            INITIALIZE  JYURRK-REC
            MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
