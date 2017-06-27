@@ -2747,6 +2747,8 @@
       *        ¿ÇÎÅ¼ïÊÌÆþÎÏ¤Ç½ªÎ»
                IF     (SPA-GMN-INPUTCD (IDX-KEN)(1:1)  =   "."
                                                        OR  "*" )
+                 AND  (SPA-NYUGAIKBN        =   1     )
+                 AND  (FLG-KENSA-CHK        =   1    )
                     IF      IDX             >   IDX-KEN
                         MOVE    ZERO        TO  WRK-KENSA-CNT
                     ELSE
