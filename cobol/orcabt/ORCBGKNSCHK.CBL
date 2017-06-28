@@ -239,9 +239,11 @@
                    "＃＃　包括検査　誤算定疑い患者一覧　＃＃".
                05  PRT-MIDASI          PIC X(10).
      ******    05  FILLER              PIC X(16)   VALUE   SPACE.
-               05  PRT-SRYYM           PIC X(16).
-               05  FILLER              PIC X(04)   VALUE
-                   "分".
+     ****      05  PRT-SRYYM           PIC X(16).
+               05  FILLER              PIC X(22)   VALUE
+                   "平成２９年　６・７月分".
+     ***       05  FILLER              PIC X(04)   VALUE
+     ***           "分".
                05  FILLER              PIC X(05)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
@@ -585,16 +587,16 @@
            INITIALIZE  STS-AREA-DAY
            INITIALIZE  LNK-DAY2-AREA
            MOVE    "21"                TO  LNK-DAY2-IRAI
-           MOVE    SPA-SYSYMD          TO  LNK-DAY2-YMD
+           MOVE    SPA-SRYYMD          TO  LNK-DAY2-YMD
            CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                            LNK-DAY2-AREA
-           MOVE    LNK-DAY2-EDTYMD3(1:16)
-                                       TO  PRT-SRYYM
+      **   MOVE    LNK-DAY2-EDTYMD3(1:16)
+      **                               TO  PRT-SRYYM
       *
       *    処理開始年月
            MOVE    "20170601"          TO  WRK-STR-YMD
       *    処理終了年月
-           MOVE    "20170630"          TO  WRK-END-YMD
+           MOVE    "20170731"          TO  WRK-END-YMD
       *
       *    IF      WRK-PARA-SYORIKBN   =   "1"
       *        MOVE    "（処理１）"        TO  PRT-MIDASI
