@@ -241,8 +241,7 @@
      ******    05  FILLER              PIC X(16)   VALUE   SPACE.
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
-                   SPACE.
-     ****          "分".
+                   "分".
                05  FILLER              PIC X(05)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
@@ -589,13 +588,13 @@
            MOVE    SPA-SYSYMD          TO  LNK-DAY2-YMD
            CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                            LNK-DAY2-AREA
-      *    MOVE    LNK-DAY2-EDTYMD3(1:16)
-      *                                TO  PRT-SRYYM
+           MOVE    LNK-DAY2-EDTYMD3(1:16)
+                                       TO  PRT-SRYYM
       *
       *    処理開始年月
-           MOVE    "20170626"          TO  WRK-STR-YMD
+           MOVE    "20170601"          TO  WRK-STR-YMD
       *    処理終了年月
-           MOVE    "20170731"          TO  WRK-END-YMD
+           MOVE    "20170630"          TO  WRK-END-YMD
       *
       *    IF      WRK-PARA-SYORIKBN   =   "1"
       *        MOVE    "（処理１）"        TO  PRT-MIDASI
