@@ -672,10 +672,10 @@
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key64"             TO  MCP-PATHNAME
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "key64"             TO  MCP-PATHNAME
+               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            ELSE
                INITIALIZE  JYURRK-REC
@@ -724,11 +724,11 @@
                PERFORM 2001-JYURRK-HEN-SEC
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key64"             TO  MCP-PATHNAME
+               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            END-PERFORM
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key64"             TO  MCP-PATHNAME
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF   (FLG-SYOHOU        =   1    )
@@ -768,10 +768,10 @@
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key64"             TO  MCP-PATHNAME
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "key64"             TO  MCP-PATHNAME
+               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            ELSE
                INITIALIZE  JYURRK-REC
@@ -817,11 +817,11 @@
                PERFORM 2001-JYURRK-HEN-SEC
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key64"             TO  MCP-PATHNAME
+               MOVE    "key69"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-READ-SEC
            END-PERFORM
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key64"             TO  MCP-PATHNAME
+           MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF   (FLG-SYOHOU        =   1    )
