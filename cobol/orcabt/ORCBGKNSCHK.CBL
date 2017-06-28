@@ -241,7 +241,8 @@
      ******    05  FILLER              PIC X(16)   VALUE   SPACE.
                05  PRT-SRYYM           PIC X(16).
                05  FILLER              PIC X(04)   VALUE
-                   " ¨".
+                   SPACE.
+     ****          " ¨".
                05  FILLER              PIC X(05)   VALUE   SPACE.
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  PRT-TIME            PIC X(07)   VALUE   SPACE.
@@ -392,7 +393,7 @@
       *    ø«Œ≈≤ Ã‹æ Û
            COPY    "CPSK1005.INC".
       *    ƒ¢…º ‘Ω∏æ Û
-           COPY    "CPSK1030.INC".
+      *    COPY    "CPSK1030.INC".
       *
       *    ¥µº‘
        01  PTINF-REC.
@@ -518,8 +519,8 @@
                                                WRK-PARA-SHELLID
                                                WRK-PARA-HOSPNUM
                                                RECEERR
-                                               WRK-PARA-SRYYM
                                                WRK-PARA-SYORIKBN
+                                               WRK-PARA-SRYYM
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
@@ -580,7 +581,7 @@
       *
       *    ø«Œ≈∆¸
            MOVE    "201706"            TO  WRK-SRY-YYMM
-           MOVE    "20170626"          TO  SPA-SRYYMD
+           MOVE    "20170601"          TO  SPA-SRYYMD
       *    ΩËÕ˝∆¸
            INITIALIZE  STS-AREA-DAY
            INITIALIZE  LNK-DAY2-AREA
@@ -588,8 +589,8 @@
            MOVE    SPA-SYSYMD          TO  LNK-DAY2-YMD
            CALL    "ORCSDAY"       USING   STS-AREA-DAY
                                            LNK-DAY2-AREA
-           MOVE    LNK-DAY2-EDTYMD3(1:16)
-                                       TO  PRT-SRYYM
+      *    MOVE    LNK-DAY2-EDTYMD3(1:16)
+      *                                TO  PRT-SRYYM
       *
       *    ΩËÕ˝≥´ªœ«Ø∑Ó
            MOVE    "20170626"          TO  WRK-STR-YMD
@@ -653,37 +654,6 @@
            PERFORM 990-DBCLOSE-SEC
            .
        1101-SRYKA-TBLSET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ƒ¢…º ‘Ω∏æ ÛºË∆¿ΩËÕ˝
-      *****************************************************************
-       1102-SYS1030-GET-SEC        SECTION.
-      *
-      *    ƒ¢…º ‘Ω∏æ Û
-           MOVE    SPACE               TO  SYS-1030-REC
-           MOVE    "1030"              TO  SYS-1030-KANRICD
-           MOVE    "*"                 TO  SYS-1030-KBNCD
-           MOVE    SPA-SRYYMD          TO  SYS-1030-STYUKYMD
-           MOVE    SPA-SRYYMD          TO  SYS-1030-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-1030-HOSPNUM
-           MOVE    SYS-1030-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
-               PERFORM 900-SYSKANRI-READ-SEC
-               MOVE    SYSKANRI-REC        TO  SYS-1030-REC
-           ELSE
-               MOVE    1               TO  FLG-SYSKANRI
-           END-IF
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-           .
-       1102-SYS1030-GET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -770,8 +740,10 @@
            END-IF
       *
       *    ∆˛±°
+      *    IF      WRK-PARA-SYORIKBN   =   "1"
            PERFORM 2100-NYUIN-MAIN-SEC
       *
+      *    END-IF
            .
        200-MAIN-EXT.
            EXIT.
@@ -861,7 +833,7 @@
            END-IF
       *
            .
-       2100-NYUIN-MAIN--EXT.
+       2100-NYUIN-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -964,11 +936,11 @@
            END-IF
       *@
       *    º´ ›∂Ë ¨§¨£±§ŒæÏπÁ°¢ Ò≥Á∫ﬁ°¢ÃÙ…æ¬–æ›≥∞
-           IF     (ACCT-JIHOKBN        =   1   )
-              OR  (ACCT-HKNCOMBI       =   "9999" )
-              OR  (ACCT-ZAIKBN     NOT =  ZERO  )
-                MOVE    1               TO  FLG-CHKIKBN
-           END-IF
+      *    IF     (ACCT-JIHOKBN        =   1   )
+      *       OR  (ACCT-HKNCOMBI       =   "9999" )
+      *       OR  (ACCT-ZAIKBN     NOT =  ZERO  )
+      *         MOVE    1               TO  FLG-CHKIKBN
+      *    END-IF
       *
            .
        20011-SRYACCT-CHK-EXT.
@@ -998,13 +970,13 @@
                                                                  (IDX)
                        MOVE    1               TO  FLG-SYOHOU
       *∆√∞€≈™£…£«£≈
-      *            WHEN    11
-      *                MOVE    TNS-HOUKNSKBN   TO  IDX
-      *                ADD     1               TO  WRK-HOUKNS-CNT (IDX)
-      *                ADD     TNS-TEN
-      *                                        TO  WRK-HOUKNS-TENSU
-      *                                                          (IDX)
-      **               MOVE    1               TO  FLG-SYOHOU
+                   WHEN    11
+                       MOVE    TNS-HOUKNSKBN   TO  IDX
+                       ADD     1               TO  WRK-HOUKNS-CNT (IDX)
+                       ADD     TNS-TEN
+                                               TO  WRK-HOUKNS-TENSU
+                                                                 (IDX)
+                       MOVE    1               TO  FLG-SYOHOU
                    END-EVALUATE
                    END-IF
                END-IF
@@ -1171,8 +1143,13 @@
                                MOVE    1            TO  FLG-ERR
                            END-IF
                        END-IF
-      ***          WHEN    11
+                   WHEN    11
       *            ∆√∞€≈™£…£«£≈
+                       IF      WRK-HOUKNS-CNT(IDX)  >   1
+                           IF      WRK-ZAICNT (IDX) NOT =  1
+                               MOVE    1            TO  FLG-ERR
+                           END-IF
+                       END-IF
       **               PERFORM 10042-IGE-HOUKNS-ADD-SEC
       *∆‚ ¨»Á…È≤ŸªÓ∏≥§œ Ò≥Á∑◊ªª≥∞
       *D           WHEN    8
