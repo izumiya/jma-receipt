@@ -1337,7 +1337,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            MOVE    "HCMSL80.red"       TO  SPRT-PRTID
-           MOVE    "°ìÈÌÌ¾½èÊý²Ã»»¸í»»Äêµ¿¤¤´µ¼Ô°ìÍ÷"
+           MOVE    "Êñ³ç¸¡ºº¸í»»Äêµ¿¤¤´µ¼Ô°ìÍ÷"
                                        TO  SPRT-TITLE
            MOVE    HCMSL80             TO  SPRT-PRTDATA
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
