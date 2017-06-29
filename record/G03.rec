@@ -12,6 +12,7 @@ G03 {
       textdata varchar(1);
     };
     CHK01 {
+      state int;
       isactive bool;
       label varchar(80);
     };

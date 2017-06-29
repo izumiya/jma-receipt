@@ -59,12 +59,14 @@
            03  FLG-HIT                         PIC 9(01).
            03  FLG-UPDATE-SYSKANRI             PIC 9(01).
            03  FLG-FIXED                       PIC 9(01).
+           03  FLG-ENABLED                     PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                            PIC 9(05).
            03  IDX1                            PIC 9(05).
            03  IDX2                            PIC 9(05).
            03  IDXA                            PIC 9(05).
+           03  IDXI                            PIC 9(04).
            03  IDXK                            PIC 9(04).
            03  IDX-STR                         PIC 9(05).
       *
@@ -369,6 +371,10 @@
       *
            MOVE    SPA-GMN-L01-REPOS-NAME (IDX0)
                                        TO  SPA-GMN-L03-REPOS-NAME
+           PERFORM 800-IS-ENABLED-SEC
+           IF    ( FLG-ENABLED         =   ZERO )
+               MOVE    "F"             TO  SPA-GMN-L03-CHK-VALUE
+           END-IF
       *
            MOVE    SPA-L01-SEL         TO  WRK-KBNCD
       *
@@ -1264,6 +1270,8 @@
            MOVE    SPA-GMN-L03-REPOS-NAME
                                        TO  L03-REPOS-NAME
       *
+           PERFORM 800-IS-ENABLED-SEC
+      *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >       WRK-CONS-PARA-MAX )
       *
@@ -1280,8 +1288,11 @@
       *
                IF    ( SPA-GMN-L03-PARAHYOJI (IDX0)
                                    NOT =   SPACE )
-                   MOVE    WIDGET-NORMAL
+                   IF    ( FLG-ENABLED     =   1 )
+                       MOVE    WIDGET-NORMAL
                                        TO  L03-PARA-STATE(IDX0)
+                   END-IF
+      *
                    IF  ( SPA-NAI-L03-HISSU-KBN(IDX0)
                                        =   "1" )
                        MOVE    "red"   TO  L03-PARAMARK-STYLE(IDX0)
@@ -1294,6 +1305,12 @@
       *
            END-PERFORM
       *
+           MOVE    WIDGET-NORMAL           TO  L03-CHK-STATE
+           IF    ( FLG-ENABLED         =   ZERO )
+               MOVE    WIDGET-INSENSITIVE
+                                           TO  L03-CHK-STATE
+               MOVE    "F"                 TO  L03-CHK-VALUE
+           END-IF
       *
            MOVE    SPA-GMN-L03-MEMO        TO  L03-MEMO
       *
@@ -1339,7 +1356,9 @@
                MOVE    "PARA018"           TO  MCP-WIDGET
            WHEN    81
                MOVE    "USERMEMO"          TO  MCP-WIDGET
-           WHEN    99
+           WHEN   201
+               MOVE    "B01"               TO  MCP-WIDGET
+           WHEN   212
                MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
       *
@@ -1370,7 +1389,7 @@
            WHEN    "PARA017"
                MOVE    09                  TO  SPA-GMN-L03-CUR
            WHEN    "PARA018"
-               MOVE    99                  TO  SPA-GMN-L03-CUR
+               MOVE   212                  TO  SPA-GMN-L03-CUR
            END-EVALUATE
       *
            .
@@ -1382,6 +1401,12 @@
       *****************************************************************
        5012-CUR-SKIP-SEC               SECTION.
       *
+           IF    ( SPA-GMN-L03-CUR =   1 )
+               IF    ( L03-CHK-STATE   =   WIDGET-INSENSITIVE )
+                   MOVE   201      TO  SPA-GMN-L03-CUR
+               END-IF
+           END-IF
+      *
            MOVE    1               TO  WRK-CHK-CUR
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
@@ -1392,14 +1417,18 @@
                IF    ( SPA-GMN-L03-CUR     = WRK-CHK-CUR  )
                 AND  ( L03-PARA-STATE(IDX0)
                                            =   WIDGET-INSENSITIVE )
-                   COMPUTE SPA-GMN-L03-CUR =   SPA-GMN-L03-CUR   + 1
+                   IF    ( SPA-GMN-L03-CUR     =   WRK-CONS-PARA-MAX )
+                       MOVE   212          TO  SPA-GMN-L03-CUR
+                   ELSE
+                       COMPUTE SPA-GMN-L03-CUR =   SPA-GMN-L03-CUR   + 1
+                   END-IF
                END-IF
       *
            END-PERFORM
       *
-           IF    ( SPA-GMN-L03-CUR NOT =   81 )
-               IF    ( SPA-GMN-L03-CUR >   9 )
-                   MOVE    99          TO  SPA-GMN-L03-CUR
+           IF    ( SPA-GMN-L03-CUR =   212 )
+               IF    ( L03-CHK-STATE   =   WIDGET-INSENSITIVE )
+                   MOVE   201      TO  SPA-GMN-L03-CUR
                END-IF
            END-IF
       *
@@ -1633,6 +1662,24 @@
            .
       *
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    使用可否チェック処理
+      *****************************************************************
+       800-IS-ENABLED-SEC        SECTION.
+      *
+           MOVE    1               TO  FLG-ENABLED
+      *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+            AND  ( SPA-GMN-L03-REPOS-NAME
+                                   NOT =   SPACE )
+            AND  ( SPA-L01-CUSTOM-ENABLED
+                                   NOT =   "1" )
+               MOVE    ZERO        TO  FLG-ENABLED
+           END-IF
+      *
+           .
+       800-IS-ENABLED-EXT.
            EXIT.
       *****************************************************************
       *    統計メモテーブル検索処理

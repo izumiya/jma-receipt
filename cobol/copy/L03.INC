@@ -26,6 +26,7 @@
                                       PIC X(20).
                 04  L03-MARKNINI      PIC X(01).
               03  L03-CHK-G.
+                04  L03-CHK-STATE     PIC S9(9)   BINARY.
                 04  L03-CHK-VALUE     PIC X.
                 04  L03-CHK-LABEL     PIC X(80).
               03  L03-PARA-G.

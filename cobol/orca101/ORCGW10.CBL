@@ -207,6 +207,9 @@
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
       *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -467,6 +470,16 @@
       *
            CALL    "ORCSUPDTOUKEIPRM"  USING   SPA-AREA
       *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               CALL    "ORCSBILLINGCHECK"  USING   SBC-AREA
+                                                   SPA-AREA
+               IF    ( SBC-BILLINGUSER =   "1" )
+                   MOVE    "1"         TO  SPA-W10-CUSTOM-ENABLED
+               END-IF
+           ELSE
+               MOVE    "1"             TO  SPA-W10-CUSTOM-ENABLED
+           END-IF
+      *
            MOVE    SPA-W01-STYUKYMD    TO  SPA-W10-STYUKYMD
            MOVE    SPA-W01-EDYUKYMD    TO  SPA-W10-EDYUKYMD
            MOVE    SPA-W01-STYUKYMDH   TO  SPA-W10-STYUKYMDH
@@ -544,8 +557,12 @@
                PERFORM 900-SYSKANRI-KEY10-SEL-SEC
                MOVE    SYSKANRI-REC    TO  SYS-3101-REC
                IF    ( SPA-MW          =   SPA-GINBEE )
-                   MOVE    SYS-3101-REPOS-NAME
+                   IF    ( SPA-W10-CUSTOM-ENABLED =   "1" )
+                    OR   ( SYS-3101-REPOS-NAME
+                                       NOT =   SPACE )
+                       MOVE    SYS-3101-REPOS-NAME
                                            TO  SPA-GMN-W10-REPOS-NAME
+                   END-IF
                END-IF
       *
                MOVE    SYS-3001-REC        TO  SYSKANRI-REC
@@ -694,6 +711,7 @@
       *    
                WHEN    "CLICKED"       ALSO    "B11"
                    IF    ( SPA-W10-MODE    =   ZERO )
+                    AND  ( SPA-MW      NOT =   SPA-GINBEE )
                        PERFORM 411-MAINTENANCE-MODE-CHK-SEC
                    END-IF
       *
@@ -1638,8 +1656,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 500-GMNHEN-SEC
       *
-           PERFORM 510-GSRAUTH-SEC
-      *
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
                GO  TO  500-SET-SCREEN-EXT
@@ -1747,13 +1763,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            IF    ( SPA-MW               =   SPA-GINBEE )
-               MOVE    "T"              TO  W10-REPOS-NAME-VISIBLE
-               MOVE    "レポジトリ名"   TO  W10-LBLREPOS-NAME
-           ELSE
-               MOVE    "F"              TO  W10-REPOS-NAME-VISIBLE
+               IF    ( SPA-W10-CUSTOM-ENABLED  =   "1" )
+                OR   ( SPA-GMN-W10-REPOS-NAME
+                                       NOT =   SPACE )
+                   MOVE    "T"              TO  W10-REPOS-NAME-VISIBLE
+                   MOVE    "レポジトリ名"   TO  W10-LBLREPOS-NAME
+               ELSE
+                   MOVE    "F"              TO  W10-REPOS-NAME-VISIBLE
+               END-IF
            END-IF
       *
-           MOVE    SPA-GMN-W10-MEMO     TO  W10-MEMO
+           MOVE    SPA-GMN-W10-MEMO         TO  W10-MEMO
+      *
+           PERFORM 510-GSRAUTH-SEC
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -1767,10 +1789,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        510-GSRAUTH-SEC             SECTION.
       *
            MOVE    WIDGET-INSENSITIVE     TO  W10-B03-STATE
+           MOVE    WIDGET-INSENSITIVE     TO  W10-B12-STATE
       *
            IF      SPA-W10-SELNUM          >   ZERO    
                MOVE    WIDGET-NORMAL      TO  W10-B03-STATE
            END-IF
+      *
+           IF    ( SPA-MW           =     SPA-GINBEE )
+               IF    ( SPA-GMN-W10-REPOS-NAME
+                                        =     SPACE )
+                OR   ( SPA-W10-CUSTOM-ENABLED  =   "1" )
+                   MOVE    WIDGET-NORMAL  TO  W10-B12-STATE
+               END-IF
+           ELSE
+               MOVE    WIDGET-NORMAL      TO  W10-B12-STATE
+           END-IF
+      *
            .
        51O-GSRAUTH-EXT.
            EXIT.
@@ -1877,6 +1911,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
           IF    ( SPA-GMN-W10-CUR              =   20 )
            AND  ( W10-PARAHYOJI-VISIBLE (9)    =   "F" )
               MOVE    999                  TO  SPA-GMN-W10-CUR
+          END-IF
+      *
+          IF    ( SPA-GMN-W10-CUR              =   999 )
+              IF    ( W10-B12-STATE            =   WIDGET-INSENSITIVE )
+                  MOVE    1                TO  SPA-GMN-W10-CUR
+              END-IF
           END-IF
       *
           EVALUATE    SPA-GMN-W10-CUR

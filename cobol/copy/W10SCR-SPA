@@ -43,6 +43,7 @@
                05  SPA-W10-KANRICD2                 PIC X(04).
                05  SPA-W10-KBNCD                   PIC X(08).
                05  SPA-W10-MODE                    PIC 9(01).
+               05  SPA-W10-CUSTOM-ENABLED          PIC X(01).
                05  SPA-W10-PARA-MAX                PIC 9(03).
       *
                05  SPA-GMN-W10-AREA.

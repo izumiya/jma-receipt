@@ -9,6 +9,9 @@ W10 {
     B07 {
       label varchar(8);
     };
+    B12 {
+      state int;
+    };
     LBLTITLE {
       textdata varchar(20);
     };

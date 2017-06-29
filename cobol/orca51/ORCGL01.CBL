@@ -88,6 +88,7 @@
            03  FLG-TOUKEIMEMO                  PIC 9(01).
            03  FLG-FIXED                       PIC 9(01).
            03  FLG-UPDATE                      PIC 9(01).
+           03  FLG-ENABLED                     PIC 9(01).
       *
       *    フラグ領域
        01  STS-AREA.
@@ -102,6 +103,8 @@
            03  IDXA                            PIC 9(04).
            03  IDXB                            PIC 9(04).
            03  IDXC                            PIC 9(04).
+           03  IDXI                            PIC 9(04).
+           03  IDXJ                            PIC 9(04).
            03  IDXK                            PIC 9(04).
            03  IDXU                            PIC 9(04).
            03  IDX0                            PIC 9(04).
@@ -294,6 +297,9 @@
       *
       *    クライアント保存可否情報取得サブ
            COPY    "CPORCSCLIENTSV.INC".
+      *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -518,6 +524,16 @@
       *
            CALL    "ORCSUPDTOUKEIPRM"  USING   SPA-AREA
       *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               CALL    "ORCSBILLINGCHECK"  USING   SBC-AREA
+                                                   SPA-AREA
+               IF    ( SBC-BILLINGUSER =   "1" )
+                   MOVE    "1"         TO  SPA-L01-CUSTOM-ENABLED
+               END-IF
+           ELSE
+               MOVE    "1"             TO  SPA-L01-CUSTOM-ENABLED
+           END-IF
+      *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL ( IDX >       WRK-CONS-LINE-MAX )
                MOVE    "F"             TO  SPA-GMN-L01-CHK-VALUE (IDX)
@@ -624,26 +640,11 @@
                                        TO  SPA-GMN-L01-REPOS-NAME (IDX)
                        END-IF
       *
-                       MOVE    SPA-GMN-L01-PRGNAME (IDX)
-                                           TO  WRK-PGID
-                       MOVE    IDX         TO  WRK-KBNCD
-                       PERFORM 900-TOUKEIMEMO-KEY2-SEL-SEC
-                       IF    ( FLG-TOUKEIMEMO  =   ZERO )
-                           MOVE    TKIMEMO-SAVEPARA
-                                          TO  SPA-NAI-L01-SAVEPARA (IDX)
-                           PERFORM VARYING IDX-PARA    FROM    1   BY  1
-                                   UNTIL ( IDX-PARA
-                                               >   WRK-CONS-PARA-MAX )
-      *
-                               IF ( SPA-GMN-L01-PARAHYOJI (IDX IDX-PARA)
-                                           NOT =   SPACE )
-                                 MOVE    TKIMEMO-PARA (IDX-PARA)
-                                   TO  SPA-GMN-L01-PARA (IDX  IDX-PARA)
-                               END-IF
-      *
-                           END-PERFORM
-                       ELSE
-                           MOVE    "1"    TO  SPA-NAI-L01-SAVEPARA (IDX)
+                       MOVE    IDX     TO  IDXI
+                       PERFORM 800-IS-ENABLED-SEC
+                       IF    ( FLG-ENABLED   =   1 )
+                           MOVE    IDX TO  IDXJ
+                           PERFORM 31011-PARA-SYOKI-SEC
                        END-IF
       *
                        IF    ( IDX         >   SPA-GMN-L01-MAX )
@@ -666,6 +667,35 @@
       *
            .
        3101-PARA-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    パラメータ初期設定処理
+      *****************************************************************
+       31011-PARA-SYOKI-SEC              SECTION.
+      *
+           MOVE    SPA-GMN-L01-PRGNAME (IDXJ)
+                                           TO  WRK-PGID
+           MOVE    IDXJ         TO  WRK-KBNCD
+           PERFORM 900-TOUKEIMEMO-KEY2-SEL-SEC
+           IF    ( FLG-TOUKEIMEMO  =   ZERO )
+               MOVE    TKIMEMO-SAVEPARA
+                                TO  SPA-NAI-L01-SAVEPARA (IDXJ)
+               PERFORM VARYING IDX-PARA   FROM    1   BY  1
+                       UNTIL ( IDX-PARA   >   WRK-CONS-PARA-MAX )
+      *
+                   IF (   SPA-GMN-L01-PARAHYOJI (IDXJ IDX-PARA)
+                                       NOT =   SPACE )
+                       MOVE    TKIMEMO-PARA (IDX-PARA)
+                               TO  SPA-GMN-L01-PARA (IDXJ IDX-PARA)
+                   END-IF
+      *
+               END-PERFORM
+           ELSE
+               MOVE    "1"     TO  SPA-NAI-L01-SAVEPARA (IDXJ)
+           END-IF
+      *
+           .
+       31011-PARA-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    日次統計付加情報検索処理
@@ -779,10 +809,19 @@
                                TO  SPA-NAI-L01-HISSU-KBN  (IDX0 IDX1)
       *
                END-PERFORM
+      *
                IF    ( SPA-MW      =   SPA-GINBEE )
                    MOVE    SPA-GMN-L03-REPOS-NAME
                                    TO  SPA-GMN-L01-REPOS-NAME (IDX0)
+      *
+                   MOVE    IDX0    TO  IDXI
+                   PERFORM 800-IS-ENABLED-SEC
+                   IF    ( FLG-ENABLED   =   ZERO )
+                       MOVE    "F" TO  SPA-GMN-L01-CHK-VALUE (IDX0)
+                   END-IF
+      *
                END-IF
+      *
            WHEN    3
                MOVE    SPA-L01-SEL     TO  IDX
                INITIALIZE                  SPA-GMN-L01-TBL (IDX)
@@ -902,22 +941,11 @@
                    END-IF
                END-IF
       *
-               MOVE    SPA-GMN-L01-PRGNAME (IDX)
-                                   TO  WRK-PGID
-               MOVE    IDX         TO  WRK-KBNCD
-               PERFORM 900-TOUKEIMEMO-KEY2-SEL-SEC
-               IF    ( FLG-TOUKEIMEMO  =   ZERO )
-                   MOVE    TKIMEMO-SAVEPARA
-                                   TO  SPA-NAI-L01-SAVEPARA (IDX)
-                   PERFORM VARYING IDX-PARA    FROM    1   BY  1
-                           UNTIL ( IDX-PARA    >   WRK-CONS-PARA-MAX )
-      *
-                       MOVE    TKIMEMO-PARA (IDX-PARA)
-                                   TO  SPA-GMN-L01-PARA (IDX  IDX-PARA)
-      *
-                   END-PERFORM
-               ELSE
-                   MOVE    "1"     TO  SPA-NAI-L01-SAVEPARA (IDX)
+               MOVE    IDX     TO  IDXI
+               PERFORM 800-IS-ENABLED-SEC
+               IF    ( FLG-ENABLED   =   1 )
+                   MOVE    IDX TO  IDXJ
+                   PERFORM 31011-PARA-SYOKI-SEC
                END-IF
       *
            END-IF
@@ -1683,7 +1711,13 @@
                                    + ( SPA-GMN-L01-PAGE    -   1 )
                                    * WRK-CONS-SCR-MAX
       *
-           MOVE    L01-CHK-VALUE (IDX) TO  SPA-GMN-L01-CHK-VALUE (IDZ)
+           MOVE    L01-CHK-VALUE (IDX)
+                                   TO  SPA-GMN-L01-CHK-VALUE (IDZ)
+           MOVE    IDZ             TO  IDXI
+           PERFORM 800-IS-ENABLED-SEC
+           IF    ( FLG-ENABLED   =   ZERO )
+               MOVE    "F"         TO  SPA-GMN-L01-CHK-VALUE (IDZ)
+           END-IF
       *
            COMPUTE SPA-GMN-L01-CUR   =   ( IDX -   1)
                                  *   ( WRK-CONS-PARA-MAX + 1 )
@@ -1923,6 +1957,8 @@
                                            TO  SHELLTBL-SHELLID
       *
                    IF    ( SPA-MW          =   SPA-GINBEE )
+                    AND  ( SPA-L01-CUSTOM-ENABLED
+                                           =   "1" )
                        MOVE    SPA-GMN-L01-REPOS-NAME (IDY)
                                            TO  SHELLTBL-REPOS-NAME
                    END-IF
@@ -2728,6 +2764,9 @@
                MOVE    SPA-GMN-L01-HCNAME   (IDZ1)
                                                 TO  L01-CHK-LABEL (IDX)
       *
+               MOVE    IDZ1        TO  IDXI
+               PERFORM 800-IS-ENABLED-SEC
+      *
                PERFORM VARYING IDZ2 FROM    1   BY  1
                        UNTIL ( IDZ2 >       WRK-CONS-PARA-MAX )
       *
@@ -2743,8 +2782,11 @@
                    MOVE    SPACE       TO  L01-PARAMARK      (IDX IDZ2)
                    IF    ( SPA-GMN-L01-PARAHYOJI (IDZ1 IDZ2)
                                            NOT =   SPACE )
-                       MOVE    WIDGET-NORMAL
+                       IF    ( FLG-ENABLED   =   1 )
+                           MOVE    WIDGET-NORMAL
                                        TO  L01-PARA-STATE(IDX IDZ2)
+                       END-IF
+      *
                        IF  ( SPA-NAI-L01-HISSU-KBN(IDZ1 IDZ2)
                                                =   "1" )
                            MOVE    "red"
@@ -2765,8 +2807,14 @@
                                        TO  L01-CHK-STATE(IDX)
       *
                IF    ( SPA-GMN-L01-HCNAME   (IDZ1)  NOT =   SPACE )
-                   MOVE    WIDGET-NORMAL
+                   IF    ( FLG-ENABLED   =   ZERO )
+                       MOVE    WIDGET-INSENSITIVE
                                        TO  L01-CHK-STATE(IDX)
+                       MOVE    "F"     TO  L01-CHK-VALUE(IDX)
+                   ELSE
+                       MOVE    WIDGET-NORMAL
+                                       TO  L01-CHK-STATE(IDX)
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -3492,6 +3540,23 @@
       *
            .
        800-KANA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    使用可否チェック処理
+      *****************************************************************
+       800-IS-ENABLED-SEC        SECTION.
+      *
+           MOVE    1               TO  FLG-ENABLED
+      *
+           IF    ( SPA-MW                       =   SPA-GINBEE )
+             AND ( SPA-GMN-L01-REPOS-NAME (IDXI)
+                                            NOT =   SPACE )
+             AND ( SPA-L01-CUSTOM-ENABLED   NOT =   "1" )
+               MOVE    ZERO        TO  FLG-ENABLED
+           END-IF
+      *
+           .
+       800-IS-ENABLED-EXT.
            EXIT.
       *****************************************************************
       *    半角チェック処理

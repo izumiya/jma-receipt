@@ -971,7 +971,7 @@
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            IF    ( FLG-SYSKANRI        NOT = ZERO )
-               MOVE    "4009"          TO  SPA-ERRCD
+               CONTINUE
            ELSE
       *
                MOVE    SYSKANRI-REC    TO  SYS-3102-REC
