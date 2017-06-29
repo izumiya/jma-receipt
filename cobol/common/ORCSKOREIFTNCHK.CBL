@@ -63,6 +63,8 @@
       *  04.07.01    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *  04.08.01    NACL-ÌçÏÆ    16/11/11  ¸º³Û¡Ê±ßÄ¶¡Ë¤ÎÂÐ±þ
+      *  04.08.02    NACL-ÌçÏÆ    17/06/02  ¸ºÌÈ¡Ê¸º³Û¡Ê³ä¡Ë¡Ë¤ÎÉéÃ´¶â·×»»¡¦
+      *                                     ¥ì¥»¥×¥ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -98,6 +100,7 @@
                05  WRK-KYURATE       PIC 9(03).
            03  WRK-FTNKEI            PIC 9(09).
            03  WRK-FTNKEI2           PIC 9(09).
+           03  WRK-FTNKEI-XXX        PIC 9(09).
            03  WRK-KINGAKU           PIC 9(09).
            03  WRK-FTN-KOH-XXX       PIC 9(09).
            03  WRK-FTN-KOH-YYY       PIC 9(09).
@@ -572,6 +575,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
            IF     SYU-KOH-HKNNUM(1) = "972"
                IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
@@ -607,6 +613,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
            IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
              CONTINUE
            ELSE
@@ -711,6 +720,9 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                * 10
                                * WRK-KYURATE(IDX1)
                                / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
            COMPUTE  WRK-FTNKEI = WRK-FTNKEI
                                + SYU-GRP-SGKMONEY
       *
@@ -787,19 +799,44 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *
            IF   LNK-KOREIFTNCHK-GENGAKUKBN   NOT =   ZERO
       *
+               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+                                   * 10
+                                   * WRK-KYURATE(IDX1)
+                                   / 100
+      *
                EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
                  WHEN        1
-                   IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
-                       MOVE   ZERO     TO   WRK-FTNKEI
+                   IF  LNK-KOREIFTNCHK-GENGAKUFLG  =  2
+                     IF  WRK-KYURATE(IDX1)  <=
+                                       LNK-KOREIFTNCHK-GENGAKU-RITU
+                         MOVE   ZERO     TO   WRK-FTNKEI
+                     ELSE
+                         COMPUTE  WRK-FTNKEI-XXX               =
+                                  SYU-TOTAL-HKNTEN             *
+                                  10                           *
+                                  LNK-KOREIFTNCHK-GENGAKU-RITU /
+                                  100
+                         IF  WRK-FTNKEI > WRK-FTNKEI-XXX
+                            COMPUTE  WRK-FTNKEI         =
+                                     WRK-FTNKEI         -
+                                     WRK-FTNKEI-XXX
+                         ELSE
+                           MOVE ZERO     TO   WRK-FTNKEI
+                         END-IF
+                     END-IF
                    ELSE
-                       COMPUTE  WRK-GENGAKU-RITUX =
-                                100 - LNK-KOREIFTNCHK-GENGAKU-RITU
-                       IF    WRK-FTNKEI  NOT = ZERO
-                          COMPUTE  WRK-FTNKEI         =
-                                   WRK-FTNKEI         *
-                                   WRK-GENGAKU-RITUX  /
-                                   100
-                       END-IF
+                     IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
+                         MOVE   ZERO     TO   WRK-FTNKEI
+                     ELSE
+                         COMPUTE  WRK-GENGAKU-RITUX =
+                                  100 - LNK-KOREIFTNCHK-GENGAKU-RITU
+                         IF    WRK-FTNKEI  NOT = ZERO
+                            COMPUTE  WRK-FTNKEI         =
+                                     WRK-FTNKEI         *
+                                     WRK-GENGAKU-RITUX  /
+                                     100
+                         END-IF
+                     END-IF
                    END-IF
                  WHEN        2
                    MOVE     WRK-FTNKEI   TO   WRK-FTNKEI-GENGAKU
@@ -855,6 +892,12 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+               IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
+                 CONTINUE
+               ELSE
+                 COMPUTE  WRK-FTNKEI = WRK-FTNKEI
+                                     + SYU-GRP-SGKMONEY
+               END-IF
       *
            END-IF
       *
