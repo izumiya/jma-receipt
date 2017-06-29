@@ -739,6 +739,8 @@
       *  04.08.34    NACL-門脇    17/03/28  保険欄−一部負担金記載修正
       *                                     （レセプト分割に関わる修正）
       *  04.08.35    NACL-門脇    17/06/02  点数欄の第四公費の集計
+      *  04.08.36    NACL-門脇    17/06/02  減免（減額（割））の負担金計算・
+      *                                     レセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1225,6 +1227,7 @@
            03  WRK-FTNKEI-FTN                          PIC 9(09).
            03  WRK-FTNKEI-GENGAKU                      PIC 9(09).
            03  WRK-FTNKEI-GENGAKU2                     PIC 9(09).
+           03  WRK-FTNKEI-XXX                          PIC 9(09).
            03  WRK-FTNKEI2                             PIC 9(09).
            03  WRK-FTNKEI3                             PIC 9(09).
            03  WRK-FTNKEI4                             PIC 9(09).
@@ -1617,6 +1620,7 @@
            03  WRK-CHK-KINGAKU                         PIC 9(07).
            03  WRK-CHK-KINGAKU2                        PIC 9(07).
            03  WRK-CHK-KINGAKU3                        PIC 9(07).
+           03  WRK-CHK-KINGAKU4                        PIC 9(07).
            03  WRK-CHK-KEIKASOCHIXX                    PIC 9(07).
            03  WRK-CHK-KEIKASOCHI1                     PIC S9(07).
            03  WRK-CHK-KEIKASOCHI2                     PIC S9(07).
@@ -1793,6 +1797,7 @@
            03  WK-GENGAKU-KOHID                PIC  9(10).
            03  WK-GENGAKU-RITU                 PIC  9(03).
            03  WK-GENGAKU-RITUX                PIC  9(03).
+           03  WK-GENGAKU-RITU-KEISAN          PIC  9V99.
            03  WK-GENGAKU-KIN                  PIC  9(07).
            03  WK-GENGAKU-KIN2                 PIC  9(07).
            03  WK-GENGAKU-KIN3                 PIC  9(07).
@@ -4721,15 +4726,22 @@
                                        TO  WK-GENGAKU-KIN
                                            WK-GENGAKU-KIN2
                                            WK-GENGAKU-KIN3
-                      COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  +  5
-                      COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  / 10
-                      COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  * 10
-                      COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 +  5
-                      COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 / 10
-                      COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 * 10
-                      COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 +  5
-                      COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 / 10
-                      COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 * 10
+                      IF   WK-GENGAKU-KIN   =  9999999 OR 999999
+                        MOVE     ZERO  TO  WK-GENGAKUKBN
+                        MOVE     ZERO  TO  WK-GENGAKU-KIN
+                        MOVE     ZERO  TO  WK-GENGAKU-KIN2
+                        MOVE     ZERO  TO  WK-GENGAKU-KIN3
+                      ELSE
+                        COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  +  5
+                        COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  / 10
+                        COMPUTE  WK-GENGAKU-KIN  = WK-GENGAKU-KIN  * 10
+                        COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 +  5
+                        COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 / 10
+                        COMPUTE  WK-GENGAKU-KIN2 = WK-GENGAKU-KIN2 * 10
+                        COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 +  5
+                        COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 / 10
+                        COMPUTE  WK-GENGAKU-KIN3 = WK-GENGAKU-KIN3 * 10
+                      END-IF
                  END-EVALUATE
               END-IF
       *
@@ -4740,7 +4752,19 @@
       *           減額（割）
                   WHEN        1
                      MOVE    1                TO  RECE62-GENMENKBN
-                     MOVE    WK-GENGAKU-RITU  TO  RECE62-GENGAKURATE
+                     IF   WK-GENGAKUKBN-KEISAN  =  2
+                       IF  RECE62-KYURATE  <= WK-GENGAKU-RITU
+                          MOVE   100          TO  RECE62-GENGAKURATE
+                       ELSE
+                          COMPUTE  WK-GENGAKU-RITU-KEISAN =
+                                  (WK-GENGAKU-RITU  /  RECE62-KYURATE)
+                                                    +  0.009
+                          COMPUTE  RECE62-GENGAKURATE =
+                                   WK-GENGAKU-RITU-KEISAN * 100
+                       END-IF
+                     ELSE
+                       MOVE  WK-GENGAKU-RITU  TO  RECE62-GENGAKURATE
+                     END-IF
       *           減額（円）
                   WHEN        2
                      MOVE    1                TO  RECE62-GENMENKBN
@@ -4823,9 +4847,13 @@
                         END-IF
                       END-IF
       *
-                      IF  (WK-GENGAKUKBN       =  1 )
-                      AND (PTKOH-FTNJANUM(1:1) = "1")
+                      IF    WK-GENGAKUKBN  =  1
+                        IF     PTKOH-FTNJANUM(1:1) = "1"
                           MOVE   1           TO  WK-GENGAKUKBN-KEISAN
+                        END-IF
+                        IF     PTKOH-FTNJANUM(1:1) = "2"
+                          MOVE   2           TO  WK-GENGAKUKBN-KEISAN
+                        END-IF
                       END-IF
       *
                       MOVE  PTKOH-TEKSTYMD   TO  WK-CHECK-TEKSTYMD
@@ -19295,7 +19323,7 @@
            MOVE    "key17"              TO      MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
-           PERFORM         21043-GENGAKU-CYO-CHECK-SEC
+           PERFORM         21043-GENMEN-TEK-CHECK-SEC
       *
       *    食事情報クリア
            IF   RECE62-SRYYM  >= "201604"
@@ -20105,8 +20133,8 @@
                                             ORCSKOREIFTNCHKAREA
                                             SPA-AREA
                 IF      LNK-KOREIFTNCHK-RC   =   ZERO
-                    MOVE   LNK-KOREIFTNCHK-FTNGAKU
-                                       TO  WRK-CHK-FTNGAKU
+      ***           MOVE   LNK-KOREIFTNCHK-FTNGAKU
+      ***                              TO  WRK-CHK-FTNGAKU
                     MOVE   LNK-KOREIFTNCHK-KOHFTNGAKU
                                        TO  WRK-CHK-KOHFTNGAKU
                     IF  FLG-ZENKOKUKOHI-NISYU = ZERO
@@ -20116,8 +20144,8 @@
                       MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU2
                                        TO  WRK-CHK-ICHIBUGAKU2
                     END-IF
-                    MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU
-                                       TO  WRK-CHIHOU-KIN
+      ***           MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU
+      ***                              TO  WRK-CHIHOU-KIN
                 END-IF
       *
            END-IF
@@ -20367,7 +20395,7 @@
       *****************************************************************
        21044-RECE62-FTN-HENSYU-SEC               SECTION.
       *
-           IF    SYU-YKZKENNUM   =   2  OR  5
+           IF    SYU-YKZKENNUM   =   1  OR  2  OR  5
               COMPUTE  WK-GENGAKU-KEISAN1 = SYU-TOTAL-HKNTEN
                                           * 10
                                           * RECE62-KYURATE
@@ -21208,11 +21236,6 @@
                     MOVE   10000      TO   WRK-KINGAKU
                  END-IF
                  MOVE  WRK-KINGAKU    TO   WRK-CYOKI-JGNGAK
-                 IF    FLG-KEISAN   =    4
-                   PERFORM 2104426-ICHIBUFTN-GEN-SEC
-                 END-IF
-                 PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
-                 PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                  IF  FLG-ZENKOKUKOHI-NISYU  =  5
                     IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                     AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
@@ -21241,6 +21264,11 @@
                                       TO   WRK-KINGAKU-GENBUTU4-XXX
                     END-IF
                  END-IF
+                 IF    FLG-KEISAN   =    4
+                   PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                 END-IF
+                 PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+                 PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                ELSE
                 IF  ( SYU-KOH-HKNNUM(1) =   "974")
                 OR  ( SYU-KOH-HKNNUM(2) =   "974")
@@ -21275,11 +21303,6 @@
                        MOVE   20000   TO   WRK-KINGAKU
                     END-IF
                     MOVE  WRK-KINGAKU TO   WRK-CYOKI-JGNGAK
-                    IF    FLG-KEISAN   =    4
-                      PERFORM 2104426-ICHIBUFTN-GEN-SEC
-                    END-IF
-                    PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
-                    PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                     IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                     AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
                     AND RECE62-KOHID(1)  = RECE62-KOHIDHC(IDX1 1)
@@ -21298,6 +21321,11 @@
                       MOVE WRK-KINGAKU
                                       TO   WRK-KINGAKU-GENBUTU4-XXX
                     END-IF
+                    IF    FLG-KEISAN   =    4
+                      PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                    END-IF
+                    PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+                    PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                 ELSE
                  IF   FLG-ZENKOH-ARI    =   ZERO
                    IF  FLG-WRKFILE-CLEAR  =  ZERO
@@ -21428,9 +21456,6 @@
                                             * 10
                                             * RECE62-KYURATE
                                             / 100
-                        COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 +  5
-                        COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 / 10
-                        COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 * 10
                         IF    WRK-FTNKEI5 >= 21000
                           MOVE  1    TO   FLG-HOKENICHIBU6
                         END-IF
@@ -22584,17 +22609,35 @@
       *
               EVALUATE   WK-GENGAKUKBN
                 WHEN        1
-                  IF  WK-GENGAKU-RITU = 100
-                      MOVE   ZERO     TO   WRK-FTNKEI
+                  IF  WK-GENGAKUKBN-KEISAN  =  2
+                    IF  RECE62-KYURATE  <= WK-GENGAKU-RITU
+                        MOVE   ZERO     TO   WRK-FTNKEI
+                    ELSE
+                        COMPUTE  WRK-FTNKEI-XXX = SYU-TOTAL-HKNTEN
+                                                * 10
+                                                * WK-GENGAKU-RITU
+                                                / 100
+                        IF  WRK-FTNKEI > WRK-FTNKEI-XXX
+                          COMPUTE  WRK-FTNKEI         =
+                                   WRK-FTNKEI         -
+                                   WRK-FTNKEI-XXX
+                        ELSE
+                          MOVE ZERO     TO   WRK-FTNKEI
+                        END-IF
+                    END-IF
                   ELSE
-                      COMPUTE  WK-GENGAKU-RITUX =
-                               100 - WK-GENGAKU-RITU
-                      IF    WRK-FTNKEI  NOT = ZERO
-                        COMPUTE  WRK-FTNKEI         =
-                                 WRK-FTNKEI         *
-                                 WK-GENGAKU-RITUX   /
-                                 100
-                      END-IF
+                    IF  WK-GENGAKU-RITU = 100
+                        MOVE   ZERO     TO   WRK-FTNKEI
+                    ELSE
+                        COMPUTE  WK-GENGAKU-RITUX =
+                                 100 - WK-GENGAKU-RITU
+                        IF    WRK-FTNKEI  NOT = ZERO
+                          COMPUTE  WRK-FTNKEI         =
+                                   WRK-FTNKEI         *
+                                   WK-GENGAKU-RITUX   /
+                                   100
+                        END-IF
+                    END-IF
                   END-IF
                 WHEN        2
                   MOVE     WRK-FTNKEI   TO   WRK-FTNKEI-GENGAKU
@@ -25340,17 +25383,21 @@
       *
               EVALUATE   WK-GENGAKUKBN
                 WHEN        1
-                  IF  WK-GENGAKU-RITU = 100
-                      MOVE   ZERO     TO   WRK-TAIHI-GENKIN2
+                  IF  WK-GENGAKUKBN-KEISAN  =  2
+                    CONTINUE
                   ELSE
-                      COMPUTE  WK-GENGAKU-RITUX =
-                               100 - WK-GENGAKU-RITU
-                      IF    WRK-TAIHI-GENKIN2  NOT = ZERO
-                        COMPUTE  WRK-TAIHI-GENKIN2  =
-                                 WRK-TAIHI-GENKIN2  *
-                                 WK-GENGAKU-RITUX   /
-                                 100
-                      END-IF
+                    IF  WK-GENGAKU-RITU = 100
+                        MOVE   ZERO     TO   WRK-TAIHI-GENKIN2
+                    ELSE
+                        COMPUTE  WK-GENGAKU-RITUX =
+                                 100 - WK-GENGAKU-RITU
+                        IF    WRK-TAIHI-GENKIN2  NOT = ZERO
+                          COMPUTE  WRK-TAIHI-GENKIN2  =
+                                   WRK-TAIHI-GENKIN2  *
+                                   WK-GENGAKU-RITUX   /
+                                   100
+                        END-IF
+                    END-IF
                   END-IF
                 WHEN        2
                   MOVE  WRK-TAIHI-GENKIN2  TO  WRK-FTNKEI-GENGAKU2
@@ -27270,6 +27317,10 @@
                 ELSE
                   PERFORM  210468-SYUHKN-JYOHEN-SEC
                 END-IF
+      *
+                IF   WK-GENGAKUKBN    NOT =   ZERO
+                  PERFORM  21046B-SYUHKN-JYOHEN-GEN-SEC
+                END-IF
                END-IF
       *
                MOVE    9999999    TO   WRK-CHK-KINGAKU
@@ -27403,6 +27454,11 @@
                   END-IF
                   IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
                     MOVE   ZERO          TO  WRK-CHK-KEIKASOCHI1
+                  ELSE
+                    IF  WK-GENGAKUKBN  NOT =  ZERO
+                      MOVE WRK-CHK-KINGAKU4
+                                         TO  WRK-CHK-KEIKASOCHI1
+                    END-IF
                   END-IF
                   COMPUTE  WRK-CHK-KEIKASOCHIXX  =  WRK-KOH-GAI-GEN70
                                                  +  WRK-KOH-FTN-GEN70
@@ -27422,10 +27478,6 @@
                                       * 10
                                       * RECE62-KYURATE
                                       / 100
-                  MOVE    WRK-FTNKEI6   TO   WRK-FTNKEI5
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 +  5
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 / 10
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 * 10
                   IF  ( WRK-FTNKEI6        >=  21000 )
                   OR  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
                        (FLG-HOKENICHIBU3  NOT = ZERO))
@@ -27434,7 +27486,7 @@
                             WRK-JYOGENKBN-TEN5 +
                             WRK-JYOGENKBN-TEN2
                     PERFORM  210468-SYUHKN-JYOHEN-SEC
-                    IF  WRK-KINGAKU-GENBUTU3 < WRK-FTNKEI5
+                    IF  WRK-KINGAKU-GENBUTU3 < WRK-FTNKEI6
                     AND WRK-JYOGENKBN-TEN2   = ZERO
                         MOVE   ZERO   TO   WRK-CHK-KEIKASOCHI1
                     END-IF
@@ -27486,9 +27538,6 @@
                                       * 10
                                       * RECE62-KYURATE
                                       / 100
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 +  5
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 / 10
-                  COMPUTE WRK-FTNKEI6 = WRK-FTNKEI6 * 10
                   MOVE  WRK-TAIHI-TOTALTEN TO  WRK-JYOGENKBN-TEN9
                   PERFORM  210468-SYUHKN-JYOHEN-SEC
                   IF WRK-KINGAKU-GENBUTU3 > RECE62-FTNMONEY(2)
@@ -30123,9 +30172,6 @@
                                      * 10
                                      * RECE62-KYURATE
                                      / 100
-                 COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 +  5
-                 COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 / 10
-                 COMPUTE WRK-FTNKEI5 = WRK-FTNKEI5 * 10
                  IF    WRK-FTNKEI5  >=  21000
                     MOVE     1     TO    FLG-HOKENICHIBU-CHK
                  END-IF
@@ -30796,6 +30842,58 @@
       *
            .
        21046A-CHIHO-ICHIBUFTN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    主保険上限金額減額
+      *****************************************************************
+       21046B-SYUHKN-JYOHEN-GEN-SEC               SECTION.
+      *
+           MOVE   WRK-KINGAKU-GENBUTU3   TO   WRK-CHK-KINGAKU4
+           IF     WK-GENGAKUKBN-KEISAN  =  ZERO
+             EVALUATE   WK-GENGAKUKBN
+               WHEN        1
+                 IF  WK-GENGAKU-RITU = 100
+                          MOVE   ZERO   TO   WRK-CHK-KINGAKU4
+                 ELSE
+                   COMPUTE  WK-GENGAKU-RITUX = 100 - WK-GENGAKU-RITU
+                   IF    WRK-CHK-KINGAKU4  NOT = ZERO
+                     IF  FLG-KOUGAKU2 = ZERO
+                       COMPUTE  WRK-CHK-KINGAKU4 = WRK-CHK-KINGAKU4
+                                                 * WK-GENGAKU-RITUX
+                                                 / 100
+                       COMPUTE  WRK-CHK-KINGAKU4 = WRK-CHK-KINGAKU4
+                                                 +  5
+                       COMPUTE  WRK-CHK-KINGAKU4 = WRK-CHK-KINGAKU4
+                                                 / 10
+                       COMPUTE  WRK-CHK-KINGAKU4 = WRK-CHK-KINGAKU4
+                                                 * 10
+                     ELSE
+                       COMPUTE  WRK-CHK-KINGAKU4 = (WRK-CHK-KINGAKU4
+                                                 *  WK-GENGAKU-RITUX
+                                                 /  100) + 0.5
+                     END-IF
+                   END-IF
+                 END-IF
+               WHEN        2
+                 IF  WRK-CHK-KINGAKU4 < WK-GENGAKU-KIN
+                   MOVE   ZERO   TO   WRK-CHK-KINGAKU4
+                 ELSE
+                   COMPUTE  WRK-CHK-KINGAKU4 = WRK-CHK-KINGAKU4
+                                             - WK-GENGAKU-KIN
+                 END-IF
+               WHEN        3
+               WHEN        4
+                   MOVE   ZERO   TO   WRK-CHK-KINGAKU4
+               WHEN        5
+                 IF  WRK-CHK-KINGAKU4 > WK-GENGAKU-KIN
+                   COMPUTE  WRK-CHK-KINGAKU4 = WK-GENGAKU-KIN
+                 END-IF
+             END-EVALUATE
+           END-IF
+      *
+           .
+       21046B-SYUHKN-JYOHEN-GEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -32788,9 +32886,35 @@
            EXIT.
       *
       *****************************************************************
-      *    減額（円超）のチェック
+      *    減免適用チェック
       *****************************************************************
-       21043-GENGAKU-CYO-CHECK-SEC      SECTION.
+       21043-GENMEN-TEK-CHECK-SEC      SECTION.
+      *
+           IF   (WK-GENGAKUKBN             =   1  )
+           AND  (WK-GENGAKUKBN-KEISAN  NOT =  ZERO)
+           AND  (FLG-GENGAKU5              =  ZERO)
+      *
+             IF      RECE62-KOUREI   =  "1" OR "2"
+               IF      FLG-JYOGENKBN   =   1
+                  MOVE   WRK-JYOGENKBN-TEN     TO  WRK-JYOGENKBN-TEN9
+                  IF   FLG-ZEROKOGAITO   =   1
+                    PERFORM  210468X-SYUHKN-JYOHEN2-SEC
+                  ELSE
+                    PERFORM  210468-SYUHKN-JYOHEN-SEC
+                  END-IF
+                  MOVE   WRK-KINGAKU-GENBUTU3  TO  WK-GENGAKU-KEISAN9
+               END-IF
+             END-IF
+      *
+             IF   WK-GENGAKU-KEISAN9  NOT =  ZERO
+             AND  WK-GENGAKU-KEISAN9      =  RECE62-FTNMONEY(1)
+                   MOVE    ZERO    TO   RECE62-GENMENKBN
+                   MOVE    ZERO    TO   RECE62-GENGAKURATE
+                   MOVE    ZERO    TO   RECE62-GENMEN-COM
+                   MOVE    ZERO    TO   WK-GENGAKUKBN
+             END-IF
+      *
+           END-IF
       *
            IF   (WK-GENGAKUKBN   =    5  )
            AND  (FLG-GENGAKU5    =   ZERO)
@@ -32837,24 +32961,30 @@
       *
            END-IF
       *
-           IF   (WK-GENGAKUKBN   =    5)
-           AND  (FLG-GENGAKU5    =    1)
-                 IF   RECE62-GENGAKU  >=  WK-GENGAKU-KEISAN3
-                   MOVE    ZERO    TO   RECE62-GENMENKBN
-                   MOVE    ZERO    TO   RECE62-GENGAKU
-                   MOVE    ZERO    TO   RECE62-GENMEN-COM
-                   MOVE    ZERO    TO   WK-GENGAKUKBN
-                 END-IF
-           END-IF
+      **>  IF   (WK-GENGAKUKBN   =    5)
+      **>  AND  (FLG-GENGAKU5    =    1)
+      **>        IF   RECE62-GENGAKU  >=  WK-GENGAKU-KEISAN3
+      **>          MOVE    ZERO    TO   RECE62-GENMENKBN
+      **>          MOVE    ZERO    TO   RECE62-GENGAKU
+      **>          MOVE    ZERO    TO   RECE62-GENMEN-COM
+      **>          MOVE    ZERO    TO   WK-GENGAKUKBN
+      **>        END-IF
+      **>  END-IF
       *
-           IF   (WK-GENGAKUKBN   =    2  OR  5)
-           AND  (FLG-GENGAKU5    =    1       )
+           IF  ((WK-GENGAKUKBN             =   1  ) AND
+                (WK-GENGAKUKBN-KEISAN  NOT =  ZERO) AND
+                (FLG-GENGAKU5              =   1  ))
+           OR  ((WK-GENGAKUKBN             =   2  ) AND
+                (FLG-GENGAKU5              =   1  ))
+           OR  ((WK-GENGAKUKBN             =   5  ) AND
+                (FLG-GENGAKU5              =   1  ))
              DISPLAY "WK-GENGAKUKBN="  WK-GENGAKUKBN
+             DISPLAY "WK-GENGAKUKBN-KEISAN="  WK-GENGAKUKBN-KEISAN
              DISPLAY "公費併用の保険組み合わせ有"
            END-IF
       *
            .
-       21043-GENGAKU-CYO-CHECK-EXT.
+       21043-GENMEN-TEK-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

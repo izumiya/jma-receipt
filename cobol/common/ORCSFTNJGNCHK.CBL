@@ -106,6 +106,7 @@
       *
       *  04.08.01    NACL-ÌçÏÆ    15/10/13  ÀÁµá¥¼¥í¥Õ¥é¥°ÊÔ½¸
       *  04.08.02    NACL-ÌçÏÆ    15/12/02  £°ÅÀÃÏ°è¸øÈñµ­ºÜÂÐ±þ
+      *  04.08.03    NACL-ÌçÏÆ    17/06/13  ¸ºÌÈ»þ¤ÎÈ½Äê½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -151,6 +152,8 @@
            03  FLG-SKJ-CHECK       PIC 9(01).
            03  FLG-SRYACCT-CHECK   PIC 9(01).
            03  FLG-SRYACT-CHECK    PIC 9(01).
+           03  FLG-GENMEN-ARI      PIC 9(01).
+           03  FLG-GENMEN-NASI     PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1790,6 +1793,8 @@
            MOVE      ZERO          TO      FLG-INNAI
            MOVE      ZERO          TO      FLG-HKNCOMBI-CHECK
            MOVE      ZERO          TO      FLG-SKJ-CHECK
+           MOVE      ZERO          TO      FLG-GENMEN-ARI
+           MOVE      ZERO          TO      FLG-GENMEN-NASI
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -2088,6 +2093,7 @@
              END-IF
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
+             AND (FLG-GENMEN-NASI        =  ZERO   )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
              END-IF
            END-IF
@@ -2357,6 +2363,12 @@
       *    ºÒ³²ÍÑ¤ÎÊÔ½¸£²
       *****************************************************************
        2004113-SAIGAI-HENSYU2-SEC            SECTION.
+      *
+           IF    SYU-YKZKENNUM  NOT = ZERO
+              MOVE    1     TO   FLG-GENMEN-ARI
+           ELSE
+              MOVE    1     TO   FLG-GENMEN-NASI
+           END-IF
       *
            IF  LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
              IF  (SYU-YKZKENNUM  =  7 OR 8  )
@@ -2670,6 +2682,8 @@
            MOVE      ZERO       TO      WRK-SYUSKJ-FTN
            MOVE      ZERO       TO      WRK-SKYMONEY-SKJ
            MOVE      ZERO       TO      FLG-SKJ-CHECK
+           MOVE      ZERO       TO      FLG-GENMEN-ARI
+           MOVE      ZERO       TO      FLG-GENMEN-NASI
            PERFORM   UNTIL    FLG-SYUNOU     =  1
              MOVE    ZERO       TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -2755,6 +2769,7 @@
              END-IF
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
+             AND (FLG-GENMEN-NASI        =  ZERO   )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
              END-IF
            END-IF
