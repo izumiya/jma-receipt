@@ -243,6 +243,7 @@
            03  FLG-EDIT                    PIC 9(01).
            03  FLG-PTCONF                  PIC 9(01).
            03  FLG-IDOKAIKEI-CANCEL        PIC 9(01).
+           03  FLG-SHOKUDOU                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -278,6 +279,7 @@
            03  IDX-SST                     PIC 9(05).
            03  IDX-NSRY                    PIC 9(05).
            03  IDX-JOKU                    PIC 9(02).
+           03  IDX-SHOKUDOU                PIC 9(02).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -529,6 +531,12 @@
                    07  WRK-TENROOM-GAIHAKU PIC 9(03)  OCCURS  31.
            03  WRK-TENROOM-MAE-SKJ1        PIC 9(03).
            03  WRK-TENROOM-MAE-SKJ2        PIC 9(03).
+      *    転科／転棟／転室時に食堂加算を退避する項目
+           03  WRK-SHOKUDOU-AREA.
+               05  WRK-SHOKUDOU-SRYYM      PIC X(06).
+               05  WRK-SHOKUDOU-SKJTBL.
+                   07  WRK-SHOKUDOU-SKJ-ARI PIC X(01)  OCCURS  31.
+      *
            03  WRK-NAI-NYUINYMD.
                05  WRK-NAI-NYUINYM         PIC X(06).
                05  WRK-NAI-NYUINDD         PIC 9(02).
@@ -11540,7 +11548,7 @@
                              TO  LNK-TOKNYUIN2-TOKUTEI-NYUIN
            CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
                                             SPA-AREA
-           DISPLAY  "LNK-TOKNYUIN2-RC = " LNK-TOKNYUIN2-RC
+      *     DISPLAY  "LNK-TOKNYUIN2-RC = " LNK-TOKNYUIN2-RC
            IF     LNK-TOKNYUIN2-RC      =   ZERO
               MOVE   SPACE           TO  SYOKIKSN-IN-KHNSRYCD
                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -12458,11 +12466,11 @@
                PERFORM   4801-TENROOM-EDIT-SEC
            END-IF
       *----入院年月日翌月分の入院会計再作成処理--------------------
-            DISPLAY  "####  NYUIN-KAIKEI  SAI-SAKUSEI-SHORI ####"
-            DISPLAY  "LNK-SCNYUACCT-STSRYYMD = "
-                      LNK-SCNYUACCT-STSRYYMD
-            DISPLAY  "PTNYUINRRK-NYUINYMD = "
-                      PTNYUINRRK-NYUINYMD
+      *      DISPLAY  "####  NYUIN-KAIKEI  SAI-SAKUSEI-SHORI ####"
+      *      DISPLAY  "LNK-SCNYUACCT-STSRYYMD = "
+      *                LNK-SCNYUACCT-STSRYYMD
+      *      DISPLAY  "PTNYUINRRK-NYUINYMD = "
+      *                PTNYUINRRK-NYUINYMD
       *     会計作成用の年月算出（入院年月＋１月）
             IF      FLG-SAI-SAKUSEI     =   1
                 MOVE    PTNYUINRRK-NYUINYMD(1:6)  TO  WRK-SAI-SRYYM
@@ -12477,7 +12485,7 @@
             ELSE
                 COMPUTE   WRK-SAI-SRYMR =   WRK-SAI-SRYMR + 1
             END-IF
-            DISPLAY "WRK-SAI-SRYYM = " WRK-SAI-SRYYM
+      *      DISPLAY "WRK-SAI-SRYYM = " WRK-SAI-SRYYM
             MOVE    WRK-SAI-SRYYM    TO  WRK-SANTEISTYMD(1:6)
             MOVE    "01"             TO  WRK-SANTEISTYMD(7:2)
             MOVE    WRK-SANTEISTYMD  TO  SPA-NAI-I01-IDOYMD
@@ -13310,7 +13318,7 @@
       *
       *    特定入院で入院料が変更になるコードの対応
       *
-           DISPLAY "===  TEST TAIINKAIKEI-CANCEL ==="
+      *     DISPLAY "===  TEST TAIINKAIKEI-CANCEL ==="
            INITIALIZE                       ORCSTOKNYUIN2-AREA
            MOVE   PTNYUINRRK-HOSPNUM    TO  LNK-TOKNYUIN2-HOSPNUM
            MOVE   PTNYUINRRK-PTID       TO  LNK-TOKNYUIN2-PTID
@@ -14601,15 +14609,15 @@
            MOVE     PTNYUINRRK-TOKUTEI-NYUIN
                                          TO  LNK-IRYOKNS-NYUIN
            MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
-           DISPLAY  "==  ORCSIRYOKNS TENROOM-CALL ==="
-           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
-           DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
-           DISPLAY  "SPA-NAI-I01-IDOYMD      = " SPA-NAI-I01-IDOYMD
+      *     DISPLAY  "==  ORCSIRYOKNS TENROOM-CALL ==="
+      *     DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+      *     DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
+      *     DISPLAY  "SPA-NAI-I01-IDOYMD      = " SPA-NAI-I01-IDOYMD
            MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
                                          TO  LNK-IRYOKNS-SANTEIYM
            CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
                                             SPA-AREA
-           DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
+      *     DISPLAY   "LNK-IRYOKNS-RC = " LNK-IRYOKNS-RC
            IF       LNK-IRYOKNS-RC     =    ZERO
                MOVE   LNK-IRYOKNS-SRYCD(1)
                                         TO LNK-SCNYUACCT-NYUKHN-SRYCD(1)
@@ -14633,7 +14641,7 @@
       *
       *    特定入院で入院料が変更になるコードの対応
       *
-           DISPLAY "===  TEST TENROOM-EDIT ==="
+      *     DISPLAY "===  TEST TENROOM-EDIT ==="
            INITIALIZE                       ORCSTOKNYUIN2-AREA
            MOVE   PTNYUINRRK-HOSPNUM    TO  LNK-TOKNYUIN2-HOSPNUM
            MOVE   PTNYUINRRK-PTID       TO  LNK-TOKNYUIN2-PTID
@@ -14872,9 +14880,6 @@
                 END-PERFORM
               END-IF
            END-IF
-           DISPLAY "WRK-IDOBI-SKJ18 = " WRK-IDOBI-SKJ18
-           DISPLAY "WRK-IDOBI-SKJ19 = " WRK-IDOBI-SKJ19
-           DISPLAY "WRK-IDOBI-SKJ20 = " WRK-IDOBI-SKJ20
       *
       *    食堂加算
            PERFORM     4801-BTUSEL-SEC
@@ -15489,6 +15494,23 @@
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
+      *    入院会計作成後に食事の算定が無い日の食堂加算をクリアする
+      *    処理を追加
+           IF  SPA-NAI-I01-IDOYMD(1:6)     >= "200604"
+               MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
+               IF        WRK-TENROOM-SKJ-SRYYM(1)   NOT =   SPACE
+                   MOVE  WRK-TENROOM-SKJ-SRYYM(1)
+                                           TO   WRK-SHOKUDOU-SRYYM
+                   PERFORM   4801-SHOKUDOU-CLEAR-SEC
+               END-IF
+               MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
+               IF        WRK-TENROOM-SKJ-SRYYM(2)   NOT =   SPACE
+                   MOVE  WRK-TENROOM-SKJ-SRYYM(2)
+                                           TO   WRK-SHOKUDOU-SRYYM
+                   PERFORM   4801-SHOKUDOU-CLEAR-SEC
+               END-IF
+           END-IF
+      *
            IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
                MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
                MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
@@ -15499,6 +15521,143 @@
            .
        4801-TENROOM-EDIT-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    食堂加算クリア処理
+      *****************************************************************
+       4801-SHOKUDOU-CLEAR-SEC       SECTION.
+      *
+      *    該当月の食堂加算算定有無チェック
+           MOVE    ZERO                TO  FLG-SHOKUDOU
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    WRK-SHOKUDOU-SRYYM  TO  NACCT-SRYYM
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key43"             TO  MCP-PATHNAME
+           PERFORM   910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE     1              TO  FLG-SHOKUDOU
+           END-IF
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key43"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *    食事（朝、昼、夕）から食事算定日を特定
+           IF      FLG-SHOKUDOU         =  1
+               MOVE    SPACE               TO  WRK-SHOKUDOU-SKJTBL
+      *        （朝食）
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+               MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+               MOVE    WRK-SHOKUDOU-SRYYM  TO  NACCT-SRYYM
+               MOVE    "key30"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-SELECT-SEC
+               MOVE    "key30"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-READ-SEC
+               IF      FLG-NYUINACCT       =   ZERO
+                   MOVE     MCPDATA-REC    TO  NYUINACCT-REC
+                   PERFORM   VARYING  IDX-SHOKUDOU   FROM  1  BY  1
+                     UNTIL   IDX-SHOKUDOU   >   31
+                     IF   NACCT-DAY(IDX-SHOKUDOU)   NOT =  ZERO
+                         MOVE  "1"         TO
+                                     WRK-SHOKUDOU-SKJ-ARI(IDX-SHOKUDOU)
+                     END-IF
+                   END-PERFORM
+               END-IF
+      *        入院会計マスタクローズ
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key30"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *        （昼食）
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+               MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+               MOVE    WRK-SHOKUDOU-SRYYM  TO  NACCT-SRYYM
+               MOVE    "key31"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-SELECT-SEC
+               MOVE    "key31"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-READ-SEC
+               IF      FLG-NYUINACCT       =   ZERO
+                   MOVE     MCPDATA-REC    TO  NYUINACCT-REC
+                   PERFORM   VARYING  IDX-SHOKUDOU   FROM  1  BY  1
+                     UNTIL   IDX-SHOKUDOU   >   31
+                     IF   NACCT-DAY(IDX-SHOKUDOU)   NOT =  ZERO
+                         MOVE  "1"         TO
+                                     WRK-SHOKUDOU-SKJ-ARI(IDX-SHOKUDOU)
+                     END-IF
+                   END-PERFORM
+               END-IF
+      *        入院会計マスタクローズ
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key31"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *        （夕食）
+               INITIALIZE                  NYUINACCT-REC
+               MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+               MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+               MOVE    WRK-SHOKUDOU-SRYYM  TO  NACCT-SRYYM
+               MOVE    "key32"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-SELECT-SEC
+               MOVE    "key32"             TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-READ-SEC
+               IF      FLG-NYUINACCT       =   ZERO
+                   MOVE     MCPDATA-REC    TO  NYUINACCT-REC
+                   PERFORM   VARYING  IDX-SHOKUDOU   FROM  1  BY  1
+                     UNTIL   IDX-SHOKUDOU   >   31
+                     IF   NACCT-DAY(IDX-SHOKUDOU)   NOT =  ZERO
+                         MOVE  "1"         TO
+                                     WRK-SHOKUDOU-SKJ-ARI(IDX-SHOKUDOU)
+                     END-IF
+                   END-PERFORM
+               END-IF
+      *        入院会計マスタクローズ
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key32"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *        食堂加算のカレンダー更新
+               MOVE    ZERO                TO  FLG-SHOKUDOU
+               INITIALIZE                      NYUINACCT-REC
+               MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+               MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+               MOVE    WRK-SHOKUDOU-SRYYM  TO  NACCT-SRYYM
+               MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key43"             TO  MCP-PATHNAME
+               PERFORM   910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE     MCPDATA-REC    TO  NYUINACCT-REC
+                   PERFORM   VARYING  IDX-SHOKUDOU   FROM  1  BY  1
+                     UNTIL   IDX-SHOKUDOU   >   31
+                        IF  WRK-SHOKUDOU-SKJ-ARI(IDX-SHOKUDOU)  =  SPACE
+                           MOVE   ZERO    TO  NACCT-DAY(IDX-SHOKUDOU)
+                        END-IF
+                   END-PERFORM
+      *            剤回数再セット
+                   MOVE  ZERO              TO  NACCT-ZAIKAISU
+                   PERFORM  VARYING   IDX-SHOKUDOU FROM  1  BY  1
+                     UNTIL  IDX-SHOKUDOU   >   31
+                       IF   NACCT-DAY(IDX-SHOKUDOU)   NOT =  0
+                           ADD   1        TO  NACCT-ZAIKAISU
+                       END-IF
+                   END-PERFORM
+               END-IF
+               MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key43"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           END-IF
+      *
+           .
+       4801-SHOKUDOU-CLEAR-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    異動取消時会計テーブル編集処理
       *****************************************************************
@@ -16130,9 +16289,9 @@
            MOVE     PTNYUINRRK-TOKUTEI-NYUIN
                                          TO  LNK-IRYOKNS-NYUIN
            MOVE     PTNYUINRRK-BTUNUM    TO  LNK-IRYOKNS-BTUNUM
-           DISPLAY  "==  ORCSIRYOKNS IDOKAIKEI-CANCEL-CALL ==="
-           DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
-           DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
+      *     DISPLAY  "==  ORCSIRYOKNS IDOKAIKEI-CANCEL-CALL ==="
+      *     DISPLAY  "SYOKIKSN-IN-SANTEISTYMD = " SYOKIKSN-IN-SANTEISTYMD
+      *     DISPLAY  "SPA-NAI-I01-NYUINYMD    = " SPA-NAI-I01-NYUINYMD
            MOVE     SYOKIKSN-IN-SANTEISTYMD(1:6)
                                          TO  LNK-IRYOKNS-SANTEIYM
            CALL     "ORCSIRYOKNS"   USING   ORCSIRYOKNS-AREA
@@ -16824,11 +16983,29 @@
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
+      *    入院会計作成後に食事の算定が無い日の食堂加算をクリアする
+      *    処理を追加
+           IF  SPA-NAI-I01-MAEIDOYMD(1:6)  >= "200604"
+               MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
+               IF        WRK-TENROOM-SKJ-SRYYM(1)   NOT =   SPACE
+                   MOVE  WRK-TENROOM-SKJ-SRYYM(1)
+                                           TO   WRK-SHOKUDOU-SRYYM
+                   PERFORM   4801-SHOKUDOU-CLEAR-SEC
+               END-IF
+               MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
+               IF        WRK-TENROOM-SKJ-SRYYM(2)   NOT =   SPACE
+                   MOVE  WRK-TENROOM-SKJ-SRYYM(2)
+                                           TO   WRK-SHOKUDOU-SRYYM
+                   PERFORM   4801-SHOKUDOU-CLEAR-SEC
+               END-IF
+           END-IF
+      *
            IF     IPN-NYUKAIKEI-SAKUSEI-FLG    =   "1"
                MOVE    SPACE   TO   SPA-GMN-I01-TOKNYUIN-CD
                MOVE    IPN-SANTEISTYMD   TO   WRK-SANTEISTYMD
                MOVE    IPN-SANTEISTYMD   TO   SPA-NAI-I01-IDOYMD
                MOVE    IPN-SANTEISTYMD   TO   PTNYUINRRK-TENNYUYMD
+               MOVE    "A"               TO   PTNYUINRRK-SKJKBN
                PERFORM   4801-TENROOM-EDIT-SEC
            END-IF
       *
