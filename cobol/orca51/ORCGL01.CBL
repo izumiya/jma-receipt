@@ -430,10 +430,11 @@
                IF    ( SPA-MOTOPG      =   "XA01" OR "XB01" OR "XC01"
                                                   OR "XG01"           )
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
+                   MOVE    SPA-WORK        TO  SPA-L01KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-L01FREE
                    PERFORM 3001-UPDATE-CHK-SEC
                    IF    ( FLG-UPDATE      =   ZERO )
-                       INITIALIZE              SPA-L01KYOUTU
+                       CONTINUE
                    ELSE
                        PERFORM 310-SPASET-SEC
                    END-IF
@@ -977,10 +978,11 @@
            MOVE    "L01"               TO  LNK-XC01-MOTOPG
            MOVE    SPACE               TO  LNK-XC01-MODE
       *
-           MOVE    LNK-XC01-AREA       TO  SPA-WORK
       *
            MOVE    SPACE               TO  LINKAREA
+           MOVE    LNK-XC01-AREA       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+           MOVE    SPA-L01KYOUTU       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-L01FREE         TO  LNK-SCRSPA
       *
@@ -2260,6 +2262,7 @@
            PERFORM 4101-GMN-SPA-SET-SEC
       *
            MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-L01KYOUTU       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-L01FREE         TO  LNK-SCRSPA
       *
@@ -2537,6 +2540,7 @@
            PERFORM 4101-GMN-SPA-SET-SEC
       *
            MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-L01KYOUTU       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-L01FREE         TO  LNK-SCRSPA
       *
@@ -2569,6 +2573,7 @@
            PERFORM 4101-GMN-SPA-SET-SEC
       *
            MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-L01KYOUTU       TO  SPA-WORK
            MOVE    SPA-KYOUTU          TO  LNK-COMMON
            MOVE    SPA-L01FREE         TO  LNK-SCRSPA
       *
