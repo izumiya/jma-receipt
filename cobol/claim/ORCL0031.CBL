@@ -2254,6 +2254,21 @@
                END-IF
                MOVE    WRK-SURYO           TO  TBL-WKSRY-SRYSURYO
                                                      (TBL-MAX IDX-S)
+      *H29.7
+      *   API  撮影料の数量>1を反映
+               IF     (LNK-KBN-CODE        =   "1" )
+                  AND (LNK-KBN-V2          =   "1" )
+                   IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)
+                                               =   "1")
+                     AND  (TNS-KZMCOMPSIKIBETU NOT =   ZERO )
+                     AND  (TNS-SRYSYUKBN       =   "721"
+                                               OR  "720"    )
+                     AND  (WRK-SURYO           >   1        )
+      *                数量入力あり
+                       MOVE    "S"             TO  TBL-WKSRY-AUTOKBN
+                                                     (TBL-MAX IDX-S)
+                   END-IF
+               END-IF
       *
            END-IF
       *    フリーコメントの内容
