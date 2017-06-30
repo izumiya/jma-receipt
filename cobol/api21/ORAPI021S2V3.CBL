@@ -2717,7 +2717,14 @@
                END-IF
            ELSE
       *        点数マスタの名称
-               MOVE    SPA-COM-NAME (IDX)  TO  MDCRES-PRSCRPT-NAME
+      ***      MOVE    SPA-COM-NAME (IDX)  TO  MDCRES-PRSCRPT-NAME
+      ***                                                    (IDY IDZ)
+               MOVE    SPACE               TO  TNS-TENSU-REC
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    SPA-COM-INPUTCD (IDX)
+                                           TO  TNS-SRYCD
+               PERFORM 910-TENSU-READ-SEC
+               MOVE    TNS-NAME            TO  MDCRES-PRSCRPT-NAME
                                                              (IDY IDZ)
            END-IF
       *    数量
@@ -2904,11 +2911,6 @@
                                            OR  ZERO
                CONTINUE
            ELSE
-               MOVE    SPACE               TO  TNS-TENSU-REC
-               INITIALIZE                      TNS-TENSU-REC
-               MOVE    SPA-COM-INPUTCD (IDX)
-                                           TO  TNS-SRYCD
-               PERFORM 910-TENSU-READ-SEC
                MOVE    TNS-TANINAME
                                        TO  MDCRES-PRSCRPT-TANICD-NAME
                                                              (IDY IDZ)
@@ -3435,6 +3437,9 @@
                PERFORM 200222-MEDICAL-HEN-SEC
       *        リクエスト＝０２へ
                MOVE    "02"            TO  MDCRES-RESPONSE-NUMBER
+               IF      WRK-ERRKBN      =   "S"
+                   MOVE    "03"            TO  MDCRES-RESPONSE-NUMBER
+               END-IF
            END-IF
       *
            .
