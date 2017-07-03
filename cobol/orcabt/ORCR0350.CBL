@@ -419,6 +419,8 @@
       *  04.08.15    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
       *  04.08.16    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
+      *  04.08.17    NACL-門脇    17/07/03  （災１）等の記録を括弧なしで
+      *                                     記録するよう変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4441,15 +4443,15 @@
                WHEN    8
                WHEN    10
                WHEN    11
-                   MOVE    "（不詳）"      TO  WRK-DISASTER-COMMENT
+                   MOVE    "不詳"      TO  WRK-DISASTER-COMMENT
                WHEN    2
                WHEN    7
-                   MOVE    "（災１）"      TO  WRK-DISASTER-COMMENT
+                   MOVE    "災１"      TO  WRK-DISASTER-COMMENT
                WHEN    4
-                   MOVE    "（災２）"      TO  WRK-DISASTER-COMMENT
+                   MOVE    "災２"      TO  WRK-DISASTER-COMMENT
                WHEN    5
-                   MOVE    "（不詳・災１）"
-                                           TO  WRK-DISASTER-COMMENT
+                   MOVE    "不詳・災１"
+                                       TO  WRK-DISASTER-COMMENT
            END-EVALUATE
            PERFORM 200701-DISASTER-COMMENT-HEN-SEC
       *

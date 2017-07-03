@@ -4756,11 +4756,13 @@
                        IF  RECE62-KYURATE  <= WK-GENGAKU-RITU
                           MOVE   100          TO  RECE62-GENGAKURATE
                        ELSE
-                          COMPUTE  WK-GENGAKU-RITU-KEISAN =
-                                  (WK-GENGAKU-RITU  /  RECE62-KYURATE)
-                                                    +  0.009
-                          COMPUTE  RECE62-GENGAKURATE =
-                                   WK-GENGAKU-RITU-KEISAN * 100
+      *****>              COMPUTE  WK-GENGAKU-RITU-KEISAN =
+      *****>                      (WK-GENGAKU-RITU  /  RECE62-KYURATE)
+      *****>                                        +  0.009
+      *****>              COMPUTE  RECE62-GENGAKURATE =
+      *****>                       WK-GENGAKU-RITU-KEISAN * 100
+                          MOVE  WK-GENGAKU-RITU
+                                              TO  RECE62-GENGAKURATE
                        END-IF
                      ELSE
                        MOVE  WK-GENGAKU-RITU  TO  RECE62-GENGAKURATE

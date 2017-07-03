@@ -237,6 +237,8 @@
       *  04.08.17    NACL-藤原    17/04/12  請求点数不一致時の種別不明対応
       *  04.08.18    NACL-藤原    17/05/26  直接請求する保険者に地方職員
       *                                     共済組合を追加
+      *  04.08.19    NACL-門脇    17/07/03  （災１）等の記載を括弧なしで
+      *                                     記載するよう変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3629,15 +3631,15 @@
                            WHEN    8
                            WHEN    10
                            WHEN    11
-                               MOVE    "（不詳）"  TO  HC06-HEAD5
+                               MOVE    "不詳"  TO  HC06-HEAD5
                            WHEN    2
                            WHEN    7
-                               MOVE    "（災１）"  TO  HC06-HEAD5
+                               MOVE    "災１"  TO  HC06-HEAD5
                            WHEN    4
-                               MOVE    "（災２）"  TO  HC06-HEAD5
+                               MOVE    "災２"  TO  HC06-HEAD5
                            WHEN    5
-                               MOVE    "（不詳・災１）"
-                                                   TO  HC06-HEAD5
+                               MOVE    "不詳・災１"
+                                               TO  HC06-HEAD5
                        END-EVALUATE
                END-EVALUATE
            END-IF
@@ -8452,15 +8454,15 @@
                          WHEN    8
                          WHEN    10
                          WHEN    11
-                             MOVE    "（不詳）"  TO  WRK-TITLE
+                             MOVE    "不詳"  TO  WRK-TITLE
                          WHEN    2
                          WHEN    7
-                             MOVE    "（災１）"  TO  WRK-TITLE
+                             MOVE    "災１"  TO  WRK-TITLE
                          WHEN    4
-                             MOVE    "（災２）"  TO  WRK-TITLE
+                             MOVE    "災２"  TO  WRK-TITLE
                          WHEN    5
-                             MOVE    "（不詳・災１）"
-                                                 TO  WRK-TITLE
+                             MOVE    "不詳・災１"
+                                             TO  WRK-TITLE
                  END-EVALUATE
                  INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
       * 
