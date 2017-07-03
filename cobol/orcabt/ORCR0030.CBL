@@ -6300,11 +6300,13 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                        IF  RECE02-KYURATE  <= WK-GENGAKU-RITU
                           MOVE   100          TO  RECE02-GENGAKURATE
                        ELSE
-                          COMPUTE  WK-GENGAKU-RITU-KEISAN =
-                                  (WK-GENGAKU-RITU  /  RECE02-KYURATE)
-                                                    +  0.009
-                          COMPUTE  RECE02-GENGAKURATE =
-                                   WK-GENGAKU-RITU-KEISAN * 100
+      *****>              COMPUTE  WK-GENGAKU-RITU-KEISAN =
+      *****>                      (WK-GENGAKU-RITU  /  RECE02-KYURATE)
+      *****>                                        +  0.009
+      *****>              COMPUTE  RECE02-GENGAKURATE =
+      *****>                       WK-GENGAKU-RITU-KEISAN * 100
+                          MOVE  WK-GENGAKU-RITU
+                                              TO  RECE02-GENGAKURATE
                        END-IF
                      ELSE
                        MOVE  WK-GENGAKU-RITU  TO  RECE02-GENGAKURATE
