@@ -533,7 +533,9 @@
            03  WRK-TENROOM-MAE-SKJ2        PIC 9(03).
       *    転科／転棟／転室時に食堂加算を退避する項目
            03  WRK-SHOKUDOU-AREA.
-               05  WRK-SHOKUDOU-SRYYM      PIC X(06).
+               05  WRK-SHOKUDOU-SRYYM.
+                   07  WRK-SHOKUDOU-SRYYY  PIC 9(04).
+                   07  WRK-SHOKUDOU-SRYMM  PIC 9(02).
                05  WRK-SHOKUDOU-SKJTBL.
                    07  WRK-SHOKUDOU-SKJ-ARI PIC X(01)  OCCURS  31.
       *
@@ -15497,16 +15499,32 @@
       *    入院会計作成後に食事の算定が無い日の食堂加算をクリアする
       *    処理を追加
            IF  SPA-NAI-I01-IDOYMD(1:6)     >= "200604"
+      *        （異動月分）
                MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
                IF        WRK-TENROOM-SKJ-SRYYM(1)   NOT =   SPACE
                    MOVE  WRK-TENROOM-SKJ-SRYYM(1)
                                            TO   WRK-SHOKUDOU-SRYYM
                    PERFORM   4801-SHOKUDOU-CLEAR-SEC
                END-IF
+      *        （異動翌月分）
                MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
                IF        WRK-TENROOM-SKJ-SRYYM(2)   NOT =   SPACE
                    MOVE  WRK-TENROOM-SKJ-SRYYM(2)
                                            TO   WRK-SHOKUDOU-SRYYM
+                   PERFORM   4801-SHOKUDOU-CLEAR-SEC
+               END-IF
+      *        （異動時の食事区分が食なしの異動翌月分）
+               MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
+               IF       (WRK-TENROOM-SKJ-SRYYM(2)    =   SPACE)  AND
+                        (PTNYUINRRK-SKJKBN   =   "0")
+                   MOVE  WRK-TENROOM-SKJ-SRYYM(1)
+                                           TO   WRK-SHOKUDOU-SRYYM
+                   IF    WRK-SHOKUDOU-SRYMM   =   12
+                         ADD     1         TO  WRK-SHOKUDOU-SRYYY
+                         MOVE    1         TO  WRK-SHOKUDOU-SRYMM
+                   ELSE
+                         ADD     1         TO  WRK-SHOKUDOU-SRYMM
+                   END-IF
                    PERFORM   4801-SHOKUDOU-CLEAR-SEC
                END-IF
            END-IF
