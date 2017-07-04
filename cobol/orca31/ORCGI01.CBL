@@ -15515,8 +15515,9 @@
                END-IF
       *        （異動時の食事区分が食なしの異動翌月分）
                MOVE      SPACE             TO   WRK-SHOKUDOU-SRYYM
-               IF       (WRK-TENROOM-SKJ-SRYYM(2)    =   SPACE)  AND
-                        (PTNYUINRRK-SKJKBN   =   "0")
+               IF       (WRK-TENROOM-SKJ-SRYYM(1) NOT =   SPACE)  AND
+                        (WRK-TENROOM-SKJ-SRYYM(2)     =   SPACE)  AND
+                        (PTNYUINRRK-SKJKBN            =   "0")
                    MOVE  WRK-TENROOM-SKJ-SRYYM(1)
                                            TO   WRK-SHOKUDOU-SRYYM
                    IF    WRK-SHOKUDOU-SRYMM   =   12
