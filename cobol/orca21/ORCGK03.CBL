@@ -4901,8 +4901,9 @@
                    COMPUTE WRK-SEIKYU      =   SPA-GMN-CHOSEI1
                                            +   SPA-GMN-CHOSEI2
                                            +   SPA-NAI-SEIKYU
-                   IF     (WRK-SEIKYU          <   ZERO )  AND
-                          (SPA-NAI-SEIKYU      >   ZERO )
+                   IF     (WRK-SEIKYU          <   ZERO )
+      *H29.7  請求額がなくてもマイナスはエラー
+      *****           AND (SPA-NAI-SEIKYU      >   ZERO )
                        MOVE    "0004"                  TO  SPA-ERRCD
                        MOVE    06                      TO  SPA-GMN-CUR
                    END-IF
