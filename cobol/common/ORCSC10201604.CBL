@@ -6760,9 +6760,51 @@
            IF      WRK-KAISU           >   ZERO
                MOVE    1               TO  LNK-ORCSC-SINSATU-ARI
            END-IF
+      *
+      *H29.7
+           IF     (FLG-TBL             =   ZERO )
+             AND  (WRK-ERRCD           =   SPACE)
+      *        Ï«ºÒ¤«¤é·òÊÝ¤Î¥Á¥§¥Ã¥¯
+               IF     (SPA-HKNKBN      =   1   )
+                 AND  (SPA-RSI-JUNKYO  =   "1" )
+                 AND  (SPA-SYORIFLG    =   1   )
+      *            ·òÊÝ¤ÇÏ«ºÒ¥³¡¼¥É¤Ï¥¨¥é¡¼¡ÊÅ¸³«»þ¤ËÅÀ¿ô·Ù¹ðÉ½¼¨¤¹¤ë°Ù
+                   PERFORM 200121-RSISINSATU-CHK02-SEC
+               END-IF
+           END-IF
            .
        2001-SINSATU-CHK-EXT.
            EXIT.
+      *
+      *H29.7
+      *****************************************************************
+      *    Ï«ºÒ¿Ç»¡ÎÁ¤ÎÈ½Äê½èÍý
+      *****************************************************************
+       200121-RSISINSATU-CHK02-SEC          SECTION.
+      *
+      *    ¿Ç»¡ÎÁ¸¡º÷
+           SET     TBL-RSI              TO  1
+           SEARCH  TBL-RSI-SINSATU-OCC  VARYING   TBL-RSI
+              AT   END
+                   MOVE    SPACE               TO  WRK-KBN
+                   MOVE    SPACE               TO  WRK-KBN2
+                   MOVE    ZERO                TO  WRK-KAISU
+                   MOVE    ZERO                TO  FLG-TBL
+               WHEN    WRK-COM-INPUTCD(IDX-Z)  =   TBLR-SRYCD (TBL-RSI)
+                   MOVE    TBLR-KBN  (TBL-RSI) TO  WRK-KBN
+                   MOVE    TBLR-KBN2 (TBL-RSI) TO  WRK-KBN2
+                   MOVE    TBLR-KAISU(TBL-RSI) TO  WRK-KAISU
+                   MOVE    1                   TO  FLG-TBL
+           END-SEARCH
+      *    Ï«ºÒ¥³¡¼¥É¤Ï¥¨¥é¡¼
+           IF      FLG-TBL             =   1
+               MOVE    "8000"          TO  WRK-ERRCD
+               MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+           END-IF
+           .
+       200121-RSISINSATU-CHK02-EXT.
+           EXIT.
+      *!
       *****************************************************************
       *    Ï«ºÒ¿Ç»¡ÎÁ¤ÎÈ½Äê½èÍý
       *****************************************************************
