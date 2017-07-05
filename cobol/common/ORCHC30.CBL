@@ -506,10 +506,20 @@
                                        SPA-AREA
                                        ORCSPRGOPTIONAREA
            MOVE    SPACE           TO  WRK-PARA
-           IF      ORCSPRGOPTION-OT-TYPE   =   1
-      *        半角で１文字目を値とする
-               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
-           END-IF
+           EVALUATE    WRK-PARA-NAME
+           WHEN  "API_CUSTOM_ID"
+               MOVE    ORCSPRGOPTION-OT-PARA
+                                   TO  WRK-PARA
+           WHEN    OTHER
+               IF    ( ORCSPRGOPTION-OT-TYPE   =   1 )
+      *            半角で１文字目を値とする
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:1)
+                                   TO  WRK-PARA(1:1)
+               ELSE
+                   MOVE    ORCSPRGOPTION-OT-PARA
+                                   TO  WRK-PARA
+               END-IF
+           END-EVALUATE
       *
            .
        1001-OPTION-CALL-EXT.
