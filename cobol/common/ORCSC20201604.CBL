@@ -6455,6 +6455,8 @@
                    UNTIL      (IDX1        >   SPA-MAX-LINE   )   OR
                               (FLG-ARI                 =   1  ) OR
                               (WRK-GMN-INPUTCD (IDX1)  =   SPACE )
+      *H29.7
+                         OR   (WRK-COM-ZAIEND(IDX1)    =   "1"  )
                IF       WRK-COM-INPUTCD (IDX1) =   WRK-SRYCD
                     MOVE    IDX1           TO  IDX-T
                     MOVE    1              TO  FLG-ARI
