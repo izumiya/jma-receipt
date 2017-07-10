@@ -13157,7 +13157,8 @@
                    MOVE     MCPDATA-REC   TO   NYUINACCT-REC
       *
       *            ¿©»ö¤òÂàÈò
-                   IF      NACCT-ZAISKBKBN     =   "4"
+                   IF     (NACCT-ZAISKBKBN     =   "4")   AND
+                          (NACCT-SRYCDTOTAL    =   99999920)
                        MOVE    SPA-NAI-I01-TAIINYMD(7:2)
                                          TO    IDX-SHOKUJIX
                        IF      NACCT-DAY(IDX-SHOKUJI9)  NOT =   ZERO
