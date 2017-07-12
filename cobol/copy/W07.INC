@@ -466,6 +466,12 @@
                     06  W07-SEI20KSNKBN-COUNT   PIC S9(9)   BINARY.
                     06  W07-SEI20KSNKBN-ITEM
                             PIC X(40)   OCCURS  5 TIMES.
+                  05  W07-SIN20KSNKBN-COMB.
+                    06  W07-SIN20KSNKBN.
+                      07  TEXTDATA    PIC X(40).
+                    06  W07-SIN20KSNKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W07-SIN20KSNKBN-ITEM
+                            PIC X(40)   OCCURS  5 TIMES.
                   05  W07-YMDHENKBN-COMB.
                     06  W07-YMDHENKBN.
                       07  W07-VALUE   PIC X(60).

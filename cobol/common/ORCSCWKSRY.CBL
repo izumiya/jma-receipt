@@ -50,6 +50,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/08/XX  »ý»²ÌôÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/02/XX  ºßÂð¼ÂÀÓ²Ã»»£²ºï½üÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/03/XX  £È£²£¹Ç¯£´·î²þÀµÂÐ±þÂ¾
+      *  04.08.00    NACL-Â¿¡¹Ç¼  17/07/XX  ¿´¿ÈÎÅË¡£²£°Ì¤Ëþ²Ã»»¶èÊ¬ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1017,6 +1018,22 @@
                       AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
                       AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
                        IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           MOVE    SPACE          TO  SPA-COM-AUTOKBN
+                                                             (IDX-1)
+                       END-IF
+                       IF      (SPA-COM-DATAKBN(IDX-1) =  "1"   )
+                           MOVE    "1"            TO  SPA-COM-KSNAUTO
+                                                             (IDX-1)
+                       END-IF
+                   END-IF
+      *H29.7
+      *            ¿´¿ÈÎÅË¡¤Î£²£°ºÐ²Ã»»¤Î¼«Æ°È¯À¸¤Ê¤·(H29/7¤«¤é¡Ë
+                   IF     (SPA-SRYYMD              >=  "20170701")
+                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO    )
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "004")
+                       IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           AND (SPA-COM-DATAKBN(IDX-1) =  "2"   )
                            MOVE    SPACE          TO  SPA-COM-AUTOKBN
                                                              (IDX-1)
                        END-IF

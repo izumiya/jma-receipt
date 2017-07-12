@@ -58,6 +58,7 @@
       * 04.08.00     NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       * 04.08.00     NACL-多々納  16/06/XX  Ｈ２８年７月改正対応
       * 04.08.00     NACL-多々納  16/06/XX  Ｈ２８年１０月改正対応
+      *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算対応追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2827,7 +2828,7 @@
       *****************************************************************
       *     外来　精神通院の加算チェック処理
       *****************************************************************
-       1001132-GAIRI-SEISIN-SEC            SECTION.
+       1001132-GAIRI-SEISIN-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-NENREI
            MOVE    ZERO                TO  FLG-NENREI2
@@ -3180,7 +3181,7 @@
       *****************************************************************
       *     入院　精神通院の加算チェック処理
       *****************************************************************
-       1001131-NYUIN-SEISIN-SEC            SECTION.
+       1001131-NYUIN-SEISIN-SEC        SECTION.
       *
       *    警告チェック済みの時、チェックなし
            IF     (WRK-COM-KZMFLG (IDX-Z)  NOT =   SPACE)
@@ -3602,9 +3603,18 @@
                    PERFORM 10211-GAIRI-SEISINAUTO-SEC
                END-IF
            ELSE
+      *H29.7
+      *        心身療法はシステム管理による
+               IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "I" )
+                 AND  (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "004")
+                   PERFORM 10022-SINSINAGEKSN-SEC
+               ELSE
+      *
                PERFORM 10021-JIDO-AGEKASAN-SEC
                IF      FLG-ADD             =   1
                    MOVE    1               TO  WRK-COM-SANFLG (IDX-S)
+               END-IF
+      *
                END-IF
            END-IF
       *
@@ -3622,6 +3632,32 @@
            END-PERFORM
            .
        1002-JIDO-KASAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    心身療法年齢加算処理
+      *****************************************************************
+       10022-SINSINAGEKSN-SEC        SECTION.
+      *
+           IF     (SPA-SIN20KSNKBN     =   "1" )
+              OR  (WRK-COM-KSNAUTO(IDX-Z)  =   "1" )
+      *       自動算定なし
+              CONTINUE
+           ELSE
+               MOVE    IDX-Z               TO  IDX-ZS3
+               PERFORM 10021-JIDO-AGEKASAN-SEC
+               IF      FLG-ADD             =   1
+                   MOVE    1               TO  WRK-COM-SANFLG (IDX-S)
+      *
+      *            H29/7から手入力とする
+                   IF      SPA-SRYYMD      >=  "20170701"
+                       MOVE    SPACE       TO  WRK-COM-AUTOKBN(IDX-S)
+                       MOVE    "1"         TO  WRK-COM-KSNAUTO(IDX-ZS3)
+                   END-IF
+               END-IF
+           END-IF
+           .
+       10022-SINSINAGEKSN-EXT.
            EXIT.
       *
       *****************************************************************

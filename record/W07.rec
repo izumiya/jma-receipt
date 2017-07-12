@@ -599,6 +599,13 @@ W07 {
           count int;
             item varchar(40)[5];
         };
+        SIN20KSNKBN_COMB {
+          SIN20KSNKBN {
+            textdata varchar(40);
+          };
+          count int;
+            item varchar(40)[5];
+        };
         YMDHENKBN_COMB {
           YMDHENKBN {
             textdata varchar(60);

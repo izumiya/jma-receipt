@@ -37,6 +37,7 @@
       * 04.08.00     NACL-多々納  15/03/XX  平成２７年４月改正対応
       * 04.08.00     NACL-多々納  16/08/XX  相互作用チェック区分追加
       * 04.08.00     NACL-多々納  16/10/04  要介護状態表示対応
+      *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算区分追加
       *****************************************************************
       *
       *
@@ -715,6 +716,8 @@
                MOVE    SYS-1038-HAIKIKBN       TO  SPA-HAIKIKBN-FLG
       *        精神療法２０未満加算区分
                MOVE    SYS-1038-SEI20KSNKBN    TO  SPA-SEI20KSNKBN
+      *        心身療法２０未満加算区分
+               MOVE    SYS-1038-SIN20KSNKBN    TO  SPA-SIN20KSNKBN
       *H28.10
       *        リハビリ・患者情報・介護表示区分
       ****     MOVE    SYS-1038-GMNHYOKBN-G    TO  SPA-GMNHYOKBN-G
@@ -773,6 +776,13 @@
       *       Ｈ２２年４月から反映
               OR  (SPA-SRYYMD          <   "20100401")
                MOVE    "0"                 TO  SPA-SEI20KSNKBN
+           END-IF
+      *H29.7
+      *    心身療法２０未満加算区分
+           IF     (SPA-SIN20KSNKBN     =   SPACE )
+      *       Ｈ２９年７月から反映
+              OR  (SPA-SRYYMD          <   "20170701")
+               MOVE    "0"                 TO  SPA-SIN20KSNKBN
            END-IF
       *    リハビリ・患者情報表示区分
            IF     (SYS-1038-GMNHYOKBN-G    =   SPACE )
