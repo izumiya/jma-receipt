@@ -109,7 +109,9 @@
       *
            03  WRK-OPID                PIC X(16).
       *
-           03  WRK-PARAM               PIC X(256).
+           03  WRK-PARAM.
+               05  WRK-PARAM-ORCA-UID  PIC X(36).
+               05  WRK-PARAM-KARTE-UID PIC X(36).
       *
            03  WRK-X.
                05  WRK-9               PIC 9(05).
@@ -1073,11 +1075,10 @@
                                    =   ZERO
       *        パラメータとカルテUID+オルカUID をチェック
                MOVE    SPACE           TO  WRK-PARAM
-               STRING  RECEPRINTQ-KARTE-UID
-                                           DELIMITED   BY  SPACE
-                       RECEPRINTQ-ORCA-UID DELIMITED   BY  SPACE
-                                           INTO    WRK-PARAM
-               END-STRING
+               MOVE    RECEPRINTQ-KARTE-UID
+                                       TO  WRK-PARAM-KARTE-UID
+               MOVE    RECEPRINTQ-ORCA-UID
+                                       TO  WRK-PARAM-ORCA-UID
       *
                IF    ( WRK-PARAM   NOT =   JOB-PARAM     )
                OR    ( SPA-R01-NYUGAIKBN
@@ -1187,10 +1188,10 @@
                GO  TO  2002-RECEIPT-PRINT-EXT
            END-IF
       *
-           STRING  RECEPRINTQ-KARTE-UID    DELIMITED  BY  SPACE
-                   RECEPRINTQ-ORCA-UID     DELIMITED  BY  SPACE
-                                          INTO    SPA-R01-JOB-PARAM
-           END-STRING
+           MOVE    RECEPRINTQ-KARTE-UID
+                                   TO  SPA-R01-JOB-KARTE-UID
+           MOVE    RECEPRINTQ-ORCA-UID
+                                   TO  SPA-R01-JOB-ORCA-UID
       *
            PERFORM 800-TEMPDIR-SEC
            IF      WRK-ERRCD   NOT =   SPACE
@@ -1234,10 +1235,10 @@
                                    =   ZERO
       *        パラメータとカルテUID+オルカUID をチェック
                MOVE    SPACE           TO WRK-PARAM
-               STRING  RECEPRINTQ-KARTE-UID DELIMITED   BY  SPACE
-                       RECEPRINTQ-ORCA-UID  DELIMITED   BY  SPACE
-                                           INTO    WRK-PARAM
-               END-STRING
+               MOVE    RECEPRINTQ-KARTE-UID
+                                       TO  WRK-PARAM-KARTE-UID
+               MOVE    RECEPRINTQ-ORCA-UID
+                                       TO  WRK-PARAM-ORCA-UID
       *
                IF      WRK-PARAM   NOT =   JOB-PARAM
                    MOVE    "E43"           TO  WRK-ERRCD

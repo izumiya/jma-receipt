@@ -117,7 +117,9 @@
       *
            03  WRK-OPID                PIC X(16).
       *
-           03  WRK-PARAM               PIC X(256).
+           03  WRK-PARAM.
+               05  WRK-PARAM-ORCA-UID  PIC X(36).
+               05  WRK-PARAM-KARTE-UID PIC X(36).
       *
            03  WRK-X.
                05  WRK-9               PIC 9(05).
@@ -720,10 +722,10 @@
                    END-IF
            END-EVALUATE
       *
-           STRING  RECEMAKEQ-KARTE-UID DELIMITED  BY  SPACE
-                   RECEMAKEQ-ORCA-UID  DELIMITED  BY  SPACE
-                                       INTO    SPA-R01-JOB-PARAM
-           END-STRING
+           MOVE    RECEMAKEQ-KARTE-UID
+                                   TO  SPA-R01-JOB-KARTE-UID
+           MOVE    RECEMAKEQ-ORCA-UID
+                                   TO  SPA-R01-JOB-ORCA-UID
       *
       *    更新前チェック
            MOVE    SPACE           TO  LINKAREA
@@ -765,12 +767,12 @@
                                                    =   ZERO
       *                        パラメータとカルテUID+オルカUID をチェック
                                MOVE    SPACE           TO WRK-PARAM
-                               STRING  RECEMAKEQ-KARTE-UID
-                                                   DELIMITED   BY  SPACE
-                                       RECEMAKEQ-ORCA-UID
-                                                   DELIMITED   BY  SPACE
-                                                   INTO    WRK-PARAM
-                               END-STRING
+                               MOVE    RECEMAKEQ-KARTE-UID
+                                                       TO
+                                                   WRK-PARAM-KARTE-UID
+                               MOVE    RECEMAKEQ-ORCA-UID
+                                                       TO
+                                                   WRK-PARAM-ORCA-UID
       *
                                IF    ( WRK-PARAM
                                                NOT =   JOB-PARAM     )
@@ -1019,10 +1021,10 @@
            DISPLAY "MAKE SPA-R01-RECEKBN=" SPA-R01-RECEKBN 
            DISPLAY "MAKE SPA-R01-FILEKBN=" SPA-R01-FILEKBN
       *??
-           STRING  RECEMAKEQ-KARTE-UID DELIMITED  BY  SPACE
-                   RECEMAKEQ-ORCA-UID  DELIMITED  BY  SPACE
-                                       INTO    SPA-R01-JOB-PARAM
-           END-STRING
+           MOVE    RECEMAKEQ-KARTE-UID
+                                   TO  SPA-R01-JOB-KARTE-UID
+           MOVE    RECEMAKEQ-ORCA-UID
+                                   TO  SPA-R01-JOB-ORCA-UID
       *
            PERFORM 800-TEMPDIR-SEC
            IF      WRK-ERRCD   NOT =   SPACE
@@ -1091,10 +1093,10 @@
                                    =   ZERO
       *        パラメータとカルテUID+オルカUID をチェック
                MOVE    SPACE           TO WRK-PARAM
-               STRING  RECEMAKEQ-KARTE-UID DELIMITED   BY  SPACE
-                       RECEMAKEQ-ORCA-UID  DELIMITED   BY  SPACE
-                                           INTO    WRK-PARAM
-               END-STRING
+               MOVE    RECEMAKEQ-KARTE-UID
+                                       TO  WRK-PARAM-KARTE-UID
+               MOVE    RECEMAKEQ-ORCA-UID
+                                       TO  WRK-PARAM-ORCA-UID
       *
                IF    ( WRK-PARAM   NOT =   JOB-PARAM     )
                OR    ( SPA-R01-NYUGAIKBN
@@ -1391,10 +1393,10 @@
                                    =   ZERO
       *        パラメータとカルテUID+オルカUID をチェック
                MOVE    SPACE           TO WRK-PARAM
-               STRING  RECEMAKEQ-KARTE-UID DELIMITED   BY  SPACE
-                       RECEMAKEQ-ORCA-UID  DELIMITED   BY  SPACE
-                                           INTO    WRK-PARAM
-               END-STRING
+               MOVE    RECEMAKEQ-KARTE-UID
+                                       TO  WRK-PARAM-KARTE-UID
+               MOVE    RECEMAKEQ-ORCA-UID
+                                       TO  WRK-PARAM-ORCA-UID
                IF      WRK-PARAM   NOT =   JOB-PARAM
                    MOVE    "E41"           TO  WRK-ERRCD
                    GO  TO  2004-RECEIPT-CANCEL-EXT

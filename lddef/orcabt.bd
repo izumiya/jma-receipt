@@ -315,5 +315,6 @@ db "shell" {
 
 db "push" {
         push_find;
+        push_batch01;
 };
 

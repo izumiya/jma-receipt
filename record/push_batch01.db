@@ -1,0 +1,14 @@
+push_batch01 {
+	event		varchar(50);
+	body	{
+		Karte_Uid	varchar(36);
+		Orca_Uid	varchar(36);
+#---> 処理結果
+		Api_Result	varchar(03);
+#---> 診療年月
+		Perform_Month	varchar(07);
+#---> 処理件数
+		Output_Count	varchar(10);
+	};
+};
+

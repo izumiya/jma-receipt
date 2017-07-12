@@ -225,5 +225,7 @@
                07  SPA-R99-FLG             PIC  X(02).
                07  SPA-R99-CANCEL          PIC  X(03).
       *
-           05  SPA-R01-JOB-PARAM           PIC X(256).
+           05  SPA-R01-JOB-PARAM.
+               07  SPA-R01-JOB-ORCA-UID    PIC X(36).
+               07  SPA-R01-JOB-KARTE-UID   PIC X(36).
       *
