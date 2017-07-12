@@ -1047,6 +1047,25 @@
                                                              (IDX-1)
                        END-IF
                    END-IF
+      *H29.7
+      *            心身療法の２０歳加算の自動発生なし(H29/7から）
+                   IF     (SPA-SRYYMD              >=  "20170701")
+                      AND ((ORCSCWKSRY-SYORIFLG    =   ZERO    )
+      *API(HAORI)
+                        OR (FLG-AUTONO             =   1       ))
+      *
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "004")
+                       IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           AND (SPA-COM-DATAKBN(IDX-1) =  "2"   )
+                           MOVE    SPACE          TO  SPA-COM-AUTOKBN
+                                                             (IDX-1)
+                       END-IF
+                       IF      (SPA-COM-DATAKBN(IDX-1) =  "1"   )
+                           MOVE    "1"            TO  SPA-COM-KSNAUTO
+                                                             (IDX-1)
+                       END-IF
+                   END-IF
       *H29.2
       *            在宅加算２の訂正時自動発生対応
                    IF     (SPA-SRYYMD              >=  "20160401")

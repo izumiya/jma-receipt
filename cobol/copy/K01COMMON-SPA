@@ -212,6 +212,9 @@
                05  SPA-HAIKIKBN-FLG        PIC  X(01).
       *¿∫ø¿Œ≈À°£≤£∞Ã§À˛≤√ªª∂Ë ¨
                05  SPA-SEI20KSNKBN         PIC  X(01).
+      *H29.7
+      *ø¥ø»Œ≈À°£≤£∞Ã§À˛≤√ªª∂Ë ¨
+               05  SPA-SIN20KSNKBN         PIC  X(01).
       *•Í•œ•”•Í°¶¥µº‘æ Û…Ωº®∂Ë ¨
                05  SPA-GMNHYOKBN-G.
                    07  SPA-GMNHYOKBN       PIC  X(01)

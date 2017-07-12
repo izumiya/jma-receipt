@@ -2812,6 +2812,16 @@
                    MOVE    "Yes"           TO  MDCRES-PRSCRPT-NOAUTO
                                                              (IDY IDZ)
                END-IF
+      *H29.7
+      *        ¿´¿ÈÎÅË¡¤Î£²£°ºÐÌ¤Ëþ²Ã»»¤Î¼«Æ°È¯À¸¤Ê¤·
+               IF      (SPA-COM-CDKBN-KBN (IDX)    =   "I"  )
+                  AND  (SPA-COM-CDKBN-KBNNUM(IDX)  =   "004")
+                  AND  (SPA-COM-AGEKSNSRYCD(IDX 1) NOT =   ZERO
+                                                        AND SPACE )
+                  AND  (SPA-SRYYMD             >=  "20170701")
+                   MOVE    "Yes"           TO  MDCRES-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
            END-IF
       *
       *    ¼«Èñ¶â³Û

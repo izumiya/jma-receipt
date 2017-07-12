@@ -490,6 +490,16 @@
                    MOVE    "Yes"           TO  ORAPISUB2-PRSCRPT-NOAUTO
                                                              (IDY IDZ)
                END-IF
+      *H29.7
+      *        ¿´¿ÈÎÅË¡¤Î£²£°ºÐÌ¤Ëþ²Ã»»¤Î¼«Æ°È¯À¸¤Ê¤·
+               IF      (TNS-CDKBN-KBN          =   "I"   )
+                  AND  (TNS-CDKBN-KBNNUM       =   "004" )
+                  AND  (TNS-AGEKSNSRYCD(1) NOT =   ZERO
+                                               AND SPACE )
+                  AND  (SPA-SRYYMD             >=  "20170701")
+                   MOVE    "Yes"           TO  ORAPISUB2-PRSCRPT-NOAUTO
+                                                             (IDY IDZ)
+               END-IF
            END-IF
       *
       *    ¼«Èñ¶â³Û

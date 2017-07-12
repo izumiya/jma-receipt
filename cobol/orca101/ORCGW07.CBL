@@ -138,6 +138,7 @@
       *  04.08.00    NACL-多々納  16/12/XX  病名表示区分に追加対応
       *  04.08.00    NACL-多々納  17/03/XX  訂正時の自動発生（処方料）追加
       *  04.08.00    NACL-多々納  17/04/XX  投薬３０日超チェック追加
+      *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算区分追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -756,6 +757,16 @@
                            11  SPA-GMN-SEI20KSNKBN-LST   PIC X(60)
                                                         OCCURS  5.
                            11  SPA-GMN-SEI20KSNKBN-MAX   PIC 9(01).
+      *H29.7
+      *                心身療法２０未満加算区分
+                       09  SPA-GMN-SIN20KSNKBN-G.
+                           11  SPA-GMN-SIN20KSNKBN       PIC X(01).
+                           11  SPA-GMN-SIN20KSNKBN-F1    PIC X(01).
+                           11  SPA-GMN-SIN20KSNKBN-MEI   PIC X(58).
+                       09  SPA-GMN-SIN20KSNKBN-COMB.
+                           11  SPA-GMN-SIN20KSNKBN-LST   PIC X(60)
+                                                        OCCURS  5.
+                           11  SPA-GMN-SIN20KSNKBN-MAX   PIC 9(01).
       *
       *                リハビリ・患者情報表示区分
                        09  SPA-GMN-GMNHYOKBN-AREA.
@@ -2164,6 +2175,12 @@
            MOVE    "1 自動算定しない"
                                        TO  SPA-GMN-SEI20KSNKBN-LST(2)
            MOVE    2                   TO  SPA-GMN-SEI20KSNKBN-MAX
+      *H29.7
+      *    心身療法２０未満加算区分
+           MOVE    "0 自動算定する"    TO  SPA-GMN-SIN20KSNKBN-LST(1)
+           MOVE    "1 自動算定しない"
+                                       TO  SPA-GMN-SIN20KSNKBN-LST(2)
+           MOVE    2                   TO  SPA-GMN-SIN20KSNKBN-MAX
       *ver.4.7
       *    リハビリ・患者情報表示区分
            MOVE    "1"                 TO  SPA-GMN-GMNHYOKBNL (1)
@@ -3631,6 +3648,9 @@
            MOVE    SYS-1038-HAIKIKBN       TO  SPA-GMN-HAIKIKBN
       *    精神療法２０未満加算区分
            MOVE    SYS-1038-SEI20KSNKBN    TO  SPA-GMN-SEI20KSNKBN
+      *H29.7
+      *    心身療法２０未満加算区分
+           MOVE    SYS-1038-SIN20KSNKBN    TO  SPA-GMN-SIN20KSNKBN
       *    入金・返金額設定区分
            MOVE    SYS-1038-NYKHNKKBN      TO  SPA-GMN-NYKHNKKBN
       *    発行日変更区分
@@ -4031,6 +4051,23 @@
            IF      FLG-OK              =   ZERO
                MOVE    SPA-GMN-SEI20KSNKBN-LST (1)
                                        TO  SPA-GMN-SEI20KSNKBN-G
+           END-IF
+      *    心身療法２０未満加算区分
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL  (IDY         >   SPA-GMN-SIN20KSNKBN-MAX )
+                       OR (FLG-OK      =   1       )
+               IF      SPA-GMN-SIN20KSNKBN
+                                       =   SPA-GMN-SIN20KSNKBN-LST (IDY)
+                                                             (1:1)
+                   MOVE    SPA-GMN-SIN20KSNKBN-LST (IDY)
+                                       TO  SPA-GMN-SIN20KSNKBN-G
+                   MOVE    1           TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-SIN20KSNKBN-LST (1)
+                                       TO  SPA-GMN-SIN20KSNKBN-G
            END-IF
       *    入金・返金額設定区分
            MOVE    ZERO                TO  FLG-OK
@@ -5676,6 +5713,7 @@
            MOVE    W07-YKJOKUKBN       TO  SPA-GMN-YKJOKUKBN-G
            MOVE    W07-NYKHNKKBN       TO  SPA-GMN-NYKHNKKBN-G
            MOVE    W07-SEI20KSNKBN     TO  SPA-GMN-SEI20KSNKBN-G
+           MOVE    W07-SIN20KSNKBN     TO  SPA-GMN-SIN20KSNKBN-G
            MOVE    W07-YMDHENKBN       TO  SPA-GMN-YMDHENKBN-G
       *H24.4
       *    確認画面名称表示区分
@@ -6054,6 +6092,10 @@
       *            精神療法２０未満加算区分
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4108-SEI20KSNKBN-CHK-SEC
+                   END-IF
+      *            心身療法２０未満加算区分
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4108-SIN20KSNKBN-CHK-SEC
                    END-IF
       *            レセプトブレビューレイアウト
                    IF      SPA-ERRCD           =   SPACE
@@ -8419,6 +8461,32 @@
       *
            .
        4108-SEI20KSNKBN-CHK-EXT.
+           EXIT.
+      *H29.7
+      *****************************************************************
+      *    心身療法２０未満加算区分チェック処理（診療行為機能情報）
+      *****************************************************************
+       4108-SIN20KSNKBN-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-SIN20KSNKBN-MAX)
+                       OR     (FLG-OK  =   1    ) 
+               IF      SPA-GMN-SIN20KSNKBN
+                                       =   SPA-GMN-SIN20KSNKBN-LST (IDX)
+                                                          (1:1)
+                   MOVE    SPA-GMN-SIN20KSNKBN-LST(IDX)
+                                          TO  SPA-GMN-SIN20KSNKBN-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    314             TO  SPA-GMN-CUR
+               MOVE    "2030"          TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4108-SIN20KSNKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    レセプトブレビューレイアウトチェック処理（診療行為機能情報）
@@ -10933,6 +11001,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-HAIKIKBN        TO  SYS-1038-HAIKIKBN
            MOVE    SPA-GMN-NYKHNKKBN       TO  SYS-1038-NYKHNKKBN
            MOVE    SPA-GMN-SEI20KSNKBN     TO  SYS-1038-SEI20KSNKBN
+      *H29.7
+      *    心身療法２０未満加算区分
+           MOVE    SPA-GMN-SIN20KSNKBN     TO  SYS-1038-SIN20KSNKBN
            MOVE    SPA-GMN-YMDHENKBN       TO  SYS-1038-YMDHENKBN
            MOVE    SPA-GMN-PRVLAYOUT038    TO  SYS-1038-PRVLAYOUT
            MOVE    SPA-GMN-SETALLKBN       TO  SYS-1038-SETALLKBN
@@ -12083,6 +12154,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-SEI20KSNKBN-MAX
                                        TO  W07-SEI20KSNKBN-COUNT
+      *
+      *    心身療法２０未満加算区分（診療行為機能情報）
+           MOVE    SPA-GMN-SIN20KSNKBN-G   TO  W07-SIN20KSNKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-SIN20KSNKBN-MAX
+               MOVE    SPA-GMN-SIN20KSNKBN-LST (IDX)
+                                       TO  W07-SIN20KSNKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-SIN20KSNKBN-MAX
+                                       TO  W07-SIN20KSNKBN-COUNT
       *    レセプトブレビューレイアウト（診療行為機能情報）
            MOVE    SPA-GMN-PRVLAYOUT038-G  TO  W07-PRVLAYOUT038
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -13132,6 +13213,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "2020"
                    MOVE    "精神療法２０未満加算区分がありません。"
                                                        TO  SPA-ERRMSG
+               WHEN    "2030"
+                   MOVE    "心身療法２０未満加算区分がありません。"
+                                                       TO  SPA-ERRMSG
                WHEN    "2021"
                    MOVE    "発行日変更区分がありません。"
                                                        TO  SPA-ERRMSG
@@ -13556,6 +13640,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "HAIKIKBN"        TO   MCP-WIDGET
                WHEN    310
                    MOVE  "SEI20KSNKBN"     TO   MCP-WIDGET
+               WHEN    314
+                   MOVE  "SIN20KSNKBN"     TO   MCP-WIDGET
                WHEN    312
                    MOVE  "PRVLAYOUT038"    TO   MCP-WIDGET
                WHEN    313
@@ -14011,7 +14097,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "SEI20KSNKBN"
       *ver.4.7     MOVE    320             TO  SPA-GMN-CUR
       *H24.12      MOVE    330             TO  SPA-GMN-CUR
+      ****         MOVE    312             TO  SPA-GMN-CUR
+                   MOVE    314             TO  SPA-GMN-CUR
+      *H29.7
+      *        心身療法
+               WHEN    "SIN20KSNKBN"
                    MOVE    312             TO  SPA-GMN-CUR
+      *
                WHEN    "PRVLAYOUT038"
       *H28.6 ***   MOVE    330             TO  SPA-GMN-CUR
                    MOVE    313             TO  SPA-GMN-CUR
