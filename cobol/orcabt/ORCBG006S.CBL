@@ -68,7 +68,7 @@
                05  TOKEI-YKZKBN        PIC 9(01).
                05  TOKEI-KANANAME      PIC X(200).
                05  TOKEI-SRYCD         PIC X(09).
-               05  TOKEI-ENDYMD        PIC X(08).
+      *         05  TOKEI-ENDYMD        PIC X(08).
                05  TOKEI-TEN           PIC 9(07)V9(02).
                05  TOKEI-SRYKA         PIC X(02).
            03  TOKEI-NAME              PIC X(40).
@@ -77,6 +77,7 @@
       *----(04.08.02)--ADD-START---
            03  TOKEI-TENSIKIBETU       PIC 9(01).
       *----(04.08.02)--ADD-END-----
+           03  TOKEI-ENDYMD            PIC X(08).
            03  TOKEI-KOME              PIC X(01).
       *
       *    エラーファイル
@@ -1064,10 +1065,20 @@
            MOVE    ZERO            TO  WRK-CYUSURYO
            MOVE    SPACE           TO  WRK-CYUSRYCD
       *
+           MOVE    1               TO  WRK-STR
+           PERFORM VARYING IDX-D FROM  1 BY 1
+                   UNTIL ( IDX-D >     31 )
+               IF      ACCT-DAY(1 IDX-D)   NOT =   ZERO
+                   MOVE    IDX-D           TO  WRK-STR
+                   MOVE    31              TO  IDX-D
+               END-IF
+           END-PERFORM
+      *
            INITIALIZE                  TNS-TENSU-REC
            MOVE    SRY-SRYCD(IDX)  TO  TNS-SRYCD
            MOVE    SRY-SRYYM       TO  TNS-YUKOSTYMD(1:6)
-           MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
+      *     MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
+           MOVE    WRK-STR         TO  TNS-YUKOSTYMD(7:2)
       *    点数マスタ検索
            PERFORM 900-TNS-READ-SEC
       *
@@ -1273,7 +1284,7 @@
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            MOVE    ACCT-SRYKA      TO  TOKEI-SRYKA
            MOVE    TNS-TEN         TO  TOKEI-TEN
-           MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
+      *     MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
            PERFORM 900-TOKEI-READ-SEC
       *
            IF      FLG-TOKEI       =   1
@@ -1297,6 +1308,7 @@
                                        *   WRK-KAISU
                COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                        +   WRK-GSURYO
+               MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
                IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
                    MOVE    "*"         TO  TOKEI-KOME
                    MOVE    1               TO  FLG-KOME
@@ -1313,6 +1325,16 @@
                                        *   WRK-KAISU
                COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                        +   WRK-GSURYO
+               IF      TNS-YUKOEDYMD   >   TOKEI-ENDYMD
+                   MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
+                   IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
+                       MOVE    "*"             TO  TOKEI-KOME
+                       MOVE    1               TO  FLG-KOME
+                   ELSE
+                       MOVE    SPACE           TO  TOKEI-KOME
+                       MOVE    ZERO            TO  FLG-KOME
+                   END-IF
+               END-IF
                REWRITE TOKEI-REC
            END-IF
       *
@@ -1340,7 +1362,7 @@
            MOVE    SS009-BRMNUM-DAY(IDX-D)(1:2)
                                    TO  TOKEI-SRYKA
            MOVE    TNS-TEN         TO  TOKEI-TEN
-           MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
+      *     MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
            PERFORM 900-TOKEI-READ-SEC
       *
            IF      FLG-TOKEI       =   1
@@ -1364,6 +1386,7 @@
                                        *   ACCT-DAY (1 IDX-D)
                COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                        +   WRK-GSURYO
+               MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
                IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
                    MOVE    "*"         TO  TOKEI-KOME
                    MOVE    1               TO  FLG-KOME
@@ -1380,6 +1403,16 @@
                                        *   ACCT-DAY (1 IDX-D)
                COMPUTE TOKEI-SRYSURYO  =   TOKEI-SRYSURYO
                                        +   WRK-GSURYO
+               IF      TNS-YUKOEDYMD   >   TOKEI-ENDYMD
+                   MOVE    TNS-YUKOEDYMD   TO  TOKEI-ENDYMD
+                   IF    ( TOKEI-ENDYMD    <   WRK-PARA-ENDYMD )
+                       MOVE    "*"             TO  TOKEI-KOME
+                       MOVE    1               TO  FLG-KOME
+                   ELSE
+                       MOVE    SPACE           TO  TOKEI-KOME
+                       MOVE    ZERO            TO  FLG-KOME
+                   END-IF
+               END-IF
                REWRITE TOKEI-REC
            END-IF
       *
