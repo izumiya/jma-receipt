@@ -485,6 +485,8 @@
       *                                     レセプト対応
       *  04.08.18    NACL-門脇    17/06/02  熊本県地方公費負担金計算対応
       *                                     （減免（減額（割））適用時）
+      *  04.08.19    NACL-門脇    17/06/29  平成２９年８月改正
+      *                                     （高額療養費制度の見直し）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5105,16 +5107,26 @@
       *      金額を超える上限額が平成２６年１２月まではなかった。＞
       *    ＜高齢者の上位所得者について、平成２７年１月以降で、
       *      一般所得の金額を超える上限額ができた為、修正した。  ＞
-           IF   (FLG-TOKUSITU-XXX      =   1      )
-           AND  (COMB-HOJOKBN =  "3" OR "6" OR "7")
-           AND  (LNK-SYU-SRYYMD(1:6)  >=  "201501")
-             MOVE    44400          TO   WK-KOH-GENDOGAKU
+           IF  LNK-SYU-SRYYMD(1:6)  >=  "201708"
+             IF   (FLG-TOKUSITU-XXX      =   1      )
+             AND  (COMB-HOJOKBN =  "3" OR "6" OR "7")
+               MOVE   57600   TO    WK-KOH-GENDOGAKU
+             ELSE
+               MOVE   14000   TO    WK-KOH-GENDOGAKU
+             END-IF
            ELSE
-             MOVE    12000          TO   WK-KOH-GENDOGAKU
-             IF    FLG-SANSHOU3  NOT =  SPACE
-                    MOVE    8000    TO   WK-KOH-GENDOGAKU
+             IF   (FLG-TOKUSITU-XXX      =   1      )
+             AND  (COMB-HOJOKBN =  "3" OR "6" OR "7")
+             AND  (LNK-SYU-SRYYMD(1:6)  >=  "201501")
+               MOVE   44400   TO    WK-KOH-GENDOGAKU
+             ELSE
+               MOVE   12000   TO    WK-KOH-GENDOGAKU
              END-IF
            END-IF
+           IF  FLG-SANSHOU3  NOT =  SPACE
+             MOVE      8000   TO    WK-KOH-GENDOGAKU
+           END-IF
+      *
            IF   ( COMB-KOH1HKNNUM  =   "972" )
            OR   ( COMB-KOH2HKNNUM  =   "972" )
            OR   ( COMB-KOH3HKNNUM  =   "972" )
@@ -8335,20 +8347,44 @@
                    END-EVALUATE
                ELSE
                  IF   FLG-ZEROKOGAITO   =   1
-                   MOVE     12000     TO    MAX-KIN-SYU-M
+                   IF    LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                     MOVE   14000   TO   MAX-KIN-SYU-M
+                   ELSE
+                     MOVE   12000   TO   MAX-KIN-SYU-M
+                   END-IF
                  ELSE
                    EVALUATE   COMB-HOJOKBN
                        WHEN   "1"
                        WHEN   "4"
                        WHEN   "9"
+                        IF     LNK-SYU-SRYYMD(1:6)   >=  "201708"
+                           IF  FLG-SANSHOU3      =   SPACE
+                               MOVE   14000   TO   MAX-KIN-SYU-M
+                           ELSE
+                               MOVE    8000   TO   MAX-KIN-SYU-M
+                           END-IF
+                        ELSE
                            IF  FLG-SANSHOU3      =   SPACE              
                                MOVE   12000   TO   MAX-KIN-SYU-M
                            ELSE
                                MOVE    8000   TO   MAX-KIN-SYU-M
                            END-IF
+                        END-IF
                        WHEN   "2"
                        WHEN   "5"
                        WHEN   "8"
+                        IF     LNK-SYU-SRYYMD(1:6)   >=  "201708"
+                           IF  (WK-BIRTHDAY      >=  "19440402")
+                           OR  (FLG-KOKI-HIGAITO  =   1        )
+                               IF  FLG-SANSHOU3   =   SPACE
+                                 MOVE 14000   TO   MAX-KIN-SYU-M
+                               ELSE
+                                 MOVE  8000   TO   MAX-KIN-SYU-M
+                               END-IF
+                           ELSE
+                               MOVE   57600   TO   MAX-KIN-SYU-M
+                           END-IF
+                        ELSE
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
                            IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
                            OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
@@ -8374,9 +8410,13 @@
                                MOVE   40200   TO   MAX-KIN-SYU-M
                            END-IF
                          END-IF
+                        END-IF
                        WHEN   "3"
                        WHEN   "6"
                        WHEN   "7"
+                        IF     LNK-SYU-SRYYMD(1:6)   >=  "201708"
+                               MOVE   57600   TO   MAX-KIN-SYU-M
+                        ELSE
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
                            IF   FLG-KEIKASOCHI-IPAN  =  1
                                MOVE   12000   TO   MAX-KIN-SYU-M
@@ -8384,6 +8424,7 @@
                                MOVE   44400   TO   MAX-KIN-SYU-M
                            END-IF
                          END-IF
+                        END-IF
                    END-EVALUATE
                  END-IF
                  IF    FLG-TOKU75  =  1 OR 2
@@ -8498,17 +8539,6 @@
                        ( COMB-KOH3HKNNUM        =    SPACE) AND
                        ( COMB-KOH4HKNNUM        =    SPACE))
                           CONTINUE
-      **            IF  (WK-1001-PREFNUM  =  13            )
-      **            AND (COMB-HKNNUM  NOT = "060" AND "067"
-      **                                          AND "039")
-      **            AND (COMB-KOH1HKNNUM(1:1)
-      **                                 >= "1" AND <=  "8")
-      **              IF    FLG-TOKU75  =  1 OR 2
-      **                MOVE   6000    TO   MAX-KIN-SYU-M
-      **              ELSE
-      **                MOVE   12000   TO   MAX-KIN-SYU-M
-      **              END-IF
-      **            END-IF
                    ELSE
                     IF   ( COMB-KOH1HKNNUM   =   "012" OR "025" )
                     OR   ( COMB-KOH2HKNNUM   =   "012" OR "025" )
@@ -31320,14 +31350,29 @@
                  MOVE      "key2"             TO    MCP-PATHNAME
                  PERFORM    DB-CLOSE-SEC
       *
-                 EVALUATE  WK-GNBKEIKBN-K-KBN(IDX19)
-                   WHEN       1
-                     MOVE    44400    TO    WK-HIKAKU-KINGAKU
-                   WHEN       2
-                     MOVE    12000    TO    WK-HIKAKU-KINGAKU
-                   WHEN       3
-                     MOVE     8000    TO    WK-HIKAKU-KINGAKU
-                 END-EVALUATE
+                 IF    LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                   EVALUATE  WK-GNBKEIKBN-K-KBN(IDX19)
+                     WHEN       1
+                       MOVE    57600    TO    WK-HIKAKU-KINGAKU
+                     WHEN       2
+                       MOVE    14000    TO    WK-HIKAKU-KINGAKU
+                     WHEN       3
+                       MOVE     8000    TO    WK-HIKAKU-KINGAKU
+                   END-EVALUATE
+                 ELSE
+                   EVALUATE  WK-GNBKEIKBN-K-KBN(IDX19)
+                     WHEN       1
+                       MOVE    44400    TO    WK-HIKAKU-KINGAKU
+                     WHEN       2
+                       MOVE    12000    TO    WK-HIKAKU-KINGAKU
+                     WHEN       3
+                       MOVE     8000    TO    WK-HIKAKU-KINGAKU
+                   END-EVALUATE
+                 END-IF
+                 IF    FLG-TOKU75  =  1 OR 2
+                   COMPUTE  WK-HIKAKU-KINGAKU  =
+                            WK-HIKAKU-KINGAKU  /  2
+                 END-IF
                  IF   WK-GNBKEIKBN-K-KIN(IDX19) > WK-HIKAKU-KINGAKU
                      MOVE   ZERO   TO  ZAN-KOHI-T(IDX19)
                  ELSE
@@ -31378,14 +31423,29 @@
       *
            IF   WK-GNBKEIKBN-K-KBN(5)  NOT =  ZERO
            AND  WK-GNBKEIKBN-K-FLG(5)      =   1
-              EVALUATE  WK-GNBKEIKBN-K-KBN(5)
-                WHEN       1
-                  MOVE    44400    TO    WK-HIKAKU-KINGAKU
-                WHEN       2
-                  MOVE    12000    TO    WK-HIKAKU-KINGAKU
-                WHEN       3
-                  MOVE     8000    TO    WK-HIKAKU-KINGAKU
-              END-EVALUATE
+              IF    LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                EVALUATE  WK-GNBKEIKBN-K-KBN(5)
+                  WHEN       1
+                    MOVE    57600    TO    WK-HIKAKU-KINGAKU
+                  WHEN       2
+                    MOVE    14000    TO    WK-HIKAKU-KINGAKU
+                  WHEN       3
+                    MOVE     8000    TO    WK-HIKAKU-KINGAKU
+                END-EVALUATE
+              ELSE
+                EVALUATE  WK-GNBKEIKBN-K-KBN(5)
+                  WHEN       1
+                    MOVE    44400    TO    WK-HIKAKU-KINGAKU
+                  WHEN       2
+                    MOVE    12000    TO    WK-HIKAKU-KINGAKU
+                  WHEN       3
+                    MOVE     8000    TO    WK-HIKAKU-KINGAKU
+                END-EVALUATE
+              END-IF
+              IF    FLG-TOKU75  =  1 OR 2
+                COMPUTE  WK-HIKAKU-KINGAKU  =
+                         WK-HIKAKU-KINGAKU  /  2
+              END-IF
               IF  WK-GNBKEIKBN-K-KIN(5) >  WK-HIKAKU-KINGAKU
                   MOVE     ZERO    TO    ZAN-SYU-M
               ELSE
