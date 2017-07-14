@@ -842,7 +842,7 @@
            MOVE    JYURRK-DENPNUM      TO  VIS01RES-DENPNUM (IDX)
       *    ø«Œ≈≤ 
            PERFORM 200212-SRYKAMEI-HEN-SEC
-           MOVE    WRK-SRYKA           TO  VIS01RES-DEP-CODE (IDX)
+           MOVE    JYURRK-SRYKA        TO  VIS01RES-DEP-CODE (IDX)
            MOVE    WRK-SRYKA-NAME      TO  VIS01RES-DEP-NAME (IDX)
       *    •…•Ø•ø°º
            IF      JYURRK-DRCD     NOT =   ZERO
