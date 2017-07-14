@@ -437,6 +437,8 @@
       *                                     ¥ì¥»¥×¥ÈÂÐ±þ
       *  04.08.14    NACL-ÌçÏÆ    17/06/02  ·§ËÜ¸©ÃÏÊý¸øÈñÉéÃ´¶â·×»»ÂÐ±þ
       *                                     ¡Ê¸ºÌÈ¡Ê¸º³Û¡Ê³ä¡Ë¡ËÅ¬ÍÑ»þ¡Ë
+      *  04.08.15    NACL-ÌçÏÆ    17/06/29  Ê¿À®£²£¹Ç¯£¸·î²þÀµ
+      *                                     ¡Ê¹â³ÛÎÅÍÜÈñÀ©ÅÙ¤Î¸«Ä¾¤·¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5123,27 +5125,33 @@
            END-IF
       *
       *    ¸øÈñÉéÃ´¸ÂÅÙ³Û¤Î¥»¥Ã¥È
-           IF   LNK-SYU-SRYYMD(1:6)   >= "200610"
-                  MOVE   44400     TO  WK-KOH-GENDOGAKU
-                  EVALUATE  FLG-SANSHOU3
-                    WHEN       "2"
-                    WHEN       "3"
-                      MOVE  24600  TO  WK-KOH-GENDOGAKU
-                    WHEN       "1"
-                    WHEN       "4"
-                      MOVE  15000  TO  WK-KOH-GENDOGAKU
-                  END-EVALUATE
+           IF      LNK-SYU-SRYYMD(1:6)  >=  "201708"
+             MOVE      57600  TO    WK-KOH-GENDOGAKU
+             IF    FLG-TOKUSITU-XXX  = 1
+               IF  FLG-TOKUSITU-TASU = 1
+                 MOVE  44400  TO    WK-KOH-GENDOGAKU
+               END-IF
+             ELSE
+               IF  FLG-KOHYONKAIME   = 1
+                 MOVE  44400  TO    WK-KOH-GENDOGAKU
+               END-IF
+             END-IF
            ELSE
-                  MOVE   40200     TO  WK-KOH-GENDOGAKU
-                  EVALUATE  FLG-SANSHOU3
-                    WHEN       "2"
-                    WHEN       "3"
-                      MOVE  24600  TO  WK-KOH-GENDOGAKU
-                    WHEN       "1"
-                    WHEN       "4"
-                      MOVE  15000  TO  WK-KOH-GENDOGAKU
-                  END-EVALUATE
+             IF    LNK-SYU-SRYYMD(1:6)  >=  "200610"
+               MOVE    44400  TO    WK-KOH-GENDOGAKU
+             ELSE
+               MOVE    40200  TO    WK-KOH-GENDOGAKU
+             END-IF
            END-IF
+           EVALUATE  FLG-SANSHOU3
+             WHEN     "2"
+             WHEN     "3"
+               MOVE    24600  TO    WK-KOH-GENDOGAKU
+             WHEN     "1"
+             WHEN     "4"
+               MOVE    15000  TO    WK-KOH-GENDOGAKU
+           END-EVALUATE
+      *
            IF   ( COMB-KOH1HKNNUM  =   "972" )
            OR   ( COMB-KOH2HKNNUM  =   "972" )
            OR   ( COMB-KOH3HKNNUM  =   "972" )
@@ -6084,9 +6092,14 @@
       *****************************************************************
        20022-TOKUSITU-TASU-HANTEI-SEC               SECTION.
       *
-           IF    ((LNK-S02-KOUREI-NYUIN-KBN =  "1"     ) OR
-                  (FLG-KOREI-TANYUIN        =   1      ))
-           AND   (FLG-TOKUSITU              =   2  OR  3)
+           IF   (((LNK-S02-KOUREI-NYUIN-KBN  =  "1"      ) OR
+                  (FLG-KOREI-TANYUIN         =   1       )) AND
+                 ( FLG-TOKUSITU              =   2  OR  3 ) AND
+                 ( LNK-SYU-SRYYMD(1:6)      <   "201708"  ))
+           OR   (((LNK-S02-KOUREI-NYUIN-KBN  =  "1"      ) OR
+                  (FLG-KOREI-TANYUIN         =   1       )) AND
+                 ( FLG-TOKUSITU              =   3        ) AND
+                 ( LNK-SYU-SRYYMD(1:6)      >=  "201708"  ))
              CONTINUE
            ELSE
              INITIALIZE                         PTKOHINF-REC
@@ -8608,12 +8621,31 @@
                    END-EVALUATE
                ELSE
                  IF   FLG-ZEROKOGAITO   =   1
-                   MOVE     44400     TO    MAX-KIN-SYU-M
+                   IF    LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                     MOVE   57600   TO   MAX-KIN-SYU-M
+                   ELSE
+                     MOVE   44400   TO   MAX-KIN-SYU-M
+                   END-IF
                  ELSE
                    EVALUATE   COMB-HOJOKBN
                        WHEN   "1"
                        WHEN   "5"
                        WHEN   "9"
+                        IF     LNK-SYU-SRYYMD(1:6)   >=  "201708"
+                           IF  FLG-SANSHOU3      =   SPACE
+                             IF  FLG-KOHYONKAIME    =   1
+                               MOVE   44400   TO   MAX-KIN-SYU-M
+                             ELSE
+                               MOVE   57600   TO   MAX-KIN-SYU-M
+                             END-IF
+                           ELSE
+                             IF  FLG-SANSHOU3     =   "1" OR "4"
+                               MOVE   15000   TO   MAX-KIN-SYU-M
+                             ELSE
+                               MOVE   24600   TO   MAX-KIN-SYU-M
+                             END-IF
+                           END-IF
+                        ELSE
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
                            IF  FLG-SANSHOU3      =   SPACE              
                                MOVE   44400   TO   MAX-KIN-SYU-M
@@ -8635,9 +8667,42 @@
                              END-IF
                            END-IF
                          END-IF
+                        END-IF
                        WHEN   "2"
                        WHEN   "6"
                        WHEN   "8"
+                        IF     LNK-SYU-SRYYMD(1:6)   >=  "201708"
+                           IF  (WK-BIRTHDAY      >=  "19440402")
+                           OR  (FLG-KOKI-HIGAITO  =   1        )
+                             IF  FLG-SANSHOU3      =   SPACE
+                               IF  FLG-KOHYONKAIME    =   1
+                                   MOVE 44400   TO   MAX-KIN-SYU-M
+                               ELSE
+                                   MOVE 57600   TO   MAX-KIN-SYU-M
+                               END-IF
+                             ELSE
+                               IF  FLG-SANSHOU3     =   "1" OR "4"
+                                 MOVE   15000   TO   MAX-KIN-SYU-M
+                               ELSE
+                                 MOVE   24600   TO   MAX-KIN-SYU-M
+                               END-IF
+                             END-IF
+                           ELSE
+                            IF  FLG-KOHYONKAIME      =  1
+                             MOVE   44400       TO   MAX-KIN-SYU-M
+                            ELSE
+                             MOVE   80100       TO   MAX-KIN-SYU-M
+                             IF  (COMB-KOH1HKNNUM    =  SPACE
+                                                     OR "970")
+                             AND (COMB-KOH2HKNNUM    =  SPACE)
+                             AND (COMB-KOH3HKNNUM    =  SPACE)
+                             AND (COMB-KOH4HKNNUM    =  SPACE)
+                               MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI
+                               MOVE   2           TO   FLG-IRYOHI
+                             END-IF
+                            END-IF
+                           END-IF
+                        ELSE
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
                            IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
                            OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
@@ -8691,6 +8756,7 @@
                             END-IF
                            END-IF
                          END-IF
+                        END-IF
                        WHEN   "3"
                        WHEN   "7"
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
@@ -8825,17 +8891,6 @@
                        ( COMB-KOH2HKNNUM(1:1)  <=     "8" ) AND
                        ( COMB-KOH3HKNNUM        =    SPACE) AND
                        ( COMB-KOH4HKNNUM        =    SPACE))
-      **                  IF  (WK-1001-PREFNUM  =  13            )
-      **                  AND (COMB-HKNNUM  NOT = "060" AND "067"
-      **                                                AND "039")
-      **                  AND (COMB-KOH1HKNNUM(1:1)
-      **                                       >= "1" AND <=  "8")
-      **                    IF    FLG-TOKU75  =  1 OR 2
-      **                      MOVE   22200   TO   MAX-KIN-SYU-M
-      **                    ELSE
-      **                      MOVE   44400   TO   MAX-KIN-SYU-M
-      **                    END-IF
-      **                  END-IF
                           IF  (LNK-SYU-SRYYMD(1:6)  >=  "200905")
                           AND (COMB-HOJOKBN  =  "3" OR "7"      )
                             IF  FLG-TOKUSITU-XXX      =   1
@@ -8850,6 +8905,32 @@
                                   MOVE   40050    TO  MAX-KIN-SYU-M
                                 ELSE
                                   MOVE   80100    TO  MAX-KIN-SYU-M
+                                END-IF
+                              END-IF
+                            END-IF
+                          END-IF
+                          IF   LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                            IF ((COMB-HOJOKBN  =  "1" OR "5" OR "9") AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                            OR ((COMB-HOJOKBN  =  "2" OR "6" OR "8") AND
+                                (WK-BIRTHDAY      >=  "19440402"   ) AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                            OR ((COMB-HOJOKBN  =  "2" OR "6" OR "8") AND
+                                (FLG-KOKI-HIGAITO  =   1           ) AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                              IF  FLG-TOKUSITU-XXX      =   1
+                                IF   FLG-TOKUSITU-TASU  =   1
+                                  IF    FLG-TOKU75  =  1 OR 2
+                                    MOVE   22200    TO  MAX-KIN-SYU-M
+                                  ELSE
+                                    MOVE   44400    TO  MAX-KIN-SYU-M
+                                  END-IF
+                                ELSE
+                                  IF    FLG-TOKU75  =  1 OR 2
+                                    MOVE   28800    TO  MAX-KIN-SYU-M
+                                  ELSE
+                                    MOVE   57600    TO  MAX-KIN-SYU-M
+                                  END-IF
                                 END-IF
                               END-IF
                             END-IF
@@ -8921,6 +9002,32 @@
                                   MOVE   40050    TO  MAX-KIN-SYU-M
                                 ELSE
                                   MOVE   80100    TO  MAX-KIN-SYU-M
+                                END-IF
+                              END-IF
+                            END-IF
+                          END-IF
+                          IF   LNK-SYU-SRYYMD(1:6)  >=  "201708"
+                            IF ((COMB-HOJOKBN  =  "1" OR "5" OR "9") AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                            OR ((COMB-HOJOKBN  =  "2" OR "6" OR "8") AND
+                                (WK-BIRTHDAY      >=  "19440402"   ) AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                            OR ((COMB-HOJOKBN  =  "2" OR "6" OR "8") AND
+                                (FLG-KOKI-HIGAITO  =   1           ) AND
+                                (FLG-SANSHOU3  =  SPACE            ))
+                              IF  FLG-TOKUSITU-XXX      =   1
+                                IF   FLG-TOKUSITU-TASU  =   1
+                                  IF    FLG-TOKU75  =  1 OR 2
+                                    MOVE   22200    TO  MAX-KIN-SYU-M
+                                  ELSE
+                                    MOVE   44400    TO  MAX-KIN-SYU-M
+                                  END-IF
+                                ELSE
+                                  IF    FLG-TOKU75  =  1 OR 2
+                                    MOVE   28800    TO  MAX-KIN-SYU-M
+                                  ELSE
+                                    MOVE   57600    TO  MAX-KIN-SYU-M
+                                  END-IF
                                 END-IF
                               END-IF
                             END-IF
