@@ -741,6 +741,7 @@
       *  04.08.35    NACL-ÌçÏÆ    17/06/02  ÅÀ¿ôÍó¤ÎÂè»Í¸øÈñ¤Î½¸·×
       *  04.08.36    NACL-ÌçÏÆ    17/06/02  ¸ºÌÈ¡Ê¸º³Û¡Ê³ä¡Ë¡Ë¤ÎÉéÃ´¶â·×»»¡¦
       *                                     ¥ì¥»¥×¥ÈÂÐ±þ
+      *  04.08.38    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -27987,6 +27988,21 @@
                       AND (RECE62-TOTALTEN(1) = RECE62-TOTALTEN(3) )
                       AND (FTN-KOH-XXX        = RECE62-FTNMONEY(1) )
                            MOVE  ZERO     TO  RECE62-KOUREI-SAIKEI
+                      END-IF
+      *
+                      IF  (RECE62-KOHNUM(1)   NOT = "972" AND "974")
+                      AND (RECE62-KOHNUM(1)   NOT =  SPACE         )
+                      AND (RECE62-TOTALTEN(2)     =  ZERO          )
+                      AND (FTN-KOH-XXX        = RECE62-FTNMONEY(1) )
+                           MOVE  ZERO    TO  RECE62-KOUREI-SAIKEI
+                      END-IF
+      *
+                      IF  (RECE62-KOHNUM(1)       = "972" OR  "974")
+                      AND (RECE62-KOHNUM(2)   NOT = "972" AND "974")
+                      AND (RECE62-KOHNUM(2)   NOT =  SPACE         )
+                      AND (RECE62-TOTALTEN(3)     =  ZERO          )
+                      AND (FTN-KOH-XXX        = RECE62-FTNMONEY(1) )
+                           MOVE  ZERO    TO  RECE62-KOUREI-SAIKEI
                       END-IF
       *
                       IF ((RECE62-KOHNUM(1)     NOT = SPACE  ) AND

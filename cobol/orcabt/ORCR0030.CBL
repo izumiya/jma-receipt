@@ -773,6 +773,7 @@
       *  04.08.45    NACL-ÌçÏÆ    17/06/02  ÅÀ¿ôÍó¤ÎÂè»Í¸øÈñ¤Î½¸·×
       *  04.08.46    NACL-ÌçÏÆ    17/06/02  ¸ºÌÈ¡Ê¸º³Û¡Ê³ä¡Ë¡Ë¤ÎÉéÃ´¶â·×»»¡¦
       *                                     ¥ì¥»¥×¥ÈÂÐ±þ
+      *  04.08.48    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -24119,6 +24120,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       IF  (RECE02-KOHNUM(1)       = "972" OR  "974")
                       AND (RECE02-KOHNUM(2)   NOT = "972" AND "974")
                       AND (RECE02-TOTALTEN(1) = RECE02-TOTALTEN(3) )
+                      AND (FTN-KOH-XXX        = RECE02-FTNMONEY(1) )
+                           MOVE  ZERO    TO  RECE02-ZAITAKU-SAIKEI
+                      END-IF
+      *
+                      IF  (RECE02-KOHNUM(1)   NOT = "972" AND "974")
+                      AND (RECE02-KOHNUM(1)   NOT =  SPACE         )
+                      AND (RECE02-TOTALTEN(2)     =  ZERO          )
+                      AND (FTN-KOH-XXX        = RECE02-FTNMONEY(1) )
+                           MOVE  ZERO    TO  RECE02-ZAITAKU-SAIKEI
+                      END-IF
+      *
+                      IF  (RECE02-KOHNUM(1)       = "972" OR  "974")
+                      AND (RECE02-KOHNUM(2)   NOT = "972" AND "974")
+                      AND (RECE02-KOHNUM(2)   NOT =  SPACE         )
+                      AND (RECE02-TOTALTEN(3)     =  ZERO          )
                       AND (FTN-KOH-XXX        = RECE02-FTNMONEY(1) )
                            MOVE  ZERO    TO  RECE02-ZAITAKU-SAIKEI
                       END-IF
