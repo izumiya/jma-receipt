@@ -235,6 +235,11 @@
                PERFORM 2002-EDIT-SYUINF-SEC
            END-IF
       *
+           IF  ( BUNBEN-TEISYUTUSAKI   NOT =   SPACE )
+               MOVE    BUNBEN-TEISYUTUSAKI
+                                       TO  LNKBUNBEN-TEISYUTUSAKI
+           END-IF
+      *
            .
        200-MAIN-EXT.
            EXIT.
