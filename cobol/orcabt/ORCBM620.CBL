@@ -37,6 +37,8 @@
       *                                     ３とする 
       *  04.08.07    NACL-藤原    17/06/21  入院年月日を履歴から取得する
       *                                     ときの条件を追加
+      *  04.08.08    NACL-藤原    17/07/20  直近の履歴が入院中の自院歴の
+      *                                     場合のみ入院年月日を取得する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1168,37 +1170,20 @@
       *
            MOVE    PTNYUINRRK-REC  TO  WRK-PTNRRK-REC
       *
-      *    初回番号が同じ入院履歴から先頭の入院年月日を取得
+      *    初回番号が同じ入院履歴から直近の入院年月日を取得
            INITIALIZE                  PTNYUINRRK-REC
            MOVE    WRK-PTNRRK-HOSPNUM
                                    TO  PTNYUINRRK-HOSPNUM
            MOVE    WRK-PTNRRK-PTID TO  PTNYUINRRK-PTID
            MOVE    WRK-PTNRRK-SHONUM
                                    TO  PTNYUINRRK-SHONUM
-           MOVE    LNK-PRTKANRI-SRYYM
-                                   TO  PTNYUINRRK-NYUINYMD(1:6)
-           MOVE    "31"            TO  PTNYUINRRK-NYUINYMD(7:2)
+           MOVE    WRK-PTNRRK-NYUINYMD
+                                   TO  PTNYUINRRK-NYUINYMD
            MOVE    PTNYUINRRK-REC  TO  MCPDATA-REC
-           MOVE    "tbl_ptnyuinrrk"
-                                   TO  MCP-TABLE
-           MOVE    "key51"         TO  MCP-PATHNAME
-           PERFORM   900-DBSELECT-SEC
-           IF      MCP-RC          =   ZERO
-               PERFORM 900-PTNYUINRRK-KEY51-READ-SEC
-           ELSE
-               MOVE    1               TO  FLG-PTNYUINRRK
-           END-IF
-      *
-           MOVE    "tbl_ptnyuinrrk"
-                                   TO  MCP-TABLE
-           MOVE    "key51"         TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
+           PERFORM 900-PTNYUINRRK-KEY51-READ-SEC
       *
            IF      FLG-PTNYUINRRK  =   ZERO
-      *        入院年月日
-               IF      PTNYUINRRK-NYUINYMD <    WRK-PTNRRK-NYUINYMD
-                   MOVE    PTNYUINRRK-NYUINYMD  TO  WRK-PTNRRK-NYUINYMD
-               END-IF 
+               MOVE    PTNYUINRRK-NYUINYMD TO  WRK-PTNRRK-NYUINYMD
            END-IF
       *
            MOVE    WRK-PTNRRK-REC TO  PTNYUINRRK-REC
@@ -1828,33 +1813,40 @@
            EXIT.
       *
       *****************************************************************
-      *    入院履歴読込
+      *    入院履歴読込（入院中の自院歴のみ対象）
       *****************************************************************
        900-PTNYUINRRK-KEY51-READ-SEC    SECTION.
-      *    
-           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
-           MOVE    "key51"              TO  MCP-PATHNAME
-           PERFORM   900-DBFETCH-SEC
-           IF      MCP-RC               =   ZERO
-               MOVE    ZERO                 TO  FLG-PTNYUINRRK
-               MOVE    MCPDATA-REC          TO  PTNYUINRRK-REC
-               IF      PTNYUINRRK-JTIKBN    =   "5"
-                   IF      PTNYUINRRK-TAINRELKBN
-                                               =   "1"
+      *
+           MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+           MOVE    "key16"         TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_ptnyuinrrk"
+                                       TO  MCP-TABLE
+               MOVE    "key16"         TO  MCP-PATHNAME
+               PERFORM   900-DBFETCH-SEC
+               IF      MCP-RC           =   ZERO
+                   MOVE    ZERO                 TO  FLG-PTNYUINRRK
+                   MOVE    MCPDATA-REC          TO  PTNYUINRRK-REC
+                   IF    ( PTNYUINRRK-JTIKBN    =   "6" )
+                   AND   ( PTNYUINRRK-NYUINCHUKBN
+                                                =   "1" )
                        CONTINUE
                    ELSE
-                       GO  TO  900-PTNYUINRRK-KEY51-READ-SEC
+                       MOVE    1                    TO  FLG-PTNYUINRRK
                    END-IF
-               END-IF
-               IF     PTNYUINRRK-NYUINCHUKBN
-                                            =   "1"
-                   CONTINUE
                ELSE
-                   GO  TO  900-PTNYUINRRK-KEY51-READ-SEC
+                   MOVE    1                    TO  FLG-PTNYUINRRK
                END-IF
            ELSE
-               MOVE    1                    TO  FLG-PTNYUINRRK
+               MOVE    1               TO  FLG-PTNYUINRRK
            END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+           MOVE    "key16"         TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
            .
        900-PTNYUINRRK-KEY51-READ-EXT.
            EXIT.
