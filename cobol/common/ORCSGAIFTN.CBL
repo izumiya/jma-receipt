@@ -39,6 +39,7 @@
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    16/02/12  Âè»°¼Ô¹Ô°ÙÂÐ±þ
+      *  04.08.02    NACL-ÌçÏÆ    17/07/14  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -58,6 +59,7 @@
            03  IDX3                        PIC 9(03).
            03  IDY                         PIC 9(02).
            03  IDZ                         PIC 9(02).
+           03  IDZ2                        PIC 9(02).
       *
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
@@ -411,6 +413,7 @@ grpsys     COPY    "COMMON-SPA".
       *
                 MOVE     LNK-ORCS01-REC       TO  WRK-ORCS01-REC
                 MOVE     IDX                  TO  WRK-S01-IDX
+                MOVE     ZERO                 TO  WRK-S01-IDX2
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
       *
                 MOVE     SPACE                TO  WRK-SYUNOU-REC-T
@@ -495,7 +498,7 @@ grpsys     COPY    "COMMON-SPA".
                 MOVE     SYUNOU-REC           TO  LNK-SYUNOU-REC(IDX)
                 MOVE     WRK-ORCS01-REC       TO  LNK-ORCS01-REC
       *
-                IF       LNK-S01-TOKUSYU-SAI-KBN    =    "1"
+                IF     LNK-S01-TOKUSYU-SAI-KBN  NOT =  SPACE
                      MOVE      1       TO     FLG-TOKUSYU-SAI
                 END-IF
       *
@@ -1413,11 +1416,14 @@ grpsys     COPY    "COMMON-SPA".
                                 OR   (LNK-SYU-SRYYMD(IDX) =  SPACE)
                                 OR   (LNK-S01-RC      NOT =  ZERO )
       *
+                PERFORM  1001-TOKUSYU-SANTEI-HENSYU-SEC
+      *
                 MOVE     WRK-ZAITAKU-KBN      TO
                                       LNK-S01-KOUREI-ZAITAKU-KBN
       *
                 MOVE     LNK-ORCS01-REC       TO  WRK-ORCS01-REC
                 MOVE     IDX                  TO  WRK-S01-IDX
+                MOVE     IDZ2                 TO  WRK-S01-IDX2
                 MOVE     LNK-SYUNOU-REC(IDX)  TO  SYUNOU-REC
       *
                 MOVE     SPACE                TO  WRK-SYUNOU-REC-T
@@ -1511,5 +1517,59 @@ grpsys     COPY    "COMMON-SPA".
            .
       *
        100-TOKUSYU-SANTEI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃ¼ì·×»»¡ÊºÆ·×»»¡Ë¥Á¥§¥Ã¥¯ÍÑ£É£Ä£ØÊÔ½¸
+      ******************************************************************
+       1001-TOKUSYU-SANTEI-HENSYU-SEC                     SECTION.
+      *
+           MOVE     ZERO      TO     IDZ2
+      *
+           IF       IDX   >   1
+             IF   SYU-SRYKA  =  "00"
+               PERFORM    VARYING   IDY    FROM   1   BY   1
+                           UNTIL    IDY      >    IDX - 1
+                 IF   WRK-S01-TTLARIFLG(IDY)  =    "1"
+                   IF   LNK-SYU-SRYKA(IDY)       =  "00"
+                          ADD   1      TO  IDZ2
+                   END-IF
+                 ELSE
+                   IF   LNK-SYU-SRYKA(IDY)   NOT =  "00"
+                          ADD   1      TO  IDZ2
+                   END-IF
+                 END-IF
+               END-PERFORM
+             ELSE
+               PERFORM    VARYING   IDY    FROM   1   BY   1
+                           UNTIL    IDY      >    IDX - 1
+                 IF   WRK-S01-TTLARIFLG(IDX)  =    "1"
+                   IF   LNK-SYU-SRYKA(IDY)      NOT =  "00"
+                          ADD   1      TO  IDZ2
+                   END-IF
+                 ELSE
+                   IF   WRK-S01-TTLARIFLG(IDY)   =   "1"
+                     IF   WRK-S01-KAGRPFLG       =   "0"
+                       IF   LNK-SYU-SRYKA(IDY)   =  "00"
+                          ADD   1      TO  IDZ2
+                       END-IF
+                     ELSE
+                       IF   LNK-SYU-SRYKA(IDY)  NOT =  "00"
+                          ADD   1      TO  IDZ2
+                       END-IF
+                     END-IF
+                   ELSE
+                     IF   LNK-SYU-SRYKA(IDY)    NOT =  "00"
+                          ADD   1      TO  IDZ2
+                     END-IF
+                   END-IF
+                 END-IF
+               END-PERFORM
+             END-IF
+           END-IF
+      *
+           .
+      *
+       1001-TOKUSYU-SANTEI-HENSYU-EXT.
            EXIT.
       *
