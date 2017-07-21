@@ -26324,6 +26324,7 @@
            IF  (WK-1001-PREFNUM         =  43           ) AND
                (COMB-KOHHKNNUM(KOH-IDX) = "143" OR "342") AND
                (LNK-SYU-SRYYMD(1:6)    >= "200912"      )
+            MOVE       "1"       TO   LNK-S02-TOKUSYU-SAI-KBN
             IF    COMB-KOH-NYUJGNKBN(KOH-IDX)  =  SPACE
              MOVE      ZERO      TO   WK-KUMAMOTO-SYUCOMPFTN
             ELSE
@@ -26341,7 +26342,6 @@
                    (LNK-SYU-KOH-HKNNUM(4)  =  "972" OR "974")
                  MOVE      1          TO   FLG-KUMAMOTO-CYO
                ELSE
-                 MOVE     "1"         TO   LNK-S02-TOKUSYU-SAI-KBN
                  EVALUATE   KOH-IDX
                    WHEN       1
                      MOVE  MAX-KIN-KOHI1-M  TO  WK-KUMAMOTO-HANTEIJGN
@@ -32588,6 +32588,14 @@
                  (COMB-KOH1HKNNUM       = "970"         ) AND
                  (WK-1001-DAISANKBN     = "1"           ))
              OR ( WK-TAIHI-FTNGAKEN(1)  =  1             )
+             OR ((FLG-KOUGAKUCYO3       NOT =    ZERO   ) AND
+                 (FLG-IRYOHI3X = 11                     ) AND
+                 (FLG-SYOUKAN(1)        = "1"           ) AND
+                 (LNK-SYU-SRYYMD(1:6)  >= "201708"      ))
+             OR ((FLG-KOUGAKUCYO-GEN70  NOT =    ZERO   ) AND
+                 (FLG-IRYOHI70 = 3 OR 4 OR 9 OR 10      ) AND
+                 (FLG-SYOUKAN(1)        = "1"           ) AND
+                 (LNK-SYU-SRYYMD(1:6)  >= "201708"      ))
                     MOVE     LNK-SYU-KOH1COMPFTN  TO
                                           LNK-SYU-KOH1HKNFTNMONEY
              ELSE
@@ -32631,6 +32639,15 @@
                  (COMB-KOH2HKNNUM       = "143" OR "342") OR
                  (LNK-SYU-SRYYMD(1:6)  <= "200911"      ))
              OR ( WK-TAIHI-FTNGAKEN(2)  =  1             )
+             OR ((FLG-KOUGAKUCYO3       NOT =    ZERO   ) AND
+                 (FLG-IRYOHI3X = 21                     ) AND
+                 (FLG-SYOUKAN(2)        = "1"           ) AND
+                 (LNK-SYU-SRYYMD(1:6)  >= "201708"      ))
+             OR ((FLG-KOUGAKUCYO-GEN70  NOT =    ZERO   ) AND
+                 (FLG-IRYOHI70 = 5 OR 6 OR 11 OR 12     ) AND
+                 (FLG-KOUGAKUCYO-GEN70K NOT =    ZERO   ) AND
+                 (FLG-SYOUKAN(2)        = "1"           ) AND
+                 (LNK-SYU-SRYYMD(1:6)  >= "201708"      ))
                     MOVE     LNK-SYU-KOH2COMPFTN  TO
                                           LNK-SYU-KOH2HKNFTNMONEY
              ELSE
