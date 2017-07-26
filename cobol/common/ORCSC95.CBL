@@ -1788,6 +1788,8 @@
                                            ORCSDRSETAREA
                IF      SPA-DRCD        NOT =   SPACE
                    MOVE    ORCSDR-IN-DRCD-G    TO  SPA-DRCD-NAME
+               ELSE
+                   MOVE    SPACE               TO  SPA-DRCD-NAME
                END-IF
                MOVE    ORCSDR-DRCD-TBL-G   TO  SPA-GMN-DRCDLST-G
                MOVE    ORCSDR-DRCD-MAX     TO  SPA-DRCD-MAX
