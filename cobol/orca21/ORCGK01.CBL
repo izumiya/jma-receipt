@@ -721,6 +721,10 @@
                        MOVE    SPA-DRCD-MAX    TO  IDX
                    END-IF
                END-PERFORM
+      *H29.8
+           ELSE
+               MOVE    SPACE               TO  SPA-GMN-DRCD-G
+               MOVE    SPACE               TO  SPA-NAI-DRCD
            END-IF
            .
        3101-PTINF-SPA-EXT.
