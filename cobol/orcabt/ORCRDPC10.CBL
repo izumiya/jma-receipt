@@ -173,6 +173,7 @@
       *                                     （17/03/16の修正に追加）
       *              NACL-小豆沢  17/06/12  特定入院料を算定しないとした場合の
       *                                     入院料（包括入力分）の記録方法変更
+      *              NACL-小豆沢  17/07/25  同日再入院日の入退院日記録修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5645,6 +5646,12 @@
                                        <=  WRK-EDYMD
               AND  WRK-NYUIN-RIREKI-TAIINYMD (IDW)
                                        >=  WRK-EDYMD
+      *同日再入院日の診療行為は次の入院履歴に変更する
+               IF  RECE641-KAISU(1 WRK-EDDD) = RECE641-KAISU(3 WRK-EDDD)
+                   IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
+                       ADD    1     TO   IDW
+                   END-IF
+               END-IF
       *退院年月日
                IF (WRK-NYUIN-RIREKI-TAIINYMD (IDW)
                                        =   "99999999")  OR
