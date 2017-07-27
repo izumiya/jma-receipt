@@ -174,6 +174,9 @@
       *              NACL-小豆沢  17/06/12  特定入院料を算定しないとした場合の
       *                                     入院料（包括入力分）の記録方法変更
       *              NACL-小豆沢  17/07/25  同日再入院日の入退院日記録修正
+      *              NACL-小豆沢  16/08/18  再診の時間外加算対応
+      *                                     RECE641-NYUSAIFLG="1"の時、
+      *                                     順序番号(E-6,F-6)の振り直し追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3509,7 +3512,8 @@
               GO  TO   20072-ZAI-HENSYU-EXT
            END-IF
       *
-           IF      RECE641-SRYKBN  NOT =   WRK-FEDT-SRYKBN-SAVE
+           IF     (RECE641-SRYKBN  NOT =   WRK-FEDT-SRYKBN-SAVE) OR
+                  (RECE641-NYUSAIFLG   =   "1")
       *    順序番号リセット
       *            順序番号の取り込み
                    INITIALIZE                        RECE900-REC
