@@ -148,6 +148,7 @@
            03  WRK-PARA-SRYKAKBN                   PIC X(01).
            03  WRK-PARA-HIDEBYOKBN                 PIC X(01).
            03  WRK-PARA-HIDEHOKATSU                PIC X(01).
+           03  WRK-PARA-EDIT-MEDADL                PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -453,6 +454,8 @@ grpsys     END-UNSTRING
                    MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
                WHEN    "4"
                    MOVE    "1"             TO  WRK-PARA-HIDEHOKATSU
+               WHEN    "5"
+                   MOVE   "1"              TO  WRK-PARA-EDIT-MEDADL
                END-EVALUATE
       *
            END-PERFORM
@@ -534,11 +537,11 @@ grpsys     END-UNSTRING
       *****************************************************************
        110-SPA-SET-SEC                 SECTION.
       *
-      *    システム日付セット
+           MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    LNK-PRTKANRI-SKYYMD
                                        TO  SPA-SYSYMD
-           MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
-      *
+           MOVE    WRK-PARA-SRYYM      TO  SPA-SRYYMD
+           MOVE    "01"                TO  SPA-SRYYMD(7:)
            MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
       *
            .
@@ -1310,6 +1313,8 @@ grpsys     END-UNSTRING
            END-IF
            MOVE    WRK-PARA-HIDEHOKATSU
                                        TO  ORCHCM34-HIDEHOKATSU
+           MOVE    WRK-PARA-EDIT-MEDADL
+                                       TO  ORCHCM34-EDIT-MEDADL
       *
            MOVE    ORCSPRTAREA         TO  ORCHCM34-PRTAREA
       *

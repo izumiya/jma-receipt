@@ -279,6 +279,7 @@
            03  IDXK                                PIC 9(05).
            03  IDXL                                PIC 9(05).
            03  IDXM                                PIC 9(05).
+           03  IDXR                                PIC 9(05).
            03  IDXS                                PIC 9(05).
            03  IDXT                                PIC 9(05).
            03  IDXZ                                PIC 9(05).
@@ -859,6 +860,9 @@
            COPY    "CPHKNCOMBI.INC"    REPLACING   //COMB-//
                                        BY          //WKCOMB-//.
       *
+           COPY    "CPORCHCN68S01.INC" REPLACING   //HCN68S01-//
+                                       BY          //THCN68S01-//.
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -1016,6 +1020,9 @@
       *    Æþ±¡ÅÀÅ©½¸·×¥µ¥Ö
            COPY    "CPORCSTENTEK3.INC".
       *
+      *    °åÎÅ¶èÊ¬¡¦£Á£Ä£ÌÅÀ¿ô¼èÆÀ¥µ¥Ö
+           COPY    "CPORCHCN68S01.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPAREA".
       *
@@ -1066,6 +1073,7 @@
            INITIALIZE                  ORCHCM34-OT
            INITIALIZE                  TBLCOMBI-AREA
            INITIALIZE                  WKPTBYOMEI-REC
+           INITIALIZE                  HCN68S01-AREA
       *
       *    °åÎÅµ¡´Ø¾ðÊó¼èÆÀ½èÍý
            PERFORM 1001-SYS1001-GET-SEC
@@ -1084,6 +1092,11 @@
       *
       *    ¿ÇÎÅ²ÊÊÔ½¸½èÍý
            PERFORM 1001-SRYKA-HEN-SEC
+      *
+      *    °åÎÅ¶èÊ¬¡¢£Á£Ä£ÌÅÀ¿ô¼èÆÀ½èÍý
+           IF    ( ORCHCM34-EDIT-MEDADL    =   "1" )
+               PERFORM 1001-MEDADL-HEN-SEC
+           END-IF
       *
       *    ´ðËÜ¾ðÊóÊÔ½¸
            PERFORM 1001-KHN-EDIT-SEC
@@ -1864,6 +1877,25 @@
       *
            .
        1001-SRYKA-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬¡¢£Á£Ä£ÌÅÀ¿ô¼èÆÀ½èÍý
+      *****************************************************************
+       1001-MEDADL-HEN-SEC             SECTION.
+      *
+           INITIALIZE                  HCN68S01-AREA
+      *
+           MOVE    "1"             TO  HCN68S01-RANGE
+           MOVE    SPA-PTID        TO  HCN68S01-PTID
+           MOVE    ORCHCM34-SRYYM  TO  HCN68S01-SRYYM
+           MOVE    ORCHCM34-SRYYM  TO  HCN68S01-SRYYMD
+           MOVE    "01"            TO  HCN68S01-SRYYMD(7:)
+           CALL    "ORCHCN68S01"       USING
+                                       SPA-AREA
+                                       HCN68S01-AREA
+      *
+           .
+       1001-MEDADL-HEN-EXT.
            EXIT.
       *****************************************************************
       *    ¼ç¡¡¡¡½èÍý
@@ -3527,6 +3559,10 @@
                    END-IF
                END-IF
       *
+               IF    ( WKACCT-ZAISKBKBN    (SRT-IDX1)     =   "8" )
+                   MOVE    ALL "9"        TO SRT-SRYACCT-TEMP (SRT-IDX1)
+               END-IF
+      *
                IF    ( WKACCT-RIHA-SYS (SRT-IDX1)  =   "1" )
                    MOVE    "H"         TO  SRT-SRYACCT-CDKBN-KBN
                                                           (SRT-IDX1)
@@ -4072,6 +4108,8 @@
            WHEN  ( WRK-ZAISKBKBN   NOT =   SPACE )
       *
                EVALUATE    WRK-ZAISKBKBN
+               WHEN    "8"
+                   CONTINUE
                WHEN    "1"
                WHEN    "6"
                    MOVE    ACCT-ZAITEN     TO  WRK-ZAITEN
@@ -5873,6 +5911,9 @@
                                    TO  TCOMBI-SENTEI-PTFTN (IDX27)
       *
                    PERFORM 20011-HCM34ACCT-INS-SEC
+      *
+                   PERFORM 280-MEDADL-SEC
+      *
                END-IF
       *
            END-PERFORM
@@ -7274,6 +7315,188 @@
       *
            .
        2801-TENTEKI-SRY-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬£Á£Ä£ÌÊÔ½¸½èÍý
+      *****************************************************************
+       280-MEDADL-SEC                  SECTION.
+      *
+           MOVE    HCN68S01-AREA   TO  THCN68S01-AREA
+      *
+           PERFORM VARYING IDXR    FROM    1   BY  1
+                   UNTIL ( IDXR    >   HCN68S01-RYOLIST-MAX )
+      *
+               MOVE    ZERO        TO  HCN68S01-TDAYALL (IDXR)
+                                       HCN68S01-TDAY-G  (IDXR)
+      *
+               PERFORM VARYING IDX-DAY FROM  ORCHCM34-STDAY    BY  1
+                       UNTIL ( IDX-DAY >     ORCHCM34-EDDAY )
+      *
+                   IF    ( HCN68S01-COMB-DAY (IDX-DAY)
+                                       =   COMB-HKNCOMBINUM )
+                       EVALUATE     TRUE
+                       WHEN  ( ORCHCM34-SRYKAKBN   =   SPACE )
+                       WHEN  ( ORCHCM34-SRYKAKBN   =   "1" )
+                        AND  ( ORCHCM34-SRYKADAY (IDX-DAY)     = 1 )
+                           IF    ( THCN68S01-TDAYALL (IDXR)
+                                                   >   ZERO )
+                               IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
+                                                NOT =   SPACE )
+                                   MOVE    THCN68S01-TDAYALL (IDXR)
+                                       TO  HCN68S01-TDAY (IDXR IDX-DAY)
+                               END-IF
+                           ELSE
+                               IF    ( THCN68S01-TDAY (IDXR IDX-DAY)
+                                                   >   ZERO )
+                                   MOVE    THCN68S01-TDAY (IDXR IDX-DAY)
+                                       TO  HCN68S01-TDAY (IDXR IDX-DAY)
+                               END-IF
+                           END-IF
+                       END-EVALUATE
+                   END-IF
+      *
+               END-PERFORM
+      *
+               IF    ( HCN68S01-TDAY-G  (IDXR) NOT =   ZERO )
+                   PERFORM 2801-MEDADL-ACCT-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           MOVE    THCN68S01-AREA  TO   HCN68S01-AREA
+      *
+           .
+       280-MEDADL-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬£Á£Ä£ÌÊÔ½¸½èÍý
+      *****************************************************************
+       2801-MEDADL-ACCT-SEC           SECTION.
+      *
+           EVALUATE    HCN68S01-TZAINUM (IDXR)
+           WHEN    1001
+               MOVE    "840000126"     TO  HCN68S01-TSRYCD (IDXR)
+           WHEN    1002
+               MOVE    "840000127"     TO  HCN68S01-TSRYCD (IDXR)
+           WHEN    1003
+               MOVE    "840000128"     TO  HCN68S01-TSRYCD (IDXR)
+           WHEN    1004
+               MOVE    "840000129"     TO  HCN68S01-TSRYCD (IDXR)
+           END-EVALUATE
+      *
+           COMPUTE WRK-MAXZAINUM = WRK-MAXZAINUM + 1
+      *
+           MOVE    ZERO                TO  WRK-RUIKEITOTAL
+                                           WRK-RUIKEITOTAL2
+      *
+           PERFORM 2801-MEDADL-SRY-SEC
+      *
+           INITIALIZE                      HCM34ACCT-REC
+      *
+           MOVE    NACCT-HOSPNUM       TO  HCM34ACCT-HOSPNUM
+           MOVE    NACCT-NYUGAIKBN     TO  HCM34ACCT-NYUGAIKBN
+           MOVE    NACCT-PTID          TO  HCM34ACCT-PTID
+           IF    ( ORCHCM34-SRYKAKBN   =   "1" )
+               MOVE    ORCHCM34-SRYKA  TO  HCM34ACCT-SRYKA
+           ELSE
+               MOVE    ZERO            TO  HCM34ACCT-SRYKA
+           END-IF
+           MOVE    NACCT-SRYYM         TO  HCM34ACCT-SRYYM
+           MOVE    "90"                TO  HCM34ACCT-SRYKBN
+           MOVE    WRK-MAXZAINUM       TO  HCM34ACCT-ZAINUM
+           MOVE    COMB-HKNCOMBINUM    TO  HCM34ACCT-HKNCOMBI
+           MOVE    ZERO                TO  HCM34ACCT-ZAITEN
+           MOVE    HCN68S01-TSRYCD (IDXR)
+                                       TO  WRK-SRYCD-9
+           MOVE    WRK-SRYCD-9         TO  HCM34ACCT-SRYCDTOTAL
+           MOVE    999                 TO  HCM34ACCT-SURYOUTOTAL
+           MOVE    1                   TO  HCM34ACCT-MEISAISU
+      *
+           PERFORM VARYING IDX-DAY FROM  ORCHCM34-STDAY    BY  1
+                   UNTIL ( IDX-DAY >     ORCHCM34-EDDAY )
+      *
+               MOVE    HCN68S01-TDAY (IDXR IDX-DAY)
+                                       TO  HCM34ACCT-DAY (1 IDX-DAY)
+               COMPUTE HCM34ACCT-ZAIKAISU
+                   =   HCM34ACCT-ZAIKAISU
+                   +   HCN68S01-TDAY (IDXR IDX-DAY)
+      *
+           END-PERFORM
+      *
+           INITIALIZE                      HCM34ACCT-DATPLUS
+      *
+           MOVE    WRK-RUIKEITOTAL     TO  HCM34ACCT-RUIKEITOTAL
+           MOVE    WRK-RUIKEITOTAL2    TO  HCM34ACCT-RUIKEITOTAL2
+           MOVE    ZERO                TO  HCM34ACCT-JIHIMONEYTOTAL
+           MOVE    HCN68S01-TSRYCD (IDXR)
+                                       TO  HCM34ACCT-SRT-SRYCD
+           MOVE    SPACE               TO  HCM34ACCT-SRT-SRYSYUKBN
+           MOVE    "4"                 TO  HCM34ACCT-ACCTKBN
+           MOVE    "8"                 TO  HCM34ACCT-ZAISKBKBN
+           MOVE    ZERO                TO  HCM34ACCT-PRIORITY
+           MOVE    ZERO                TO  HCM34ACCT-PRIORITY2
+           MOVE    ZERO                TO  HCM34ACCT-PRIORITY3
+      *
+           WRITE   HCM34ACCT-REC
+      *
+           .
+       2801-MEDADL-ACCT-EXT.
+           EXIT.
+      *****************************************************************
+      *    °åÎÅ¶èÊ¬£Á£Ä£ÌÊÔ½¸½èÍý
+      *****************************************************************
+       2801-MEDADL-SRY-SEC            SECTION.
+      *
+           INITIALIZE                  HCM34SRY-REC
+      *
+           MOVE    NACCT-PTID      TO  HCM34SRY-ISM-PTID
+           MOVE    WRK-MAXZAINUM   TO  HCM34SRY-ISM-ZAINUM
+           MOVE    1               TO  HCM34SRY-ISM-RENNUM
+           MOVE    NACCT-HOSPNUM   TO  HCM34SRY-HOSPNUM
+           MOVE    NACCT-NYUGAIKBN TO  HCM34SRY-NYUGAIKBN
+           MOVE    NACCT-PTID      TO  HCM34SRY-PTID
+           MOVE    WRK-MAXZAINUM   TO  HCM34SRY-ZAINUM
+           MOVE    1               TO  HCM34SRY-RENNUM
+           IF    ( ORCHCM34-SRYKAKBN
+                                   =   "1" )
+               MOVE    ORCHCM34-SRYKA
+                                   TO  HCM34SRY-SRYKA
+           ELSE
+               MOVE     ZERO       TO  HCM34SRY-SRYKA
+           END-IF
+           MOVE    "90"            TO  HCM34SRY-SRYKBN
+           MOVE    SPACE           TO  HCM34SRY-SRYSYUKBN
+      *
+           MOVE    HCN68S01-TSRYCD (IDXR)
+                                   TO  HCM34SRY-SRYCD    (1)
+           MOVE    1               TO  HCM34SRY-SRYSURYO (1)
+      *
+           EVALUATE    HCN68S01-TZAISKBKBN(IDXR)
+           WHEN    "1"
+               MOVE    1           TO  HCM34SRY-INPUTNUM(1)
+               STRING  "£Á£Ä£Ì"                DELIMITED BY SIZE
+                       HCN68S01-TNAME (IDXR)   DELIMITED BY SPACE
+               INTO    HCM34SRY-COMMENT (1)
+               END-STRING
+           WHEN    "2"
+               MOVE    1           TO  HCM34SRY-INPUTNUM(1)
+               STRING  "°åÎÅ¶èÊ¬"              DELIMITED BY SIZE
+                       HCN68S01-TNAME (IDXR)   DELIMITED BY SPACE
+               INTO    HCM34SRY-COMMENT (1)
+               END-STRING
+           END-EVALUATE
+      *
+           MOVE    HCN68S01-TSRYCD (IDXR)
+                                   TO  WRK-SRYCD-9
+                                       WRK-CALCSRYCD-G
+           MOVE    HCM34SRY-SRYSURYO (1)
+                                   TO  WRK-SURYO
+           PERFORM 2001111-RUIKEITOTAL-SEC
+      *
+           WRITE   HCM34SRY-REC
+      *
+           .
+       2801-MEDADL-SRY-EXT.
            EXIT.
       *****************************************************************
       *    °õºþ½èÍý

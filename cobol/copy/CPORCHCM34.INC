@@ -53,6 +53,8 @@
                05  ORCHCM34-EDSRYYMD       PIC X(08).
       *         Ò≥Á»Û…Ωº®∂Ë ¨
                05  ORCHCM34-HIDEHOKATSU    PIC X(01).
+      *        ∞ÂŒ≈∂Ë ¨°¢£¡£ƒ£Ã≈¿øÙ ‘Ω∏∂Ë ¨
+               05  ORCHCM34-EDIT-MEDADL    PIC X(01).
       *        ∞Ï≥Á•—•È•·•ø
                05  ORCHCM34-PRTAREA        PIC X(25000).
       *
