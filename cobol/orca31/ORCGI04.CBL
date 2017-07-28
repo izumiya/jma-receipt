@@ -236,6 +236,7 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-CHOSEITTL               PIC  S9(08).
            03  WRK-CHOSEI                  PIC  S9(08).
+           03  WRK-BASE-MONEY              PIC  S9(08).
       *!!
       *I041мя
            03  IDX-D                    PIC 9(04).
@@ -5877,20 +5878,29 @@
       *
            MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
       *
+           MOVE    ZERO                TO  WRK-BASE-MONEY
            IF    ( BUNBEN-RIYOUKBN     =   "1" )
-               IF    ( SYS-1001-SANKANUM   NOT =   ZERO )
-                AND  ( BUNBEN-ZAIWEEK      >=   22 )
-                   COMPUTE BUNBEN-DAIRI-MONEY
-                       =   420000      *   BUNBEN-BIRTHCNT
-               ELSE
+               EVALUATE    TRUE
+               WHEN  ( SYS-1001-SANKANUM   =   ZERO )
+               WHEN  ( BUNBEN-ZAIWEEK      <   22 )
+               WHEN  ( BUNBEN-SANKAKBN     =   "2" OR "3" )
                    EVALUATE   TRUE
                    WHEN    ( BUNBEN-BIRTHDAY  >= CONST-H270101 )
-                       COMPUTE BUNBEN-DAIRI-MONEY
-                           =   404000      *   BUNBEN-BIRTHCNT
+                       MOVE    404000  TO  WRK-BASE-MONEY
                    WHEN    OTHER
-                       COMPUTE BUNBEN-DAIRI-MONEY
-                           =   390000      *   BUNBEN-BIRTHCNT
+                       MOVE    390000  TO  WRK-BASE-MONEY
                    END-EVALUATE
+               WHEN    OTHER
+                   MOVE    420000      TO  WRK-BASE-MONEY
+               END-EVALUATE
+      *
+               IF    ( BUNBEN-SANKAKBN =   "3" )
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   WRK-BASE-MONEY  *   BUNBEN-BIRTHCNT
+                       +   LNKBUNBEN-SNK-MONEY
+               ELSE
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   WRK-BASE-MONEY  *   BUNBEN-BIRTHCNT
                END-IF
       *
                IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )

@@ -62,6 +62,7 @@
                05  WRK-BIRTHYEAR       PIC 9(04).
                05  WRK-BIRTHMMDD       PIC X(04).
            03  WRK-AGE                 PIC 9(03).
+           03  WRK-BASE-MONEY          PIC S9(08).
       *
        01  CONST-AREA.
            03  CONST-H211001           PIC X(08)   VALUE "20091001".
@@ -400,28 +401,36 @@
       *
            MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
       *
+           MOVE    ZERO                TO  BUNBEN-DAIRI-MONEY
+           MOVE    ZERO                TO  WRK-BASE-MONEY
            IF    ( BUNBEN-RIYOUKBN     =   "1" )
-               IF    ( SYS-1001-SANKANUM   NOT =   ZERO )
-                AND  ( BUNBEN-ZAIWEEK      >=   22 )
+      *
+               EVALUATE    TRUE
+               WHEN  ( SYS-1001-SANKANUM    =   ZERO )
+               WHEN  ( BUNBEN-ZAIWEEK     <   22 )
+               WHEN  ( BUNBEN-SANKAKBN    =   "2" OR "3" )
+                   IF    ( BUNBEN-BIRTHDAY   NOT =   SPACE )
+                       EVALUATE   TRUE
+                       WHEN    ( BUNBEN-BIRTHDAY
+                                          >= CONST-H270101 )
+                           MOVE    404000  TO  WRK-BASE-MONEY
+                       WHEN    OTHER
+                           MOVE    390000  TO  WRK-BASE-MONEY
+                       END-EVALUATE
+                   END-IF
+               WHEN    OTHER
+                   MOVE    420000      TO  WRK-BASE-MONEY
+               END-EVALUATE
+      *
+               IF    ( BUNBEN-SANKAKBN    =   "3" )
                    COMPUTE BUNBEN-DAIRI-MONEY
-                       =   420000      *   BUNBEN-BIRTHCNT
+                       =   WRK-BASE-MONEY  *   BUNBEN-BIRTHCNT
+                       +   BUNBEN-SNK-MONEY
                ELSE
-                   EVALUATE   TRUE
-                   WHEN    ( BUNBEN-BIRTHDAY  >= CONST-H270101 )
-                       COMPUTE BUNBEN-DAIRI-MONEY
-                           =   404000      *   BUNBEN-BIRTHCNT
-                   WHEN    OTHER
-                       COMPUTE BUNBEN-DAIRI-MONEY
-                           =   390000      *   BUNBEN-BIRTHCNT
-                   END-EVALUATE
+                   COMPUTE BUNBEN-DAIRI-MONEY
+                       =   WRK-BASE-MONEY  *   BUNBEN-BIRTHCNT
                END-IF
       *
-               IF    ( BUNBEN-DAIRI-MONEY  >   BUNBEN-NINPUFTN-MONEY )
-                   MOVE    BUNBEN-NINPUFTN-MONEY
-                                       TO  BUNBEN-DAIRI-MONEY
-               END-IF
-           ELSE
-                   MOVE    ZERO    TO  BUNBEN-DAIRI-MONEY
            END-IF
       *
            MOVE    SNRRK-UPYMD     TO  BUNBEN-UPYMD
