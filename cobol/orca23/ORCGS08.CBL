@@ -111,6 +111,7 @@
                05  WRK-LBLNINPUFTN-MONEY   PIC X(20).
                05  WRK-LBLDAIRI-MONEY      PIC X(20).
                05  WRK-LBLMEIPRTKBN        PIC X(20).
+           03  WRK-BASE-MONEY              PIC S9(08).
       *
        01  CONST-AREA.
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
@@ -1633,25 +1634,36 @@
        4101-DAIRI-MONEY-CHK-SEC        SECTION.
       *
            MOVE    ZERO    TO  SPA-GMN-DAIRI-MONEY
+           MOVE    ZERO    TO  WRK-BASE-MONEY
       *
            IF    ( SPA-GMN-RIYOUKBN        =   "1" )
-               IF    ( SPA-NAI-SANKANUM    NOT =   ZERO )
-                AND  ( SPA-GMN-ZAIWEEK        >=   22 )
-                   COMPUTE SPA-GMN-DAIRI-MONEY
-                       =   420000      *   SPA-GMN-BIRTHCNT
-               ELSE
+      *
+               EVALUATE    TRUE
+               WHEN  ( SPA-NAI-SANKANUM    =   ZERO )
+               WHEN  ( SPA-GMN-ZAIWEEK     <   22 )
+               WHEN  ( SPA-GMN-SANKAKBN    =   "2" OR "3" )
                    IF    ( SPA-NAI-BIRTHDAY-BABY   NOT =   SPACE )
-                       EVALUATE    TRUE
-                       WHEN  ( SPA-NAI-BIRTHDAY-BABY
+                       EVALUATE   TRUE
+                       WHEN    ( SPA-NAI-BIRTHDAY-BABY
                                           >= CONST-H270101 )
-                           COMPUTE SPA-GMN-DAIRI-MONEY
-                               =   404000  *   SPA-GMN-BIRTHCNT
+                           MOVE    404000  TO  WRK-BASE-MONEY
                        WHEN    OTHER
-                           COMPUTE SPA-GMN-DAIRI-MONEY
-                               =   390000  *   SPA-GMN-BIRTHCNT
+                           MOVE    390000  TO  WRK-BASE-MONEY
                        END-EVALUATE
                    END-IF
+               WHEN    OTHER
+                   MOVE    420000      TO  WRK-BASE-MONEY
+               END-EVALUATE
+      *
+               IF    ( SPA-GMN-SANKAKBN    =   "3" )
+                   COMPUTE SPA-GMN-DAIRI-MONEY
+                       =   WRK-BASE-MONEY  *   SPA-GMN-BIRTHCNT
+                       +   SPA-GMN-SNK-MONEY
+               ELSE
+                   COMPUTE SPA-GMN-DAIRI-MONEY
+                       =   WRK-BASE-MONEY  *   SPA-GMN-BIRTHCNT
                END-IF
+      *
            END-IF
       *
            IF  ( SPA-GMN-DAIRI-MONEY >   ZERO )
