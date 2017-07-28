@@ -1296,9 +1296,6 @@
       *
            MOVE    SPA-J01KYOUTU       TO  PARA-DATA-REC
       *
-      **   MOVE    SMCNDATE-YMD        TO  PARA-UPYMD
-      **   MOVE    SMCNDATE-HMS        TO  PARA-UPHMS
-      *
            MOVE    PARA-REC            TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_para"          TO  MCP-TABLE
@@ -1353,8 +1350,8 @@
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
-      **   MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
-      **   MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
+           MOVE    SMCNDATE-YMD        TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS        TO  APIPARA-UPHMS
       *
            MOVE    APIPARA-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
@@ -1627,6 +1624,10 @@
            MOVE    TBL-COMB-HKNNUM-NAME (IDX-H)
                                    TO  MDCRES-MED-INSURANCE-NAME
                                                              (IDX-J)
+      *    保険者番号
+           MOVE    TBL-COMB-HKNJANUM (IDX-H)
+                                   TO  MDCRES-MED-INSURANCE-NUMBER
+                                                             (IDX-J)
       *    公費情報
            PERFORM VARYING     IDY2    FROM    1   BY  1
                    UNTIL       IDY2    >   4
@@ -1637,6 +1638,14 @@
       *        公費の種類名称
                MOVE    TBL-COMB-KOHNUM-NAME(IDX-H IDY2)
                                        TO  MDCRES-MED-INSU-NAME
+                                                         (IDX-J IDY2)
+      *        負担者番号
+               MOVE    TBL-COMB-FTNJANUM(IDX-H IDY2)
+                                       TO  MDCRES-MED-PROVIDER-NUMBER
+                                                         (IDX-J IDY2)
+      *        受給者番号
+               MOVE    TBL-COMB-JKYSNUM (IDX-H IDY2)
+                                       TO  MDCRES-MED-RECIPIENT-NUMBER
                                                          (IDX-J IDY2)
            END-PERFORM
       *    保険組合せ削除区分（１：削除、２：期間外）

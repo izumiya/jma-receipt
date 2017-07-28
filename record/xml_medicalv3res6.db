@@ -51,7 +51,7 @@ xml_medicalv3res6 {
                 	PublicInsuredPerson_Number	varchar(20);
         	} [4];
 #---    保険組合せ状態
-		Insurance_Combinatio_Mode      varchar(01);
+		Insurance_Combination_Mode      varchar(01);
 	}[150];
 #---    保険組合せ情報
 	HealthInsurance_Combination_Information	{
@@ -72,7 +72,7 @@ xml_medicalv3res6 {
             	RelationToInsuredPerson			varchar(01);
             	Certificate_StartDate			varchar(10);
             	Certificate_ExpiredDate			varchar(10);
-                PublicInsurance_Info      {
+                PublicInsurance_Information     {
         	        PublicInsurance_Class			varchar(03);
 	                PublicInsurance_Name			varchar(20);
 	                PublicInsurer_Number			varchar(08);
@@ -85,14 +85,14 @@ xml_medicalv3res6 {
             } [100];
         };
 #---    一括変更内容（リクエスト＝０２）
-	Chenge_Information  {
+	Change_Information  {
 #---    前保険組合せ番号
 		Bf_Insurance_Combination_Number	varchar(04);
 #---    後保険組合せ番号
 		Af_Insurance_Combination_Number	varchar(04);
 #---    変更期間
-		Md_Start_Date	varchar(02);
-		Md_End_Date	varchar(02);
+		Md_Start_Day 	varchar(02);
+		Md_End_Day	varchar(02);
 #---   収納一括更新区分
 		Income_Change	varchar(03);
 	};
@@ -115,7 +115,7 @@ xml_medicalv3res6 {
 		Af_Ac_Money		varchar(7);
 #---    変更メッセージ
 		Dc_Message    		varchar(6);
-            } [150];
+            } [100];
         };
 #---    ワーニングメッセージ
 	Change_Warning_Information	{

@@ -163,7 +163,7 @@
                   07  MDCRES-INCOME-CHANGE     PIC X(03).
       *        ïœçXå„ÅAé˚î[èÓïÒ
                05  MDCRES-CD-INF-G.
-                   07  MDCRES-CD-INF-TBL     OCCURS   150.
+                   07  MDCRES-CD-INF-TBL     OCCURS   100.
       *                êfó√ì˙ït
                        09  MDCRES-CD-PERFORM-DATE       PIC X(10).
       *                ì`ï[î‘çÜ
