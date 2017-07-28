@@ -165,7 +165,7 @@
                05  MEDH20-11FL07    PIC X(02)    VALUE  "11".
                05  MEDH20-11FL08    PIC X(06)    VALUE  "１１　".
                05  MEDH20-11FL09    PIC X(100)   VALUE  
-         "注１：重度の肢体不自由児（者）等（障害者施設等入院基本料）等".
+           "重度の肢体不自由児（者）等（障害者施設等入院基本料）等".
       *----------------------------------------------------------------
                05  MEDH20-12FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-12FLE     PIC X(08)    VALUE  "99999999".
@@ -248,7 +248,7 @@
                05  MEDH28-17FLS     PIC X(08)    VALUE  "20160401".
                05  MEDH28-17FLE     PIC X(08)    VALUE  "99999999".
                05  MEDH28-17FL01    PIC X(09)    VALUE  "820000064".
-               05  MEDH28-17FL02    PIC X(09)    VALUE  "820000230".
+               05  MEDH28-17FL02    PIC X(09)    VALUE  "820000229".
                05  MEDH28-17FL03    PIC X(01)    VALUE  "3".
                05  MEDH28-17FL04    PIC 9(03)    VALUE 0.
                05  MEDH28-17FL05    PIC 9(01)    VALUE 0.
@@ -287,7 +287,7 @@
                05  MEDH28-19FLS     PIC X(08)    VALUE  "20160401".
                05  MEDH28-19FLE     PIC X(08)    VALUE  "99999999".
                05  MEDH28-19FL01    PIC X(09)    VALUE  "820000067".
-               05  MEDH28-19FL02    PIC X(09)    VALUE  "820000114".
+               05  MEDH28-19FL02    PIC X(09)    VALUE  "820000230".
                05  MEDH28-19FL03    PIC X(01)    VALUE  "2".
                05  MEDH28-19FL04    PIC 9(03)    VALUE 0.
                05  MEDH28-19FL05    PIC 9(01)    VALUE 1.
@@ -412,7 +412,7 @@
                05  MEDH20-27FL07    PIC X(02)    VALUE  "27".
                05  MEDH20-27FL08    PIC X(06)    VALUE  "２７　".
                05  MEDH20-27FL09    PIC X(100)   VALUE  
-         "注２：重度の肢体不自由児（者）等（障害者施設等入院基本料）等".
+           "重度の肢体不自由児（者）等（障害者施設等入院基本料）等".
       *----------------------------------------------------------------
                05  MEDH20-28FLS     PIC X(08)    VALUE  "00000000".
                05  MEDH20-28FLE     PIC X(08)    VALUE  "99999999".

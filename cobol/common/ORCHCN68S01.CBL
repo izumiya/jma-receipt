@@ -253,6 +253,10 @@
            IF    ( FLG-NYUINACCT   =   ZERO )
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
+      *
+                   MOVE    NACCT-DAY (IDX-DAY)
+                                   TO  HCN68S01-COMB-DAY  (IDX-DAY)
+      *
                    IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
                        MOVE    1   TO  HCN68S01-NYUIN-DAY (IDX-DAY)
                        COMPUTE HCN68S01-NYUIN-NISSU
