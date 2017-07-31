@@ -284,10 +284,13 @@
            END-IF
       *
       *    £Ñ£Ò¥Ç¡¼¥¿ºï½ü
-           MOVE    ZERO                TO  IF-RESULT
-           MOVE    FILE-NAME1          TO  IF-FILENAME
-           CALL    "orcfiledel"        USING
-                                       ORCSFDELAREA
+           IF    ( SPA-API-FLG         =   ZERO )
+               MOVE    ZERO                TO  IF-RESULT
+               MOVE    FILE-NAME1          TO  IF-FILENAME
+               CALL    "orcfiledel"        USING
+                                           ORCSFDELAREA
+           END-IF
+      *
            .
        000-PROC-EXT.
            EXIT    PROGRAM

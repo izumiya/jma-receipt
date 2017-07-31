@@ -1192,6 +1192,10 @@
                MOVE    WRK-PARA    TO  TPARA-API-DATA
            END-IF
       *
+           IF     ( SPA-API-FLG    NOT =   ZERO )
+               MOVE    "1"         TO  TPARA-API-DATA
+           END-IF
+      *
       *    API_CUSTOM_ID
            MOVE    "API_CUSTOM_ID" TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
@@ -1916,7 +1920,9 @@
            IF    ( ORCHC03-MOTOID      =   2 OR 5 )
                MOVE    WRK-JNISSU      TO  FMSEIKYU-JNISSU
            END-IF
-           MOVE    WRK-SRYKA-MEI       TO  FMSEIKYU-SRYKANAME
+           IF    ( TPARA-SRYKA         =   "1" )
+               MOVE    WRK-SRYKA-MEI   TO  FMSEIKYU-SRYKANAME
+           END-IF
       *
            MOVE    WRK-SRYKIKANKBN     TO  FMSEIKYU-SRYKIKANKBN
       *

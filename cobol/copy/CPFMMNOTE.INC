@@ -82,3 +82,6 @@
                        09  FMMNOTE-SRYCD           PIC X(9).
       *        îıçl
                05  FMMNOTE-MEMO    PIC X(80)       OCCURS  10 TIMES.
+      *        ÇpÇqéÊìæópÇhÇc
+               05  FMMNOTE-QR-ID   PIC X(80).
+

@@ -405,17 +405,24 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
                MOVE    PRTKANRI-REC    TO  TPRT-REC
       *
-      *        °õºþ£Ä£ÂÊÔ½¸½èÍý
-               PERFORM 900-PRTDATA-SELECT-SEC
-               PERFORM                     UNTIL   FLG-PRTDATA  =   1
-                                           OR      FLG-END      =   1
-                   PERFORM 2001-PRTDATA-PRINT-SEC
-                   PERFORM 900-PRTDATA-FET-SEC
-               END-PERFORM    
+               IF    ( PRTKANRI-SHELLID    =   "API" )
+                    PERFORM 20011-PUSH-FORM-SEC
+               ELSE
       *
-               MOVE    "tbl_prtdata"       TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
+      *            °õºþ£Ä£ÂÊÔ½¸½èÍý
+                   PERFORM 900-PRTDATA-SELECT-SEC
+                   PERFORM             UNTIL   FLG-PRTDATA  =   1
+                                       OR      FLG-END      =   1
+      *
+                       PERFORM 2001-PRTDATA-PRINT-SEC
+                       PERFORM 900-PRTDATA-FET-SEC
+                   END-PERFORM
+      *
+                   MOVE    "tbl_prtdata"   TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 900-CLOSE-SEC
+      *
+               END-IF
       *
                IF    ( TPRT-PRTFLG    =    "D" )
                    PERFORM 2003-PRTKANRI-DEL-SEC
@@ -430,6 +437,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            CLOSE   PRT-FILE
       *
            PERFORM 210-PRINT-SEC
+      *
+           IF    ( CNT-PUSH        >   ZERO )
+      *
+               PERFORM 20012-PUSH-FORM-SEC
+      *
+           END-IF
       *
            .
        2001-COMMON-PRINT-EXT.
@@ -455,12 +468,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *
                MOVE    ZERO            TO  CNT-GROUP
       *
-               COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
-      *
                IF    ( PRTKANRI-SHELLID    =   "API" )
-                    IF    ( CNT-PUSH       <   CONST-PUSH-MAX )
-                        PERFORM 20011-PUSH-FORM-SEC
-                    END-IF
+                    PERFORM 20011-PUSH-FORM-SEC
                ELSE
                     PERFORM 20011-BIND-PRINT-SEC
                END-IF
@@ -487,7 +496,21 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *****************************************************************
       *   PUSH¾ðÊóÊÔ½¸½èÍý
       *****************************************************************
-       20011-PUSH-FORM-SEC           SECTION.
+       20011-PUSH-FORM-SEC             SECTION.
+      *
+           IF    ( WRK-PARA-PRTFLG     NOT =  "3" )
+               IF    ( CNT-PUSH       <   CONST-PUSH-MAX )
+                   PERFORM 200111-PUSH-FORM-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-PUSH-FORM-EXT.
+           EXIT.
+      *****************************************************************
+      *   PUSH¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       200111-PUSH-FORM-SEC           SECTION.
       *
       *    PUSHÊ¬¤Ï¥«¥¦¥ó¥È¤«¤é½ü³°
       *    ADD     1                   TO  CNT-OUT
@@ -522,12 +545,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            PERFORM 20021-PRTDATA-UPD-SEC
       *
            .
-       20011-PUSH-FORM-EXT.
+       200111-PUSH-FORM-EXT.
            EXIT.
       *****************************************************************
       *   PUSH¾ðÊóÊÔ½¸½èÍý
       *****************************************************************
        20012-PUSH-FORM-SEC           SECTION.
+      *
+           COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
       *
            INITIALIZE                      SGETTEMP-AREA
            MOVE    HC01PARA-BASENAME
@@ -566,6 +591,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
       *    Ä¢É¼Ëè°õºþ½èÍý
       *****************************************************************
        20011-BIND-PRINT-SEC            SECTION.
+      *
+           COMPUTE HC01PARA-CNT = HC01PARA-CNT + 1
       *
            INITIALIZE                  SGETTEMP-AREA
            MOVE    HC01PARA-BASENAME

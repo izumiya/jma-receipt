@@ -128,6 +128,10 @@ shell_sources = \
 	allways/HL05.sh.in \
 	allways/mask.sh.in \
 	allways/get_license_access_key.sh.in \
+	daily/export_blob.sh.in \
+	daily/import_blob.sh.in \
+	daily/rpmain1.sh.in \
+
 
 ruby_sources = \
 	daily/print_parent2.rb.in \

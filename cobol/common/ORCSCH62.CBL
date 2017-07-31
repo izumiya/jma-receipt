@@ -562,6 +562,15 @@
       *****************************************************************
        300-HC62-PRINT-SEC             SECTION.
       *
+      *H29.6
+      *HAORIÂÐ±þ
+           IF      SPA-API-FLG         NOT =   ZERO
+               CALL    "ORCHC62"           USING
+                                           SPA-AREA
+                                           ORCHC62AREA
+               GO      TO      300-HC62-PRINT-EXT
+           END-IF
+      *
            CALL    WRK-OKUSURI-PG          USING
                                            SPA-AREA
                                            ORCHC62AREA

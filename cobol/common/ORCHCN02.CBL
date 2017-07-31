@@ -35,6 +35,7 @@
       *
       *  04.08.01    NACL-藤原    16/02/23  傷病名欄記載対応
       *  04.08.02    NACL-藤原    16/10/11  傷病名記載方法変更
+      *  05.00.00    NACL-森脇    17/06/19  API(GINBEE)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -134,6 +135,19 @@
       *
            03  WRK-ERRMSG          PIC X(40).
       *
+      *----API-ADD-START---
+      *    日付編集
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *    病名編集
+           03  WRK-BYOMEI-G.
+               05  WRK-BYOMEI          PIC X(76)   OCCURS   2.
+      *----API-ADD-END-----
+      *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG         PIC X(22).
            03  WRK-HENYMD.
@@ -172,6 +186,15 @@
                05  WRK-HCN02-KIKANENDDD     PIC X(4).
                05  FILLER                   PIC X(8)  VALUE  "日）".
       *
+      *----API-ADD-START---
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-API-DATA           PIC X(01).
+           03  PARA-API-CUSTOM-ID      PIC X(30).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(50).
+      *----API-ADD-END-----
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -236,6 +259,15 @@
            COPY    "MCPAREA".
       *
            COPY    "MCPDATA.INC".
+      *----API-ADD-START---
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
+      *
+      *    退院証明書api
+           COPY    "CPFMTAIIN.INC".
+      *
+           COPY    "CPORCRPMAIN.INC".
+      *----API-ADD-END-----
       *
       *****************************************************************
       *    連絡　領域
@@ -282,7 +314,6 @@
       *
            ACCEPT  SYS-TIME            FROM    TIME
       *
-      *    ファイルＯＰＥＮ
            MOVE    SPA-HOSPNUM         TO  HC01PARA-HOSPNUM
            MOVE    "HCN2"              TO  HC01PARA-FORM-ID
            MOVE    SPA-TERMID          TO  HC01PARA-TERMID
@@ -295,11 +326,27 @@
            CALL    "ORCSGETTEMP"   USING   SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAME   TO  ASGNPARA
       *
-           OPEN    OUTPUT              PRT-FILE
-      *
       *    パラメタ編集処理
            PERFORM 110-PARA-HENSYU-SEC
       *
+      *----API-ADD-START---
+      *    プログラムオプション設定
+           INITIALIZE                  PARA-AREA
+      *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
+           MOVE    "API_DATA"      TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-API-DATA
+           IF     (PARA-API-DATA       =   "1"       )
+               CONTINUE
+           ELSE
+      *        API送信なし
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
+      *    ＡＰＩカスタムＩＤ
+           MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-API-CUSTOM-ID
+      *----API-ADD-END-----
            .
        100-INIT-EXT.
            EXIT.
@@ -322,6 +369,28 @@
        110-PARA-HENSYU-EXT.
            EXIT.
       *
+      *----API-ADD-START---
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC        SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHCN02"      TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME   TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING
+                                       SPA-AREA
+                                       ORCSPRGOPTIONAREA
+           MOVE    SPACE           TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
+           END-IF
+      *
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
+      *----API-ADD-END-----
       *****************************************************************
       *    主　　処理
       *****************************************************************
@@ -329,11 +398,18 @@
       *
       *　　印刷項目編集
             PERFORM 2001-SYORI-SEC
+      *----API-ADD-START---
+           IF      PARA-API-DATA       =   "1"
+               MOVE    1                   TO  FLG-END
+               GO  TO  200-MAIN-EXT
+           END-IF
+      *----API-ADD-END-----
       *　　印刷用データ出力
+      *
+            OPEN   OUTPUT                  PRT-FILE
             MOVE   HCN02               TO  PRT-REC
             WRITE  PRT-REC
-      *
-            CLOSE                       PRT-FILE
+            CLOSE                          PRT-FILE
       *
             INITIALIZE                 ORCSMKPRTAREA
             MOVE   "HC01.sh"           TO  MKPRT-ID
@@ -409,6 +485,13 @@
                END-IF
            END-IF
       *
+      *----API-ADD-START---
+           IF      PARA-API-DATA       =   "1"
+      *        ＡＰＩ処理
+               PERFORM 700-API-SYORI-SEC
+               GO  TO  2001-SYORI-EXT
+           END-IF
+      *----API-ADD-END-----
       *    帳票編集処理
            PERFORM 310-HC01-HEN-SEC
       *
@@ -883,6 +966,378 @@
        2009-HENKAN-EXT.
            EXIT.
       *
+      *----API-ADD-START---
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       700-API-SYORI-SEC           SECTION.
+      *
+           INITIALIZE              FMTAIIN-REC
+      *
+           MOVE    "taiin_shomeisho"   TO  FMTAIIN-FORM-ID
+      *    プリンタ名
+           MOVE    SYS-1034-PRTNM(2)   TO  FMTAIIN-PRINTER
+      *
+      *    医療機関名称
+           MOVE    SYS-1001-HOSPNAME   TO  FMTAIIN-HOSP-NAME(1)
+      *    住所
+           MOVE    SYS-1002-POST       TO  FMTAIIN-HOSP-POST
+           MOVE    SYS-1002-ADRS       TO  FMTAIIN-HOSP-ADRS(1)
+      *
+      *    電話番号
+           MOVE    SYS-1002-TEL        TO  FMTAIIN-HOSP-TEL
+      *
+      *    主治医氏名
+           MOVE    LNK-PTNYUINRRK-DRCD1
+                                       TO  FMTAIIN-DR-CODE
+           MOVE    SYS-1010-NAME       TO  FMTAIIN-DR-NAME
+           MOVE    SYS-1010-KANANAME   TO  FMTAIIN-DR-KANANAME
+      *
+      *    患者氏名
+           MOVE    SPA-PTNUM           TO  FMTAIIN-PTNUM
+           MOVE    PTINF-NAME          TO  FMTAIIN-NAME
+           MOVE    PTINF-KANANAME      TO  FMTAIIN-KANANAME
+           MOVE    PTINF-SEX           TO  FMTAIIN-SEX
+      *
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           MOVE    SPACE               TO  WRK-HEN-DATE
+           MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+           MOVE    "-"                 TO  WRK-HEN-H1
+           MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+           MOVE    "-"                 TO  WRK-HEN-H2
+           MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+           MOVE    WRK-HEN-DATE        TO  FMTAIIN-BIRTHDAY
+      *
+      *    年齢
+           MOVE    SPA-SYSYMD(1:4)     TO  WRK-SPA-SYSYYYY
+           COMPUTE WRK-NENREI          =   WRK-SPA-SYSYY
+                                       -   WRK-SYY
+           IF      SPA-SYSYMD(5:4)     <   WRK-SYMD(5:4)
+               COMPUTE WRK-NENREI      =   WRK-NENREI  -   1
+           END-IF
+           MOVE    WRK-NENREI          TO  FMTAIIN-AGE
+      *
+      *    患者住所
+           MOVE    PTINF-HOME-ADRS     TO  FMTAIIN-HOME-ADRS(1)
+           MOVE    PTINF-HOME-BANTI    TO  FMTAIIN-HOME-ADRS(2)
+      *
+           MOVE    PTINF-HOME-POST     TO  FMTAIIN-HOME-POST
+           MOVE    PTINF-HOME-TEL1     TO  FMTAIIN-HOME-TEL
+      *
+      *    発行日
+           MOVE    SPA-SYSYMD          TO  WRK-SYMD
+           MOVE    SPACE               TO  WRK-HEN-DATE
+           MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+           MOVE    "-"                 TO  WRK-HEN-H1
+           MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+           MOVE    "-"                 TO  WRK-HEN-H2
+           MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+           MOVE    WRK-HEN-DATE        TO  FMTAIIN-PRTYMD
+      *
+      *    入退院日編集処理
+           INITIALIZE                  SYS-5000-REC
+           MOVE    "5000"              TO  SYS-5000-KANRICD
+           MOVE    "*"                 TO  SYS-5000-KBNCD
+           MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  SYS-5000-STYUKYMD
+                                           SYS-5000-EDYUKYMD
+           MOVE    SYS-5000-REC        TO  MCPDATA-REC
+           PERFORM 800-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-5000-REC
+           END-IF
+           IF   SYS-5000-TAIKSIKBN     =   SPACE OR "0"
+               PERFORM 710-API-NTYMD-HEN1-SEC
+           ELSE
+               PERFORM 710-API-NTYMD-HEN2-SEC
+           END-IF
+      *
+           MOVE    SPACE       TO  WRK-BYOMEI-G
+      *
+      *    傷病名
+           IF   SYS-5000-TAIKSIKBN     =   "4"  OR  "5"
+               INITIALIZE                      PTBYOMEI-REC
+               MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+               MOVE    SPA-PTID            TO  PTBYO-PTID
+               MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC         =   ZERO )
+                   MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
+                   MOVE    ZERO            TO  FLG-PTBYOMEI
+               ELSE
+                   MOVE    1                   TO  FLG-PTBYOMEI
+               END-IF
+      *
+               PERFORM UNTIL   FLG-PTBYOMEI    =   1
+                   IF      WRK-TAIINYMD        >=   PTBYO-SRYYMD
+                       IF      PTBYO-TENKIKBN       =   SPACE
+                           MOVE    1               TO  FLG-PTBYOMEI
+                       ELSE
+                           IF      WRK-NYUINYMD    <=   PTBYO-TENKIYMD
+                               MOVE    1               TO  FLG-PTBYOMEI
+                           END-IF
+                       END-IF
+                   END-IF
+      *
+                   IF      FLG-PTBYOMEI        =   1
+                       INITIALIZE                  ORCSMKBYOMEIAREA
+                       MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
+                       MOVE    PTBYO-BYOMEI    TO  SMKBYO-BYOMEI
+                       MOVE    PTBYO-HOSOKU-COMMENT
+                                               TO  SMKBYO-HOSOKU-COMMENT
+                       CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+                       MOVE    SMKBYO-BYOMEI   TO  WRK-BYOMEI-G
+                   ELSE
+                       MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+                       MOVE    "key49"         TO  MCP-PATHNAME
+                       PERFORM 900-PTBYO-READ-SEC
+                   END-IF
+               END-PERFORM
+      *
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key49"             TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           MOVE    WRK-BYOMEI-G   TO  FMTAIIN-BYOMEI
+      *
+           PERFORM 790-API-CALL-SEC
+      *
+           .
+       700-API-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入退院日編集処理（入院料等の記載なし）
+      *****************************************************************
+       710-API-NTYMD-HEN1-SEC          SECTION.
+      *
+           INITIALIZE                  ORCSNTYMDAREA
+           MOVE    PTINF-HOSPNUM       TO  SNTYMD-HOSPNUM
+           MOVE    PTINF-PTID          TO  SNTYMD-PTID
+           MOVE    "3"                 TO  SNTYMD-KBN
+           CALL    "ORCSNTYMD" USING   ORCSNTYMDAREA
+                                       SPA-AREA
+      *
+           PERFORM VARYING IDX2    FROM    1   BY   1
+                   UNTIL ( IDX2    >   SNTYMD-MAX )
+               IF    ( LNK-PTNYUINRRK-RRKNUM
+                                   =   SNTYMD-RRKNUM (IDX2))
+      *            入院日
+                   MOVE    SNTYMD-NYUINYMD(IDX2)
+                                               TO  WRK-SYMD
+                                                   WRK-NYUINYMD
+                   MOVE    SPACE               TO  WRK-HEN-DATE
+                   MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+                   MOVE    "-"                 TO  WRK-HEN-H1
+                   MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+                   MOVE    "-"                 TO  WRK-HEN-H2
+                   MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+                   MOVE    WRK-HEN-DATE        TO  FMTAIIN-NYUINYMD
+      *
+      *            退院日
+                   MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO  WRK-SYMD
+                                                   WRK-TAIINYMD
+                   MOVE    SPACE               TO  WRK-HEN-DATE
+                   MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+                   MOVE    "-"                 TO  WRK-HEN-H1
+                   MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+                   MOVE    "-"                 TO  WRK-HEN-H2
+                   MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+                   MOVE    WRK-HEN-DATE        TO  FMTAIIN-TAIINYMD
+      *
+                   MOVE    SNTYMD-MAX          TO  IDX2
+      *
+               END-IF
+           END-PERFORM
+      *
+           .
+       710-API-NTYMD-HEN1-EXT.
+           EXIT.
+      *****************************************************************
+      *    入退院日編集処理（入院料等の記載あり）
+      *****************************************************************
+       710-API-NTYMD-HEN2-SEC              SECTION.
+      *
+           INITIALIZE                  ORCHCN02SUB-AREA
+      *
+           INITIALIZE                  ORCSNTYMDAREA
+           MOVE    PTINF-HOSPNUM       TO  SNTYMD-HOSPNUM
+           MOVE    PTINF-PTID          TO  SNTYMD-PTID
+           MOVE    "3"                 TO  SNTYMD-KBN
+           CALL    "ORCSNTYMD" USING   ORCSNTYMDAREA
+                                       SPA-AREA
+      *
+           PERFORM VARYING IDX2    FROM    1   BY   1
+                   UNTIL ( IDX2    >   SNTYMD-MAX )
+               IF    ( LNK-PTNYUINRRK-RRKNUM
+                                   =   SNTYMD-RRKNUM (IDX2))
+      *            入院日
+                   MOVE    SNTYMD-NYUINYMD(IDX2)
+                                               TO  WRK-SYMD
+                                                   WRK-NYUINYMD
+                   MOVE    SPACE               TO  WRK-HEN-DATE
+                   MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+                   MOVE    "-"                 TO  WRK-HEN-H1
+                   MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+                   MOVE    "-"                 TO  WRK-HEN-H2
+                   MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+                   MOVE    WRK-HEN-DATE        TO  FMTAIIN-NYUINYMD
+                                                   FMTAIIN-SNTSTYMD
+                   MOVE    SNTYMD-NYUINYMD(IDX2)
+                                       TO  LNK-ORCHCN02SUB-NYUINYMD
+      *
+      *            退院日
+                   MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO  WRK-SYMD
+                                                   WRK-TAIINYMD
+                   MOVE    SPACE               TO  WRK-HEN-DATE
+                   MOVE    WRK-SYMD(1:4)       TO  WRK-HEN-YY
+                   MOVE    "-"                 TO  WRK-HEN-H1
+                   MOVE    WRK-SYMD(5:2)       TO  WRK-HEN-MM
+                   MOVE    "-"                 TO  WRK-HEN-H2
+                   MOVE    WRK-SYMD(7:2)       TO  WRK-HEN-DD
+                   MOVE    WRK-HEN-DATE        TO  FMTAIIN-TAIINYMD
+                                                   FMTAIIN-SNTEDYMD
+                                                   FMTAIIN-BASEYMD
+                   MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                       TO  LNK-ORCHCN02SUB-TAIINYMD
+      *
+                   MOVE    SNTYMD-MAX          TO  IDX2
+      *
+               END-IF
+           END-PERFORM
+      *
+      *    退院証明書用入院取得サブ
+      *
+           MOVE    PTINF-HOSPNUM       TO  LNK-ORCHCN02SUB-HOSPNUM
+           MOVE    PTINF-PTID          TO  LNK-ORCHCN02SUB-PTID
+           CALL    "ORCHCN02SUB"       USING   ORCHCN02SUB-AREA
+                                               SPA-AREA
+           IF      LNK-ORCHCN02SUB-RC  NOT =   ZERO
+               DISPLAY "LNK-ORCHCN02SUB-RC=" LNK-ORCHCN02SUB-RC 
+           END-IF
+      *
+           MOVE    ZERO      TO     KISAI-IDX
+      *
+           PERFORM    VARYING   MEISAI-IDX  FROM  1   BY   1
+              UNTIL   (MEISAI-IDX            >   20)     OR
+                      (LNK-ORCHCN02SUB-SYUBETUCD(MEISAI-IDX) = SPACE) OR
+                      (KISAI-IDX             >=   3) 
+               IF   (LNK-ORCHCN02SUB-SYUBETUCD(MEISAI-IDX) NOT = SPACE)
+                AND (LNK-ORCHCN02SUB-NISSU(MEISAI-IDX)   NOT =   ZERO)
+                   ADD     1                   TO   KISAI-IDX
+                   MOVE  LNK-ORCHCN02SUB-SYUBETUMEI(MEISAI-IDX)
+                               TO  FMTAIIN-NYUINRYO-NAME(KISAI-IDX)
+                   MOVE  LNK-ORCHCN02SUB-NISSU(MEISAI-IDX)
+                                               TO   WRK-Z5
+                   MOVE   WRK-Z5
+                               TO  FMTAIIN-NYUINRYO-NISSU(KISAI-IDX)
+               END-IF
+           END-PERFORM
+           COMPUTE   WRK-Z5   =   LNK-ORCHCN02SUB-NISSU(1)   +
+                                  LNK-ORCHCN02SUB-NISSU(2)   +
+                                  LNK-ORCHCN02SUB-NISSU(3)   +
+                                  LNK-ORCHCN02SUB-NISSU(4)   +
+                                  LNK-ORCHCN02SUB-NISSU(5)   +
+                                  LNK-ORCHCN02SUB-NISSU(6)   +
+                                  LNK-ORCHCN02SUB-NISSU(7)   +
+                                  LNK-ORCHCN02SUB-NISSU(8)   +
+                                  LNK-ORCHCN02SUB-NISSU(9)   +
+                                  LNK-ORCHCN02SUB-NISSU(10)  +
+                                  LNK-ORCHCN02SUB-NISSU(11)   +
+                                  LNK-ORCHCN02SUB-NISSU(12)   +
+                                  LNK-ORCHCN02SUB-NISSU(13)   +
+                                  LNK-ORCHCN02SUB-NISSU(14)   +
+                                  LNK-ORCHCN02SUB-NISSU(15)   +
+                                  LNK-ORCHCN02SUB-NISSU(16)   +
+                                  LNK-ORCHCN02SUB-NISSU(17)   +
+                                  LNK-ORCHCN02SUB-NISSU(18)   +
+                                  LNK-ORCHCN02SUB-NISSU(19)   +
+                                  LNK-ORCHCN02SUB-NISSU(20)
+           MOVE  WRK-Z5                    TO   FMTAIIN-TOTAL-NISSU
+      *
+           MOVE   LNK-ORCHCN02SUB-TKIKAN   TO   WRK-Z5
+           MOVE   WRK-Z5                   TO   FMTAIIN-IPPAN-NISSU
+      *
+      *    予備エリアの印字
+           MOVE      ZERO         TO      FLG-YOBI
+           MOVE      ZERO         TO      WRK-YOBI-NISSU
+           PERFORM   VARYING   IDX   FROM  MEISAI-IDX  BY  1
+             UNTIL  (IDX        >    20)    OR
+                    (LNK-ORCHCN02SUB-SYUBETUCD(IDX)   =   SPACE)
+                IF   LNK-ORCHCN02SUB-NISSU(IDX)    NOT =   ZERO
+                     MOVE   1      TO     FLG-YOBI
+                     ADD    LNK-ORCHCN02SUB-NISSU(IDX)
+                                   TO     WRK-YOBI-NISSU
+               END-IF
+           END-PERFORM
+      *
+           MOVE   WRK-YOBI-NISSU   TO   WRK-Z5
+           MOVE   WRK-Z5           TO   FMTAIIN-OTHER-NISSU
+      *
+      *    印刷対象外箇所の初期化
+           IF   SYS-5000-TAIKSIKBN     =   "2"
+               MOVE   SPACE        TO  FMTAIIN-IPPAN-NISSU
+               MOVE   SPACE        TO  FMTAIIN-BASEYMD
+           END-IF
+      *
+           IF   SYS-5000-TAIKSIKBN     =   "3"
+               PERFORM    VARYING   IDX   FROM  1  BY  1
+                 UNTIL    IDX   >   3
+                     MOVE   SPACE  TO  FMTAIIN-NYUINRYO-NAME(IDX)
+                     MOVE   SPACE  TO  FMTAIIN-NYUINRYO-NISSU(IDX)
+               END-PERFORM
+               MOVE   SPACE        TO  FMTAIIN-TOTAL-NISSU
+               MOVE   SPACE        TO  FMTAIIN-SNTSTYMD
+               MOVE   SPACE        TO  FMTAIIN-SNTEDYMD
+               MOVE   SPACE        TO  FMTAIIN-OTHER-NISSU
+           END-IF
+      *
+           IF   SYS-5000-TAIKSIKBN     =   "4"
+               PERFORM    VARYING   IDX   FROM  1  BY  1
+                 UNTIL    IDX   >   3
+                     MOVE   SPACE  TO  FMTAIIN-NYUINRYO-NAME(IDX)
+                     MOVE   SPACE  TO  FMTAIIN-NYUINRYO-NISSU(IDX)
+               END-PERFORM
+               MOVE   SPACE        TO  FMTAIIN-TOTAL-NISSU
+               MOVE   SPACE        TO  FMTAIIN-SNTSTYMD
+               MOVE   SPACE        TO  FMTAIIN-SNTEDYMD
+               MOVE   SPACE        TO  FMTAIIN-OTHER-NISSU
+               MOVE   SPACE        TO  FMTAIIN-IPPAN-NISSU
+               MOVE   SPACE        TO  FMTAIIN-BASEYMD
+           END-IF
+      *
+           .
+       710-API-NTYMD-HEN2-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ送信処理
+      *****************************************************************
+       790-API-CALL-SEC            SECTION.
+      *
+      *    カスタムＩＤ
+           MOVE    PARA-API-CUSTOM-ID  TO  FMTAIIN-CUSTOM-ID
+      *
+           INITIALIZE                      RPMAIN-AREA
+           MOVE    "taiin_shomeisho"   TO  RPMAIN-ID
+           MOVE    PARA-API-CUSTOM-ID  TO  RPMAIN-CUSTOM-ID
+           MOVE    "退院証明書"        TO  RPMAIN-TITLE
+           MOVE    "fm_discharge_certificate"
+                                       TO  MCP-TABLE
+           MOVE    FMTAIIN-DATA        TO  RPMAIN-DATA
+           CALL    "ORCRPMAIN"            USING
+                                          MCPAREA
+                                          RPMAIN-AREA
+                                          SPA-AREA
+      *
+           .
+       790-API-CALL-EXT.
+           EXIT.
+      *----API-ADD-END-----
       *****************************************************************
       *    患者マスター読み込み
       *****************************************************************

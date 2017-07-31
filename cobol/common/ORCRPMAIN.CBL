@@ -32,22 +32,42 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
+      *    °õºþÍÑ¥Ç¡¼¥¿
+           SELECT  PRT2-FILE       ASSIGN              PRTOUTPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-PRT2.
+      *
        DATA                        DIVISION.
        FILE                        SECTION.
+      *
+      *    °õºþÍÑ¥Ç¡¼¥¿
+       FD  PRT2-FILE.
+       01  PRT2-REC.
+           03  PRT2-PRTDATA        PIC X(20000).
       *
        WORKING-STORAGE             SECTION.
       *
            COPY    "CPCOMMONPRT.INC".
            COPY    "CPASGNPARA.INC"    REPLACING   //ASGNPARA//
-                                       BY          //OUTPARA//.
+                                       BY          //PRTOUTPARA//.
       *
       *    ¥·¥§¥ëÍÑÎÎ°è
            COPY    "CPSHELLTBL.INC".
       *
+      *    ¥¹¥Æ¡¼¥¿¥¹ÎÎ°è
+       01  STS-AREA.
+           03  STS-PRT2            PIC X(02).
+      *
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
-       
+           03  FLG-PRT2            PIC 9(01).
+           03  FLG-PRTKANRI        PIC 9(01).
+      *
+      *    ¥«¥¦¥ó¥ÈÎÎ°è
+       01  CNT-AREA.
+           03  CNT-OUT             PIC 9(04).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                PIC 9(05).
@@ -57,6 +77,7 @@
            03  WRK-NUM2-G.
                05  WRK-NUM2            PIC 9(02).
                05  WRK-SHORI-RENNUM    PIC 9(02).
+           03  WRK-DATAID              PIC X(80).
       *
        01  SGYOUMU-CODE                PIC 9(03).
       *
@@ -64,6 +85,20 @@
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
       *
+      *    °õºþ´ÉÍý£Ä£Â
+       01  PRTKANRI-REC.
+           COPY    "CPPRTKANRI.INC".
+      *
+      *    °õºþ£Ä£Â
+       01  PRTDATA-REC.
+           COPY    "CPPRTDATA.INC".          
+      *
+      *    £Á£Ð£É¥Ñ¥é¥á¥¿
+       01  APIPARA-REC.
+           COPY    "CPAPIPARA.INC".
+      *
+      *    Ä¢É¼¥Ç¡¼¥¿¼èÆÀAPIÍÑ¥Ñ¥é¥á¥¿
+           COPY    "CPPARA001.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -88,6 +123,9 @@
            03  UIDIO-RET   PIC X(2).
            03  UIDIO-UID   PIC X(36).
       *
+      *   °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
+           COPY    "CPORCSPRT.INC".
+      *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
       *****************************************************************
@@ -110,8 +148,11 @@
       *****************************************************************
        000-PROC-SEC                 SECTION.
       *
-           INITIALIZE                      WRK-AREA
+           INITIALIZE                      STS-AREA
            INITIALIZE                      FLG-AREA
+           INITIALIZE                      CNT-AREA
+           INITIALIZE                      IDX-AREA
+           INITIALIZE                      WRK-AREA
       *
            PERFORM 100-INIT-SEC
       *
@@ -131,9 +172,14 @@
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
       *
-           CALL     "ORCSGYOUMUGET"    USING
-                                       SPA-AREA
-                                       SGYOUMU-CODE
+           MOVE    ZERO                TO  SGYOUMU-CODE
+           IF    (  RPMAIN-TBL-KEY     =   "ORCBS01" )
+               MOVE    23              TO  SGYOUMU-CODE
+           ELSE
+               CALL     "ORCSGYOUMUGET"    USING
+                                           SPA-AREA
+                                           SGYOUMU-CODE
+           END-IF
       *
            CALL    "orcuidset"         USING
                                        UIDIO-ST
@@ -157,9 +203,7 @@
            CALL    "ORCSGETTEMP"           USING
                                            SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAMES (1)
-                                       TO  OUTPARA
-      *
-           DISPLAY "OUTPARA[" OUTPARA(1:100) "]"
+                                       TO  PRTOUTPARA
       *
            .
       *
@@ -172,7 +216,20 @@
       *
            PERFORM 2001-JSON-EXPORT-SEC
       *
-           PERFORM 2001-REPRINT-SEC
+           IF    ( SPA-API-FLG     NOT =   ZERO )
+            OR   ( SPA-CLIENT-PRT-FLG  =   ZERO )
+      *
+               PERFORM 2001-PRTDATA-EDIT-SEC
+      *
+               PERFORM 2001-APIPARA-INS-SEC
+      *
+               IF    ( SPA-CLIENT-PRT-FLG  =   ZERO )
+                   PERFORM 2001-PUSH-SEC
+               END-IF
+      *
+           ELSE
+               PERFORM 2001-REPRINT-SEC
+           END-IF
       *
            .
       *
@@ -198,12 +255,40 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "blob"              TO  MCP-TABLE
            MOVE     XMLDATA-OBJECT     TO  ORCA-BLOB-OBJECT
-           MOVE     OUTPARA            TO  ORCA-BLOB-FILE
+           MOVE     PRTOUTPARA         TO  ORCA-BLOB-FILE
            PERFORM 910-BLOBEXPORT-SEC
       *
            .
       *
        2001-JSON-EXPORT-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH½èÍý
+      *    ¡Ê¥·¥§¥ë¤Î¼Â¹Ô¤Ï¥ª¥ó¥é¥¤¥ó¤Î¥È¥é¥ó¥¶¥¯¥·¥ç¥ó½ªÎ»¸å¡Ë
+      *****************************************************************
+       2001-PUSH-SEC                   SECTION.
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           INITIALIZE                      SHELLTBL
+      *
+           MOVE    "rpmain1.sh"        TO  SHELLTBL-NAME
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
+           MOVE    SPA-TERMID          TO  SHELLTBL-ARG2
+           MOVE    SPA-OPID            TO  SHELLTBL-ARG3
+           MOVE    SPA-SYSYMD          TO  SHELLTBL-ARG4
+      *
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"             USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+      *
+           .
+      *
+       2001-PUSH-EXT.
            EXIT.
       *****************************************************************
       *    ºÆ°õºþ¥Ç¡¼¥¿ºîÀ®½èÍý
@@ -213,10 +298,35 @@
            MOVE    SPACE               TO  SHELLTBL
            INITIALIZE                      SHELLTBL
       *
+           PERFORM 20011-SHELL-ARG-EDIT-SEC
+      *
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "daily"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           .
+      *
+       2001-REPRINT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥·¥§¥ë°ú¿ôÊÔ½¸½èÍý
+      *****************************************************************
+       20011-SHELL-ARG-EDIT-SEC            SECTION.
+      *
+      *
            MOVE    "online-reprint.sh" TO  SHELLTBL-NAME
            MOVE    1                   TO  LNK-PRTKANRI-RENNUM
-           MOVE    "ONLINE"            TO  LNK-PRTKANRI-TBL-KEY
+           IF    ( RPMAIN-TBL-KEY      NOT =   SPACE )
+               MOVE    RPMAIN-TBL-KEY  TO  LNK-PRTKANRI-TBL-KEY
+           ELSE
+               MOVE    "ONLINE"        TO  LNK-PRTKANRI-TBL-KEY
+           END-IF
            MOVE    SPA-PRT-GROUP       TO  LNK-PRTKANRI-TBL-GROUP
+           MOVE    SPA-PRT-UUID        TO  LNK-PRTKANRI-TBL-UUID
            MOVE    SPA-SYSYMD          TO  LNK-PRTKANRI-SKYYMD
                                            LNK-PRTKANRI-SRYYM
            MOVE    1                   TO  LNK-PRTKANRI-PRIORITY
@@ -233,12 +343,17 @@
                MOVE ZERO               TO  WRK-SHORI-RENNUM
            END-IF
            COMPUTE LNK-PRTKANRI-SHORI-RENNUM
-               =   WRK-SHORI-RENNUM    +   1000
+               =   WRK-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-SHORI-RENNUM
                                        TO  SHELLTBL-ARG4
            MOVE    LNK-PRTKANRI-SRYYM  TO  SHELLTBL-ARG5
            MOVE    LNK-PRTKANRI-SKYYMD TO  SHELLTBL-ARG6
-           MOVE    "API"               TO  SHELLTBL-ARG7
+           IF    ( SPA-API-FLG         =   2 OR 3 )
+            OR   ( SPA-CLIENT-PRT-FLG  =   ZERO )
+               MOVE    "API_01"        TO  SHELLTBL-ARG7
+           ELSE
+               MOVE    "API"           TO  SHELLTBL-ARG7
+           END-IF
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SHELLTBL-ARG8
            MOVE    LNK-PRTKANRI-TERMID
@@ -247,11 +362,12 @@
                                        TO  SHELLTBL-ARG10
            MOVE    SPACE               TO  SHELLTBL-ARG11
            MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG12
-           MOVE    SPA-PRT-UUID        TO  SHELLTBL-ARG13
+           MOVE    LNK-PRTKANRI-TBL-UUID
+                                       TO  SHELLTBL-ARG13
            MOVE    SPA-PTID            TO  SHELLTBL-ARG14
       *    SITE_KBN
            MOVE    "1"                 TO  SHELLTBL-ARG15
-      *    
+      *
            MOVE    SGYOUMU-CODE        TO  SHELLTBL-ARG16
            MOVE    RPMAIN-TITLE        TO  SHELLTBL-ARG17
       *    DIA
@@ -271,13 +387,31 @@
       *     AND  ( SPA-CLIENT-TEMP-FLG =   2 )
       *        MOVE    "D"             TO  SHELLTBL-ARG23
       *    ELSE
+           IF    ( SPA-API-FLG         =   2 OR 3)
+               MOVE    "D"             TO  SHELLTBL-ARG23
+           ELSE
                MOVE    "1"             TO  SHELLTBL-ARG23
+           END-IF
       *    END-IF
            MOVE    HC01PARA-BASENAME   TO  SHELLTBL-ARG24
            MOVE    RPMAIN-ID           TO  SHELLTBL-ARG25
       *
+           .
+      *
+       20011-SHELL-ARG-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþ¥Ç¡¼¥¿ÊÔ½¸½èÍý
+      *****************************************************************
+       2001-PRTDATA-EDIT-SEC           SECTION.
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           INITIALIZE                      SHELLTBL
+      *
+           PERFORM 20011-SHELL-ARG-EDIT-SEC
+      *
            MOVE    SHELLTBL            TO  MCPDATA-REC
-           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "EXCOMMAND"         TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
            MOVE    "daily"             TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
@@ -285,9 +419,202 @@
                                        MCPDATA-REC
                                        SPA-AREA
       *
+           OPEN    INPUT               PRT2-FILE
+           IF    ( STS-PRT2    NOT =   ZERO )
+               MOVE    1           TO  FLG-END
+           END-IF
+      *
+           PERFORM 900-PRTKANRI-KEY-SEL-SEC
+      *
+           PERFORM 900-PRT2-READ-SEC
+      *
+           MOVE    ZERO                TO  CNT-OUT
+      *
+           PERFORM UNTIL ( FLG-END     NOT =   ZERO )
+                    OR   ( FLG-PRT2    NOT =   ZERO )
+      *
+               COMPUTE CNT-OUT =   CNT-OUT +   1
+      *
+               IF    ( FLG-PRTKANRI    =   ZERO )
+                AND  ( CNT-OUT         =   1 )
+                   MOVE    ","             TO  PRTDATA-PRTDATA(1:1)
+                   MOVE    PRT2-PRTDATA    TO  PRTDATA-PRTDATA(2:)
+               ELSE
+                   MOVE    PRT2-PRTDATA    TO  PRTDATA-PRTDATA
+               END-IF
+               PERFORM 390-PRINT-OUT-SEC
+      *
+               PERFORM 900-PRT2-READ-SEC
+      *
+           END-PERFORM
+      *
+           CLOSE                       PRT2-FILE
+      *
+           MOVE    SPACE               TO  WRK-DATAID
+           STRING  LNK-PRTKANRI-TBL-KEY    DELIMITED BY SPACE
+                   "#"                     DELIMITED BY SIZE
+                   LNK-PRTKANRI-TBL-UUID   DELIMITED BY SPACE
+                   "#"                     DELIMITED BY SIZE
+                   LNK-PRTKANRI-TBL-GROUP  DELIMITED BY SIZE
+                   "#"                     DELIMITED BY SIZE
+                   LNK-PRTKANRI-RENNUM     DELIMITED BY SIZE
+                   "#"                     DELIMITED BY SIZE
+                   LNK-PRTKANRI-SHORI-RENNUM
+                                           DELIMITED BY SIZE
+           INTO    WRK-DATAID
+           END-STRING
+      *
+           .
+       2001-PRTDATA-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼°õºþ½èÍý
+      *****************************************************************
+       390-PRINT-OUT-SEC                SECTION.
+      *
+           INITIALIZE                  ORCSPRTAREA
+           MOVE    "INS"               TO  SPRT-MODE
+           MOVE    LNK-PRTKANRI-RENNUM TO  SPRT-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                       TO  SPRT-TBL-KEY
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  SPRT-TBL-GROUP
+           MOVE    LNK-PRTKANRI-TBL-UUID
+                                       TO  SPRT-TBL-UUID
+           MOVE    LNK-PRTKANRI-GYOUMU-CD
+                                       TO  SPRT-GYOUMU-CD
+           MOVE    LNK-PRTKANRI-SRYYM  TO  SPRT-SRYYM
+           MOVE    SPA-SRYYMD          TO  SPRT-SKYYMD
+           IF    ( SPA-API-FLG         =   2 OR 3 )
+               MOVE    "API_01"        TO  SPRT-SHELLID
+           ELSE
+               MOVE    "API"           TO  SPRT-SHELLID
+           END-IF
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  SPRT-SHORI-RENNUM
+           MOVE    LNK-PRTKANRI-PRIORITY
+                                       TO  SPRT-PRIORITY
+           MOVE    RPMAIN-CUSTOM-ID    TO  SPRT-PRTID
+           MOVE    PRTDATA-PRTDATA     TO  SPRT-PRTDATA
+           MOVE    RPMAIN-TITLE        TO  SPRT-TITLE
+      *
+           MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
+           MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
+           MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
+           MOVE    "1"                 TO  SPRT-SITEKBN
+           IF    ( SPA-API-FLG         =   2 OR 3 )
+               MOVE    "D"             TO  SPRT-PRTFLG
+           ELSE
+               MOVE    "1"             TO  SPRT-PRTFLG
+           END-IF
+      *
+           MOVE    SPA-PTID            TO  SPRT-PTID
+           MOVE    SPACE               TO  SPRT-DATA-TYPE
+           MOVE    RPMAIN-ID           TO  SPRT-API-ID
+      *
+           CALL    "ORCSPRT"           USING
+                                       ORCSPRTAREA
+                                       SPA-AREA
+      *    IF      SPRT-RETURN         =   ZERO
+      *        CONTINUE
+      *    ELSE
+      *        MOVE    "°õºþ£Ä£Â¤Ë¹¹¿·¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"
+      *                                   TO  WRK-RECEERR
+      *        PERFORM 500-ERR-HENSYU-SEC                           
+      *    END-IF                                                              
+           .
+       390-PRINT-OUT-EXT.
+           EXIT.
+      *****************************************************************
+      *    API¥Ñ¥é¥á¥¿ºîÀ®½èÍý
+      *****************************************************************
+       2001-APIPARA-INS-SEC            SECTION.
+      *
+           INITIALIZE                  APIPARA-REC
+                                       PARA001-REC
+      *
+           MOVE    SPA-HOSPNUM     TO  APIPARA-HOSPNUM
+           MOVE    "api001"        TO  APIPARA-GYOUMUID
+           MOVE    SPA-TERMID      TO  APIPARA-TERMID
+           MOVE    SPA-OPID        TO  APIPARA-FILEMEI
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                   TO  APIPARA-EDANUM
+           MOVE    SPA-PRT-UUID    TO  APIPARA-KARTE-UID
+           MOVE    SMCNDATE-YMD    TO  APIPARA-UPYMD
+           MOVE    SMCNDATE-HMS    TO  APIPARA-UPHMS
+      *
+           MOVE    RPMAIN-ID       TO  PARA001-FORMID
+           MOVE    RPMAIN-CUSTOM-ID TO PARA001-CUSTOMID
+           MOVE    RPMAIN-TITLE    TO  PARA001-FORMNAME
+           MOVE    WRK-DATAID      TO  PARA001-DATAID
+           MOVE    PARA001-REC     TO  APIPARA-DATA-REC
+      *
+           MOVE    APIPARA-REC     TO  MCPDATA-REC
+           MOVE    "tbl_api_para"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           MOVE    APIPARA-REC     TO  MCPDATA-REC
+           MOVE    "tbl_api_para"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBINSERT-SEC
+      *
            .
       *
-       2001-REPRINT-EXT.
+       2001-APIPARA-INS-EXT.
+           EXIT.
+      *****************************************************************
+      *    °õºþ´ÉÍý¸¡º÷½èÍý
+      *****************************************************************
+       900-PRTKANRI-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PRTKANRI
+      *
+           INITIALIZE                      PRTKANRI-REC
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                       TO  PRTKANRI-TBL-KEY
+           MOVE    LNK-PRTKANRI-RENNUM TO  PRTKANRI-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  PRTKANRI-TBL-GROUP
+           MOVE    LNK-PRTKANRI-TBL-UUID
+                                       TO  PRTKANRI-TBL-UUID
+           MOVE    LNK-PRTKANRI-GYOUMU-CD
+                                       TO  PRTKANRI-GYOUMU-CD
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  PRTKANRI-SHORI-RENNUM
+           MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
+           MOVE    PRTKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PRTKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-PRTKANRI
+               INITIALIZE                  PRTKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PRTKANRI-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       900-PRT2-READ-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PRT2
+      *
+           READ    PRT2-FILE
+           AT  END
+               MOVE    1               TO  FLG-PRT2
+           END-READ
+      *
+           .
+       900-PRT2-READ-EXT.
            EXIT.
       *****************************************************************
       *    £Ø£Í£Ì£Ï£Ð£Å£Î½èÍý
@@ -340,4 +667,82 @@
       *
            .
        900-BLOBEXPORT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â£Ä£Å£Ì£Å£Ô£Å½èÍý
+      *****************************************************************
+       910-DBDELETE-SEC                 SECTION.
+      *
+           MOVE    "DBDELETE"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â£É£Î£Ó£Å£Ò£Ô½èÍý
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¸¡º÷½èÍý
+      *****************************************************************
+       910-DBSELECT-SEC               SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£ÂÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¥¯¥í¡¼¥º½èÍý
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
            EXIT.

@@ -159,8 +159,7 @@
       *
       ****************************************************************
        LINKAGE                 SECTION.
-       01  COMMAND-PARAM.
-           02  FILLER      PIC X(2000).
+           COPY    "CPCOMMAND-PARAM.INC".
       ****************************************************************
        PROCEDURE           DIVISION
                USING

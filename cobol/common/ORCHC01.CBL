@@ -2040,10 +2040,16 @@
            MOVE    PTINF-KISEI-TEL     TO  FMKARTE1-KISEI-TEL
       *
       *保険組合せ情報
-           MOVE    SPA-HKNCOMBINUM     TO  FMKARTE1-HKNCOMBI
-      *    負担割合
-           MOVE    COMB-GAI-KFTNRATE   TO  FMKARTE1-GAI-KFTNRATE
-           MOVE    COMB-NYU-KFTNRATE   TO  FMKARTE1-NYU-KFTNRATE
+           IF    ( SPA-HKNCOMBINUM     =   ZERO OR SPACE )
+               CONTINUE
+           ELSE
+               MOVE    SPA-HKNCOMBINUM TO  FMKARTE1-HKNCOMBI
+      *        負担割合
+               MOVE    COMB-GAI-KFTNRATE
+                                       TO  FMKARTE1-GAI-KFTNRATE
+               MOVE    COMB-NYU-KFTNRATE
+                                       TO  FMKARTE1-NYU-KFTNRATE
+           END-IF
       *    保険年齢
       *    保険算定年齢チェック等
            INITIALIZE                  ORCSAGECHKAREA

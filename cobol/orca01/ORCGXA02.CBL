@@ -683,7 +683,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
                MOVE    PRTKANRI-TITLE      TO  SPA-GMN-TPRT-TITLE (IDX)
                MOVE    PRTKANRI-PRTFLG     TO  SPA-NAI-TPRTFLG    (IDX)
       *
-               IF    ( PRTKANRI-SHELLID    =   "API" )
+               IF    ( PRTKANRI-SHELLID    =   "API" OR "API_01" )
                    MOVE    "1"             TO  SPA-NAI-TAPI       (IDX)
                END-IF
                MOVE    PRTKANRI-API-ID     TO  SPA-NAI-TAPI-ID    (IDX)

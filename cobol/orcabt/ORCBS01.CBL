@@ -50,6 +50,8 @@
            COPY    "CPRECEERR.INC" REPLACING   //RECEERR//
                                    BY          //ERRPARA//.
       *
+           COPY    ENUM-VALUE.
+      *
       *    ステータス領域
        01  STS-AREA.
            03  STS-ORCBS01ERR                  PIC X(02).
@@ -57,6 +59,7 @@
       *    フラグ
        01  FLG-AREA.
            03  FLG-END                         PIC 9(01).
+           03  FLG-API                         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -94,6 +97,8 @@
            03  WRK-PRTTITLE                    PIC X(100).
            03  WRK-ERRMSG                      PIC X(200).
            03  WRK-UPDCNT                      PIC 9(06).
+           03  WRK-PRT-FLG-X.
+               05  WRK-PRT-FLG                 PIC 9(02).
       *
            COPY    "MCPAREA".
       *
@@ -122,6 +127,9 @@
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *    COPY    "ORCA-DBPATH".
+      *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    支払証明書
            COPY    "CPORCHCM31.INC".
@@ -267,6 +275,11 @@
                                        SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAME
                                    TO  ERRPARA
+           MOVE    SGETTEMP-MW     TO  SPA-MW
+      *
+           IF    ( WRK-PARA-PGNAME =   "ORCHCM31" OR "ORCHCM32" )
+               PERFORM 1001-PRGOPTION-SEC
+           END-IF
       *
            PERFORM 1001-ORCSPRTAREA-SEC
       *
@@ -301,11 +314,36 @@
            MOVE    ORCHCM31-PTID       TO  SPA-PTID
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
+                                           SPA-SRYYMD
            MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
+           MOVE    LNK-PRTKANRI-TBL-GROUP
+                                       TO  SPA-PRT-GROUP
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                       TO  WRK-PRT-FLG
+           MOVE    WRK-PRT-FLG-X       TO  SPA-PRT-FLG
       *
            .
        1001-SPA-AREA-SET-EXT.
            EXIT.
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       1001-PRGOPTION-SEC              SECTION.
+      *
+           INITIALIZE                      ORCSPRGOPTIONAREA
+           MOVE    WRK-PARA-PGNAME     TO  ORCSPRGOPTION-PRGID
+           MOVE    "API_DATA"          TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           IF    ( ORCSPRGOPTION-OT-PARA
+                                       =    "1" )
+               MOVE    1               TO  FLG-API
+           END-IF
+      *
+           .
+       1001-PRGOPTION-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    印刷ＤＢ制御情報領域設定処理
       *****************************************************************
@@ -419,7 +457,9 @@
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
-           MOVE    WRK-UPDCNT      TO  JOB-UPDCNT
+           IF    ( FLG-API         =   ZERO )
+               MOVE    WRK-UPDCNT  TO  JOB-UPDCNT
+           END-IF
            CALL    "ORCSJOB"           USING
                                        ORCSJOBKANRIAREA
                                        JOBKANRI-REC

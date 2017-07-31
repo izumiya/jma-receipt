@@ -98,9 +98,8 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYMD-YM       PIC X(06).
                05  WRK-SRYYMD-DD       PIC 9(02).
-           03  WRK-TEMPDIR-ROOT        PIC X(512).
-           03  WRK-EXTENTION           PIC X(10).
            03  WRK-SRYCD               PIC X(09).
+           03  WRK-IMAGEID             PIC X(80).
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -130,6 +129,12 @@
       *
       *    ファイル存在チェック
            COPY    "CPORCSACCESS.INC".
+      *
+      *    一時ディレクトリ作成作成
+           COPY    "CPORCSTEMPDIR.INC".
+      *
+      *    一時ファイル名編集
+           COPY    "CPORCSGETTEMP.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -243,31 +248,9 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           MOVE    SPACE                   TO  MCP-TEMPDIR
-           ACCEPT  WRK-TEMPDIR-ROOT
-                               FROM    ENVIRONMENT  "MCP_TEMPDIR_ROOT"
-           IF    ( WRK-TEMPDIR-ROOT    =   SPACE )
-               MOVE    "/tmp/jma-tempdir"  TO  WRK-TEMPDIR-ROOT
-               CALL    "SYSTEM"        USING
-                                       FUNCTION CONCATENATE (
-                                       "mkdir -p "
-                                       WRK-TEMPDIR-ROOT
-                                       )
-           END-IF
-           STRING  WRK-TEMPDIR-ROOT    DELIMITED BY SPACE
-                   "/"                 DELIMITED BY SIZE
-                   SPA-TERMID          DELIMITED BY SPACE
-                   LOW-VALUE           DELIMITED BY SIZE
-           INTO    MCP-TEMPDIR
-           END-STRING
-      *
-           SET ENVIRONMENT "MCP_TEMPDIR"   TO    MCP-TEMPDIR
-      *
-           CALL "CBL_CREATE_DIR"   USING MCP-TEMPDIR
-           IF    ( RETURN-CODE     NOT =   ZERO )
-               MOVE    "0001"          TO  SPA-ERRCD
-               PERFORM 990-EXIT-PROGRAM-SEC
-           END-IF
+           INITIALIZE                  STEMPDIR-AREA
+           CALL    "ORCSTEMPDIR"       USING
+                                       STEMPDIR-AREA
       *
            .
        100-INIT-EXT.
@@ -279,6 +262,8 @@
        200-MAIN-SEC                    SECTION.
       *
            EVALUATE    IMGGETREQ-DATAID(1:1)
+           WHEN    "1"
+               PERFORM 2000-MEDIMAGE-GET-SEC
            WHEN    "2"
                PERFORM 2001-MEDIMAGE-GET-SEC
            WHEN    OTHER
@@ -292,6 +277,58 @@
       *****************************************************************
       *    画像データ取得処理
       *****************************************************************
+       2000-MEDIMAGE-GET-SEC           SECTION.
+      *
+           MOVE    IMGGETREQ-DATAID(3:)
+                                   TO  WRK-IMAGEID
+      *
+           MOVE    SPACE           TO  ZIPPARA
+           STRING  WRK-IMAGEID         DELIMITED BY SPACE
+                   ".zip"              DELIMITED BY SIZE
+           INTO    ZIPPARA
+           END-STRING
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    ZIPPARA         TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                   TO  ZIPPARA
+      *
+           MOVE    SPACE           TO  SHELLTBL
+           INITIALIZE                  SHELLTBL
+      *
+           MOVE    SPA-HOSPNUM     TO  SHELLTBL-HOSPNUM
+           MOVE    "export_blob.sh"
+                                   TO  SHELLTBL-NAME
+           MOVE    "API000R2"      TO  SHELLTBL-SHELLID
+           MOVE    1               TO  SHELLTBL-JOBID
+           MOVE    SPA-TERMID      TO  SHELLTBL-TERMID
+      *
+           MOVE    WRK-IMAGEID     TO  SHELLTBL-ARG1
+           MOVE    SHELLTBL        TO  MCPDATA-REC
+           MOVE    "EXCOMMAND"     TO  MCP-FUNC
+           MOVE    "shell"         TO  MCP-TABLE
+           MOVE    "daily"         TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           INITIALIZE                  SACCESS-AREA
+           MOVE    ZIPPARA         TO  SACCESS-IN-FILENAME
+           CALL    "ORCSACCESS"        USING
+                                       SACCESS-AREA
+           DISPLAY "SACCESS-RC=" SACCESS-RC
+           IF    ( SACCESS-RC      NOT =   ZERO )
+               MOVE    "0004"      TO  WRK-ERRCD
+           END-IF
+      *
+           .
+       2000-MEDIMAGE-GET-EXT.
+           EXIT.
+      *****************************************************************
+      *    画像データ取得処理
+      *****************************************************************
        2001-MEDIMAGE-GET-SEC           SECTION.
       *
            MOVE    IMGGETREQ-DATAID(3:9)
@@ -301,18 +338,21 @@
       *
            IF    ( MEDIMG-IMAGEDATA    NOT =   SPACE )
       *
-               MOVE    SPACE           TO  METAPARA
-               STRING  MCP-TEMPDIR         DELIMITED BY SPACE
-                       "/"                 DELIMITED BY SIZE
-                       WRK-SRYCD           DELIMITED BY SIZE
-               INTO    METAPARA
-               END-STRING
-      *
+               MOVE    WRK-SRYCD       TO  METAPARA
                MOVE    SPACE           TO  ZIPPARA
                STRING  METAPARA            DELIMITED BY SPACE
                        ".zip"              DELIMITED BY SIZE
                INTO    ZIPPARA
                END-STRING
+      *
+               INITIALIZE                  SGETTEMP-AREA
+               MOVE    METAPARA        TO  SGETTEMP-BASENAMES (1)
+               MOVE    ZIPPARA         TO  SGETTEMP-BASENAMES (2)
+               CALL    "ORCSGETTEMP" USING SGETTEMP-AREA
+               MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  METAPARA
+               MOVE    SGETTEMP-FULLNAMES (2)
+                                       TO  ZIPPARA
       *
                OPEN    OUTPUT  META-FILE
                MOVE    MEDIMG-IMAGEDATA    TO  META-REC
@@ -326,7 +366,7 @@
                MOVE    "convert_image.sh"
                                        TO  SHELLTBL-NAME
                MOVE    "API000R2"      TO  SHELLTBL-SHELLID
-               MOVE    1               TO  SHELLTBL-JOBID
+               MOVE    2               TO  SHELLTBL-JOBID
                MOVE    SPA-TERMID      TO  SHELLTBL-TERMID
       *
                MOVE    WRK-SRYCD       TO  SHELLTBL-ARG1
@@ -489,6 +529,9 @@
       *****************************************************************
        890-ERRCD-MSG-SEC               SECTION.
       *
+           DISPLAY "ZIPPARA=" ZIPPARA
+           DISPLAY "WRK-ERRCD=" WRK-ERRCD
+           DISPLAY "IMGGETREQ-DATAID=" IMGGETREQ-DATAID
            IF    ( WRK-ERRCD   NOT =   SPACE )
                MOVE    404         TO  APILST30-HTTPSTATUS
            END-IF
@@ -753,11 +796,10 @@
       *****************************************************************
        990-TERMINATE-SEC               SECTION.
       *
-           IF    ( ZIPPARA         NOT =   SPACE )
-               CALL "CBL_DELETE_FILE"  USING ZIPPARA
-           END-IF
-      *
-           CALL "CBL_DELETE_DIR"   USING MCP-TEMPDIR
+           INITIALIZE                  STEMPDIR-AREA
+           MOVE    "DEL"           TO  STEMPDIR-MODE
+           CALL    "ORCSTEMPDIR"       USING
+                                       STEMPDIR-AREA
       *
            .
        990-TERMINATE-EXT.

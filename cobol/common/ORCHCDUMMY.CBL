@@ -73,17 +73,23 @@
       *****************************************************************
        000-PROC-SEC                    SECTION.
       *
-           MOVE    3                   TO  SPA-CLIENT-PRT-FLG
+           IF    ( SPA-API-FLG         =   ZERO )
       *
-           INITIALIZE                  ORCSMKPRTAREA
-           MOVE    "HC01.sh"           TO  MKPRT-ID
-           MOVE    "ORCDUMMMY.red"     TO  MKPRT-DIA
-           MOVE    SPACE               TO  MKPRT-DEF
-           MOVE    "DUMMY"             TO  MKPRT-DAT
-           MOVE    "DUMMY"             TO  MKPRT-PRTNM
-           CALL    "ORCSMKPRT1"        USING
+               MOVE    3               TO  SPA-CLIENT-PRT-FLG
+      *
+               INITIALIZE                  ORCSMKPRTAREA
+               MOVE    "HC01.sh"       TO  MKPRT-ID
+               MOVE    "ORCDUMMMY.red" TO  MKPRT-DIA
+               MOVE    SPACE           TO  MKPRT-DEF
+               MOVE    "DUMMY"         TO  MKPRT-DAT
+               MOVE    "DUMMY"         TO  MKPRT-PRTNM
+               CALL    "ORCSMKPRT1"        USING
                                        ORCSMKPRTAREA
                                        SPA-AREA
+           ELSE
+               CALL    "ORCSAPIFMTERM"     USING
+                                           SPA-AREA
+           END-IF
       *
            IF    ( SPA-PRTCONF     =   "1" )
                MOVE    ZERO            TO  SPA-CLIENT-PRT-FLG

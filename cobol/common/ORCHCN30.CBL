@@ -33,6 +33,7 @@
       *  04.08.00    NACL-多々納   14/07/30  一時ディレクトリ対応
       *  04.08.01    NACL-森脇     14/08/11  画像イメージ作成機能追加
       *  04.08.03    NACL-森脇     16/11/22  服用方法コード対応
+      *  05.00.00    NACL-森脇     17/05/16  API(GINBEE)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -122,6 +123,9 @@
            03  IDX-KEIJYO          PIC 9(04).
            03  IDX-KONO            PIC 9(04).
            03  IDX-CYUI            PIC 9(04).
+      *----API-ADD-START---
+           03  IDXA                PIC 9(04).
+      *----API-ADD-END-----
       *
       *    一時領域
        01  WRK-AREA.
@@ -141,6 +145,17 @@
                05  WRK-HOSPADRS1   PIC X(50).
                05  WRK-HOSPADRS2   PIC X(50).
            03  WRK-HOSPTEL         PIC X(15).
+      *----API-ADD-START---
+           03  WRK-API-HOSPNAME-G.
+               05  WRK-API-HOSPNAME    PIC X(120)
+                                       OCCURS 3.
+           03  WRK-API-HOSPADRS-G.
+               05  WRK-API-HOSPADRS    PIC X(120)
+                                       OCCURS 3.
+           03  WRK-HOSPPOST        PIC X(07).
+           03  WRK-DRNAME          PIC X(50).
+           03  WRK-DRKANANAME      PIC X(50).
+      *----API-ADD-END-----
       *
            03  WRK-YKZNAME         PIC X(100).
            03  WRK-SRYCD           PIC X(09).
@@ -156,6 +171,15 @@
                05  WRK-SYY         PIC 9(04).
                05  WRK-SMM         PIC 9(02).
                05  WRK-SDD         PIC 9(02).
+      *----API-ADD-START---
+      *    日付編集
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *----API-ADD-END-----
       *
            03  WRK-HENSURYO        PIC X(14).
            03  WRK-SURYO           PIC 9(08)V9(05).
@@ -175,7 +199,10 @@
       *    全角を行毎に編集
        01  WRK-HENSYU-AREA.
            03  WRK-HENSYU-OCC                  OCCURS   64.
-               05  WRK-HENSYU      PIC X(44).
+      *----API-UPD-START---
+      *         05  WRK-HENSYU      PIC X(44).
+               05  WRK-HENSYU      PIC X(100).
+      *----API-UPD-END-----
            03  WRK-HENSYUDATA      PIC X(4000).
            03  GYO-MAX             PIC 9(04).
            03  KOU-MAX             PIC 9(04).
@@ -220,6 +247,10 @@
            03  PARA-COMMENT            PIC X(01).
            03  PARA-COMMENT2           PIC X(01).
            03  PARA-TANI               PIC X(01).
+      *----API-ADD-START---
+           03  PARA-API-DATA           PIC X(01).
+           03  PARA-API-CUSTOM-ID      PIC X(30).
+      *----API-ADD-END-----
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -301,6 +332,12 @@
       *    一時ファイル名取得
            COPY    "CPORCSGETTEMP.INC".
       *
+      *----API-ADD-START---
+      *    入院薬剤情報提供書構造体
+           COPY    "CPFMYAKUJON.INC".
+      *    API対応
+           COPY    "CPORCRPMAIN.INC".
+      *----API-ADD-END-----
       *
       *****************************************************************
       *    連絡　領域
@@ -351,17 +388,29 @@
       *    医療機関情報−基本情報
            PERFORM 900-1001-READ-SEC
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+      *----API-ADD-START---
+           MOVE    SYS-1001-HOSPNAME   TO  WRK-API-HOSPNAME(1)
+      *----API-ADD-START---
       *
       *    医療機関情報−所在地、連絡先
            PERFORM 900-1002-READ-SEC
            MOVE    SYS-1002-ADRS   TO  WRK-HOSPADRS
            MOVE    SYS-1002-TEL    TO  WRK-HOSPTEL
+      *----API-ADD-START---
+           MOVE    SYS-1002-ADRS   TO  WRK-API-HOSPADRS(1)
+           MOVE    SYS-1002-POST   TO  WRK-HOSPPOST
+      *----API-ADD-END-----
       *
       *    医療機関編集情報
            PERFORM 900-1900-READ-SEC
       *
       *    職員情報
            PERFORM 900-1010-READ-SEC
+      *----API-ADD-START---
+           MOVE    SYS-1010-NAME   TO  WRK-DRNAME
+           MOVE    SYS-1010-KANANAME
+                                   TO  WRK-DRKANANAME
+      *----API-ADD-END-----
       *
       *    ファイルデイレクトリ位置指定
            INITIALIZE                  ORCSMKPASSAREA
@@ -405,6 +454,25 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-TANI
       *
+      *----API-ADD-START---
+      *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
+           MOVE    "API_DATA"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA(1:1)       =   "1" )
+               MOVE    WRK-PARA(1:1)       TO  PARA-API-DATA
+           END-IF
+           IF     (PARA-API-DATA       =   "1"       )
+               CONTINUE
+           ELSE
+      *        API送信なし
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
+      *    ＡＰＩカスタムＩＤ
+           MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-API-CUSTOM-ID
+      *----API-ADD-END-----
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -421,10 +489,20 @@
                                        SPA-AREA
                                        ORCSPRGOPTIONAREA
            MOVE    SPACE           TO  WRK-PARA
-           IF      ORCSPRGOPTION-OT-TYPE   =   1
-      *        半角で１文字目を値とする
-               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
-           END-IF
+           EVALUATE    WRK-PARA-NAME
+           WHEN  "API_CUSTOM_ID"
+               MOVE    ORCSPRGOPTION-OT-PARA
+                                   TO  WRK-PARA
+           WHEN    OTHER
+               IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *            半角で１文字目を値とする
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:1)
+                                   TO  WRK-PARA(1:1)
+               ELSE
+                   MOVE    ORCSPRGOPTION-OT-PARA
+                                   TO  WRK-PARA
+               END-IF
+           END-EVALUATE
       *
            .
        1001-OPTION-CALL-EXT.
@@ -450,6 +528,14 @@
            IF      CNT-KENSU       =   ZERO
                GO  TO  200-MAIN-EXT
            END-IF
+      *
+      *----API-ADD-START---
+           IF      PARA-API-DATA       =   "1"
+      *        ＡＰＩ処理
+               PERFORM 700-API-SYORI-SEC
+               GO  TO  200-MAIN-EXT
+           END-IF
+      *----API-ADD-END-----
       *
       *    帳票ＨＥＡＤ情報編集処理
            PERFORM 210-HEAD-HENSYU-SEC
@@ -516,8 +602,11 @@
            MOVE    WRK-HOSPNAME    TO  WRK-YKJ-HSPNAME
       *    電話番号
            MOVE    WRK-HOSPTEL     TO  WRK-YKJ-TEL
+      *----API-UPD-START---
       *    職員氏名
-           MOVE    SYS-1010-NAME   TO  WRK-YKJ-DRNAME
+      *     MOVE    SYS-1010-NAME   TO  WRK-YKJ-DRNAME
+           MOVE    WRK-DRNAME      TO  WRK-YKJ-DRNAME
+      *----API-UPD-START---
       *    病棟名
            STRING  ORCHCN30-BTUNAME    DELIMITED  BY  SPACE
                    ORCHCN30-ROOMNO     DELIMITED  BY  SIZE
@@ -1371,7 +1460,13 @@
                          ( WRK-HENSURYO(2:1)   =   "." )
                        COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
                                                +   1
-                       MOVE    "１"        TO  WRK-YKJ-KBN(IDX-KBN)
+      *----API-UPD-START---
+                       IF      PARA-API-DATA       =   "1"
+                           MOVE    "1"        TO  WRK-YKJ-KBN(IDX-KBN)
+                       ELSE
+                           MOVE    "１"        TO  WRK-YKJ-KBN(IDX-KBN)
+                       END-IF
+      *----API-UPD-END-----
                        MOVE    "包"        TO  WRK-TANINAME
                        MOVE    2           TO  FLG-KBN
                    ELSE
@@ -1380,6 +1475,11 @@
                        ELSE
                            COMPUTE WRK-ZENSURYO    =   WRK-ZENSURYO
                                                    +   WRK-SURYO
+      *----API--UPD-START---
+                           IF      PARA-API-DATA       =   "1"
+                               MOVE    WRK-HENSURYO(1:3)
+                                   TO  WRK-YKJ-KBN(IDX-KBN)
+                           ELSE
                            IF      WRK-HENSURYO(2:)    NOT =   SPACE
                                MOVE    WRK-HENSURYO(1:3)
                                                TO  WRK-YKJ-KBN(IDX-KBN)
@@ -1395,6 +1495,8 @@
                                MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                TO  WRK-YKJ-KBN(IDX-KBN)
                            END-IF
+                           END-IF
+      *----API-UPD-END-----
                        END-IF
                    END-IF
                    IF   (( WRK-TANINAME    =   "包" )  AND
@@ -1733,7 +1835,7 @@
            MOVE    WRK-YKJ-CYUJKO-G(1:352)
                                    TO  HCN300-CYUJKO-G(CNT-LINE)
            MOVE    WRK-YKJ-TANI-G  TO  HCN300-TANI-G(CNT-LINE)
-     *
+      *
            MOVE    ZERO            TO  FLG-NAIYO
            MOVE    ZERO            TO  FLG-KEIJYO
            MOVE    ZERO            TO  FLG-KONO
@@ -1855,6 +1957,339 @@
        430-BODY-NEXT-SET-EXT.
            EXIT.
       *
+      *----API-ADD-START---
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       700-API-SYORI-SEC           SECTION.
+      *
+           PERFORM 710-API-HEAD-SET-SEC
+      *
+      *    データがなくなるまで
+           PERFORM VARYING CNT-PARA    FROM 1 BY 1
+                   UNTIL   CNT-PARA    >   ORCHCN30-MAX
+               IF      PARA-ZAITAKU    =   1
+      *            帳票ＢＯＤＹ情報編集処理
+                   PERFORM 720-API-BODY-SET-SEC
+               ELSE
+                   IF      ORCHCN30-ZAIKBN(CNT-PARA)    NOT =   4
+      *                帳票ＢＯＤＹ情報編集処理
+                       PERFORM 720-API-BODY-SET-SEC
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           PERFORM 790-API-CALL-SEC
+      *
+           .
+       700-API-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩＨＥＡＤセット処理
+      *****************************************************************
+       710-API-HEAD-SET-SEC            SECTION.
+      *
+           INITIALIZE                  FMYAKUJON-REC
+      *
+           MOVE    PARA-STYLE      TO  FMYAKUJON-STYLE
+      *
+           MOVE    "okusuri_joho_n"  TO  FMYAKUJON-FORM-ID
+           MOVE    PARA-API-CUSTOM-ID
+                                   TO  FMYAKUJON-CUSTOM-ID
+           MOVE    SYS-1031-PRTNM(10)
+                                   TO  FMYAKUJON-PRINTER
+      *
+           MOVE    SPA-SRYYMD      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE    TO  FMYAKUJON-SRYYMD
+      *
+           MOVE    SPA-SYSYMD      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE    TO  FMYAKUJON-KOFYMD
+      *
+           MOVE    SPA-PTNUM       TO  FMYAKUJON-PTNUM
+           MOVE    SPA-NAME        TO  FMYAKUJON-NAME
+           MOVE    SPA-KANANAME    TO  FMYAKUJON-KANANAME
+      *
+           EVALUATE    SPA-SEX
+               WHEN    "男"
+                   MOVE    "1"         TO  FMYAKUJON-SEX
+               WHEN    "女"
+                   MOVE    "2"         TO  FMYAKUJON-SEX
+           END-EVALUATE
+      *
+           MOVE    SPA-BIRTHDAY    TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE    TO  FMYAKUJON-BIRTHDAY
+      *
+           PERFORM VARYING IDXA    FROM    1   BY  1
+                   UNTIL ( IDXA    >   3 )
+               MOVE    WRK-API-HOSPNAME (IDXA)
+                                   TO  FMYAKUJON-HOSP-NAME (IDXA)
+           END-PERFORM
+      *
+           MOVE    WRK-HOSPPOST    TO  FMYAKUJON-HOSP-POST
+      *
+           PERFORM VARYING IDXA    FROM    1   BY  1
+                   UNTIL ( IDXA    >   3 )
+               MOVE    WRK-API-HOSPADRS (IDXA)
+                                   TO  FMYAKUJON-HOSP-ADRS (IDXA)
+           END-PERFORM
+      *
+           MOVE    WRK-HOSPTEL     TO  FMYAKUJON-HOSP-TEL
+      *
+           MOVE    SPA-DRCD        TO  FMYAKUJON-DR-CODE
+           MOVE    WRK-DRNAME      TO  FMYAKUJON-DR-NAME
+           MOVE    WRK-DRKANANAME  TO  FMYAKUJON-DR-KANANAME
+      *
+           MOVE    ORCHCN30-BTUNAME
+                                   TO  FMYAKUJON-BTUNAME
+           MOVE    ORCHCN30-ROOMNO TO  FMYAKUJON-BRMNUM
+           MOVE    ORCHCN30-BTUNUM TO  FMYAKUJON-BTUNUM
+      *
+           MOVE    ZERO            TO  CNT-KENSU
+      *
+           .
+       710-API-HEAD-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩＢＯＤＹセット処理
+      *****************************************************************
+       720-API-BODY-SET-SEC            SECTION.
+      *
+           INITIALIZE                  WRK-YKJ-BODY
+      *
+           COMPUTE CNT-KENSU   =   CNT-KENSU   +     1
+      *
+      *    薬情マスタ検索
+           PERFORM 900-YAKUJYO-READ-SEC
+      *
+           MOVE    ORCHCN30-SRYCD(CNT-PARA)
+                                       TO  FMYAKUJON-SRYCD(CNT-KENSU)
+      *
+           IF      FLG-YAKUJYO     =   ZERO
+               MOVE    YAKUJYO-NAME    TO  FMYAKUJON-YKZNAME(CNT-KENSU)
+               MOVE    YAKUJYO-EFFECT  TO  FMYAKUJON-EFFECT(CNT-KENSU)
+               MOVE    YAKUJYO-SHAPE   TO  FMYAKUJON-SHAPE(CNT-KENSU)
+               MOVE    YAKUJYO-COLOR   TO  FMYAKUJON-COLOR(CNT-KENSU)
+               MOVE    YAKUJYO-MARK    TO  FMYAKUJON-MARK(CNT-KENSU)
+               MOVE    YAKUJYO-CAUTION TO  FMYAKUJON-CAUTION(CNT-KENSU)
+               IF      YAKUJYO-PHOTO   NOT =   SPACE
+                   MOVE    "2#"    TO  FMYAKUJON-IMAGE-ID(CNT-KENSU)
+                   MOVE    ORCHCN30-SRYCD(CNT-PARA)
+                                   TO  FMYAKUJON-IMAGE-ID(CNT-KENSU)(3:)
+               END-IF
+           END-IF
+      *
+      *    内容
+           PERFORM 740-API-NAIYO-SET-SEC
+      *
+           IF      FMYAKUJON-YKZNAME(CNT-KENSU) =   SPACE
+               MOVE    WRK-YKZNAME     TO  FMYAKUJON-YKZNAME(CNT-KENSU)
+           END-IF
+      *
+           .
+       720-API-BODY-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   帳票内容データセット処理
+      *****************************************************************
+       740-API-NAIYO-SET-SEC       SECTION.
+      *
+           INITIALIZE                  WRK-HENSYU-AREA
+           MOVE    1               TO  IDX-GYO
+           MOVE    30              TO  GYO-MAX
+           MOVE    100             TO  KOU-MAX
+           MOVE    SPACE           TO  WRK-ZENSUMAE
+           MOVE    SPACE           TO  WRK-ZENSUATO
+           MOVE    0               TO  WRK-ZENSURYO
+      *
+      *    用法編集
+           IF      ORCHCN30-YSRYCD-NAME(CNT-PARA)   =   SPACE
+               MOVE    ORCHCN30-YSRYCD(CNT-PARA)    TO  WRK-SRYCD
+               PERFORM 900-TENSU-READ-SEC
+               MOVE    TNS-NAME        TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           ELSE
+               MOVE    ORCHCN30-YSRYCD(CNT-PARA)    TO  WRK-SRYCD
+               PERFORM 900-TENSU-READ-SEC
+               MOVE    ORCHCN30-YSRYCD-NAME(CNT-PARA)
+                                       TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+      *
+      *    回数カウント
+           MOVE    SPACE           TO  WRK-SSTKIJUNCD
+           MOVE    ZERO            TO  CNT-KAISU
+           MOVE    ZERO            TO  WRK-HENKBN-G
+           PERFORM VARYING IDX-KBN     FROM    1   BY  1
+                   UNTIL   IDX-KBN     >   5
+               IF      TNS-SSTKIJUNCD(IDX-KBN) =   1
+                   COMPUTE CNT-KAISU   =   CNT-KAISU   +   1
+                   MOVE    "1"         TO  WRK-SSTKIJUNCD(IDX-KBN:1)
+               END-IF
+           END-PERFORM
+      *
+      *    点数マスタ薬剤検索
+           MOVE    ORCHCN30-SRYCD(CNT-PARA)
+                                   TO  WRK-SRYCD
+           PERFORM 900-TENSU-READ-SEC
+           MOVE    TNS-NAME        TO  WRK-YKZNAME
+           MOVE    TNS-TANINAME    TO  WRK-TANINAME
+      *
+      *    点数付加情報検索
+           PERFORM 900-TNSP-READ-SEC
+      *
+      *    換算単位があるが値がない場合は単位のみ変換
+           IF    ( TNSP-KANZANTANICD   NOT =   SPACE ) AND
+                 ( TNSP-KANZANTANICD   NOT =   "000" ) AND
+                 ( TNSP-KANZANCHI  =   ZERO )
+               MOVE    TNSP-KANZANTANINAME TO  WRK-TANINAME
+           END-IF
+      *
+      *    区分編集
+           IF      CNT-KAISU       >   ZERO
+               PERFORM 240-KBN-SET-SEC
+           END-IF
+      *
+      *    全数量編集
+           IF      TNSP-ALLSURYOKBN    NOT =   "0"
+               PERFORM 241-NAIYO-SURYO-SET-SEC
+           END-IF
+      *
+      *    その他の用法
+           IF      ORCHCN30-YOHOU-G(CNT-PARA)   NOT =   SPACE
+               PERFORM 241-NAIYO-YOUHOU-SET-SEC
+           END-IF
+      *    コメント
+      *D   IF      PARA-COMMENT        =   1
+               IF      ORCHCN30-COMMENT-G(CNT-PARA) NOT =   SPACE
+                   PERFORM 241-NAIYO-COMMENT-SET-SEC
+               END-IF
+      *d   END-IF
+      *
+      *    日数編集
+           IF    ( ORCHCN30-ZAIKBN(CNT-PARA)    NOT =   3 ) AND
+                 ( ORCHCN30-ZAIKBN(CNT-PARA)    NOT =   4 ) AND
+                 ( TNSP-SOURYOHENKBN           NOT =   "1" )
+               PERFORM 241-NAIYO-NISSU-SET-SEC
+           END-IF
+      *
+           IF    ( PARA-TIMESURYO  =   "1" )   AND
+                (( PARA-COMMENT2   =   "2" )   OR
+                (( PARA-COMMENT2   =   "1" )   AND
+                 ( WRK-YKJ-KBN-G   =   SPACE )))
+      *        １日分が割切れていなかったらエラー
+               COMPUTE WRK-SURYO   =   WRK-HENKBN(1)
+                                   +   WRK-HENKBN(2)
+                                   +   WRK-HENKBN(3)
+                                   +   WRK-HENKBN(4)
+                                   +   WRK-HENKBN(5)
+               IF      ORCHCN30-SURYO(CNT-PARA) =   WRK-SURYO
+                   MOVE    5           TO  IDX-KBN
+                   PERFORM 241-NAIYO-FUKUYOU-SET-SEC
+                   PERFORM VARYING  IDX-KBN    FROM    1   BY  1
+                           UNTIL  ( IDX-KBN    >   4 )
+                       PERFORM 241-NAIYO-FUKUYOU-SET-SEC
+                   END-PERFORM
+               END-IF
+           END-IF
+      *
+           IF     WRK-YKJ-KBN-G    NOT =   SPACE
+      *        回数編集
+               IF      CNT-KAISU       >   ZERO
+                  PERFORM 241-NAIYO-KAISU-SET-SEC
+               END-IF
+           END-IF
+      *
+      *    換算前があればセット
+           IF      WRK-ZENSUMAE        NOT =   SPACE
+               MOVE    WRK-ZENSUMAE    TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+      *
+      *    全数があればセット
+           IF      WRK-ZENSUATO        NOT =   SPACE
+               MOVE    WRK-ZENSUATO    TO  WRK-HENSYUDATA
+               PERFORM 250-HENSYU-SYORI-SEC
+           END-IF
+      *
+      *    内容にセット
+           PERFORM VARYING IDX-GYO     FROM    1   BY  1
+                   UNTIL   IDX-GYO     >   GYO-MAX
+               MOVE    WRK-HENSYU(IDX-GYO)
+                                   TO
+                                   FMYAKUJON-YOHO(CNT-KENSU IDX-GYO)
+           END-PERFORM
+      *
+           MOVE    WRK-YKJ-KBN(1)  TO  FMYAKUJON-ASA(CNT-KENSU)
+           MOVE    WRK-YKJ-TANI(1) TO  FMYAKUJON-ASA-TANI(CNT-KENSU)
+           MOVE    WRK-YKJ-KBN(2)  TO  FMYAKUJON-HIRU(CNT-KENSU)
+           MOVE    WRK-YKJ-TANI(2) TO  FMYAKUJON-HIRU-TANI(CNT-KENSU)
+           MOVE    WRK-YKJ-KBN(3)  TO  FMYAKUJON-YU(CNT-KENSU)
+           MOVE    WRK-YKJ-TANI(3) TO  FMYAKUJON-YU-TANI(CNT-KENSU)
+           MOVE    WRK-YKJ-KBN(4)  TO  FMYAKUJON-SHUSHINJI(CNT-KENSU)
+           MOVE    WRK-YKJ-TANI(4) TO
+                                   FMYAKUJON-SHUSHINJI-TANI(CNT-KENSU)
+           MOVE    WRK-YKJ-KBN(5)  TO  FMYAKUJON-KISHOJI(CNT-KENSU)
+           MOVE    WRK-YKJ-TANI(5) TO
+                                   FMYAKUJON-KISHOJI-TANI(CNT-KENSU)
+      *
+           .
+       740-API-NAIYO-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ送信処理
+      *****************************************************************
+       790-API-CALL-SEC            SECTION.
+      *
+           MOVE    CNT-KENSU       TO  WRK-ZZ9
+           MOVE    WRK-ZZ9         TO  FMYAKUJON-SHURUISU
+      *
+           MOVE    "okusuri_joho_n"  TO  RPMAIN-ID
+           MOVE    PARA-API-CUSTOM-ID
+                                   TO  RPMAIN-CUSTOM-ID
+           MOVE    "お薬情報"      TO  RPMAIN-TITLE
+           MOVE    "fm_medicine_information_h"
+                                   TO  MCP-TABLE
+           MOVE    FMYAKUJON-DATA  TO  RPMAIN-DATA
+           CALL    "ORCRPMAIN"         USING
+                                       MCPAREA
+                                       RPMAIN-AREA
+                                       SPA-AREA
+      *
+           .
+       790-API-CALL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理(API）
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *----API-ADD-END-----
       *****************************************************************
       *    終了　　処理
       *****************************************************************
@@ -2176,6 +2611,14 @@
                                        TO  WRK-HOSPNAME1
                MOVE    SYS-1901-HOSPNAME2
                                        TO  WRK-HOSPNAME2
+      *----API-ADD-START---
+               MOVE    SYS-1901-HOSPNAME1
+                                       TO  WRK-API-HOSPNAME(1)
+               MOVE    SYS-1901-HOSPNAME2
+                                       TO  WRK-API-HOSPNAME(2)
+               MOVE    SYS-1901-HOSPNAME3
+                                       TO  WRK-API-HOSPNAME(3)
+      *----API-ADD-END-----
            ELSE
                INITIALIZE                  SYS-1901-REC
            END-IF
@@ -2205,6 +2648,12 @@
                MOVE    SYS-1902-ADRS1  TO  WRK-HOSPADRS1
                MOVE    SYS-1902-ADRS2  TO  WRK-HOSPADRS2
                MOVE    SYS-1902-TEL    TO  WRK-HOSPTEL
+      *----API-ADD-START---
+               MOVE    SYS-1902-POST   TO  WRK-HOSPPOST
+               MOVE    SYS-1902-ADRS1  TO  WRK-API-HOSPADRS(1)
+               MOVE    SYS-1902-ADRS2  TO  WRK-API-HOSPADRS(2)
+               MOVE    SYS-1902-ADRS3  TO  WRK-API-HOSPADRS(3)
+      *----API-ADD-END-----
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF

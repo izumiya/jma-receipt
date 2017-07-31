@@ -126,3 +126,4 @@
                   09  FMSHOHO-FUKA              PIC X(1).
               05  FMSHOHO-MEMO2   PIC X(40)     OCCURS  4  TIMES.
               05  FMSHOHO-MEMO    PIC X(100)    OCCURS  50 TIMES.
+              05  FMSHOHO-QR-ID   PIC X(80).

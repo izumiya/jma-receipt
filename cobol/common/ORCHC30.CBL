@@ -59,7 +59,7 @@
       *  04.08.01    NACL-¿¹ÏÆ     14/08/08  ²èÁü¥¤¥á¡¼¥¸ºîÀ®µ¡Ç½ÄÉ²Ã
       *  04.08.02    NACL-¿¹ÏÆ     16/09/06  API(GINBEE)ÂÐ±þ
       *  04.08.03    NACL-¿¹ÏÆ     16/11/22  ÉþÍÑÊýË¡¥³¡¼¥ÉÂÐ±þ
-      *  05.00.00    NACL-¿¹ÏÆ     17/03/06  ¼«ÈñÌôºÞÂÐ±þ
+      *  05.00.00    NACL-¿¹ÏÆ     17/02/22  ¼«ÈñÌôºÞÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -417,6 +417,7 @@
            MOVE    SYS-1002-ADRS   TO  WRK-HOSPADRS
            MOVE    SYS-1002-ADRS   TO  WRK-API-HOSPADRS(1)
            MOVE    SYS-1002-TEL    TO  WRK-HOSPTEL
+           MOVE    SYS-1002-POST   TO  WRK-HOSPPOST
       *
       *    °åÎÅµ¡´ØÊÔ½¸¾ðÊó
            PERFORM 900-1900-READ-SEC
@@ -425,7 +426,6 @@
            PERFORM 900-1010-READ-SEC
       *
       *----(04.08.02)--ADD-START---
-           MOVE    SYS-1002-POST   TO  WRK-HOSPPOST
            MOVE    SYS-1010-NAME   TO  WRK-DRNAME
            MOVE    SYS-1010-KANANAME
                                    TO  WRK-DRKANANAME
@@ -485,6 +485,11 @@
       *        APIÁ÷¿®¤Ê¤·
                MOVE    "0"             TO  PARA-API-DATA
            END-IF
+      *    HAORIÂÐ±þ
+           IF      SPA-API-FLG         =   1
+               MOVE    "1"             TO  PARA-API-DATA
+           END-IF
+      *
       *    £Á£Ð£É¥«¥¹¥¿¥à£É£Ä
            MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
@@ -2669,6 +2674,7 @@
                MOVE    SYS-1902-ADRS3  TO  WRK-API-HOSPADRS(3)
       *
                MOVE    SYS-1902-TEL    TO  WRK-HOSPTEL
+               MOVE    SYS-1902-POST   TO  WRK-HOSPPOST
            ELSE
                INITIALIZE                  SYS-1902-REC
            END-IF

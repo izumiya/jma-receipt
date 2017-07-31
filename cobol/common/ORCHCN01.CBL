@@ -36,6 +36,7 @@
       *  04.07.00    NACL-多々納  13/10/08  第三者行為対応
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  05.00.00    NACL-太田    17/04/29  退院日編集対応
+      *  05.00.00    NACL-森脇    17/07/11  API(GINBEE)対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -131,6 +132,17 @@
            03  WRK-SRYKA-MEI           PIC X(20).
            03  WRK-DRCD-G.
                05  WRK-DRCD-MEI        PIC X(50)  OCCURS  3.
+      *----API-ADD-START---
+               05  WRK-DRCD-CODE       PIC X(05)  OCCURS  3.
+               05  WRK-DRCD-KANA       PIC X(50)  OCCURS  3.
+      *    状態
+           03  WRK-CONDITION-MEI       PIC X(20).
+           03  WRK-CONDITION           PIC X(08).
+           03  WRK-KANRICD             PIC X(04).
+      *
+           03  WRK-KEIMEI              PIC X(02).
+           03  WRK-SIKUMEI             PIC X(02).
+      *----API-ADD-END-----
       *
            03  WRK-ADRS                PIC X(200).
            03  WRK-NENREI-X.
@@ -158,6 +170,15 @@
            03  WRK-COMB-KOHID          PIC 9(10).
       *
            03  WRK-COMMENT             PIC X(40).
+      *----API-ADD-START---
+      *    日付編集
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *----API-ADD-END-----
       *
       *    保険組合せテーブル
        01  TBL-HKNCOMBI-AREA.
@@ -195,6 +216,10 @@
            03  PARA-HKNCOMBIKBN        PIC X(01).
            03  PARA-DAISANKBN          PIC X(01).
            03  PARA-TAIINYMDKBN        PIC X(01).
+      *----API-ADD-START---
+           03  PARA-API-DATA           PIC X(01).
+           03  PARA-API-CUSTOM-ID      PIC X(20).
+      *----API-ADD-END-----
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -247,6 +272,14 @@
       *
       *    患者登録機能制御情報
            COPY  "CPSK1017.INC".
+      *----API-ADD-START---
+      *    医療機関情報−基本情報
+           COPY    "CPSK1001.INC".
+           COPY    "CPSK1018.INC".
+      *
+      *    入院診療録api
+           COPY    "CPFMKARTE1N.INC".
+      *----API-ADD-END-----
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -260,7 +293,7 @@
       *
       *    数字変換領域
            COPY  "CPORCSNUM.INC".
-      *   患者番号変換サブ
+      *    患者番号変換サブ
            COPY  "CPORCSPTID.INC".
       *
       *    全角チェックパラメタ
@@ -284,6 +317,12 @@
       *
            COPY    "MCPDATA.INC".
       *D   COPY    "CPORCMCP.INC".
+      *----API-ADD-START---
+      *    保険年齢パラメタ
+           COPY    "CPORCSAGECHK.INC".
+      *
+           COPY    "CPORCRPMAIN.INC".
+      *----API-ADD-END-----
       *
       *****************************************************************
       *    連絡　領域
@@ -441,6 +480,22 @@
            IF    ( WRK-PARA(1:1)       =   "0" OR "1" )
                MOVE    WRK-PARA(1:1)   TO  PARA-TAIINYMDKBN
            END-IF
+      *----API-ADD-START---
+      *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
+           MOVE    "API_DATA"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-API-DATA
+           IF     (PARA-API-DATA       =   "1"       )
+               CONTINUE
+           ELSE
+      *        API送信なし
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
+      *    ＡＰＩカスタムＩＤ
+           MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-API-CUSTOM-ID
+      *----API-ADD-END-----
       *
            .
        100-OPTION-SELECT-EXT.
@@ -456,10 +511,18 @@
            CALL    "ORCSPRGOPTION"     USING   SPA-AREA
                                                ORCSPRGOPTIONAREA
            MOVE    SPACE               TO  WRK-PARA
-           IF      ORCSPRGOPTION-OT-TYPE   =   1
-      *        半角で１文字目を値とする
-               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
-           END-IF
+      *----API-UPD-START---
+           EVALUATE    WRK-PARA-NAME
+           WHEN  "API_CUSTOM_ID"
+               MOVE    ORCSPRGOPTION-OT-PARA
+                                   TO  WRK-PARA
+           WHEN    OTHER
+               IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *            半角で１文字目を値とする
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+               END-IF
+           END-EVALUATE
+      *----API-UPD-END-----
            .
        1001-OPTION-CALL-EXT.
            EXIT.
@@ -470,6 +533,12 @@
       *
       *　   共通印刷項目編集
             PERFORM 2001-HEAD-HENSYU-SEC
+      *----API-ADD-START---
+           IF      PARA-API-DATA       =   "1"
+               PERFORM 710-HEAD-API-SEC
+               GO  TO  200-HEAD-PRT-EXT
+           END-IF
+      *----API-ADD-END-----
       *     カルテ印刷
             IF      ORCHCN01-PRTKBN    =   "1"  OR  "3"
                  PERFORM 2002-HCN01-HENSYU-SEC
@@ -542,6 +611,11 @@
                        MOVE    SYSKANRI-REC        TO  SYS-1010-REC
                        MOVE    SYS-1010-NAME       TO  WRK-DRCD-MEI
                                                                 (IDX)
+      *----API-ADD-START---
+                       MOVE    SYS-1010-KBNCD  TO  WRK-DRCD-CODE(IDX)
+                       MOVE    SYS-1010-KANANAME
+                                               TO  WRK-DRCD-KANA(IDX)
+      *----API-ADD-END-----
                    END-IF
                END-IF
            END-PERFORM
@@ -767,6 +841,12 @@
       *
       *　  共通印刷項目編集
            PERFORM 2001-HEAD-HENSYU-SEC
+      *----API-ADD-START---
+           IF      PARA-API-DATA       =   "1"
+               PERFORM 710-ALL-API-SEC
+               GO  TO  300-ALL-PRT-EXT
+           END-IF
+      *----API-ADD-END-----
            PERFORM 2002-HCN01-HENSYU-SEC
       *    保険項目編集
            PERFORM 3001-HCN01-ALLHENSYU-SEC
@@ -1374,6 +1454,579 @@
            .
        3104-HCN011-BYOMEI-SET-EXT.
            EXIT.
+      *----API-ADD-START---
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       710-HEAD-API-SEC            SECTION.
+      *
+           PERFORM 710-API-HEAD-SYORI-SEC
+      *
+           PERFORM 790-API-CALL-SEC
+           .
+       710-HEAD-API-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       710-ALL-API-SEC            SECTION.
+      *
+           PERFORM 710-API-HEAD-SYORI-SEC
+           PERFORM 710-API-PTINF-SYORI-SEC
+      *
+           IF      SPA-HKNCOMBINUM         NOT =  SPACE
+               PERFORM 710-API-PTHKN-SYORI-SEC
+           END-IF
+      *
+           IF   (  PARA-BYOMEIKBN          NOT =   "2" )
+      *        病名を印刷する
+               PERFORM 710-API-BYOMEIHEN-SEC
+           END-IF
+      *
+           PERFORM 790-API-CALL-SEC
+           .
+       710-ALL-API-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       710-API-HEAD-SYORI-SEC     SECTION.
+      *
+           INITIALIZE                      FMKARTE1N-REC
+      *    印刷処理区分
+           MOVE    ORCHCN01-PRTKBN     TO  FMKARTE1N-HAKKOKBN
+           MOVE    "karte_no1_n"       TO  FMKARTE1N-FORM-ID
+           MOVE    SYS-1034-PRTNM(1)   TO  FMKARTE1N-PRINTER
+      *
+      *    医療機関名
+           MOVE    SPACE               TO  SYS-1001-REC
+           INITIALIZE                      SYS-1001-REC
+           MOVE    "1001"              TO  SYS-1001-KANRICD
+           MOVE    "*"                 TO  SYS-1001-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-1001-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-1001-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
+           MOVE    SYS-1001-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
+           ELSE
+               INITIALIZE                      SYS-1001-REC
+           END-IF
+           MOVE    SYS-1001-HOSPNAME   TO  FMKARTE1N-HOSPNAME
+      *
+      *    患者マスターより
+           MOVE    SPA-PTNUM           TO  FMKARTE1N-PTNUM
+           MOVE    PTINF-KANANAME      TO  FMKARTE1N-KANANAME
+           MOVE    PTINF-NAME          TO  FMKARTE1N-NAME
+           MOVE    PTINF-SEX           TO  FMKARTE1N-SEX
+      *
+      *    生年月日
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMKARTE1N-BIRTHDAY
+      *
+           .
+       710-API-HEAD-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       710-API-PTINF-SYORI-SEC     SECTION.
+      *
+      *    年齢
+           MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
+           COMPUTE WRK-NENREI          =   WRK-SYSYY
+                                       -   WRK-SYY
+           IF      SPA-SYSYMD(5:4)     <   WRK-SYMD(5:4)
+               COMPUTE WRK-NENREI      =   WRK-NENREI   -   1
+           END-IF
+           MOVE    WRK-NENREI          TO  FMKARTE1N-HOKEN-AGE
+      *
+      *    診療科
+           MOVE    SPA-SRYKA           TO  FMKARTE1N-SRYKA
+           MOVE    WRK-SRYKA-MEI       TO  FMKARTE1N-SRYKANAME
+      *    ドクター
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   3
+               MOVE    WRK-DRCD-CODE(IDX)  TO  FMKARTE1N-DR-CODE(IDX)
+               MOVE    WRK-DRCD-MEI(IDX)   TO  FMKARTE1N-DR-NAME(IDX)
+               MOVE    WRK-DRCD-KANA(IDX)
+                                       TO  FMKARTE1N-DR-KANANAME(IDX)
+           END-PERFORM
+      *
+      *    自宅−住所
+           MOVE    PTINF-HOME-POST     TO  FMKARTE1N-HOME-POST
+           MOVE    PTINF-HOME-ADRS     TO  FMKARTE1N-HOME-ADRS(1)
+           MOVE    PTINF-HOME-BANTI    TO  FMKARTE1N-HOME-ADRS(2)
+           MOVE    PTINF-HOME-TEL1     TO  FMKARTE1N-HOME-TEL1
+           MOVE    PTINF-HOME-TEL2     TO  FMKARTE1N-HOME-TEL2
+      *
+      *    状態名称１〜３
+           MOVE    PTINF-CONDITION-1   TO  WRK-CONDITION
+           MOVE    "1018"              TO  WRK-KANRICD
+           PERFORM 200190-API-CONDITION-SEC
+           MOVE    WRK-CONDITION-MEI   TO  FMKARTE1N-CONDITION(1)
+           MOVE    PTINF-CONDITION-2   TO  WRK-CONDITION
+           MOVE    "1019"              TO  WRK-KANRICD
+           PERFORM 200190-API-CONDITION-SEC
+           MOVE    WRK-CONDITION-MEI   TO  FMKARTE1N-CONDITION(2)
+           MOVE    PTINF-CONDITION-3   TO  WRK-CONDITION
+           MOVE    "1020"              TO  WRK-KANRICD
+           PERFORM 200190-API-CONDITION-SEC
+           MOVE    WRK-CONDITION-MEI   TO  FMKARTE1N-CONDITION(3)
+      *
+      *    勤務先
+           MOVE    PTINF-OFFICE-NAME   TO  FMKARTE1N-OFFICE-NAME
+           MOVE    PTINF-OFFICE-POST   TO  FMKARTE1N-OFFICE-POST
+           MOVE    PTINF-OFFICE-ADRS   TO  FMKARTE1N-OFFICE-ADRS(1)
+           MOVE    PTINF-OFFICE-BANTI  TO  FMKARTE1N-OFFICE-ADRS(2)
+           MOVE    PTINF-OFFICE-TEL    TO  FMKARTE1N-OFFICE-TEL
+      *    連絡先
+           MOVE    PTINF-RENRAKU-NAME  TO  FMKARTE1N-RENRAKU-NAME
+           MOVE    PTINF-RENRAKU-ZOKUGARA
+                                       TO  FMKARTE1N-RENRAKU-ZOKUGARA
+           MOVE    PTINF-RENRAKU-POST  TO  FMKARTE1N-RENRAKU-POST
+           MOVE    PTINF-RENRAKU-ADRS  TO  FMKARTE1N-RENRAKU-ADRS(1)
+           MOVE    PTINF-RENRAKU-BANTI TO  FMKARTE1N-RENRAKU-ADRS(2)
+           MOVE    PTINF-RENRAKU-TEL1  TO  FMKARTE1N-RENRAKU-TEL1
+           MOVE    PTINF-RENRAKU-TEL2  TO  FMKARTE1N-RENRAKU-TEL2
+      *    帰省先
+           MOVE    PTINF-KISEI-NAME    TO  FMKARTE1N-KISEI-NAME
+           MOVE    PTINF-KISEI-POST    TO  FMKARTE1N-KISEI-POST
+           MOVE    PTINF-KISEI-ADRS    TO  FMKARTE1N-KISEI-ADRS(1)
+           MOVE    PTINF-KISEI-BANTI   TO  FMKARTE1N-KISEI-ADRS(2)
+           MOVE    PTINF-KISEI-TEL     TO  FMKARTE1N-KISEI-TEL
+      *
+      *    続柄
+           MOVE    PTINF-ZOKUGARA      TO  FMKARTE1N-ZOKUGARA
+      *    職業
+           MOVE    PTINF-JOB           TO  FMKARTE1N-JOB
+      *    世帯主
+           MOVE    PTINF-SETAINUSI     TO  FMKARTE1N-SETAINUSI
+      *    登録日
+           MOVE    PTINF-CREYMD        TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMKARTE1N-CREYMD
+      *
+      *    備考禁忌編集
+           MOVE    PTINF-TABOO-1       TO  FMKARTE1N-TABOO(1)
+           MOVE    PTINF-TABOO-2       TO  FMKARTE1N-TABOO(2)
+      *    備考アレルギー編集
+           MOVE    PTINF-ALLERGY-1     TO  FMKARTE1N-ALLERGY(1)
+           MOVE    PTINF-ALLERGY-2     TO  FMKARTE1N-ALLERGY(2)
+      *    備考感染症編集
+           MOVE    PTINF-KANSENSYO-1   TO  FMKARTE1N-KANSENSYO(1)
+           MOVE    PTINF-KANSENSYO-2   TO  FMKARTE1N-KANSENSYO(2)
+      *    備考コメント編集
+           MOVE    PTINF-COMMENT-1     TO  FMKARTE1N-COMMENT(1)
+           MOVE    PTINF-COMMENT-2     TO  FMKARTE1N-COMMENT(2)
+      *
+      *    入院日
+           IF      ORCHCN01-NYUINYMD   NOT =   SPACE
+               MOVE    ORCHCN01-NYUINYMD   TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  FMKARTE1N-NYUINYMD
+           END-IF
+      *    退院日
+           IF      PARA-TAIINYMDKBN        =   "1"
+            AND    ORCHCN01-TAIINYMD   NOT =   SPACE
+               MOVE    ORCHCN01-TAIINYMD   TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  FMKARTE1N-TAIINYMD
+           END-IF
+           .
+       710-API-PTINF-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ処理
+      *****************************************************************
+       710-API-PTHKN-SYORI-SEC     SECTION.
+      *
+      *    保険情報検索
+           PERFORM 30011-HKNCOMBI-HEN-SEC
+      *
+           MOVE    SPA-HKNCOMBINUM     TO  FMKARTE1N-HKNCOMBI
+      *    負担割合
+           MOVE    COMB-GAI-KFTNRATE   TO  FMKARTE1N-GAI-KFTNRATE
+           MOVE    COMB-NYU-KFTNRATE   TO  FMKARTE1N-NYU-KFTNRATE
+      *    保険年齢
+      *    保険算定年齢チェック等
+           INITIALIZE                  ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+           MOVE    SPA-PTID            TO  AGECHK-PTID
+           MOVE    SPA-SYSYMD          TO  AGECHK-SRYYMD
+           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
+           MOVE    SPA-HKNCOMBINUM     TO  AGECHK-HKNCOMBINUM
+           MOVE    "1"                 TO  AGECHK-NYUGAIKBN
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+           IF      AGECHK-FTNRATE  NOT =   ZERO
+      *        負担率
+               MOVE    AGECHK-FTNRATE      TO  FMKARTE1N-HOKEN-RATE
+           END-IF
+      *    年齢
+           MOVE    AGECHK-NENREI       TO  FMKARTE1N-HOKEN-AGE
+      *
+      *    保険情報
+           MOVE    COMB-HKNNUM         TO  FMKARTE1N-HKNNUM
+      *    短縮制度名
+           MOVE    COMB-SYU-TANSEIDONAME
+                                       TO  FMKARTE1N-HKNNAME
+           INITIALIZE                  HKNNUM-REC
+           MOVE    SPA-HOSPNUM         TO  HKN-HOSPNUM
+           MOVE    COMB-HKNNUM         TO  HKN-HKNNUM
+           MOVE    "00"                TO  HKN-PAYKBN
+           MOVE    PTHKN-TEKSTYMD      TO  HKN-TEKSTYMD
+           PERFORM 930-HKNNUM-READ-SEC
+           IF      FLG-HKNNUM          =   ZERO
+               MOVE    HKN-TANSEIDONAME
+                                       TO  FMKARTE1N-HKNNAME
+           END-IF
+      *    保険者番号
+           MOVE    PTHKN-HKNJANUM      TO  FMKARTE1N-HKNJANUM
+      *    記号・番号
+           MOVE    PTHKN-KIGO          TO  FMKARTE1N-KIGO
+           MOVE    PTHKN-NUM           TO  FMKARTE1N-NUM
+      *    継続区分
+           MOVE    PTHKN-CONTKBN       TO  FMKARTE1N-CONTKBN
+      *    補助区分
+           MOVE    PTHKN-HOJOKBN       TO  FMKARTE1N-HOJOKBN
+      *    本人家族区分
+           MOVE    PTHKN-HONKZKKBN     TO  FMKARTE1N-HONKZKKBN
+      *    資格取得日
+           MOVE    PTHKN-SKKGETYMD     TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMKARTE1N-SKKGETYMD
+      *    適用開始年月日
+           MOVE    PTHKN-TEKSTYMD      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMKARTE1N-TEKSTYMD
+      *    適用終了年月日
+           MOVE    PTHKN-TEKEDYMD      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMKARTE1N-TEKEDYMD
+      *    保険者情報
+           MOVE    HKNJA-HKNJANAME     TO  FMKARTE1N-HKNJANAME
+           MOVE    HKNJA-ADRS          TO  FMKARTE1N-HKNJA-ADRS(1)
+           MOVE    HKNJA-BANTI         TO  FMKARTE1N-HKNJA-ADRS(2)
+           MOVE    HKNJA-TEL           TO  FMKARTE1N-HKNJA-TEL
+      *    被保険者名
+           MOVE    PTHKN-HIHKNJANAME   TO  FMKARTE1N-HIHKNJANAME
+      *
+      *    労災の時、保険者番号・記号の変更
+           IF      COMB-HKNNUM         =   "971"  OR  "973"
+      *        患者保険情報検索
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+               MOVE    SPA-PTID            TO  PTRSI-PTID
+               MOVE    COMB-HKNID          TO  PTRSI-HKNID
+               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 993-PTRSIINF-NEXT-SEC
+               ELSE
+                   INITIALIZE                      PTRSIINF-REC
+                   MOVE    1                   TO  FLG-PTRSIINF
+               END-IF
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+               IF      FLG-PTRSIINF        =   ZERO
+                   MOVE    PTRSI-HKNKBN    TO  FMKARTE1N-RSI-HKNKBN
+      *            患者交付番号・年金証書番号・健康管理手帳番号
+                   MOVE    PTRSI-KOFUNUM   TO  FMKARTE1N-RSI-KOFUNUM
+      *            事業所名称
+                   MOVE    PTRSI-JIGYOUNAME
+                                           TO  FMKARTE1N-RSI-JIGYOUNAME
+      *            所在地都道府県名
+                   PERFORM 200191-RSI-PREFNAME-SEC
+      *            所在地都道府県名
+                   STRING  PTRSI-PREFNAME
+                           WRK-KEIMEI      DELIMITED  BY  SPACE
+                                           INTO    FMKARTE1N-PREFNAME
+                   END-STRING
+      *            所在地郡市区名
+                   STRING  PTRSI-CITYNAME
+                           WRK-SIKUMEI     DELIMITED  BY  SPACE
+                                           INTO    FMKARTE1N-CITYNAME
+                   END-STRING
+      *            傷病年月日
+                   MOVE    PTRSI-SHOBYOYMD     TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE
+                                       TO  FMKARTE1N-RSI-SHOBYOYMD
+                   IF      PTRSI-HKNKBN    =   "3"
+      *            アフターケア
+      *                療養開始日
+                       MOVE    PTRSI-SINSATUYMD    TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE
+                                           TO  FMKARTE1N-RSI-RYOSTYMD
+      *                療養終了日
+                       MOVE    PTRSI-SINSATUEND    TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE
+                                           TO  FMKARTE1N-RSI-RYOEDYMD
+                   ELSE
+      *                療養開始日
+                       MOVE    PTRSI-RYOSTYMD      TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE
+                                           TO  FMKARTE1N-RSI-RYOSTYMD
+      *                療養終了日
+                       MOVE    PTRSI-RYOEDYMD      TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE
+                                           TO  FMKARTE1N-RSI-RYOEDYMD
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    公費情報
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   2
+               IF      COMB-KOHID(IDY)     NOT =   SPACE
+                   INITIALIZE                  PTKOHINF-REC
+                   MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+                   MOVE    SPA-PTID            TO  PTKOH-PTID
+                   MOVE    COMB-KOHID(IDY)     TO  PTKOH-KOHID
+                   PERFORM 940-PTKOHINF-READ-SEC
+                   IF      FLG-PTKOHINF          =   ZERO
+                       MOVE    COMB-KOHHKNNUM(IDY)
+                                   TO  FMKARTE1N-KOH-HKNNUM(IDY)
+                       MOVE    COMB-KOH-TANSEIDONAME(IDY)
+                                   TO  FMKARTE1N-KOH-TANSEIDONAME(IDY)
+                       MOVE    PTKOH-FTNJANUM 
+                                   TO  FMKARTE1N-KOH-FTNJANUM(IDY)
+                       MOVE    PTKOH-JKYSNUM 
+                                   TO  FMKARTE1N-KOH-JKYSNUM(IDY)
+                   END-IF
+      *            開始年月日
+                   MOVE    PTKOH-TEKSTYMD      TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE
+                                   TO  FMKARTE1N-KOH-TEKSTYMD(IDY)
+      *            終了年月日
+                   MOVE    PTKOH-TEKEDYMD      TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE
+                                   TO  FMKARTE1N-KOH-TEKEDYMD(IDY)
+               END-IF
+           END-PERFORM
+           .
+       710-API-PTHKN-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＡＰＩ病名編集処理
+      *****************************************************************
+       710-API-BYOMEIHEN-SEC         SECTION.
+      *
+      *    保険組合せテーブル編集
+           INITIALIZE                  TBL-HKNCOMBI-AREA
+           IF      SPA-HKNCOMBINUM     =   ZERO
+               MOVE    SPACE               TO  WRK-COMB-HKNNUM
+           ELSE
+               MOVE    COMB-HKNNUM         TO  WRK-COMB-HKNNUM
+      *ver.4.7
+      *        第三者
+               IF      COMB-KOH1HKNNUM     =   "970"
+                   MOVE    COMB-KOH1HKNNUM TO  WRK-COMB-HKNNUM
+                   MOVE    COMB-KOH1ID     TO  WRK-COMB-KOHID
+               END-IF
+           END-IF
+           IF     (PARA-HKNCOMBIKBN    =   "1"
+                                       OR  "2" )
+               PERFORM 2009-HKNCOMBI-HEN-SEC
+           END-IF
+      *
+      *    患者病名マスタより編集
+           MOVE    MAX-LINE1           TO  CNT-MEI
+           MOVE    ZERO                TO  IDX
+           MOVE    1                   TO  WRK-PRT-CNT
+      *
+           INITIALIZE                      PTBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+           MOVE    SPA-PTID            TO  PTBYO-PTID
+      *
+           MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 950-PTBYOMEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTBYOMEI
+           END-IF
+           PERFORM 
+                   UNTIL   FLG-PTBYOMEI    NOT =   ZERO
+      *
+               ADD     1               TO  IDX
+      *
+      *        病名編集
+               INITIALIZE                  ORCSMKBYOMEIAREA
+               MOVE    PTBYO-BYOMEI        TO  SMKBYO-BYOMEI
+      *        補足コメント
+               MOVE    PTBYO-HOSOKU-COMMENT
+                                           TO  SMKBYO-HOSOKU-COMMENT
+               IF    ( PARA-UTAGAIKBN      =   "1" )
+                   MOVE    PTBYO-UTAGAIFLG     TO  SMKBYO-UTAGAIFLG
+               END-IF
+               CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+      *        カルテ病名がある時はカルテ病名
+               IF    ( PTBYO-CHARTBYOMEI   NOT =   SPACE )
+                   INITIALIZE                      ORCSMKBYOMEIAREA
+                   MOVE    PTBYO-CHARTBYOMEI   TO  SMKBYO-BYOMEI
+                   IF    ( PARA-CHARTKBN       =   "1" )
+                       MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
+                   END-IF
+                   CALL    "ORCSMKBYOMEI"      USING   ORCSMKBYOMEIAREA
+               END-IF
+               MOVE    SMKBYO-BYOMEI   TO  FMKARTE1N-BYOMEI (IDX)
+      *
+      *        主病区分
+               MOVE    PTBYO-SYUBYOFLG TO  FMKARTE1N-SYUBYOFLG(IDX)
+      *        疑い区分
+               MOVE    PTBYO-UTAGAIFLG TO  FMKARTE1N-UTAGAIFLG(IDX)
+      *
+      *        開始年月日（診療年月日）
+               MOVE    PTBYO-SRYYMD    TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE    TO  FMKARTE1N-SRYYMD(IDX)
+      *        転帰日付
+               MOVE    PTBYO-TENKIYMD  TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE    TO  FMKARTE1N-TENKIYMD(IDX)
+      *        転帰区分
+               MOVE    PTBYO-TENKIKBN  TO  FMKARTE1N-TENKIKBN(IDX)
+      *
+               MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+               MOVE    "key3"          TO  MCP-PATHNAME
+               PERFORM 950-PTBYOMEI-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       710-API-BYOMEIHEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    状態名称編集処理
+      *****************************************************************
+       200190-API-CONDITION-SEC        SECTION.
+      *
+           IF      WRK-CONDITION       =   SPACE
+                                       OR  ZERO
+               MOVE    "該当なし"          TO  WRK-CONDITION-MEI
+           ELSE
+               MOVE    SPACE               TO  SYS-1018-REC
+               INITIALIZE                      SYS-1018-REC
+               MOVE    WRK-KANRICD         TO  SYS-1018-KANRICD
+               MOVE    WRK-CONDITION       TO  SYS-1018-KBNCD
+               MOVE    SPA-SYSYMD          TO  SYS-1018-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-1018-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-1018-HOSPNUM
+               MOVE    SYS-1018-REC        TO  MCPDATA-REC
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI        =   ZERO
+                   MOVE    SYSKANRI-REC        TO  SYS-1018-REC
+                   MOVE    SYS-1018-CONDITION-BODY
+                                               TO  WRK-CONDITION-MEI
+               ELSE
+                   MOVE    "該当なし"          TO  WRK-CONDITION-MEI
+               END-IF
+           END-IF
+           .
+       200190-API-CONDITION-EXT.
+           EXIT.
+      *****************************************************************
+      *    都道府県名編集処理
+      *****************************************************************
+       200191-RSI-PREFNAME-SEC        SECTION.
+      *
+           EVALUATE    PTRSI-PREFKBN
+               WHEN    "1"
+                   MOVE    "都"            TO  WRK-KEIMEI
+               WHEN    "2"
+                   MOVE    "道"            TO  WRK-KEIMEI
+               WHEN    "3"
+                   MOVE    "府"            TO  WRK-KEIMEI
+               WHEN    "4"
+                   MOVE    "県"            TO  WRK-KEIMEI
+               WHEN    OTHER
+                   MOVE    SPACE           TO  WRK-KEIMEI
+           END-EVALUATE
+      *
+           EVALUATE    PTRSI-CITYKBN
+               WHEN    "1"
+                   MOVE    "郡"            TO  WRK-SIKUMEI
+               WHEN    "2"
+                   MOVE    "市"            TO  WRK-SIKUMEI
+               WHEN    "3"
+                   MOVE    "区"            TO  WRK-SIKUMEI
+               WHEN    OTHER
+                   MOVE    SPACE           TO  WRK-SIKUMEI
+           END-EVALUATE
+           .
+       200191-RSI-PREFNAME-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ送信処理
+      *****************************************************************
+       790-API-CALL-SEC         SECTION.
+      *
+      *    カスタムＩＤ
+           MOVE    PARA-API-CUSTOM-ID  TO  FMKARTE1N-CUSTOM-ID
+      *
+           INITIALIZE                      RPMAIN-AREA
+           MOVE    "karte_no1_n"       TO  RPMAIN-ID
+           MOVE    PARA-API-CUSTOM-ID  TO  RPMAIN-CUSTOM-ID
+           MOVE    "カルテ１号紙（入院）"
+                                       TO  RPMAIN-TITLE
+           MOVE    "fm_karte_no1_h"
+                                       TO  MCP-TABLE
+           MOVE    FMKARTE1N-DATA      TO  RPMAIN-DATA
+           CALL    "ORCRPMAIN"         USING
+                                       MCPAREA
+                                       RPMAIN-AREA
+                                       SPA-AREA
+      *
+           .
+       790-API-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    日付変換処理
+      *****************************************************************
+       801-DAYHEN01-SEC            SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *----API-ADD-END-----
       *****************************************************************
       *    西暦日本語変換処理
       *****************************************************************

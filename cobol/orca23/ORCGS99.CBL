@@ -60,7 +60,7 @@
            03  IDX                 PIC 9(04).
       *
        01  WRK-AREA.
-           03  WRK-PAGE            PIC ZZZZZZZZZ9.
+           03  WRK-PAGE            PIC ZZZZZZZZZZ.
       *----(03.04.01)--ADD-START---
            03  WRK-PRT-PAGE        PIC 9(10).
       *----(03.04.01)--ADD-END-----

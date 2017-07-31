@@ -96,6 +96,7 @@
       * 04.08.00     NACL-多々納  16/11/01  残薬確認プログラムオプション対応
       * 04.08.00     NACL-多々納  16/12/05  再印刷処理対応
       * 04.08.00     NACL-多々納  17/03/07  商品名編集対応
+      * 04.08.00     NACL-多々納  17/06/XX  HAORI対応
       *****************************************************************
       *
       *
@@ -417,7 +418,14 @@
            03  WRK-HOSPADRS-R          REDEFINES   WRK-HOSPADRS.
                05  WRK-HOSPADRS1       PIC X(40).
                05  WRK-HOSPADRS2       PIC X(40).
+           03  WRK-API-HOSPNAME-G.
+               05  WRK-API-HOSPNAME    PIC X(120)
+                                       OCCURS 3.
+           03  WRK-API-HOSPADRS-G.
+               05  WRK-API-HOSPADRS    PIC X(120)
+                                       OCCURS 3.
            03  WRK-HOSPTEL             PIC X(15).
+           03  WRK-HOSPPOST            PIC X(07).
       *H28.4
       *    残量確認指示 
            03  WRK-ZANSIJI-G.
@@ -666,9 +674,12 @@
            03  QR-FILE-TERMID      PIC X(32)   VALUE   SPACE.
            03  FILLER              PIC X(01)   VALUE   ".".
            03  QR-FILE-SYOHMS      PIC 9(08)   VALUE   ZERO.
-           03  FILLER              PIC X(04)   VALUE   ".qr_".
-           03  QR-FILE-ID          PIC 9(02)   VALUE   ZERO.
-           03  FILLER              PIC X(04)   VALUE   ".png".
+           03  QR-FILE-SUFFIX.
+               05  QR-FILE-TYPE    PIC X(04)   VALUE   SPACE.
+               05  QR-FILE-ID      PIC 9(02)   VALUE   ZERO.
+               05  QR-FILE-EXT     PIC X(24)   VALUE   SPACE.
+           03  QR-FILE-SUFFIX-R    REDEFINES   QR-FILE-SUFFIX.
+               05  QR-FILE-REGEX   PIC X(30).
       *v4.8
       *    ファイル指定領域
        01  QR-FILE-NAME              PIC X(1024).
@@ -893,6 +904,7 @@
       * API対応
       *    処方せん情報構造体
            COPY    "CPFMSHOHO.INC".
+           COPY    "CPORCSBLOBIMPORT.INC".
       *
            COPY    "CPORCRPMAIN.INC".
       *    画面色等
@@ -1121,6 +1133,11 @@
       *        API送信なし
                MOVE    "0"             TO  PARA-API-DATA
            END-IF
+      *    HAORI対応
+           IF      SPA-API-FLG     NOT =   ZERO
+               MOVE    "1"             TO  PARA-API-DATA
+           END-IF
+      *
       *    ＡＰＩカスタムＩＤ
            MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
@@ -2696,7 +2713,9 @@
                    MOVE    "HC2Q"              TO  QR-FILE-FORM-ID
                    MOVE    SPA-TERMID          TO  QR-FILE-TERMID
                    MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
+                   MOVE    ".qr_"              TO  QR-FILE-TYPE
                    MOVE    WRK-FILE-CNT        TO  QR-FILE-ID
+                   MOVE    ".png"              TO  QR-FILE-EXT
       *ver.4.8
       *    一時ファイル名取得
                    INITIALIZE                      SGETTEMP-AREA
@@ -2838,8 +2857,11 @@
            PERFORM 990-DBCLOSE-SEC
       *
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
+                                           WRK-API-HOSPNAME (1)
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
+                                           WRK-API-HOSPADRS (1)
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
+           MOVE    SYS-1002-POST       TO  WRK-HOSPPOST
       *    医療機関編集情報
            PERFORM 900-SYS1900-SYORI-SEC
       *
@@ -5868,15 +5890,18 @@
       *    医療機関コード
            MOVE    SYS-1001-HOSPCD     TO  FMSHOHO-HOSPCD
       *    医療機関名称
-           MOVE    WRK-HOSPNAME1       TO  FMSHOHO-HOSP-NAME (1)
-           MOVE    WRK-HOSPNAME2       TO  FMSHOHO-HOSP-NAME (2)
+           MOVE    WRK-API-HOSPNAME(1) TO  FMSHOHO-HOSP-NAME (1)
+           MOVE    WRK-API-HOSPNAME(2) TO  FMSHOHO-HOSP-NAME (2)
+           MOVE    WRK-API-HOSPNAME(3) TO  FMSHOHO-HOSP-NAME (3)
       *    医療機関住所名称
-           MOVE    WRK-HOSPADRS1       TO  FMSHOHO-HOSP-ADRS (1)
-           MOVE    WRK-HOSPADRS2       TO  FMSHOHO-HOSP-ADRS (2)
+           MOVE    WRK-API-HOSPADRS(1) TO  FMSHOHO-HOSP-ADRS (1)
+           MOVE    WRK-API-HOSPADRS(2) TO  FMSHOHO-HOSP-ADRS (2)
+           MOVE    WRK-API-HOSPADRS(3) TO  FMSHOHO-HOSP-ADRS (3)
       *    医療機関郵便番号
-           MOVE    SYS-1002-POST       TO  FMSHOHO-HOSP-POST
+           MOVE    WRK-HOSPPOST        TO  FMSHOHO-HOSP-POST
       *    医療機関電話
-           MOVE    SYS-1002-TEL        TO  FMSHOHO-HOSP-TEL
+      **** MOVE    SYS-1002-TEL        TO  FMSHOHO-HOSP-TEL
+           MOVE    WRK-HOSPTEL         TO  FMSHOHO-HOSP-TEL
       *    ドクターコード
            MOVE    WRK-DRCD            TO  FMSHOHO-DR-CODE 
       *    医師情報
@@ -5975,6 +6000,10 @@
            IF      WRK-ZANSIJI2        =   "1"
                MOVE    "2"                 TO  FMSHOHO-ZANSIJI
            END-IF
+           IF     (WRK-ZANSIJI1        =   "1" )
+              AND (WRK-ZANSIJI2        =   "1" )
+               MOVE    "3"                 TO  FMSHOHO-ZANSIJI
+           END-IF
       *    麻毒フラグ
            MOVE    FLG-MAYAKU          TO  FMSHOHO-MAYAKU
       *    保険医名記載
@@ -5982,6 +6011,24 @@
       *    処方内容編集
       *    備考編集
            PERFORM 7002-APIBIKOU-HENSYU-SEC
+      *    ＱＲイメージ編集処理
+           IF      ORCSQRCSV-RET-COUNT >   ZERO
+                INITIALIZE                      SBI-AREA
+                MOVE    SPA-HOSPNUM         TO  QR-FILE-HOSPNUM
+                MOVE    "HC2Q"              TO  QR-FILE-FORM-ID
+                MOVE    SPA-TERMID          TO  QR-FILE-TERMID
+                MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
+      *         MOVE    "\.qr(.*[0-9][0-9]\.png|\.dat)$"
+                MOVE    "\.qr.*[0-9][0-9]\.png$"
+                                            TO  QR-FILE-REGEX
+                MOVE    FUNCTION SUBSTITUTE(QR-FILE-NAME-PARA ,
+                                            "+", "\+")
+                                            TO  SBI-AREA
+                CALL    "ORCSBLOBIMPORT"    USING
+                                            SBI-AREA
+                                            SPA-AREA
+                MOVE    SBI-BLOB-ID         TO  FMSHOHO-QR-ID
+           END-IF
       *    ＡＰＩ送信処理
            PERFORM 7009-API-CALLSYORI-SEC
            .
@@ -6349,6 +6396,11 @@
                MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1  TO  WRK-HOSPNAME1
                MOVE    SYS-1901-HOSPNAME2  TO  WRK-HOSPNAME2
+      *
+               MOVE    SYS-1901-HOSPNAME1  TO  WRK-API-HOSPNAME (1)
+               MOVE    SYS-1901-HOSPNAME2  TO  WRK-API-HOSPNAME (2)
+               MOVE    SYS-1901-HOSPNAME3  TO  WRK-API-HOSPNAME (3)
+      *
            END-IF
            .
       *
@@ -6376,6 +6428,12 @@
                MOVE    SYS-1902-ADRS1      TO  WRK-HOSPADRS1
                MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
                MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
+               MOVE    SYS-1902-POST       TO  WRK-HOSPPOST
+      *
+               MOVE    SYS-1902-ADRS1      TO  WRK-API-HOSPADRS (1)
+               MOVE    SYS-1902-ADRS2      TO  WRK-API-HOSPADRS (2)
+               MOVE    SYS-1902-ADRS3      TO  WRK-API-HOSPADRS (3)
+      *
            END-IF
            .
       *

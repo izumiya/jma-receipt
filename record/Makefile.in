@@ -876,7 +876,6 @@ DB_files = \
 	xml_claim_receivev2req.db \
 	xml_claim_receivev2res.db \
 	fm_karte_no1.db \
-	fm_medication_note.db \
 	xml_formdatagetv2req.db \
 	xml_contraindication_checkv2req.db \
 	xml_contraindication_checkv2res.db \
@@ -991,6 +990,15 @@ DB_files = \
 	push_batch01.db \
 	push_accept02.db \
 	push_patient01.db \
+	fm_discharge_certificate.db \
+	fm_karte_no1_h.db \
+	fm_karte_no3.db \
+	fm_karte_no3_h.db \
+	fm_medicine_information_h.db \
+	fm_medicine_notebook.db \
+	fm_medicine_notebook_h.db \
+	fm_payment_certificate.db \
+	fm_statement_h.db \
 	push_medical01.db \
 	
 

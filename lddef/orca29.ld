@@ -67,11 +67,16 @@ db	{
 	tbl_list_doctor;
         tbl_generic_price;
 	tbl_santei;
+	tbl_prtdata;
+	tbl_prtkanri;
+	tbl_api_para;
 };
 db "xml2" {
- fm_medication_note;
+ fm_medicine_notebook;
  fm_prescription;
  fm_medicine_information;
+ fm_medicine_notebook_h;
+ fm_medicine_information_h;
 };
 
 

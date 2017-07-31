@@ -1,0 +1,36 @@
+fm_karte_no3_h{
+  context                            int;
+  object                             object;
+  mode                               int;
+  recordname                         varchar(128);
+  data {
+    Form_ID                          varchar(30);
+    Custom_ID                        varchar(30);
+    Printer                          varchar(20);
+    Order_Class                      varchar(1);
+    Last_Page_Number                 varchar(3);
+    Last_Row_Number                  varchar(2);
+    Patient{
+      ID                             varchar(20);
+      Name                           varchar(50);
+      KanaName                       varchar(50);
+      BirthDate                      varchar(10);
+      Sex                            varchar(1);
+    };
+    Department_Code                  varchar(02);
+    Department_Name                  varchar(10);
+    Insurance_Name                   varchar(124);
+    Account_Information{
+       Insurance_Combination_Number  varchar(04);
+       InsuranceProvider_Class       varchar(03);
+       Perform_Date                  varchar(10);
+       Point_Information{
+         Medical_Class               varchar(2);
+         Point                       varchar(8);
+         Money                       varchar(8);
+         Count                       varchar(3);
+       }[400];
+       Ai_Money                      varchar(8);
+    }[300];
+  };
+};

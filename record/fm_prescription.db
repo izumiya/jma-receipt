@@ -92,5 +92,7 @@ fm_prescription {
 		}[50];
 		Memo2						varchar(40)[4];
 		Memo						varchar(100)[50];
+		Qr_ID   					varchar(80);
 	};
 };
+

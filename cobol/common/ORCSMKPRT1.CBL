@@ -31,6 +31,86 @@
       *  04.07.00    NACL-竹田  11/03/20  クライアント印刷対応
       *****************************************************************
       *
+      *  オンライン帳票印刷処理の流れ(2017.05.29)
+      *  1.通常印刷
+      *  2.クライアント印刷、帳票毎印刷
+      *  3.Ginbee環境
+      *  4.APIからの印刷
+      *  5.HAORIからの印刷
+      *
+      *  1.通常印刷（初期状態での印刷）
+      *    システム管理［1010 職員情報］
+      *     +［個別設定］
+      *       +プリンタへのデータ送信［0 １ページ毎に送信］
+      *       +クライアント印刷      ［0 しない］
+      *
+      *    ORCSONPRTSET 再印刷用UUID振り出し
+      *    ↓
+      *    帳票PG
+      *       +ORCSMKPRT1 帳票印刷
+      *         +HC01.sh （帳票印刷）
+      *         +online-reprint.sh (再印刷データ登録）
+      *          +ORCBONPRT
+      *
+      *       +ORCRPMAIN 帳票APIデータ作成、再印刷データ登録
+      *         +rpmain1.sh (push通知)
+      *
+      *
+      *  2.クライアント印刷、帳票毎印刷
+      *  3.Ginbee環境
+      *    システム管理［1010 職員情報］
+      *     +［個別設定］
+      *       +プリンタへのデータ送信［1 帳票毎に送信］
+      *       +クライアント印刷      ［1 する］
+      *
+      *    ORCSONPRTSET
+      *    ↓
+      *    ORCSPRTCTRL クライアント印刷フラグ設定
+      *    ↓
+      *    帳票PG
+      *    ｜ +ORCSMKPRT1
+      *    ｜   +online-reprint.sh (再印刷データ登録）
+      *    ｜    +ORCBONPRT
+      *    ｜
+      *    ｜ +ORCRPMAIN
+      *    ｜   +online-reprint.sh (再印刷データ登録）
+      *    ｜    +ORCBONPRT
+      *    ↓
+      *    ORCHCDUMMY
+      *       +ORCSMKPRT1
+      *         +client_print.sh (帳票印刷）
+      *           +ORCBCLPRT
+      *             +print_prv.sh
+      *               +ORCBPRT1
+      *                 +HCALL_prv.sh（帳票印刷）
+      *
+      *                 +push_form.sh（push通知）
+      *
+      *
+      *  4.APIからの印刷
+      *    ORCSONPRTSET
+      *    ↓
+      *    ORCSPRTCTRL クライアント印刷フラグ設定
+      *    ↓
+      *    帳票PG
+      *    ｜ +ORCRPMAIN 帳票APIデータ作成、再印刷データ登録
+      *    ↓
+      *    ORCSAPIFM(レスポンス作成)
+      *       +ORCSAPIFMTERM(push通知）
+      *
+      *
+      *  5.HAORIからの印刷
+      *    ORCSONPRTSET
+      *    ↓
+      *    ORCSPRTCTRL クライアント印刷フラグ設定
+      *    ↓
+      *    帳票PG
+      *    ｜ +ORCRPMAIN 帳票APIデータ作成、再印刷データ登録
+      *    ↓
+      *    ORCHCDUMMY
+      *       +ORCSAPIFMTERM(push通知）
+      *
+      *
        ENVIRONMENT             DIVISION.
        CONFIGURATION               SECTION.
        INPUT-OUTPUT                SECTION.
@@ -257,11 +337,12 @@
                                        INTO    MKPASS-IN-03
            END-STRING
       *    DEF名
-           STRING  SHELL-RECORD        DELIMITED  BY  SPACE
-                   MKPRT-DEF           DELIMITED  BY  SPACE
-                                       INTO    MKPASS-IN-04
-           END-STRING
-           CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
+           IF    ( MKPRT-DEF           =   "__SITE__" )
+               CALL    "ORCSMKPASSSITE"
+                                       USING   ORCSMKPASSAREA
+           ELSE
+               CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
+           END-IF
       *
            PERFORM 201-OFFSET-GET-SEC
       *
@@ -446,8 +527,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-PRT-UUID    TO  SHELLTBL-ARG13
            MOVE    SPA-PTID        TO  SHELLTBL-ARG14
       *    SITE_KBN
-           MOVE    "1"             TO  SHELLTBL-ARG15
-      *    
+           IF    ( MKPRT-DEF           =   "__SITE__" )
+               MOVE    "2"         TO  SHELLTBL-ARG15
+           ELSE
+               MOVE    "1"         TO  SHELLTBL-ARG15
+           END-IF
+      *
            MOVE    SGYOUMU-CODE    TO  SHELLTBL-ARG16
            MOVE    MKPRT-INFO      TO  SHELLTBL-ARG17
       *    DIA

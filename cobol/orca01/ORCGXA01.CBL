@@ -99,12 +99,16 @@
                            11  SPA-GMN-EDPAGE      PIC 9(05).
       *                 
                05  SPA-NAI-AREA.
-                   07  SPA-NAI-SELNUM              PIC 9(03).      
+                   07  SPA-NAI-BODY.
+                       09  SPA-NAI-SELNUM          PIC 9(03).      
+                       09  SPA-NAI-BODY1.
+                           11  SPA-NAI-API         PIC X(1).
                    07  SPA-NAI-TBL.
                        09  SPA-NAI-OCC             OCCURS  100.
                            11  SPA-NAI-TTBL-KEY    PIC X(08).
                            11  SPA-NAI-TTBL-GROUP  PIC X(14).
                            11  SPA-NAI-TPRTFLG     PIC X(01).
+                           11  SPA-NAI-TAPI        PIC X(1).
       *
                05  SPA-WRK-TBL-KEY                 PIC X(08).            
       *
@@ -127,6 +131,10 @@
            03  FLG-LIST-ROW        PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-LOOPEND         PIC 9(01).
+      *
+      *    ¥«¥¦¥ó¥ÈÎÎ°è
+       01  CNT-AREA.
+           03  CNT-MONPE           PIC 9(05).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -167,6 +175,8 @@
            03  WRK-MOTOPG          PIC X(08).
            03  WRK-XA01-MOTOPG     PIC X(08).
            03  WRK-SELNUM          PIC 9(03). 
+           03  WRK-RENNUM          PIC 9(04).
+           03  WRK-SHORI-RENNUM    PIC 9(04).
       *
            03  WRK-ZZ              PIC ZZ9.
       *  
@@ -299,6 +309,7 @@
        000-PROC-SEC                SECTION.
       *
            INITIALIZE                  FLG-AREA
+           INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  IDX-AREA
       *
@@ -520,6 +531,9 @@
                IF      SPA-NAI-TPRTFLG (IDX)   =   SPACE
                    MOVE    "Ì¤"            TO  SPA-GMN-TPRTFLG (IDX)
                END-IF    
+               IF    ( PRTKANRI-SHELLID    =   "API" OR "API_01" )
+                   MOVE    "1"             TO  SPA-NAI-TAPI       (IDX)
+               END-IF
       *                                                                                          
                PERFORM 900-PRTKANRI-FET-SEC
            END-PERFORM
@@ -751,8 +765,10 @@
       *****************************************************************
        4101-GMN-SPA-SET-SEC       SECTION.
       *
-           MOVE    XA01-STPAGE         TO  SPA-GMN-STPAGE
-           MOVE    XA01-EDPAGE         TO  SPA-GMN-EDPAGE
+           IF    ( SPA-NAI-API     NOT =   "1" )
+               MOVE    XA01-STPAGE         TO  SPA-GMN-STPAGE
+               MOVE    XA01-EDPAGE         TO  SPA-GMN-EDPAGE
+           END-IF
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -780,7 +796,7 @@
            MOVE    1                   TO  SPA-GMN-CUR
       *
            INITIALIZE                  SPA-GMN-BODY
-           MOVE    ZERO                TO  SPA-NAI-SELNUM
+                                       SPA-NAI-BODY
       *      
            MOVE    XA01-SELNUM         TO  SPA-GMN-SELNUM
       *     
@@ -815,6 +831,9 @@
                                                SPA-GMN-SHORI-RENNUM
            MOVE    1                           TO  SPA-GMN-STPAGE
            MOVE    SPA-GMN-TPAGE       (IDY)   TO  SPA-GMN-EDPAGE 
+           MOVE    SPA-NAI-TAPI (IDY)          TO  SPA-NAI-API
+           MOVE    SPA-NAI-TTBL-GROUP  (IDY)   TO  SPA-GMN-TBL-GROUP
+           
            .
        2011-SELECT-HENSYU-EXT.
            EXIT.
@@ -1811,8 +1830,10 @@
            MOVE    SPA-GMN-RENNUM      TO  XA01-RENNUM
            MOVE    SPA-GMN-SHORI-RENNUM 
                                        TO  XA01-SHORI-RENNUM
-           MOVE    SPA-GMN-STPAGE      TO  XA01-STPAGE
-           MOVE    SPA-GMN-EDPAGE      TO  XA01-EDPAGE                            
+           IF    ( SPA-NAI-API     NOT =   "1" )
+               MOVE    SPA-GMN-STPAGE  TO  XA01-STPAGE
+               MOVE    SPA-GMN-EDPAGE  TO  XA01-EDPAGE                            
+           END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX             >   SPA-GMN-MAX
@@ -1824,8 +1845,10 @@
                MOVE    SPA-GMN-TSHORI-RENNUM(IDX)
                                                TO
                                                XA01-TSHORI-RENNUM (IDX)
-               MOVE    SPA-GMN-TPAGE     (IDX) TO  WRK-PAGE
-               MOVE    WRK-PAGE(6:5)           TO  XA01-TPAGE     (IDX)
+               IF    ( SPA-NAI-TAPI (IDX)   NOT =   "1" )
+                   MOVE    SPA-GMN-TPAGE     (IDX) TO  WRK-PAGE
+                   MOVE    WRK-PAGE(6:5)       TO  XA01-TPAGE     (IDX)
+               END-IF
                MOVE    SPA-GMN-TSRYYM    (IDX) TO  XA01-TSRYYM    (IDX)
                MOVE    SPA-GMN-TSKYYMD   (IDX) TO  XA01-TSKYYMD   (IDX)
                MOVE    SPA-GMN-TSHORI-TITLE (IDX)  TO
@@ -2023,7 +2046,39 @@
            MOVE    SPACE                TO  XAID2
            INITIALIZE                       XAID2
       *
-           MOVE    "T"                  TO  XAID2-B10-VISIBLE
+           MOVE    ZERO                 TO  CNT-MONPE
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX     >   SPA-GMN-MAX )
+      *
+               MOVE    ZERO            TO  WRK-RENNUM
+                                           WRK-SHORI-RENNUM
+               IF    ( SPA-GMN-RENNUM  NOT =   ZERO )
+                   MOVE    SPA-GMN-TRENNUM (IDX)
+                                       TO  WRK-RENNUM
+               END-IF
+      *
+               IF    ( SPA-GMN-SHORI-RENNUM
+                                       NOT =   ZERO )
+                   MOVE    SPA-GMN-TSHORI-RENNUM (IDX)
+                                       TO  WRK-SHORI-RENNUM
+               END-IF
+      *
+               IF    ( SPA-NAI-TTBL-GROUP (IDX)
+                                       =   SPA-GMN-TBL-GROUP )
+                 AND ( WRK-RENNUM  =   SPA-GMN-RENNUM )
+                 AND ( WRK-SHORI-RENNUM
+                                       =   SPA-GMN-SHORI-RENNUM )
+                 AND ( SPA-NAI-TAPI (IDX)    NOT =   "1" )
+                    COMPUTE CNT-MONPE = CNT-MONPE   +   1
+               END-IF
+           END-PERFORM
+      *
+           IF    ( CNT-MONPE        >   ZERO )
+               MOVE    "T"          TO  XAID2-B10-VISIBLE
+           ELSE
+               MOVE    "F"          TO  XAID2-B10-VISIBLE
+           END-IF
       *
            MOVE    SPA-XAIDCD2          TO  XAID2-ID1CODE
            MOVE    WRK-XAIDMSG          TO  XAID2-ID1MSG
