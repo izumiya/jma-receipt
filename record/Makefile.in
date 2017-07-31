@@ -989,6 +989,8 @@ DB_files = \
 	xml_patientlst6v2req.db \
 	xml_patientlst6v2res.db \
 	push_batch01.db \
+	push_accept02.db \
+	push_patient01.db \
 	
 
 shell.db: shell.db.in

@@ -69,3 +69,6 @@ db	{
 
 #include "orcadb.inc"
 #include "orcadbh.inc"
+db "push" {
+        push_accept02;
+};

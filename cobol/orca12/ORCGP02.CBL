@@ -71,6 +71,7 @@
       *  04.06.00    NACL-多々納  11/03/24  患者情報削除サブ対応
       *  04.07.00    NACL-多々納  12/01/11  クライアント印刷対応
       *  04.07.00    NACL-多々納  12/08/08  患者削除再確認対応
+      *  05.00.00    NACL-多々納  17/07/XX  PUSH通信対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -141,6 +142,9 @@
       *    クライアント印刷有
            03  FLG-CLIENT-OK       PIC 9(01).
            03  FLG-PRT             PIC 9(01).
+      *H29.7
+      *PUSH通信用
+           03  FLG-PUSHSYORI       PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -206,6 +210,27 @@
            03  WRK-KARUTE-PG           PIC X(20).
       *    処方せんＰＧ名
            03  WRK-SYOHOU-PG           PIC X(20).
+      *
+      *H29.7
+      *PUSH通信用
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *    時間編集
+           03  WRK-THMS.
+               05  WRK-THHH             PIC X(02).
+               05  WRK-THMM             PIC X(02).
+               05  WRK-THSS             PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH         PIC X(02).
+               05  WRK-HEN-T1          PIC X(01).
+               05  WRK-HEN-TMM         PIC X(02).
+               05  WRK-HEN-T2          PIC X(01).
+               05  WRK-HEN-TSS         PIC X(02).
+      *
       *
       *    ＣＬＡＩＭファイル名
        01  CLAIM-FILE.
@@ -331,6 +356,10 @@
            COPY    "CPSHELLTBL.INC".
       *****COPY    "ORCA-DBPATH".
       *===> For Claim End
+      *H29.7
+      *PUSH通信
+           COPY    "CPPUSHPATIENT01.INC".
+      *
       *
       *****************************************************************
       *    連絡　領域
@@ -2627,6 +2656,13 @@
                GO      TO      4991-DELETE-SYORI-EXT
            END-IF
       *
+      *H29.7
+      *PUSH通信
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    3                   TO  FLG-PUSHSYORI
+               PERFORM 600-PUSH-SYORI-SEC
+           END-IF
+      *
       *    ユーザプログラム起動
       *v4.8
       *    ginbee対応
@@ -3085,6 +3121,17 @@
            END-IF
       *
       *
+      *H29.7
+      *PUSH通信
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-P02-SYORI   =   1
+                   MOVE    1               TO  FLG-PUSHSYORI
+               ELSE
+                   MOVE    2               TO  FLG-PUSHSYORI
+               END-IF
+               PERFORM 600-PUSH-SYORI-SEC
+           END-IF
+      *
       **** IF      SPA-MACHIPG         =   "U02"  OR  "K02" OR "Q02"
            MOVE    0                   TO  FLG-BACK
            IF      SPA-HZN-MOTOPG(1:3) =   "U02"
@@ -3105,6 +3152,7 @@
                    MOVE    1               TO  FLG-BACK
                END-IF
            END-IF
+      *
       *    ユーザプログラム起動
       *v4.8
       *    ginbee対応
@@ -3897,6 +3945,80 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        49071-XD01-SYORI-EXT.
            EXIT.
+      *
+      *H29.7
+      *PUSH通信
+      *****************************************************************
+      *    PUSH通信処理
+      *****************************************************************
+       600-PUSH-SYORI-SEC             SECTION.
+      *
+           INITIALIZE                      PUSHPT01-REC
+           MOVE    "patient_infomation"    TO  PUSHPT01-EVENT
+           EVALUATE    FLG-PUSHSYORI
+           WHEN    1
+      *        追加
+               MOVE    "add"               TO  PUSHPT01-PMODE
+           WHEN    2
+      *        更新
+               MOVE    "modify"            TO  PUSHPT01-PMODE
+           WHEN    3
+      *        削除
+               MOVE    "delete"            TO  PUSHPT01-PMODE
+           END-EVALUATE
+      *    処理時間取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+           MOVE    SMCNDATE-YMD        TO  WRK-SYMD
+           MOVE    SMCNDATE-HMS        TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  PUSHPT01-SYSYMD
+           MOVE    WRK-HEN-TIME        TO  PUSHPT01-SYSTIME
+           MOVE    SPA-GMN-PTNUM       TO  PUSHPT01-PTNUM
+      *
+           MOVE    PUSHPT01-REC        TO  MCPDATA-REC
+      *
+           MOVE    "PUSHEVENT"         TO  MCP-FUNC
+           MOVE    "push_patient01"    TO  MCP-TABLE
+           MOVE    "push_patient01"    TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       600-PUSH-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           INITIALIZE                  WRK-HEN-TIME
+           MOVE    WRK-THHH            TO  WRK-HEN-THH
+           MOVE    WRK-THMM            TO  WRK-HEN-TMM
+           MOVE    WRK-THSS            TO  WRK-HEN-TSS
+           MOVE    ":"                 TO  WRK-HEN-T1
+           MOVE    ":"                 TO  WRK-HEN-T2
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    西暦→和暦FORMAT日付編集

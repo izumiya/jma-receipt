@@ -87,6 +87,7 @@
       *  04.08.01    NACL-多々納  16/01/XX  医師一覧遷移対応
       *  04.08.01    NACL-多々納  16/06/XX  API CLAIM対応
       *  04.08.01    NACL-多々納  16/12/XX  受付順変更対応
+      *  05.00.00    NACL-多々納  17/07/XX  PUSH通信対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -281,6 +282,25 @@
            03  SORT-MAX                PIC 9(04).
            03  WRK-IDY                 PIC 9(04).
            03  WRK-IDX                 PIC 9(04).
+      *H29.7
+      *PUSH通信用
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *    時間編集
+           03  WRK-THMS.
+               05  WRK-THHH             PIC X(02).
+               05  WRK-THMM             PIC X(02).
+               05  WRK-THSS             PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH         PIC X(02).
+               05  WRK-HEN-T1          PIC X(01).
+               05  WRK-HEN-TMM         PIC X(02).
+               05  WRK-HEN-T2          PIC X(01).
+               05  WRK-HEN-TSS         PIC X(02).
       *
       *    公費期限切れ表示用
        01  WRK-KOH-AREA.
@@ -545,6 +565,10 @@
            COPY    "CPSHELLTBL.INC".
       *****COPY    "ORCA-DBPATH".
       *===> For Claim End
+      *H29.7
+      *PUSH通信
+           COPY    "CPPUSHACCEPT02.INC".
+      *
       *****************************************************************
       *    連絡領域
       *****************************************************************
@@ -4977,6 +5001,11 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                PERFORM 49061-API-CLMAI-SEC
            END-IF
       *
+      *H29.7
+      *PUSH通信
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 600-PUSH-SYORI-SEC
+           END-IF
       *
       *    ユーザプログラム起動
       *v4.8
@@ -6321,13 +6350,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+      *H29.7
+      *PUSH通信
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    3                   TO  FLG-USERPG
+               PERFORM 600-PUSH-SYORI-SEC
+           END-IF
+      *
       *    ユーザプログラム起動
            IF      SPA-GMN-PTNUM   NOT =   SPACE
                MOVE    3                   TO  FLG-USERPG
                PERFORM 4907-USERPG-SEC
            END-IF
       *
-           PERFORM 493-CLEAR-SEC  
+           PERFORM 493-CLEAR-SEC
       **** PERFORM 3101-UKETU-HEN-SEC
            .
        4910-DELETE-SYORI-EXT.
@@ -7044,6 +7080,79 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
        4759-UKETUKE-DOWN-SYORI-EXT.
            EXIT.
       *H28.12
+      *
+      *H29.7
+      *PUSH通信
+      *****************************************************************
+      *    PUSH通信処理
+      *****************************************************************
+       600-PUSH-SYORI-SEC             SECTION.
+      *
+           INITIALIZE                      PUSHAC02-REC
+           MOVE    "patient_accept"        TO  PUSHAC02-EVENT
+           EVALUATE    FLG-USERPG
+           WHEN    1
+      *        追加
+               MOVE    "add"               TO  PUSHAC02-PMODE
+           WHEN    2
+      *        更新
+               MOVE    "modify"            TO  PUSHAC02-PMODE
+           WHEN    3
+      *        削除
+               MOVE    "delete"            TO  PUSHAC02-PMODE
+           END-EVALUATE
+           MOVE    SPA-GMN-PTNUM       TO  PUSHAC02-PTNUM
+           MOVE    UKE-UKEYMD          TO  WRK-SYMD
+           MOVE    UKE-UKETIME         TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  PUSHAC02-UKEYMD
+           MOVE    WRK-HEN-TIME        TO  PUSHAC02-UKETIME
+           MOVE    UKE-UKEID           TO  PUSHAC02-UKEID
+           MOVE    UKE-DRCD            TO  PUSHAC02-DRCD
+           MOVE    UKE-SRYKA           TO  PUSHAC02-SRYKA
+           MOVE    UKE-HKNCOMBI        TO  PUSHAC02-HKNCOMBI
+      *
+           MOVE    PUSHAC02-REC        TO  MCPDATA-REC
+           MOVE    "PUSHEVENT"         TO  MCP-FUNC
+           MOVE    "push_accept02"     TO  MCP-TABLE
+           MOVE    "push_accept02"     TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       600-PUSH-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           INITIALIZE                  WRK-HEN-TIME
+           MOVE    WRK-THHH            TO  WRK-HEN-THH
+           MOVE    WRK-THMM            TO  WRK-HEN-TMM
+           MOVE    WRK-THSS            TO  WRK-HEN-TSS
+           MOVE    ":"                 TO  WRK-HEN-T1
+           MOVE    ":"                 TO  WRK-HEN-T2
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    自画面編集処理
