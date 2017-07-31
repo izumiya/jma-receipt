@@ -466,19 +466,21 @@
       *****************************************************************
        1001-ORCSCOMMON-SEC           SECTION.
       *
-      *    診療日をシステム日付へ
-           IF      MDCREQ-PERFORM-DATE NOT =   SPACE
-               MOVE    MDCREQ-PERFORM-DATE TO  WRK-HEN-DATE
-               MOVE    SPACE               TO  WRK-HEN-TIME
-               PERFORM 802-DAYHEN02-SEC
-               MOVE    WRK-SYMD            TO  WRK-PERFORM-YMD
-               PERFORM 20011-PERFORM-CHK-SEC
+      *    システム日付で検索
+      ***  診療日をシステム日付へ
+      *    IF      MDCREQ-PERFORM-DATE NOT =   SPACE
+      *        MOVE    MDCREQ-PERFORM-DATE TO  WRK-HEN-DATE
+      *        MOVE    SPACE               TO  WRK-HEN-TIME
+      *        PERFORM 802-DAYHEN02-SEC
+      *        MOVE    WRK-SYMD            TO  WRK-PERFORM-YMD
+      *        PERFORM 20011-PERFORM-CHK-SEC
       *        診療日をシステム日付へ
-               IF      WRK-ERRCD           =   SPACE
-                   MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
-               END-IF
-               MOVE    SPACE               TO  WRK-ERRCD
-           END-IF
+      *        IF      WRK-ERRCD           =   SPACE
+      *            MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
+      *        END-IF
+      *        MOVE    SPACE               TO  WRK-ERRCD
+      *****END-IF
+      *
       *
            MOVE    "API"               TO  SPA-MOTOPG
       *    ＳＰＡ共通設定
@@ -494,6 +496,7 @@
                MOVE   "89"             TO  WRK-ERRCD
            END-IF
            MOVE    SPACE               TO  SPA-MOTOPG
+      *
            .
        1001-ORCSCOMMON-EXT.
            EXIT.
@@ -922,8 +925,6 @@
                MOVE    MDCRES-INFORMATION-DATE
                                            TO  MDCRES-PERFORM-DATE
            END-IF
-      *    診療日をシステム日付・診療日付へ
-      **** MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
       *
            MOVE    WRK-PERFORM-YMD     TO  SPA-SRYYMD
       *    診療科

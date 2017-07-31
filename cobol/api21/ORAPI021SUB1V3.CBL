@@ -840,16 +840,17 @@
                    ELSE
                        MOVE    "012"               TO  WRK-ERRCD
                    END-IF
-               ELSE
+      *H29.7   数量空白は数量=1で返却するので、フィルム枚数が反映できない為　廃止。
+      ****     ELSE
       *            Ｘ線撮影は１でも数量入力有
-                   IF     (WRK-SRYCD(1:1)      =   "1"  )  AND
-                          (TNS-KZMCOMPSIKIBETU NOT =   ZERO ) AND
-                          (TNS-SRYSYUKBN       =   "721"
-                                               OR  "720"    )
+      *            IF     (WRK-SRYCD(1:1)      =   "1"  )  AND
+      *                   (TNS-KZMCOMPSIKIBETU NOT =   ZERO ) AND
+      *                   (TNS-SRYSYUKBN       =   "721"
+      *                                        OR  "720"    )
       *                数量入力あり
-                       MOVE    "S"             TO  TBL-WKSRY-AUTOKBN
-                                                     (TBL-MAX IDX-S)
-                   END-IF
+      *                MOVE    "S"             TO  TBL-WKSRY-AUTOKBN
+      *                                              (TBL-MAX IDX-S)
+      ****         END-IF
                END-IF
            END-IF
            .
