@@ -50,8 +50,6 @@ xml_medicalv3res3 {
             	} [4];
         	};
     	};
-#--- 伝票番号
-        Invoice_Number			varchar(07);
 #--- 診療内容
 	Medical_Information  {
 		Medical_Info  {
@@ -94,19 +92,33 @@ xml_medicalv3res3 {
         Medical_Result			varchar(4);
         Medical_Result_Message		varchar(100);
 	        };
+#--- 伝票番号
+        Invoice_Number			varchar(07);
 #--- 収納情報
 	Cd_Information {
 	Ic_Code				varchar(2);
 	Ic_Code_Name			varchar(20);
-	Ic_Money			varchar(10);
-	Ad_Money1			varchar(10);
-	Ad_Money2			varchar(10);
-	Ac_Money			varchar(10);
+#--- 入金取り扱い区分
+	Ic_Request_Code			varchar(1);
+	Ic_Request_Code_Name 		varchar(40);
 #---    今回請求額合計
 	Total_Ac_Money			varchar(10);
-#---    返金額（訂正時）
-	Re_Money			varchar(10);
-	Cd_Ac_Information  {
+#---    今回入金合計
+	Total_Ic_Money			varchar(10);
+#---    今回返金合計
+	Total_Re_Money			varchar(10);
+#---    今回入金額上限
+	Max_Ac_Money			varchar(10);
+	Cd_Information2 {
+#---    今回入金額
+	   Ic_Money			varchar(10);
+	   Ad_Money1			varchar(10);
+  	   Ad_Money2			varchar(10);
+#---    今回請求額
+   	   Ac_Money			varchar(10);
+#---    返金額
+	    Re_Money			varchar(10);
+	    Cd_Ac_Information  {
 		Ai_Money		varchar(10);
 		Oe_Money		varchar(10);
 		Dg_Smoney		varchar(10);
@@ -114,18 +126,58 @@ xml_medicalv3res3 {
 		Pi_Smoney		varchar(10);
 		Lsi_Total_Money 	varchar(10);
 		};
-		Ac_Point_Information  {
-			Ac_Ttl_Point	varchar(10);
-			Ac_Point_Detail   {
-				AC_Point_Name	varchar(30);
-				AC_Point	varchar(10);
+#---    請求点数情報
+	    Ac_Point_Information  {
+		Ac_Ttl_Point	varchar(10);
+		Ac_Point_Detail   {
+			Ac_Point_Name	varchar(30);
+			Ac_Point	varchar(10);
+			Me_Money	varchar(10);
 	 		} [16];
+   	 	 };
+#---           自費明細
+	        Oe_Etc_Information  {
+	             Oe_Etc_Detail    {
+			Oe_Etc_Name		varchar(20);
+			Oe_Etc_Money_Non_Taxable	varchar(10);
+			Oe_Etc_Money_Taxable		varchar(10);
+	 		} [10];
+#---            自費消費税額（再計）
+	  	    Tax_In_Oe_Etc_Ttl_Money_Taxable	varchar(10);
+    	         };
+#---        訂正前情報
+	    Old_Money_Information  {
+		Old_Ic_Money			varchar(10);
+		Old_Ac_Money			varchar(10);
+		Old_Ad_Money1			varchar(10);
+		Old_Ad_Money2			varchar(10);
+	 	};
+ 	    };
+#---        減免情報
+	    Discount_Information  {
+		Discount_Name			varchar(12);
+        	};
+            Old_Total_Information  {
+#---            前回までの未収金
+		Old_Total_Re_Money		varchar(10);
+#---            前回までの過入金
+		Old_Total_Ov_Money		varchar(10);
+    		};
+	};
+#--- 印刷区分
+	Print_Information    {
+		Print_Prescription_Class		varchar(1);
+		Print_Prescription_Class_Name		varchar(30);
+		Print_Invoice_Receipt_Class		varchar(1);
+		Print_Invoice_Receipt_Class_Name	varchar(30);
+		Print_Statement_Class			varchar(1);
+		Print_Statement_Class_Name		varchar(30);
+		Print_Medicine_Information_Class	varchar(1);
+		Print_Medicine_Information_Class_Name	varchar(30);
+		Print_Medication_Note_Class		varchar(1);
+		Print_Medication_Note_Class_Name	varchar(30);
+		Print_Appointment_Form_Class		varchar(1);
+		Print_Appointment_Form_Class_Name	varchar(30);
 		};
-    	};
-#---    訂正前情報
-	Old_Ic_Money			varchar(10);
-	Old_Ac_Money			varchar(10);
-	Old_Ad_Money1			varchar(10);
-	Old_Ad_Money2			varchar(10);
 	};
 };

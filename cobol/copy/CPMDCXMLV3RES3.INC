@@ -105,9 +105,6 @@
       *               外来−固定額
                       11  MDCRES-MONEY-OUTPATIENT        PIC X(06).
       *
-      *        伝票番号（登録時のみ）
-               05  MDCRES-INVOICD-NUMBER     PIC  X(07).
-      *
       *        診療内容返却
                05  MDCRES-MEDICAL-INF-G.
                  07  MDCRES-MDC-INFO          OCCURS   120.
@@ -175,11 +172,32 @@
       *           エラーメッセージ
                   07  MDCRES-MEDI-RESULT-MSG     PIC X(100).
       *
-      *        収納情報返却
-               05  MDCRES-CD-INF.
+      *        伝票番号
+               05  MDCRES-INVOICD-NUMBER     PIC  X(07).
+      *
+               05  MDCRES-IC-INF.
       *            入金方法区分
                    07  MDCRES-IC-CODE           PIC  X(02).
                    07  MDCRES-IC-CODE-NAME      PIC  X(20).
+      *!!
+      *H29.7
+      *            入金取り扱い区分
+                   07  MDCRES-IC-REQUEST           PIC X(01).
+                   07  MDCRES-IC-REQUEST-NAME      PIC X(40).
+      *
+      *            今回合計請求額  （調整金・充当含む。訂正は差額）
+                   07  MDCRES-TOTAL-AC-MONEY      PIC  X(10).
+      *
+      *            今回入金額（合計）
+                   07  MDCRES-TOTAL-IC-MONEY      PIC  X(10).
+      *            今回返金額（合計）
+                   07  MDCRES-TOTAL-RE-MONEY      PIC  X(10).
+      *
+      *            今回入金額上限額・今回返金額（新規のみ）
+                   07  MDCRES-MAX-IC-MONEY        PIC X(10).
+      *
+      *        収納情報返却
+               05  MDCRES-CD-INF.
       *            今回入金金額
                    07  MDCRES-IC-MONEY          PIC  X(10).
       *
@@ -187,12 +205,10 @@
                    07  MDCRES-AD-MONEY1         PIC  X(10).
       *            調整金額２
                    07  MDCRES-AD-MONEY2         PIC  X(10).
-      *            請求金額
+      *            請求金額（調整金を含まない）
                    07  MDCRES-AC-MONEY          PIC  X(10).
       *
-      *            今回請求金額合計（訂正時は差額）
-                   07  MDCRES-TOTAL-AC-MONEY    PIC  X(10).
-      *            今回返金額（訂正時のみ）マイナス編集
+      *            今回返金額（訂正時以外は充当）
                    07  MDCRES-RE-MONEY          PIC  X(10).
       *
       *            収納情報返却（請求額内訳）
@@ -218,15 +234,60 @@
                         09  MDCRES-AC-POINT-G.
                             11  MDCRES-AC-POINT-TBL      OCCURS   16.
                                 13  MDCRES-AC-POINT-NAME   PIC  X(30).
+      *                         保険点数
                                 13  MDCRES-AC-POINT        PIC  X(10).
-      *        訂正前収納情報返却
-               05  MDCRES-OLD-CD-INF.
-      *            前回入金金額
-                   07  MDCRES-OLD-IC-MONEY         PIC  X(10).
-      *            前回請求金額
-                   07  MDCRES-OLD-AC-MONEY         PIC  X(10).
-      *            前回調整金額１
-                   07  MDCRES-OLD-AD-MONEY1        PIC  X(10).
-      *            前回調整金額２
-                   07  MDCRES-OLD-AD-MONEY2        PIC  X(10).
+      *                         適用外金額
+                                13  MDCRES-AC-TGMONEY      PIC  X(10).
+      *              自費明細
+                     07  MDCRES-JIHI-G.
+                         09  MDCRES-JIHI-TBL      OCCURS   10.
+                             11  MDCRES-JIHI-NAME       PIC  X(20).
+      *                      自費金額
+                             11  MDCRES-JIHI-MONEY      PIC  X(10).
+      *                      自費金額（消費税あり）
+                             11  MDCRES-JIHI-MONEY-TAX  PIC  X(10).
+      *                  自費消費税（再掲）
+                         09  MDCRES-JIHI-TAX    PIC X(10).
+      *
+      *            訂正前収納情報返却
+                   07  MDCRES-OLD-CD-INF.
+      *                前回入金金額
+                       09  MDCRES-OLD-IC-MONEY         PIC  X(10).
+      *                前回請求金額
+                       09  MDCRES-OLD-AC-MONEY         PIC  X(10).
+      *                前回調整金額１
+                       09  MDCRES-OLD-AD-MONEY1        PIC  X(10).
+      *                前回調整金額２
+                       09  MDCRES-OLD-AD-MONEY2        PIC  X(10).
+      *H29.6
+      *        減免情報
+               05  MDCRES-DISCOUNT-INF.
+                   07  MDCRES-DISCOUNT-NAME        PIC X(12).
+               05  MDCRES-MAE-CD-INF.
+      *            前回までの未収額
+                   07  MDCRES-MAE-MISYU             PIC X(10).
+      *            前回までの超過額
+                   07  MDCRES-MAE-CHOUKA            PIC X(10).
+      *H29.6
+      *   帳票印刷指示区分
+              05  MDCRES-PRINT-AREA.
+      *           処方せん印刷
+                  07  MDCRES-PRINT-SHOHOU      PIC X(01).
+                  07  MDCRES-PRINT-SHOHOU-MEI  PIC X(30).
+      *           請求書兼領収書印刷
+                  07  MDCRES-PRINT-SEIKYU      PIC X(01).
+                  07  MDCRES-PRINT-SEIKYU-MEI  PIC X(30).
+      *           診療費明細書印刷
+                  07  MDCRES-PRINT-MEISAI      PIC X(01).
+                  07  MDCRES-PRINT-MEISAI-MEI  PIC X(30).
+      *           薬剤情報印刷
+                  07  MDCRES-PRINT-YAKUJYO     PIC X(01).
+                  07  MDCRES-PRINT-YAKUJYO-MEI PIC X(30).
+      *           お薬手帳印刷
+                  07  MDCRES-PRINT-TECHOU      PIC X(01).
+                  07  MDCRES-PRINT-TECHOU-MEI  PIC X(30).
+      *           予約票印刷
+                  07  MDCRES-PRINT-YOYAKU      PIC X(01).
+                  07  MDCRES-PRINT-YOYAKU-MEI  PIC X(30).
+      *
       *

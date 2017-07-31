@@ -17,10 +17,29 @@ xml_medicalv3req3 {
 		Delete_Number_Info    {
 			Delete_Number	varchar(02);
 				} [30];
+#--- 登録処理区分
+		Request_Mode		varchar(06);
+#--- 入金方法
 		Ic_Code			varchar(2);
-		Ic_Money		varchar(10);
+#--- 入金取り扱い区分
+		Ic_Request_Code		varchar(1);
+#--- 一括入返金区分
+		Ic_All_Code		varchar(1);
+#--- 収納内容
+		Cd_Information    {
 		Ad_Money1		varchar(10);
 		Ad_Money2		varchar(10);
+		Ic_Money		varchar(10);
 		Re_Money		varchar(10);
+		}; 
+#--- 印刷区分
+		Print_Information    {
+		Print_Prescription_Class	varchar(1);
+		Print_Invoice_Receipt_Class	varchar(1);
+		Print_Statement_Class		varchar(1);
+		Print_Medicine_Information_Class	varchar(1);
+		Print_Medication_Note_Class	varchar(1);
+		Print_Appointment_Form_Class	varchar(1);
+		};
 	};
 };

@@ -77,13 +77,19 @@ data	{
 db "xml2" {
  xml_medicalsetv2req;
  xml_medicalsetv2res;
- fm_medication_note;
+ fm_medicine_notebook;
  fm_prescription;
  fm_medicine_information;
  fm_appointment_form;
  fm_statement;
  fm_invoice_receipt;
+ fm_prescription_h;
+ fm_order_injection;
+ fm_order_direction;
 };
 
 #include "orcadb.inc"
 #include "orcadbh.inc"
+db "push" {
+        push_medical01;
+};

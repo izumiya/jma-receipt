@@ -54,15 +54,41 @@
               05  MDCREQ-DEL-NUMBER-G.
                   07  MDCREQ-DEL-NUMBER        PIC X(02)
                                                OCCURS   30.
+      *H29.7
+      *       登録処理区分（Finish:登録）（リクエスト番号=05)
+              05  MDCREQ-REQUEST-MODE      PIC X(06).
       *
       *       入金方法
               05  MDCREQ-IC-CODE           PIC X(02).
-      *       入金金額
-              05  MDCREQ-IC-MONEY          PIC X(10).
-      *       調整金額１
-              05  MDCREQ-AD-MONEY1         PIC X(10).
-      *       調整金額２
-              05  MDCREQ-AD-MONEY2         PIC X(10).
-      *       返金額（訂正時）
-              05  MDCREQ-RE-MONEY          PIC X(10).
+      *H29.7
+      *       入金取り扱い区分
+              05  MDCREQ-IC-REQUEST        PIC X(01).
+      *       一括入返金区分
+              05  MDCREQ-IC-ALLKBN         PIC X(01).
+      *
+      *       収納内容
+              05  MDCREQ-SYUNOU-AREA.
+      *           調整金額１
+                  07  MDCREQ-AD-MONEY1         PIC X(10).
+      *           調整金額２
+                  07  MDCREQ-AD-MONEY2         PIC X(10).
+      *           入金額（合計と違う時のみ）
+                  07  MDCREQ-IC-MONEY          PIC X(10).
+      *           返金額（訂正のみ、充当の返金はゼロ）
+                  07  MDCREQ-RE-MONEY          PIC X(10).
+      *H29.6
+      *   帳票印刷指示区分
+              05  MDCREQ-PRINT-AREA.
+      *           処方せん印刷
+                  07  MDCREQ-PRINT-SHOHOU      PIC X(01).
+      *           請求書兼領収書印刷
+                  07  MDCREQ-PRINT-SEIKYU      PIC X(01).
+      *           診療費明細書印刷
+                  07  MDCREQ-PRINT-MEISAI      PIC X(01).
+      *           薬剤情報印刷
+                  07  MDCREQ-PRINT-YAKUJYO     PIC X(01).
+      *           お薬手帳印刷
+                  07  MDCREQ-PRINT-TECHOU      PIC X(01).
+      *           予約票印刷
+                  07  MDCREQ-PRINT-YOYAKU      PIC X(01).
       *
