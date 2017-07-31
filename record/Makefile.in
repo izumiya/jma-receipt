@@ -1000,6 +1000,10 @@ DB_files = \
 	fm_payment_certificate.db \
 	fm_statement_h.db \
 	push_medical01.db \
+	fm_prescription_h.db  \
+	fm_order_injection.db \
+	fm_order_direction.db \
+
 	
 
 shell.db: shell.db.in
