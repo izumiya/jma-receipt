@@ -7297,7 +7297,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 310-SPA-SET-SEC
       *
-      *
            .
        3001-HAORI-INI-EXT.
            EXIT.
@@ -7548,7 +7547,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            IF      SPA-ERRCD           =   SPACE
       *        外来更新処理
-               PERFORM 450012-GAIRAI-CALL-SEC
+               IF     (SPA-HKNCOMBINUM     =   "9999" )
+                   PERFORM 30031-GAIRAI999-CALL-SEC
+               ELSE
+                    PERFORM 450012-GAIRAI-CALL-SEC
+               END-IF
            END-IF
            IF      SPA-ERRCD       NOT =   SPACE
       *        エラーメッセージ編集
@@ -7558,6 +7561,32 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        3003-HAORI-UPD-EXT.
            EXIT.
+      *****************************************************************
+      *    HAORI　保険組合わせ9999　更新処理
+      *****************************************************************
+       30031-GAIRAI999-CALL-SEC             SECTION.
+      *
+      *    外来更新処理
+           INITIALIZE                  ORCSCGAIRAIAREA
+      *    新規、更新
+           MOVE    "1"                 TO  ORCSCGAIRAI-KBN
+      *    収納情報
+           MOVE    SPA-SYUNOU-MAX      TO  ORCSCGAIRAI-SYUNOU-MAX
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-SYUNOU-MAX
+               MOVE    SPA-SYUNOU-REC(IDX) TO  ORCSCGAIRAI-SYUNOU-REC
+                                                               (IDX)
+           END-PERFORM
+      *
+           CALL    "ORCSCGAIRAI"       USING
+                                       SPA-AREA
+                                       ORCSCGAIRAIAREA
+           MOVE    SPA-WORK        TO  SPA-K01KYOUTU
+      *
+           .
+       30031-GAIRAI999-CALL-EXT.
+           EXIT.
+      *
       *HAORI
       *H29.7
       *PUSH通信

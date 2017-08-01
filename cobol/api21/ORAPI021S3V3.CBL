@@ -910,14 +910,6 @@
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20011-BASEDATE-CHK-SEC
            END-IF
-      *    入金方法
-      *    IF     WRK-ERRCD            =   SPACE
-      *        PERFORM 20013-NYUKIN-HOHO-CHK-SEC
-      *    END-IF
-      *    入金取り扱い区分
-      *    IF     WRK-ERRCD            =   SPACE
-      *        PERFORM 20013-IC-REQUEST-CHK-SEC
-      *    END-IF
       *
            IF      FLG-SYORI           =   2
       *        リクエスト＝０５のチェックチェック
@@ -1638,7 +1630,10 @@
       *    入金・請求額
            IF     (WRK-ERRCD           =   SPACE)
                INITIALIZE                  SPA-K03
-               IF     (SPA-HKNCOMBINUM     NOT =   "9999" )
+               IF     (SPA-HKNCOMBINUM     =   "9999" )
+      *            収納データをSPAへ
+                   PERFORM 20025-SYUNOU-9999-SEC
+               ELSE
       *            請求確認画面編集処理
                    PERFORM 20023-SEIKYU-SYORI-SEC
                END-IF
@@ -1853,6 +1848,25 @@
        20022-SYUNOU-HEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    収納データをSPAへ編集処理
+      *****************************************************************
+       20025-SYUNOU-9999-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-K03
+           MOVE    ZERO                TO  SPA-IDX-KOUI
+           INITIALIZE                  SPA-SYUNOU-AREA
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   LNK-SYUNOU-MAX
+               ADD     1                   TO  SPA-SYUNOU-MAX
+               MOVE    LNK-SYUNOU-REC(IDX)
+                                           TO  SPA-SYUNOU-REC
+                                                       (SPA-SYUNOU-MAX)
+           END-PERFORM
+           .
+       20025-SYUNOU-9999-EXT.
+           EXIT.
       *****************************************************************
       *    請求確認画面編集処理
       *****************************************************************
@@ -2493,8 +2507,8 @@
            END-IF
       *
       *    更新後返却内容編集
-           IF     (SPA-HKNCOMBINUM NOT =   "9999" )
-              AND (FLG-UPDEND          =   1      )
+      *??  IF     (SPA-HKNCOMBINUM NOT =   "9999" )
+           IF     (FLG-UPDEND          =   1      )
       *        収納編集
                PERFORM 200234-SYUNOU-HEN-SEC
           END-IF
