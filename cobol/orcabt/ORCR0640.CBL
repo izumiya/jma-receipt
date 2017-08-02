@@ -744,6 +744,7 @@
       *  04.08.37    NACL-ÌçÏÆ    17/06/29  Ê¿À®£²£¹Ç¯£¸·î²þÀµ
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÀ©ÅÙ¤Î¸«Ä¾¤·¡Ë
       *  04.08.38    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
+      *  04.08.39    NACL-ÌçÏÆ    17/08/02  Ê¿À®£²£¹Ç¯£¸·î²þÀµÂÐ±þ¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -23664,7 +23665,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      11
@@ -23732,7 +23733,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      11
@@ -23806,7 +23807,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      21
@@ -23860,7 +23861,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      21
@@ -23920,7 +23921,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                        MOVE    12300   TO   WRK-KINGAKU
                  ELSE
@@ -23938,7 +23939,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF  FLG-KOHYONKAIME = 1
+               IF  FLG-TOKUSITU-TASU  =  1
                  IF  FLG-TOKU75 = 3
                        MOVE    12300   TO   WRK-KINGAKU
                  ELSE
@@ -23974,7 +23975,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      11
@@ -24042,7 +24043,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      11
@@ -24117,7 +24118,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      21
@@ -24171,7 +24172,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                    EVALUATE  FLG-GENBUTU70-KBN
                      WHEN      21
@@ -24231,7 +24232,7 @@
              EVALUATE   FLG-KEISAN2
               WHEN        ZERO
               WHEN         1
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                        MOVE    12300   TO   WRK-KINGAKU
                  ELSE
@@ -24249,7 +24250,7 @@
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                END-IF
               WHEN         2
-               IF    FLG-TOKUSITU-TASU  =  1
+               IF    FLG-KOHYONKAIME  =  1
                  IF  FLG-TOKU75 = 3
                        MOVE    12300   TO   WRK-KINGAKU
                  ELSE
