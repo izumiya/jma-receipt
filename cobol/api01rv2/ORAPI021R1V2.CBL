@@ -34,6 +34,7 @@
       * 04.07.00     NACL-多々納  15/08/XX  入院対応、単位追加対応
       *                                     包括対象項目追加
       * 04.08.00     NACL-多々納  15/12/14  伝票番号追加対応
+      * 05.00.00     NACL-多々納  17/08/XX  CLASS=02伝票番号追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -198,6 +199,9 @@
       *    単位
            03  WRK-TANICD              PIC X(03).
            03  WRK-TANINAME            PIC X(24).
+      *
+           03  WRK-DENPNUM             PIC 9(07).
+      *
       *
        01  TBL-JYURRK-AREA.
            03  TBL-JYURRK-OCC          OCCURS   150.
@@ -966,7 +970,12 @@
            IF      WRK-SRYKA           =   SPACE
                IF     (FLG-SYORI           =   2      )
                AND    (WRK-ERRCD           =   SPACE  )
-                   MOVE    "02"                TO  WRK-ERRCD
+      *!!
+      *            伝票番号なし、入院は日数
+                   IF     (MDCREQ-INVOICD-NUMBER   =   SPACE)
+                      OR  (SPA-NYUGAIKBN           =   "1"  )
+                       MOVE    "02"                TO  WRK-ERRCD
+                   END-IF
                END-IF
            END-IF
            .
@@ -1417,8 +1426,16 @@
       *****************************************************************
        2003-SYORI-02-SEC          SECTION.
       *
-      *    保険組合せチェック
-           PERFORM 20031-HKNCOMBI-CHK-SEC
+      *H29.8
+      *    伝票番号なし
+           IF     (MDCREQ-INVOICD-NUMBER   =   SPACE )
+              OR  (SPA-NYUGAIKBN           =   "1"   )
+      *        保険組合せチェック
+               PERFORM 20031-HKNCOMBI-CHK-SEC
+           ELSE
+      *        伝票番号チェック
+               PERFORM 20033-DENPNUM-CHK-SEC
+           END-IF
       *
       *    患者情報内容編集
            PERFORM 20032-MDC02RES-HEN-SEC
@@ -1479,6 +1496,13 @@
                    ELSE
                        MOVE    JYURRK-HKNCOMBINUM  TO  WRK-KEY-HKNCOMBI
                        PERFORM 20033-HKNCOMBI-HEN-SEC
+      *H29.8
+                       IF      SPA-NYUGAIKBN       =   "2"
+      *                    伝票番号
+                           MOVE    JYURRK-DENPNUM  TO
+                                               MDC02RES-INVOICD-NUMBER
+                                                               (IDX)
+                       END-IF
                    END-IF
                END-IF
       *        剤毎編集
@@ -1617,6 +1641,70 @@
        200311-HKNCOMBI-NUM-EXT.
            EXIT.
       *****************************************************************
+      *    伝票番号チェック処理
+      *****************************************************************
+       20033-DENPNUM-CHK-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  WRK-DENPNUM
+      *
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    MDCREQ-INVOICD-NUMBER   TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-SEISUU         >   7     )   OR
+                  (SNUM-SYOSUU         >   0     )
+      *        数値７桁
+               MOVE    "22"                TO  WRK-ERRCD
+           ELSE
+               MOVE    SNUM-OUTNUM         TO  WRK-DENPNUM
+           END-IF
+      *
+           IF      WRK-DENPNUM         =   ZERO
+               MOVE    "22"                TO  WRK-ERRCD
+               GO      TO      20033-DENPNUM-CHK-EXT
+           END-IF
+      *
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-PTID            TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           MOVE    WRK-DENPNUM         TO  JYURRK-DENPNUM
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-JYURRK          =   ZERO
+               IF      JYURRK-SRYYMD   NOT =   WRK-PERFORM-YMD
+                   MOVE    "23"                 TO  WRK-ERRCD
+               END-IF
+               IF      WRK-ERRCD           =   SPACE
+                   MOVE    JYURRK-SRYKA        TO  WRK-SRYKA
+                   MOVE    JYURRK-RENNUM       TO  WRK-RENNUM
+                   MOVE    JYURRK-HKNCOMBINUM  TO  WRK-HKNCOMBI
+      *            診療科名称
+                   MOVE    JYURRK-SRYYMD       TO  WRK-SRYYMD
+                   PERFORM 20011-SRYKA-CHK-SEC
+               END-IF
+           ELSE
+               MOVE    "15"                 TO  WRK-ERRCD
+           END-IF
+      *
+           .
+       20033-DENPNUM-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    患者情報出力情報編集処理
       *****************************************************************
        20032-MDC02RES-HEN-SEC     SECTION.
@@ -1636,13 +1724,24 @@
       *    診療科
            MOVE    WRK-SRYKA           TO  MDC02RES-DEP-CODE
            MOVE    WRK-SRYKA-NAME      TO  MDC02RES-DEP-NAME
+      *
+      *H29.8
+           IF      MDCREQ-INVOICD-NUMBER   =   SPACE
       *    連番
-           IF      MDCREQ-NUMBER   NOT NUMERIC
-               MOVE    1                   TO  WRK-RENNUM
+               IF      MDCREQ-NUMBER   NOT NUMERIC
+                   MOVE    1                   TO  WRK-RENNUM
+               ELSE
+                   MOVE    MDCREQ-NUMBER       TO  WRK-RENNUM
+               END-IF
+               MOVE    WRK-RENNUM          TO  MDC02RES-NUMBER
            ELSE
-               MOVE    MDCREQ-NUMBER       TO  WRK-RENNUM
+      *        伝票番号
+               MOVE    MDCREQ-INVOICD-NUMBER
+                                           TO  MDC02RES-INVOICD-NUMBER
+                                                               (1)
+      *        連番
+               MOVE    WRK-RENNUM          TO  MDC02RES-NUMBER
            END-IF
-           MOVE    WRK-RENNUM          TO  MDC02RES-NUMBER
       *
       *    保険組合せ情報
            IF      WRK-ERRCD       NOT =   SPACE
@@ -1683,7 +1782,7 @@
                                        TO  MDC02RES-RECIPIENT-NUMBER
                                                               (1 IDK)
                END-PERFORM
-          END-IF
+           END-IF
            .
        20032-MDC02RES-HEN-EXT.
            EXIT.
@@ -3405,9 +3504,13 @@
            WHEN    "21"
                MOVE    "対象の保険組合せが５件以上あります。"
                                                TO  WRK-ERRMSG
-     ****  WHEN    "22"
-     ****      MOVE    "対象がありません。"
-     ****                                      TO  WRK-ERRMSG
+      *H29.8
+           WHEN    "22"
+               MOVE    "伝票番号エラーです"
+                                               TO  WRK-ERRMSG
+           WHEN    "23"
+               MOVE    "伝票番号の受診履歴が送信内容と一致しません"
+                                               TO  WRK-ERRMSG
       *警告
            WHEN    "K1"
                MOVE    "診療日を設定しました"
@@ -3761,8 +3864,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
-           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+           MOVE    WRK-SYSYMD          TO  TNSP-YUKOSTYMD
+           MOVE    WRK-SYSYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC

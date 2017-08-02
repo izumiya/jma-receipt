@@ -22,6 +22,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 05.00.00     NACL-多々納  17/08/XX  伝票番号追加対応
       *****************************************************************
         01  XML-MEDICALGET02RES.
             02  MDC02RES-CONTEXT           PIC S9(9)   BINARY.
@@ -86,6 +87,8 @@
                           09  MDC02RES-PROVIDER-NUMBER     PIC X(08).
       *                   受給者番号
                           09  MDC02RES-RECIPIENT-NUMBER    PIC X(20).
+      *           伝票番号
+                  05  MDC02RES-INVOICD-NUMBER    PIC X(07).
       *           診療行為内容
                   05  MDC02RES-MDC-INFO        OCCURS   135.
       *               診療種別区分

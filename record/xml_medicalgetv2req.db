@@ -25,6 +25,8 @@ xml_medicalgetv2req {
 				PublicInsuredPerson_Number	varchar(20);
 			} [4];
 		} ;
+#---     ì`ï[î‘çÜ
+		Invoice_Number		varchar(07);
 		};
    	};
 };
