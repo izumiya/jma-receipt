@@ -51,7 +51,17 @@ db "xml2" {
  xml_medicalv3res5;
  xml_medicalv3req6;
  xml_medicalv3res6;
+ fm_medicine_notebook;
+ fm_prescription;
+ fm_medicine_information;
+ fm_appointment_form;
+ fm_statement;
+ fm_invoice_receipt;
 };
 
 #include "orcadb.inc"
 #include "orcadbh.inc"
+
+db "push" {
+  push_print001;
+};
