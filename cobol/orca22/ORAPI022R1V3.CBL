@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.01    NACL-藤原    17/08/03  補足コメントの設定方法修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3115,7 +3116,11 @@
                    END-IF
                END-PERFORM
                MOVE    PTBYO-BYOMEI        TO  DISEASES-SPINAME1   (IDY)
-               MOVE    PTBYO-HOSOKUCD-G    TO  DISEASES-HOSOKUCD-G (IDY)
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       3
+                   MOVE    PTBYO-HOSOKUCD (IDXX)   TO
+                                           DISEASES-HOSOKUCD (IDY IDXX)
+               END-PERFORM
                MOVE    PTBYO-HOSOKU-COMMENT
                                            TO  DISEASES-HOSOKU-COMMENT
                                                                    (IDY)
