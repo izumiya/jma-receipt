@@ -6048,6 +6048,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-LSTYMD 
            PERFORM 1101-HKN-SYOYMD-SET-SEC
       *
+      *H29.8 APIデフォルト取得
+      *    最終来院日からの判定
+           IF      LNK-SC95-PG         =   SPACE
+               IF      SPA-LAST-KIKAN      NOT =   ZERO
+                   PERFORM 2003-LAST-KIKAN-CHK-SEC
+               END-IF
+           END-IF
+      *
       *    病名編集
            PERFORM 11012-BYOMEI-HENSYU-SEC
       *    特定疾患の有無検索
