@@ -624,6 +624,8 @@
       *
       *H24.9
       *    £Ñ£Ò°õºþ
+           MOVE    ORCSQRCSV62AREA     TO  WQRCSV62AREA
+      *
            MOVE    ZERO                TO  FLG-QROK
            IF     (WRK-QRKBN           =   "1"
                                        OR  "2"  )
@@ -1607,7 +1609,6 @@
            MOVE    ORCHC62-CNT         TO  ORCSQRCSV62-CNT
            MOVE    ORCHC62-PGKBN       TO  ORCSQRCSV62-PGKBN
       *
-           MOVE    ORCSQRCSV62AREA     TO  WQRCSV62AREA
            CALL    "ORCSQRCSV62"       USING
                                        SPA-AREA
                                        ORCSQRCSV62AREA
