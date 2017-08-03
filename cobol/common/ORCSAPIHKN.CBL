@@ -540,6 +540,14 @@
                PERFORM 299-PTKOHINF-OUTHEN-SEC
            END-IF
       *
+      *    最大件数 
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL     (IDX      >   200 )
+               IF      ORCSAPIHKN-THKNCOMBI (IDX) NOT  =  SPACE
+                   MOVE    IDX             TO  ORCSAPIHKN-OT-MAX
+               END-IF
+           END-PERFORM
+      *
            .
        200-HKNCOMBI-SET-EXT.
            EXIT.
@@ -547,7 +555,7 @@
       *****************************************************************
       *    前回保険組合せで決定
       *****************************************************************
-       2001-HKNCOMBI-SRYKA-SEC             SECTION.
+       2001-HKNCOMBI-SRYKA-SEC         SECTION.
       *
       *    受診歴を検索する  医療機関、患者ＩＤ
            INITIALIZE                  JYURRK-REC
@@ -1120,6 +1128,7 @@
                    PERFORM 29012-KOHHENSYU-SEC
                END-PERFORM
            END-IF
+      *
            .
        2901-HKNCOMBI-HEN-EXT.
            EXIT.
