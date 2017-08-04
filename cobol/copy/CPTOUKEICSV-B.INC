@@ -15,7 +15,7 @@
       *    診療年月日
            03  TOUKEICSV-B-SRYYMD      PIC X(8).
            03  TOUKEICSV-B-PTID        PIC 9(10).
-           03  TOUKEICSV-B-SEQ-NO      PIC 9(5).
+           03  TOUKEICSV-B-SEQ-NO      PIC 9(8).
            03  TOUKEICSV-B-CSVDATA     PIC X(20000).
       *    作成日
            03  TOUKEICSV-B-CREYMD      PIC X(8).
