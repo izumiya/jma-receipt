@@ -8,7 +8,7 @@ tbl_toukeicsv_b	{
 	SRYYM			varchar(6);
 	SRYYMD			varchar(8);
 	PTID			number(10);
-	SEQ_NO			number(5);
+	SEQ_NO			number(8);
 	CSVDATA			varchar(20000);
 	CREYMD			varchar(8);
 	UPYMD			char(8);

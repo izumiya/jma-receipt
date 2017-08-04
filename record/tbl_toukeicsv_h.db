@@ -7,7 +7,7 @@ tbl_toukeicsv_h	{
 	SHELLID			varchar(20);
 	SRYYM			varchar(6);
 	SRYYMD			varchar(8);
-	CNT			number(5);
+	CNT			number(8);
 	NYUGAIKBN		char(1);
 	TO_FOLDER		varchar(200);
 	TO_DATA			varchar(200);

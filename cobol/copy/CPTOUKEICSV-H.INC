@@ -19,7 +19,7 @@
       *    診療年月日
            03  TOUKEICSV-H-SRYYMD      PIC X(8).
       *    件数
-           03  TOUKEICSV-H-CNT         PIC 9(5).
+           03  TOUKEICSV-H-CNT         PIC 9(8).
       *    入外区分
            03  TOUKEICSV-H-NYUGAIKBN   PIC X(1).
       *    先格納場所
