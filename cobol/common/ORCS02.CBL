@@ -5851,7 +5851,7 @@
                         END-IF
                       ELSE
                         IF   LNK-SYU-TOTAL-HKNTEN  NOT = ZERO
-                          MOVE  "1"      TO   LNK-S02-TOKUSYU-SAI-KBN
+      ********************MOVE  "1"      TO   LNK-S02-TOKUSYU-SAI-KBN
                           MOVE   1       TO   LNK-SYU-SKJ-FTNDAY(3)
                         END-IF
                       END-IF
@@ -5865,9 +5865,9 @@
                     OR     FLG-KOREI-TANYUIN         =   1
                       CONTINUE
                     ELSE
-                      IF    LNK-S02-TOKUSYU-SAI-KBN   =  "1"
-                        PERFORM  20021-TOKUSITU-HENSYU-SEC
-                      ELSE
+      ****************IF    LNK-S02-TOKUSYU-SAI-KBN   =  "1"
+      ****************  PERFORM  20021-TOKUSITU-HENSYU-SEC
+      ****************ELSE
                         INITIALIZE                    SSRHKOH-AREA
                         MOVE  LNK-SYU-PTID        TO  SSRHKOH-PTID
                         MOVE  LNK-SYU-NYUGAIKBN   TO  SSRHKOH-NYUGAIKBN
@@ -5879,7 +5879,7 @@
                         IF   SSRHKOH-RC  =  1
                           PERFORM  20021-TOKUSITU-HENSYU-SEC
                         END-IF
-                      END-IF
+      ****************END-IF
                     END-IF
                  END-IF
                END-IF
