@@ -745,6 +745,8 @@
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÀ©ÅÙ¤Î¸«Ä¾¤·¡Ë
       *  04.08.38    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
       *  04.08.39    NACL-ÌçÏÆ    17/08/02  Ê¿À®£²£¹Ç¯£¸·î²þÀµÂÐ±þ¤Î½¤Àµ
+      *  04.08.40    NACL-ÌçÏÆ    17/08/03  Ê¿À®£²£¹Ç¯£¸·î²þÀµ
+      *                                     ¡Ê¹â³ÛÎÅÍÜÈñÀ©ÅÙ¤Î¸«Ä¾¤·¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5034,69 +5036,69 @@
                  IF    RECE62-KOUREI-HANTEIFLG  =  "1"
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "17"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-      **@                   "18" OR "19" OR "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                            "18" OR "19" OR "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                             "18" OR "19" OR "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "18"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-      **@                   "17" OR "19" OR  "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                            "17" OR "19" OR  "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                             "17" OR "19" OR  "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "19"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-      **@                   "17" OR "18" OR  "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                            "17" OR "18" OR  "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                             "17" OR "18" OR  "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "22"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-      **@                   "17" OR "18" OR "19" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                            "17" OR "18" OR "19" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
                             "17" OR "18" OR "19"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
-      **@          WHEN      "34"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
-      **@                   "17" OR "18" OR "19" OR "22"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            END-IF
+                     END-IF
+                   WHEN      "34"
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-PTTOKKI-CD(TOKKI-IDX) =
+                            "17" OR "18" OR "19" OR "22"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     END-IF
                   END-EVALUATE
                  ELSE
                   EVALUATE  WRK-TOKUSITU-TOKKI
@@ -5192,69 +5194,69 @@
                IF    RECE62-KOUREI-HANTEIFLG  =  "1"
                   EVALUATE  WRK-TOKUSITU-TOKKI
                    WHEN      "17"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-TOKKI(TOKKI-IDX) =
-      **@                   "18" OR "19" OR "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-TOKKI(TOKKI-IDX) =
+                            "18" OR "19" OR "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-TOKKI(TOKKI-IDX) =
                             "18" OR "19" OR "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "18"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-TOKKI(TOKKI-IDX) =
-      **@                   "17" OR "19" OR  "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-TOKKI(TOKKI-IDX) =
+                            "17" OR "19" OR  "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-TOKKI(TOKKI-IDX) =
                             "17" OR "19" OR  "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "19"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-TOKKI(TOKKI-IDX) =
-      **@                   "17" OR "18" OR  "22" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-TOKKI(TOKKI-IDX) =
+                            "17" OR "18" OR  "22" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-TOKKI(TOKKI-IDX) =
                             "17" OR "18" OR  "22"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
+                     END-IF
                    WHEN      "22"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-TOKKI(TOKKI-IDX) =
-      **@                   "17" OR "18" OR "19" OR "34"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            ELSE
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-TOKKI(TOKKI-IDX) =
+                            "17" OR "18" OR "19" OR "34"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     ELSE
                        IF   RECE62-TOKKI(TOKKI-IDX) =
                             "17" OR "18" OR "19"
                          MOVE   WRK-TOKUSITU-TOKKI  TO
                                             WRK-TOKUSITU-TOKKI2
                        END-IF
-      **@            END-IF
-      **@          WHEN      "34"
-      **@            IF  RECE62-SRYYM  >=  "201708"
-      **@              IF   RECE62-TOKKI(TOKKI-IDX) =
-      **@                   "17" OR "18" OR "19" OR "22"
-      **@                MOVE   WRK-TOKUSITU-TOKKI  TO
-      **@                                   WRK-TOKUSITU-TOKKI2
-      **@              END-IF
-      **@            END-IF
+                     END-IF
+                   WHEN      "34"
+                     IF  RECE62-SRYYM  >=  "201708"
+                       IF   RECE62-TOKKI(TOKKI-IDX) =
+                            "17" OR "18" OR "19" OR "22"
+                         MOVE   WRK-TOKUSITU-TOKKI  TO
+                                            WRK-TOKUSITU-TOKKI2
+                       END-IF
+                     END-IF
                   END-EVALUATE
                ELSE
                   EVALUATE  WRK-TOKUSITU-TOKKI
@@ -11885,17 +11887,17 @@
               IF ACCT-JIHOKBN = SPACE
                        MOVE    "36"      TO      WRK-TOKKI
               END-IF
-      **@    WHEN       18
-      **@      EVALUATE   FLG-TOKUSITU
-      **@          WHEN     1
-      **@              MOVE    "22"      TO      WRK-TOKKI
-      **@          WHEN     2
-      **@              MOVE    "34"      TO      WRK-TOKKI
-      **@      END-EVALUATE
-      **@      IF    RECE62-SRYYM            >=  "201501"
-      **@      AND   WRK-TOKKI            NOT =  SPACE
-      **@          MOVE   WRK-TOKKI      TO      WRK-TOKUSITU-TOKKI
-      **@      END-IF
+             WHEN       18
+               EVALUATE   FLG-TOKUSITU
+                   WHEN     1
+                       MOVE    "22"      TO      WRK-TOKKI
+                   WHEN     2
+                       MOVE    "34"      TO      WRK-TOKKI
+               END-EVALUATE
+               IF    RECE62-SRYYM            >=  "201501"
+               AND   WRK-TOKKI            NOT =  SPACE
+                   MOVE   WRK-TOKKI      TO      WRK-TOKUSITU-TOKKI
+               END-IF
       *
              WHEN       96
                        MOVE    "96"      TO      WRK-TOKKI
@@ -32984,19 +32986,19 @@
       *
            IF   FLG-KISAIOK  =  1
              IF  RECE62-KOUREI-HANTEIFLG = "1"
-      **@      IF  RECE62-SRYYM   >=  "201708"
-      **@        IF   FLG-TOKUSITU-TASU  =  1
-      **@          MOVE  18    TO   FLG-TOKKI
-      **@        ELSE
-      **@          MOVE   7    TO   FLG-TOKKI
-      **@        END-IF
-      **@      ELSE
+               IF  RECE62-SRYYM   >=  "201708"
+                 IF   FLG-TOKUSITU-TASU  =  1
+                   MOVE  18    TO   FLG-TOKKI
+                 ELSE
+                   MOVE   7    TO   FLG-TOKKI
+                 END-IF
+               ELSE
                  IF   FLG-TOKUSITU-TASU  =  1
                    MOVE   8    TO   FLG-TOKKI
                  ELSE
                    MOVE   7    TO   FLG-TOKKI
                  END-IF
-      **@      END-IF
+               END-IF
              ELSE
                IF  RECE62-SRYYM   >=  "201501"
                  IF   FLG-TOKUSITU-TASU  =  1

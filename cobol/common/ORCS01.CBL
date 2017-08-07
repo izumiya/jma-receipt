@@ -12882,7 +12882,8 @@
            AND  (SYU-KOH2HKNNUM     = SPACE)
            AND  (SYU-KOH3HKNNUM     = SPACE)
            AND  (SYU-KOH4HKNNUM     = SPACE)
-             IF  WK-HKNJANUM2-TBL  =  WK-HKNJANUM-TBL
+             IF   (LNK-SYU-YKZKENNUM  =  SYU-YKZKENNUM  )
+             AND  (WK-HKNJANUM2-TBL   =  WK-HKNJANUM-TBL)
                IF  ( FLG-GENBUTU70  NOT =  ZERO )
                OR  ((FLG-GENBUTU70      =  ZERO) AND
                     (SYU-SKJ-FTNGAKU(2) =  ZERO))
