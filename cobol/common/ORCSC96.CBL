@@ -3530,6 +3530,27 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H29.8
+               WHEN    "1310"
+                   STRING  "保険組合せの選択件数が上限を超えています。"
+                           "選択できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "1311"
+                   STRING  "診療科の選択件数が上限を超えています。"
+                           "選択できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "1312"
+                   STRING  "保険組合せ・診療科の組合せ件数が"
+                           "上限件数を超えています。"
+                           "選択できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
       **
                WHEN    "K910"
                    STRING  "警告！"

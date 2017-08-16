@@ -795,7 +795,8 @@
                MOVE    SPA-SRYKA           TO  SPA-GMN-TSRYKA (02)
            END-IF
            PERFORM VARYING     IDX2    FROM    2   BY  1
-                    UNTIL     (IDX2    >   10  )  OR
+      ***           UNTIL     (IDX2    >   10  )  OR
+                    UNTIL     (IDX2    >   40  )  OR
                               (SPA-GMN-TSRYKA (IDX2)   =   SPACE)
                PERFORM VARYING     IDY     FROM    1   BY  1
                        UNTIL       IDY     >   SPA-SRYKA-MAX

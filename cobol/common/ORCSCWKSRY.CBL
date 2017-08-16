@@ -176,6 +176,8 @@
       *H27.7
            03  IDW2-H                  PIC 9(04).
       *
+           03  IDHC                    PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-ERRCD               PIC X(04).
@@ -260,8 +262,10 @@
            03  IDXZ                        PIC 9(04).
            03  WRK-ZKS-GRP             PIC X(02).
            03  WRK-ZKS-KBN             PIC X(01).
+      *H29.8
+           03  WRK-GRPCNT              PIC 9(03).
+           03  FLG-CHK01               PIC 9(01).
       *
-      *TEST
       *    収納集計点数内容
        01  TBL-K02SCR-AREA.
            03  TBL-K02SCR-OCC          OCCURS   400.
@@ -3677,11 +3681,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-GMN-INPUTCD (IDH1)(1:1) =   "#"
                                                    OR  "$"
                    CONTINUE
+                   IF      SPA-GMN-INPUTCD (IDH1)(1:1) =   "#"
+                       MOVE    IDH1              TO  IDHC
+                   END-IF
                ELSE
                  IF      SPA-COM-HKNCOMBI(IDH1)  =   "9999"
                      MOVE    1                   TO  FLG-HKN999
                  ELSE
                    MOVE    SPA-COM-HKNCOMBI(IDH1)  TO  WRK-HKNCOMBI
+      *H29.8
+                   MOVE    ZERO                TO  FLG-CHK01
                    PERFORM VARYING     IDH     FROM    1   BY  1
                            UNTIL       IDH     >   15
                        IF      SPA-TBL-HKNCOMBI (IDH)  =   SPACE
@@ -3690,34 +3699,60 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                        IF      SPA-TBL-HKNCOMBI (IDH)   =   WRK-HKNCOMBI
                            MOVE    15              TO  IDH
+      *H29.8
+                           MOVE    1               TO  FLG-CHK01
                        END-IF
                    END-PERFORM
+      *H29.8
+      *            テーブルオーバーチェック
+                   IF      FLG-CHK01            =   ZERO
+                       MOVE    "1310"           TO  SPA-ERRCD
+                       MOVE    "1"              TO  SPA-COM-CUR (IDHC)
+                   END-IF
                  END-IF
                END-IF
            END-PERFORM
       *    包括保険は最後
            IF     (SPA-HKNCOMBINUM NOT =   "9999")  AND
                   (FLG-HKN999          =   1     )
+               MOVE    ZERO                TO  FLG-CHK01
                PERFORM VARYING     IDH     FROM    1   BY  1
                        UNTIL       IDH     >   15
                    IF      SPA-TBL-HKNCOMBI (IDH)  =   SPACE
                        MOVE    "9999"          TO  SPA-TBL-HKNCOMBI
                                                                  (IDH)
                        MOVE    15              TO  IDH
+                       MOVE    1               TO  FLG-CHK01
                    END-IF
                END-PERFORM
+      *H29.8
+      *        テーブルオーバーチェック
+               IF      FLG-CHK01            =   ZERO
+                   MOVE    "1310"           TO  SPA-ERRCD
+                   MOVE    "1"              TO  SPA-COM-CUR (IDHC)
+               END-IF
            END-IF
+      *
+      *    H29.8   SPA-SRYKA,HKNCOMBIは設定済み
+           MOVE    1                   TO  WRK-GRPCNT
       *
            PERFORM VARYING     IDH     FROM    1   BY  1
                    UNTIL      (IDH     >   15   )  OR
                               (SPA-TBL-HKNCOMBI(IDH)   =   SPACE )
+      *H29.8
+                          OR  (SPA-ERRCD   NOT =   SPACE )
                PERFORM VARYING     IDH1    FROM    1   BY  1
                        UNTIL      (IDH1    >   SPA-MAX-LINE  )  OR
                                  ((SPA-GMN-INPUTCD (IDH1)  =   SPACE )
                              AND  (SPA-COM-INPUTCD (IDH1)  =   SPACE ))
+      *H29.8
+                          OR  (SPA-ERRCD   NOT =   SPACE )
                  IF      SPA-GMN-INPUTCD (IDH1)(1:1) =   "#"
                                                      OR  "$"
                      CONTINUE
+                     IF      SPA-GMN-INPUTCD (IDH1)(1:1) =   "$"
+                         MOVE    IDH1              TO  IDHC
+                     END-IF
                  ELSE
                    IF     (SPA-COM-HKNCOMBI(IDH1)  =
                                                SPA-TBL-HKNCOMBI(IDH))
@@ -3725,11 +3760,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  WRK-SRYKA
                        MOVE    SPA-COM-DRCD (IDH1)
                                                    TO  WRK-DRCD
+      *H29.8
+                       MOVE    ZERO                TO  FLG-CHK01
                        PERFORM VARYING     IDH2    FROM    1   BY  1
                                UNTIL       IDH2    >   10
                            IF      SPA-TBL-SRYKA (IDH  IDH2)   =   SPACE
                                MOVE    WRK-SRYKA  TO  SPA-TBL-SRYKA
                                                              (IDH IDH2)
+      *H29.8
+                               ADD     1               TO  WRK-GRPCNT
                                IF      WRK-DRCD   NOT =   SPACE
                                    MOVE    "1"        TO  SPA-TBL-DRCD1
                                                              (IDH IDH2)
@@ -3740,8 +3779,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            IF      SPA-TBL-SRYKA (IDH  IDH2)
                                                        =   WRK-SRYKA
                                MOVE    10              TO  IDH2
+                               MOVE    1               TO  FLG-CHK01
                            END-IF
                        END-PERFORM
+      *H29.8
+                       IF      FLG-CHK01            =   ZERO
+                           MOVE    "1311"           TO  SPA-ERRCD
+                           MOVE    "1"              TO  SPA-COM-CUR
+                                                         (IDHC)
+                       END-IF
                    END-IF
                  END-IF
                END-PERFORM
@@ -3749,9 +3795,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-TBL-SRYKA(IDH 1)    =   SPACE
                    MOVE    SPA-SRYKA           TO  SPA-TBL-SRYKA(IDH 1)
                    MOVE    SPA-DRCD            TO  SPA-TBL-DRCD (IDH 1)
+      *H29.8
+                   ADD     1               TO  WRK-GRPCNT
                END-IF
            END-PERFORM
       *
+      *H29.8
+           IF      SPA-ERRCD           =   SPACE
+      *        組合せ最大１３件（合計を除く）
+               IF      WRK-GRPCNT      >   13
+                   MOVE    "1312"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  SPA-COM-CUR
+                                                      (IDHC)
+               END-IF
+           END-IF
            .
        45021-HKNCOMBI-SRYKA-EXT.
            EXIT.
