@@ -288,7 +288,7 @@
            END-IF
            MOVE    ZERO                TO  LNK-SYUNOU-MAX
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   600 )
+                   UNTIL      (IDX     >   15  )
                           OR  (LNK-SYU-SRYYMD (IDX)  =   SPACE )
                MOVE    IDX                 TO  LNK-SYUNOU-MAX
            END-PERFORM

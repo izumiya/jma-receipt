@@ -631,7 +631,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL      (IDH     >   15  )  OR
                               (SPA-TBL-HKNCOMBI(IDH)   =   SPACE)
                PERFORM VARYING     IDH2    FROM    1   BY  1
-                       UNTIL      (IDH2    >   15  )  OR
+                       UNTIL      (IDH2    >   10  )  OR
                                   (SPA-TBL-SRYKA(IDH IDH2) =   SPACE)
                    MOVE    SPA-TBL-SRYKA(IDH IDH2) TO  WRK-SRYKA
                    PERFORM VARYING     IDH3    FROM    1   BY  1
@@ -672,7 +672,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    1                   TO  FLG-FUKU-FLG
                END-IF
                PERFORM VARYING     IDH2    FROM    1   BY  1
-                       UNTIL      (IDH2    >   15  )  OR
+                       UNTIL      (IDH2    >   10  )  OR
                                   (SPA-TBL-SRYKA(IDH IDH2) =   SPACE)
                               OR  (SPA-ERRCD   NOT =   SPACE )
                    MOVE    SPA-TBL-SRYKA(IDH IDH2) TO  WRK-SRYKA
@@ -1924,7 +1924,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                OR (SPA-TBL-HKNCOMBI(IDH)   =   SPACE)
                                OR (FLG-SRYKA-OK   =   1  )
                    PERFORM VARYING     IDH2    FROM    1   BY  1
-                           UNTIL      (IDH2    >   15  )  OR
+                           UNTIL      (IDH2    >   10  )  OR
                                    (SPA-TBL-SRYKA(IDH IDH2) =   SPACE)
                                    OR (FLG-SRYKA-OK   =   1  )
                        IF      SPA-TBL-SRYKA(IDH IDH2) =

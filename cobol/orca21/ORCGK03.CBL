@@ -839,7 +839,8 @@
                MOVE    SPA-SRYKA           TO  SPA-GMN-TSRYKA (02)
            END-IF
            PERFORM VARYING     IDX2    FROM    2   BY  1
-                    UNTIL     (IDX2    >   10  )  OR
+      ***           UNTIL     (IDX2    >   10  )  OR
+                    UNTIL     (IDX2    >   40  )  OR
                               (SPA-GMN-TSRYKA (IDX2)   =   SPACE)
                PERFORM VARYING     IDY     FROM    1   BY  1
                        UNTIL       IDY     >   SPA-SRYKA-MAX
@@ -6145,7 +6146,7 @@
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-FLG-CLAIM       =   1     )
                PERFORM 4906-CLAIM-SOUSIN-SEC
-               PERFORM 49061-API-CLMAI-SEC
+               PERFORM 49061-API-CLAIM-SEC
            END-IF
       *!!!!
       *H28.6
@@ -6153,7 +6154,7 @@
            IF     (SPA-MW              =   SPA-GINBEE)
              AND  (SPA-ERRCD           =   SPACE     )
       *        AIP CLAIM送信処理
-               PERFORM 49061-API-CLMAI-SEC
+               PERFORM 49061-API-CLAIM-SEC
            END-IF
       *
       *H29.7
@@ -7051,7 +7052,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
       *    API ＣＬＡＩＭ送信処理
       *****************************************************************
-       49061-API-CLMAI-SEC  SECTION.
+       49061-API-CLAIM-SEC  SECTION.
       *
            MOVE    ZERO                TO  FLG-CLAIM
       *    ＣＬＡＩＭ接続判定
@@ -7078,7 +7079,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            IF      FLG-CLAIM           =   ZERO
-               GO  TO  49061-API-CLMAI-EXT
+               GO  TO  49061-API-CLAIM-EXT
            END-IF
       *
       *
@@ -7137,7 +7138,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            .
-       49061-API-CLMAI-EXT.
+       49061-API-CLAIM-EXT.
            EXIT.
       *****************************************************************
       *    ユーザプログラム起動処理
