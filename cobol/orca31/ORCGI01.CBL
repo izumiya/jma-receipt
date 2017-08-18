@@ -18291,11 +18291,10 @@
                GO  TO  490-FTNKIN-CALC-EXT
            END-IF
       *
-           MOVE    SPA-AREA            TO  WRK-SPA-AREA
-           MOVE    "1"                 TO  WRK-SPA-NYUGAIKBN
-           MOVE    SPA-NAI-I01-PTID    TO  WRK-SPA-PTID
+           MOVE    "1"                 TO  SPA-NYUGAIKBN
+           MOVE    SPA-NAI-I01-PTID    TO  SPA-PTID
            MOVE    SPA-NAI-I01-BIRTHDAY
-                                       TO  WRK-SPA-BIRTHDAY
+                                       TO  SPA-BIRTHDAY
       *
            INITIALIZE                      I0SUB02-LNK
            IF    ( SPA-GMN-I01-SYORIKBN-CD =   "02" )
