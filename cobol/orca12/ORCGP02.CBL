@@ -2666,12 +2666,12 @@
       *    ユーザプログラム起動
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               CONTINUE
-           ELSE
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        CONTINUE
+      ***  ELSE
                MOVE    2                   TO  FLG-USERPG
                PERFORM 4907-USERPG-SEC
-           END-IF
+      **** END-IF
            IF      FLG-END             =   1
                GO      TO      4991-DELETE-SYORI-EXT
            END-IF
@@ -3156,12 +3156,12 @@
       *    ユーザプログラム起動
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               CONTINUE
-           ELSE
+      **   IF      SPA-MW              =   SPA-GINBEE
+      *        CONTINUE
+      **** ELSE
                MOVE    1                   TO  FLG-USERPG
                PERFORM 4907-USERPG-SEC
-           END-IF
+      ***  END-IF
       *
            IF      FLG-END             =   1
                MOVE    ZERO                TO  SPA-KEI-FLG

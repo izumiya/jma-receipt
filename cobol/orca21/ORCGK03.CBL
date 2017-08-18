@@ -1238,11 +1238,11 @@
       *    ユーザプログラム起動初期
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               INITIALIZE                  SPA-NAI-GYOUMU-FLG
-               INITIALIZE                  SPA-NAI-GYOUMU-ARI
-               GO      TO      310-SPA-SET-EXT
-           END-IF
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        INITIALIZE                  SPA-NAI-GYOUMU-FLG
+      *        INITIALIZE                  SPA-NAI-GYOUMU-ARI
+      *        GO      TO      310-SPA-SET-EXT
+      *    END-IF
       *
            INITIALIZE                      ORCSUSERCHKAREA
            MOVE    "K03"               TO  ORCSUSERCHK-GMNPG
@@ -3613,11 +3613,11 @@
            MOVE    WIDGET-NORMAL       TO  K03-B03-STATE
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               MOVE    WIDGET-INSENSITIVE  TO  K03-USERPG-STATE
-           ELSE
-               MOVE    WIDGET-NORMAL       TO  K03-USERPG-STATE
-           END-IF
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        MOVE    WIDGET-INSENSITIVE  TO  K03-USERPG-STATE
+      *    ELSE
+      *        MOVE    WIDGET-NORMAL       TO  K03-USERPG-STATE
+      *    END-IF
       *
            .
        51O-GSRAUTH-EXT.
@@ -7146,10 +7146,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
        4907-USERPG-SEC  SECTION.
       *
       *v4.8
-      *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               GO      TO      4907-USERPG-EXT
-           END-IF
+      **   ginbee対応
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        GO      TO      4907-USERPG-EXT
+      **   END-IF
       *
            EVALUATE    SPA-USERPG-FLG
                WHEN    1

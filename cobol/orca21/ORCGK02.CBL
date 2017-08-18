@@ -1787,6 +1787,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    ZERO            TO  SPA-GAZJIKAN-CHK
       *H28.9       認知症地域包括投薬確認
                    MOVE    ZERO            TO  SPA-NINCHI-CHK
+      *H29.4       投薬３０日超（未使用）
+                   MOVE    ZERO            TO  SPA-SHOH30-CHK
       *            診療行為、計計算処理、編集
                    MOVE    SPACE           TO  FLG-TOROKU
                    PERFORM 510-TBLHEN-SEC
@@ -13194,7 +13196,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE    ZERO            TO  FLG-TAISYO
                END-IF
       *        画面表示外のものに頁、行位置を設定する
-               IF     (SPA-COM-SET  (WRK-IDX)  =   SPACE )
+               IF     (SPA-COM-SET    (WRK-IDX)  =   SPACE )
                 AND   (FLG-TAISYO            =   ZERO  )
                    ADD     1                 TO  IDX
       *ページなし
@@ -14767,11 +14769,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ユーザプログラム起動初期表示
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               MOVE    WIDGET-INSENSITIVE  TO  KID2-USERPG-STATE
-           ELSE
+      **   IF      SPA-MW              =   SPA-GINBEE
+      *        MOVE    WIDGET-INSENSITIVE  TO  KID2-USERPG-STATE
+      **   ELSE
                PERFORM 5301-USERPG-SET-SEC
-           END-IF
+      ***  END-IF
       *
            MOVE    "B12"               TO  MCP-WIDGET
       *

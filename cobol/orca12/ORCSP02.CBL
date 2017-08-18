@@ -1394,10 +1394,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ユーザプログラム起動初期
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               INITIALIZE                      SPA-NAI-GYOUMU-FLG
-               INITIALIZE                      SPA-NAI-GYOUMU-ARI
-           ELSE
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        INITIALIZE                      SPA-NAI-GYOUMU-FLG
+      *        INITIALIZE                      SPA-NAI-GYOUMU-ARI
+      **   ELSE
       *
            INITIALIZE                      ORCSUSERCHKAREA
            MOVE    "P02"               TO  ORCSUSERCHK-GMNPG
@@ -1424,7 +1424,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-USERPG-LST (1)  TO  SPA-GMN-USERPG-G
            END-IF
       *
-           END-IF
+      **** END-IF
       *
       *    請求書発行区分
            MOVE    "0 請求書・明細書不要"
@@ -3631,11 +3631,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *v4.8
       *    ginbee対応
-           IF      SPA-MW              =   SPA-GINBEE
-               MOVE    WIDGET-INSENSITIVE  TO  P02-P02-USERPG-STATE
-           ELSE
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        MOVE    WIDGET-INSENSITIVE  TO  P02-P02-USERPG-STATE
+      ***  ELSE
                MOVE    WIDGET-NORMAL       TO  P02-P02-USERPG-STATE
-           END-IF
+      **** END-IF
            .
        200-P02-SET-EXT.
            EXIT.

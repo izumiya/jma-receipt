@@ -1246,11 +1246,11 @@
       *        ユーザプログラム起動初期
       *v4.8
       *    ginbee対応
-               IF      SPA-MW              =   SPA-GINBEE
-                   MOVE    ZERO                TO  SPA-USERPG-MAX
-               ELSE
+      *        IF      SPA-MW              =   SPA-GINBEE
+      *            MOVE    ZERO                TO  SPA-USERPG-MAX
+      **       ELSE
                    PERFORM 3101-USERPG-SET-SEC
-               END-IF
+      ***      END-IF
            ELSE
                MOVE    ZERO                TO  SPA-USERPG-MAX
            END-IF

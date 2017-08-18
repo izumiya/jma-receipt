@@ -1922,9 +1922,9 @@
       *
       *v4.8
       *    ginbeeÂÐ±þ
-           IF      SPA-MW              =   SPA-GINBEE
-               GO      TO      4907-USERPG-EXT
-           END-IF
+      *    IF      SPA-MW              =   SPA-GINBEE
+      *        GO      TO      4907-USERPG-EXT
+      **   END-IF
       *
            EVALUATE    FLG-USERPG
                WHEN    1
