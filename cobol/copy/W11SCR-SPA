@@ -133,6 +133,16 @@
                                                       OCCURS  5.
                            11  SPA-GMN-ORGPGNM04-MAX  PIC 9(04).
       *
+                       09  SPA-GMN-CSTPGNMLST-G.
+                           11  SPA-GMN-CSTPGNMLST          OCCURS 12.
+                               13  SPA-GMN-CSTPGNMLST-MAX  PIC 9(04).
+                               13  SPA-GMN-CSTPGNMMEIL PIC X(20)
+                                                       OCCURS  10.
+                       09  SPA-GMN-CSTPGNM-NLST-G.
+                           11  SPA-GMN-CSTPGNM-NLST          OCCURS 10.
+                               13  SPA-GMN-CSTPGNM-NLST-MAX  PIC 9(04).
+                               13  SPA-GMN-CSTPGNM-NMEIL PIC X(20)
+                                                       OCCURS  10.
       *            Ä¢É¼ÊÔ½¸¶èÊ¬¾ðÊó
                    07  SPA-GMN-1030-AREA.
                        09  SPA-GMN-SYOHOGEPRTFLG-G.

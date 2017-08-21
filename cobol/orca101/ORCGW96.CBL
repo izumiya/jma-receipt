@@ -1098,11 +1098,11 @@
                MOVE    SPA-GMN-EXEC (IDX-CRON)
                                        TO  W96-EXEC (IDX-CRON)
       *
-               IF    ( W96-EXEC (IDX-CRON) =   "T" )
+      *        IF    ( W96-EXEC (IDX-CRON) =   "T" )
                    MOVE    "実行する"      TO  W96-EXEC-LBL (IDX-CRON)
-               ELSE
-                   MOVE    "実行しない"    TO  W96-EXEC-LBL (IDX-CRON)
-               END-IF
+      *        ELSE
+      *            MOVE    "実行しない"    TO  W96-EXEC-LBL (IDX-CRON)
+      *        END-IF
       *
            END-PERFORM
       *

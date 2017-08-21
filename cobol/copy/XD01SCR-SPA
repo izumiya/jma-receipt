@@ -30,6 +30,8 @@
                05  SPA-MAE-MOTOPG                PIC X(08).
       *H28.6   伝票番号
                05  SPA-NAI-DENPNUM               PIC 9(07).
+      *H29.8   Ginbeeカスタムバッチ有効区分（1:有効）
+               05  SPA-NAI-CUSTOM-ENABLED        PIC X(01).
       *
                05  SPA-GMN-AREA.
       *        見出領域

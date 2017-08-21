@@ -4,6 +4,11 @@
                 04  W97-SHELL   PIC X(100).
               03  W97-SYORINM-TBL   OCCURS   10.
                 04  W97-SYORINM   PIC X(30).
+              03  W97-LBLREPOS-NAME-TBL   OCCURS   10.
+                04  W97-LBLREPOS-NAME   PIC X(20).
+              03  W97-REPOS-NAME-TBL   OCCURS   10.
+                04  W97-REPOS-NAME-VISIBLE   PIC X.
+                04  W97-REPOS-NAME           PIC X(128).
               03  W97-PRTNM-TBL     OCCURS   10.
                 04  W97-PRTNM   PIC X(16).
               03  W97-GYOUMUMEI-COMB.
@@ -29,3 +34,5 @@
                 04  W97-GYOUMUFLG-COUNT   PIC S9(9)   BINARY.
                 04  W97-GYOUMUFLG-ITEM
                         PIC X(20)   OCCURS  2 TIMES.
+              03  W97-LBLMSG01-STYLE    PIC X(20).
+              03  W97-LBLMSG01          PIC X(80).

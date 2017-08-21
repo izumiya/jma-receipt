@@ -94,5 +94,23 @@ W23 {
       count int;
         item varchar(30)[5];
     };
+    frame_repo {
+      visible bool;
+      fixed_repo {
+        LBLMSG01 {
+          style varchar(20);
+          textdata varchar(80);
+        };
+        REPOS_NAME {
+          textdata varchar(128);
+        };
+        SKYPRT_NAME {
+          textdata varchar(20);
+        };
+        SRYPRT_NAME {
+          textdata varchar(20);
+        };
+      };
+    };
   };
 };

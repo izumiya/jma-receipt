@@ -192,6 +192,8 @@
            03  CONST-SHELLID
                                            PIC X(08)   VALUE   "TEIKI2".
            03  CONST-JOBID                 PIC 9(07)   VALUE   1.
+           03  CONST-PRT-SHELLID           PIC X(08)   VALUE "TEIKIPRT".
+           03  CONST-PRT-JOBID             PIC 9(07)   VALUE   1.
            03  CONST-PRTKANRI-TBL-KEY      PIC X(08)   VALUE   "TEIKI2".
       *
            COPY    "CPSHELLTBL.INC".
@@ -212,6 +214,7 @@
            COPY    "CPSK5001.INC".
            COPY    "CPSK5002.INC".
            COPY    "CPSK5010.INC".
+           COPY    "CPSK3103.INC".
       *
       *    患者マスタ−
        01  PTINF-REC.
@@ -257,6 +260,9 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -417,6 +423,17 @@
       *
            INITIALIZE              SPA-O03-AREA
       *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               INITIALIZE                          SBC-AREA
+               CALL    "ORCSBILLINGCHECK"  USING   SBC-AREA
+                                                   SPA-AREA
+               IF    ( SBC-BILLINGUSER =   "1" )
+                   MOVE    "1"         TO  SPA-NAI-O03-CUSTOM-ENABLED
+               END-IF                                  
+           ELSE                                        
+               MOVE    "1"             TO  SPA-NAI-O03-CUSTOM-ENABLED
+           END-IF
+      *
       *    処理区分
            MOVE    "T"             TO  SPA-GMN-O03-SYOKBN
            MOVE    "F"             TO  SPA-GMN-O03-CHKTAIIN
@@ -442,6 +459,15 @@
            MOVE    SYS-5010-REC    TO  SYSKANRI-REC
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-5010-REC
+      *
+           INITIALIZE                  SYS-3103-REC
+           MOVE    "3103"          TO  SYS-3103-KANRICD
+           MOVE    "5010001"       TO  SYS-3103-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-3103-STYUKYMD
+                                       SYS-3103-EDYUKYMD
+           MOVE    SYS-3103-REC    TO  SYSKANRI-REC
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-3103-REC
       *
            MOVE    SYS-5010-SKYPRTKBN
                                    TO  WRK-CMB-CD
@@ -498,6 +524,13 @@
       *
            IF    ( SYS-5010-TAIINGRPKBN    =   "1" )
                MOVE    "T"         TO  SPA-GMN-O03-CHKTAIIN
+           END-IF
+      *
+           IF    ( SPA-MW          =   SPA-GINBEE )
+            AND  ( SPA-NAI-O03-CUSTOM-ENABLED
+                                   =   "1" )
+               MOVE    SYS-3103-REPOS-NAME
+                                   TO  SPA-NAI-O03-REPOS-NAME
            END-IF
       *
            PERFORM 3101-EDIT-PAGE-SEC
@@ -1077,6 +1110,14 @@
                    IF    ( SPA-ERRCD   =   SPACE )
                        PERFORM 450-PRINT-SEC
                    END-IF
+                   IF    ( SPA-ERRCD   =   SPACE )
+                       IF    ( SPA-OID1-FLG    =   "OK"  OR "PV")
+                           PERFORM 451-PRINT-SEC
+                       END-IF
+                   END-IF
+                   IF    ( SPA-ERRCD   =   SPACE )
+                       PERFORM 490-KAKUNIN-SEC
+                   END-IF
                END-EVALUATE
            END-IF
       *
@@ -1650,7 +1691,7 @@
            IF    ( SPA-GMN-O03-SYOKBN  =   "F" )
                PERFORM 4501-BTPARA-INS-SEC
                IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  450-PRINT-SEC
+                   GO  TO  450-PRINT-EXT
                END-IF
            END-IF
       *
@@ -1677,6 +1718,16 @@
       *
            MOVE    SPACE               TO  SHELLTBL
            MOVE    "teiki2.sh"         TO  SHELLTBL-NAME
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-HOSPNUM
+           MOVE    CONST-JOBID         TO  SHELLTBL-JOBID
+           MOVE    CONST-SHELLID       TO  SHELLTBL-SHELLID
+      *
+           IF    ( SPA-MW          =   SPA-GINBEE )
+            AND  ( SPA-NAI-O03-CUSTOM-ENABLED
+                                   =   "1" )
+               MOVE    SPA-NAI-O03-REPOS-NAME
+                                       TO  SHELLTBL-REPOS-NAME
+           END-IF
       *
            MOVE    LNK-PRTKANRI-RENNUM TO  SHELLTBL-ARG1
            MOVE    LNK-PRTKANRI-TBL-KEY
@@ -1737,10 +1788,67 @@
            MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  SPA-O01-TBL-GROUP
       *
-           PERFORM 490-KAKUNIN-SEC
-      *
            .
        450-PRINT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    出力処理
+      *****************************************************************
+       451-PRINT-SEC                   SECTION.
+      *
+           MOVE    ZERO                    TO  WRK-STPAGE
+           MOVE    99999                   TO  WRK-EDPAGE
+      *
+           MOVE    SPACE                   TO  SHELLTBL
+           INITIALIZE                          SHELLTBL
+      *
+           MOVE    "print_prv.sh"          TO  SHELLTBL-NAME
+      *
+           MOVE    "print_prv.sh"          TO  LNK-PRTKANRI-SHELLID
+      *
+           MOVE    LNK-PRTKANRI-RENNUM     TO  SHELLTBL-ARG1
+           MOVE    LNK-PRTKANRI-TBL-KEY
+                                           TO  SHELLTBL-ARG2
+           MOVE    LNK-PRTKANRI-TBL-GROUP  TO  SHELLTBL-ARG3
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+                                           TO  SHELLTBL-ARG4
+           MOVE    LNK-PRTKANRI-SRYYM      TO  SHELLTBL-ARG5
+           MOVE    LNK-PRTKANRI-SKYYMD     TO  SHELLTBL-ARG6
+           MOVE    LNK-PRTKANRI-SHELLID    TO  SHELLTBL-ARG7
+           MOVE    LNK-PRTKANRI-PRIORITY   TO  SHELLTBL-ARG8
+           MOVE    LNK-PRTKANRI-TERMID     TO  SHELLTBL-ARG9
+           MOVE    LNK-PRTKANRI-OPID       TO  SHELLTBL-ARG10
+           MOVE    LNK-PRTKANRI-PRTNM      TO  SHELLTBL-ARG11
+      *
+           MOVE    TEIKIERR-BASENAME       TO  SHELLTBL-ARG12
+      *
+      *    ジョブ管理は作成しない(下記はDUMMY)
+           MOVE    CONST-PRT-JOBID         TO  SHELLTBL-ARG13
+           MOVE    CONST-PRT-SHELLID       TO  SHELLTBL-ARG14
+           MOVE    WRK-STPAGE              TO  SHELLTBL-ARG15
+           MOVE    WRK-EDPAGE              TO  SHELLTBL-ARG16
+           EVALUATE    SPA-OID1-FLG
+           WHEN    "PV"
+                MOVE    "3"                TO  SHELLTBL-ARG17
+      *    WHEN    "NO"
+      *         MOVE    "3"                TO  SHELLTBL-ARG17
+           WHEN    "OK"
+                MOVE    "2"                TO  SHELLTBL-ARG17
+           END-EVALUATE
+           MOVE    SPA-HOSPNUM             TO  SHELLTBL-ARG18
+      *
+           MOVE    SHELLTBL                TO  MCPDATA-REC
+           MOVE    "SHELL"                 TO  MCP-FUNC
+           MOVE    "shell"                 TO  MCP-TABLE
+           MOVE    "allways"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"                 USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       451-PRINT-EXT.
            EXIT.
       *
       *****************************************************************

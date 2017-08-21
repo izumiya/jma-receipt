@@ -268,53 +268,101 @@ W11 {
             ORCAORGCHK12 {
               isactive bool;
             };
-            ORCACSTNM01 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM01_COB {
+              ORCACSTNM01{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM02 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM02_COB {
+              ORCACSTNM02{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM03 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM03_COB {
+              ORCACSTNM03{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM04 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM04_COB {
+              ORCACSTNM04{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM05 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM05_COB {
+              ORCACSTNM05{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM06 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM06_COB {
+              ORCACSTNM06{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM07 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM07_COB {
+              ORCACSTNM07{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM08 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM08_COB {
+              ORCACSTNM08{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM09 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM09_COB {
+              ORCACSTNM09{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM10 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM10_COB {
+              ORCACSTNM10{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM11 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM11_COB {
+              ORCACSTNM11{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM12 {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM12_COB {
+              ORCACSTNM12{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
             ORCACSTCHK01 {
               isactive bool;
@@ -548,45 +596,85 @@ W11 {
             ORCAORGCHK10N {
               isactive bool;
             };
-            ORCACSTNM01N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM01N_COB {
+              ORCACSTNM01N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM02N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM02N_COB {
+              ORCACSTNM02N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM03N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM03N_COB {
+              ORCACSTNM03N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM04N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM04N_COB {
+              ORCACSTNM04N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM05N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM05N_COB {
+              ORCACSTNM05N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM06N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM06N_COB {
+              ORCACSTNM06N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM07N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM07N_COB {
+              ORCACSTNM07N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM08N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM08N_COB {
+              ORCACSTNM08N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM09N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM09N_COB {
+              ORCACSTNM09N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
-            ORCACSTNM10N {
-              style varchar(20);
-              textdata varchar(20);
+            ORCACSTNM10N_COB {
+              ORCACSTNM10N{
+                style varchar(20);
+                textdata varchar(20);
+              };
+              count int;
+              item varchar(20)[10];
             };
             ORCACSTCHK01N {
               isactive bool;

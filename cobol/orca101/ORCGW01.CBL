@@ -678,7 +678,6 @@
                            MOVE    ZERO    TO  FLG-HIT
                        END-IF
                    WHEN    "9103"
-                   WHEN    "9700"
                        IF    ( SPA-MW      =   SPA-GINBEE )
                            MOVE    ZERO    TO  FLG-HIT
                        END-IF
@@ -718,7 +717,6 @@
                        MOVE    ZERO    TO  FLG-HIT
                    END-IF
                WHEN    "9103"
-               WHEN    "9700"
                    IF    ( SPA-MW      =   SPA-GINBEE )
                        MOVE    ZERO    TO  FLG-HIT
                    END-IF

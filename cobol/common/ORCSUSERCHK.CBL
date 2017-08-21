@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.08.00    NACL-多々納  16/06/22  伝票番号追加対応
+      *  05.00.00    NACL-太田    17/08/10  Ginbee対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -41,6 +42,8 @@
       *FILE                        SECTION.
       *
        WORKING-STORAGE             SECTION.
+      *
+           COPY    "ENUM-VALUE".
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -71,6 +74,7 @@
            COPY  "CPSK9700.INC".
       *    ユーザプログラム起動
            COPY  "CPSK9701.INC".
+           COPY  "CPSK3103.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -83,6 +87,12 @@
       **** COPY    "CPORCMCP.INC".
       *
       **** COPY    "ORCA-DBPATH".
+      *
+      *    一時ファイル名取得
+           COPY    "CPORCSGETTEMP.INC".
+      *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
       *
            COPY    "MCPAREA".
       *
@@ -109,6 +119,16 @@ grpsys*
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
+           INITIALIZE                  SBC-AREA
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           CALL    "ORCSGETTEMP"       USING
+                                       SGETTEMP-AREA
+           IF    ( SGETTEMP-MW     =   SPA-GINBEE )
+               CALL    "ORCSBILLINGCHECK"  USING
+                                           SBC-AREA
+                                           SPA-AREA
+           END-IF
       *
            EVALUATE    ORCSUSERCHK-SYORI
                WHEN    "1"
@@ -179,10 +199,63 @@ grpsys*
                END-PERFORM
            END-IF
       *
+           IF    ( SGETTEMP-MW         =   SPA-GINBEE )
+            AND  ( SBC-BILLINGUSER     =   SPACE )
+            AND  ( WRK-KANRICD     NOT =   SPACE )
+               MOVE    ZERO            TO  FLG-GYOUMU-ARI
+               PERFORM 1001-SYSKANRI-CHK-SEC
+           END-IF
+      *
            .
        100-SYSKANRI-CHK-EXT.
            EXIT.
+      *****************************************************************
+      *    ユーザプログラム起動チェク処理
+      *****************************************************************
+       1001-SYSKANRI-CHK-SEC            SECTION.
       *
+           MOVE    SPACE               TO  SYS-9701-REC
+           INITIALIZE                      SYS-9701-REC
+           MOVE    WRK-KANRICD         TO  SYS-9701-KANRICD
+           MOVE    "00000000"          TO  SYS-9701-STYUKYMD
+           MOVE    "99999999"          TO  SYS-9701-EDYUKYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-9701-HOSPNUM
+           MOVE    SYS-9701-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           PERFORM UNTIL    ( FLG-SYSKANRI     NOT =   ZERO )
+                    OR      ( FLG-GYOUMU-ARI   NOT =   ZERO )
+      *
+               MOVE    MCPDATA-REC         TO  SYS-9701-REC
+      *
+               IF    ( SYS-9701-EXECUTE-SW =   "1" )
+      *
+                   PERFORM 900-SYS-3103-READ-SEC
+                   IF    ( SYS-3103-REPOS-NAME =   SPACE )
+                       MOVE    1               TO  FLG-GYOUMU-ARI
+                   END-IF
+      *
+               END-IF
+      *
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 990-SYSKANRI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       1001-SYSKANRI-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    業務起動処理
       *****************************************************************
@@ -207,9 +280,17 @@ grpsys*
            END-IF
            PERFORM UNTIL     (FLG-SYSKANRI     =   1 )
                MOVE    MCPDATA-REC         TO  SYS-9701-REC
-               IF     (SYS-9701-EXECUTE-SW     =   "1" ) AND
-                      (SYS-9701-EXECUTE-YTPE   =   "2" )
-                   PERFORM 2001-SHELL-SYORI-SEC
+      *
+               PERFORM 900-SYS-3103-READ-SEC
+               IF    ( SPA-MW                  =   SPA-GINBEE )
+                AND  ( SBC-BILLINGUSER         =   SPACE )
+                AND  ( SYS-3103-REPOS-NAME NOT =   SPACE )
+                   CONTINUE
+               ELSE
+                   IF     (SYS-9701-EXECUTE-SW     =   "1" ) AND
+                          (SYS-9701-EXECUTE-YTPE   =   "2" )
+                       PERFORM 2001-SHELL-SYORI-SEC
+                   END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 990-SYSKANRI-READ-SEC
@@ -254,6 +335,12 @@ grpsys*
            MOVE    SYS-9701-SHELL      TO  ORCSUSERPG-SHELL
       *    プリンタ名
            MOVE    SYS-9701-PRTNM      TO  ORCSUSERPG-PRTNM
+      *    リポジトリ名
+           IF    ( SPA-MW                  =   SPA-GINBEE )
+            AND  ( SBC-BILLINGUSER         =   "1" )
+               MOVE    SYS-3103-REPOS-NAME
+                                       TO  ORCSUSERPG-REPOS-NAME
+           END-IF
       *
            CALL    "ORCSUSERPG"        USING
                                        ORCSUSERPGAREA
@@ -263,6 +350,39 @@ grpsys*
        2001-SHELL-SYORI-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       900-SYS-3103-READ-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  SYS-3103-REC
+           INITIALIZE                      SYS-3103-REC
+           MOVE    "3103"              TO  SYS-3103-KANRICD
+           MOVE    SYS-9701-KANRICD    TO  SYS-3103-KBNCD
+           MOVE    "0"                 TO  SYS-3103-KBNCD(5:1)
+           MOVE    SYS-9701-KBNCD(1:2) TO  SYS-3103-KBNCD(6:2)
+           MOVE    SPA-SYSYMD          TO  SYS-3103-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-3103-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-3103-HOSPNUM
+           MOVE    SYS-3103-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           MOVE    SPACE               TO  SYS-3103-REC
+           INITIALIZE                      SYS-3103-REC
+           IF  MCP-RC              =   ZERO
+               PERFORM 990-SYSKANRI-READ-SEC
+               IF    ( FLG-SYSKANRI    =   ZERO )
+                   MOVE    MCPDATA-REC TO  SYS-3103-REC
+               END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYS-3103-READ-EXT.
+           EXIT.
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

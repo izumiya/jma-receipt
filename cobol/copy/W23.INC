@@ -52,4 +52,11 @@
                 04  W23-TAIINGRPKBN        PIC X(30).
                 04  W23-TAIINGRPKBN-COUNT  PIC S9(9)   BINARY.
                 04  W23-TAIINGRPKBNLST     PIC X(30)   OCCURS  5 TIMES.
+              03  W23-FR-REPO.
+                04  W23-FR-REPO-VISIBLE    PIC X(01).
+                04  W23-LBLMSG01-STYLE     PIC X(20).
+                04  W23-LBLMSG01           PIC X(80).
+                04  W23-REPOS-NAME         PIC X(128).
+                04  W23-SKYPRT-NAME        PIC X(20).
+                04  W23-SRYPRT-NAME        PIC X(20).
 

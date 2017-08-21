@@ -30,6 +30,7 @@
       *  01.00.01    NACL-多々納  06/07/13  MONFUNC 対応
       *  03.05.00    NACL-多々納  07/05/02  グループ診療対応
       *  04.01.00    NACL-多々納  07/10/02  入院追加
+      *  05.00.00    NACL-太田    17/08/10  Ginbee対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -80,6 +81,7 @@
                    07  SPA-GMN-SHELL-OCC   OCCURS   10.
                        09  SPA-GMN-SYORINM       PIC X(30).
                        09  SPA-GMN-SHELL         PIC X(100).
+                       09  SPA-GMN-REPOS-NAME    PIC X(128).
                        09  SPA-GMN-PRTNM         PIC X(16).
       *
                        09  SPA-GMN-TYPE-G.
@@ -98,7 +100,10 @@
                    07  SPA-TYPE-MAX              PIC 9(04).
       *
                05  SPA-NAI-AREA.
-                   07  SPA-NAI-GYOUMUID          PIC X(10).
+                   07  SPA-NAI-CUSTOM-VISIBLE      PIC X(01).
+                   07  SPA-NAI-CUSTOM-CAUTION      PIC X(01).
+                   07  SPA-NAI-CUSTOM-ENABLED      PIC X(01).
+                   07  SPA-NAI-GYOUMUID            PIC X(10).
                    07  SPA-NAI-KANRICD             PIC X(04).
                    07  SPA-NAI-KBNCD               PIC X(08).
                    07  SPA-NAI-GYOUMUIDX           PIC 9(04).
@@ -148,6 +153,7 @@
            03  WRK-MCP-WIDGET      PIC X(64).
       *
            03  WRK-SYORI-CNT       PIC 9(02).
+           03  WRK-NEXT-CUR        PIC 9(03).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -169,6 +175,8 @@
            COPY  "CPSK9700.INC".
       *    ユーザプログラム起動
            COPY  "CPSK9701.INC".
+      *    リポジトリ設定
+           COPY  "CPSK3103.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -193,6 +201,10 @@
            COPY    "MCPDATA.INC".
       **** COPY    "CPORCMCP.INC".
       **** COPY    "ORCA-DBPATH".
+      *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
+      *
       *
       *****************************************************************
       *    連絡　領域
@@ -337,6 +349,16 @@
       *
            INITIALIZE   SPA-W97
       *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               INITIALIZE                          SBC-AREA
+               CALL    "ORCSBILLINGCHECK"  USING   SBC-AREA
+                                                   SPA-AREA
+               IF    ( SBC-BILLINGUSER =   "1" )
+                   MOVE    "1"         TO  SPA-NAI-CUSTOM-ENABLED
+                   MOVE    "1"         TO  SPA-NAI-CUSTOM-VISIBLE
+               END-IF
+           END-IF
+      *
            MOVE    "患者登録  (P02)"   TO  SPA-GMN-GYOUMUMEIL (1)
            MOVE    "P02"               TO  SPA-NAI-GYOUMUIDL  (1)
            MOVE    "受付  (U02)"       TO  SPA-GMN-GYOUMUMEIL (2)
@@ -440,8 +462,9 @@
       *
            MOVE    10                  TO  SPA-TBL-MAX
       *
-           MOVE    SPA-GMN-GYOUMUMEIL (1)  TO  SPA-GMN-GYOUMUMEI
-      *
+           MOVE    SPA-GMN-GYOUMUMEIL (1)  TO  W97-GYOUMUMEI
+           PERFORM 4001-GYOUMUMEI-CHK-SEC
+           MOVE    SPACE               TO  SPA-ERRCD
            MOVE    1                   TO  SPA-GMN-CUR
            . 
        310-SPASET-EXT.
@@ -558,6 +581,9 @@
            END-PERFORM
       *
            INITIALIZE                      SPA-GMN-SHELL-TBL
+           MOVE    SPACE               TO  SPA-NAI-CUSTOM-CAUTION
+           MOVE    SPA-NAI-CUSTOM-ENABLED
+                                       TO  SPA-NAI-CUSTOM-VISIBLE
       *    業務初期表示
            MOVE    SPACE               TO  SYS-9701-REC
            INITIALIZE                      SYS-9701-REC
@@ -587,6 +613,40 @@
                                            TO  SPA-GMN-TYPE  (IDX)
                MOVE    SYS-9701-EXECUTE-SW
                                            TO  SPA-GMN-EXECUTE  (IDX)
+      *
+               MOVE    SPACE               TO  SYS-3103-REC
+               INITIALIZE                      SYS-3103-REC
+               MOVE    "3103"              TO  SYS-3103-KANRICD
+               MOVE    SYS-9701-KANRICD    TO  SYS-3103-KBNCD
+               MOVE    "0"                 TO  SYS-3103-KBNCD(5:1)
+               MOVE    SYS-9701-KBNCD(1:2) TO  SYS-3103-KBNCD(6:2)
+               MOVE    SPA-SYSYMD          TO  SYS-3103-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-3103-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-3103-HOSPNUM
+               MOVE    SYS-3103-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   PERFORM 990-SYSKANRI-READ-SEC
+                   IF    ( FLG-SYSKANRI    =   ZERO )
+                       MOVE    MCPDATA-REC TO  SYS-3103-REC
+                       MOVE    SYS-3103-REPOS-NAME
+                                           TO  SPA-GMN-REPOS-NAME (IDX)
+                       IF    ( SPA-MW      =   SPA-GINBEE )
+                        AND  ( SYS-3103-REPOS-NAME
+                                          NOT =   SPACE )
+                           MOVE    "1" TO  SPA-NAI-CUSTOM-VISIBLE
+                           IF    ( SPA-NAI-CUSTOM-ENABLED
+                                              =   SPACE )
+                               MOVE  "1"  TO  SPA-NAI-CUSTOM-CAUTION
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -676,6 +736,7 @@
                    UNTIL       IDX     >   SPA-TBL-MAX
                MOVE    W97-SYORINM (IDX)   TO  SPA-GMN-SYORINM (IDX)
                MOVE    W97-SHELL (IDX)     TO  SPA-GMN-SHELL (IDX)
+               MOVE    W97-REPOS-NAME (IDX) TO SPA-GMN-REPOS-NAME (IDX)
                MOVE    W97-PRTNM (IDX)     TO  SPA-GMN-PRTNM (IDX)
                MOVE    W97-TYPE  (IDX)     TO  SPA-GMN-TYPE-G (IDX)
            END-PERFORM
@@ -699,8 +760,17 @@
                ELSE
       *            処理名
                    PERFORM 41021-SYORINM-CHK-SEC
+      *            リポジトリ名
+                   IF    ( SPA-ERRCD       =   SPACE )
+                       IF    ( SPA-MW      =   SPA-GINBEE )
+                        AND  ( SPA-NAI-CUSTOM-VISIBLE  =   "1" )
+                           PERFORM 41021-REPOS-NAME-CHK-SEC
+                       END-IF
+                   END-IF
       *            タイプ名
-                   PERFORM 41021-TYPE-CHK-SEC
+                   IF    ( SPA-ERRCD       =   SPACE )
+                       PERFORM 41021-TYPE-CHK-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -723,6 +793,32 @@
       *
            .
        41021-SYORINM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    リポジトリ名チェック処理
+      *****************************************************************
+       41021-REPOS-NAME-CHK-SEC        SECTION.
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    SPA-GMN-REPOS-NAME (IDX)
+                                       TO  KANACHK-MAE-INPUT
+           MOVE    128                 TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  SPA-GMN-REPOS-NAME (IDX)
+           IF     (KANACHK-RC      NOT =   ZERO  )  OR
+                  (KANACHK-SYUBETU     =   2     )
+               MOVE    "0006"          TO  SPA-ERRCD
+               COMPUTE SPA-GMN-CUR     =   800 +   IDX
+               IF    ( KANACHK-RC2     =   7 )
+                   MOVE    KANACHK-OUT-INPUT
+                                       TO  SPA-GMN-REPOS-NAME (IDX)
+               END-IF
+           END-IF
+      *
+           .
+       41021-REPOS-NAME-CHK-EXT.
            EXIT.
       *****************************************************************
       *    実行形式チェック処理
@@ -973,7 +1069,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    新規
                MOVE    SMCNDATE-YMD            TO  SYS-9700-CREYMD
                MOVE    SPA-HOSPNUM             TO  SYS-9700-HOSPNUM
-               MOVE    SYS-9700-REC            TO  MCPDATA-REC
+               MOVE    SYS-9700-REC            TO  SYSKANRI-REC
       *
                PERFORM 4901-INSERT-SYORI-SEC
            END-IF
@@ -1006,6 +1102,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1003"              TO  SPA-ERRCD
                DISPLAY "W97 DB DEL ERR SYSKANRI-KEY =>" SYS-9701-KEY 
            END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               MOVE    SPACE               TO  SYS-3103-REC
+               INITIALIZE                      SYS-3103-REC
+               MOVE    "3103"              TO  SYS-3103-KANRICD
+               MOVE    SPA-NAI-KANRICD     TO  SYS-3103-KBNCD
+               MOVE    "%"                 TO  SYS-3103-KBNCD(5:1)
+               MOVE    SPA-SYSYMD          TO  SYS-3103-STYUKYMD
+               MOVE    SPA-SYSYMD          TO  SYS-3103-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-3103-HOSPNUM
+               MOVE    SYS-3103-REC        TO  MCPDATA-REC
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "del3"              TO  MCP-PATHNAME
+grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+      *
+               IF      MCP-RC              NOT =   ZERO 
+                   MOVE    "1004"              TO  SPA-ERRCD
+                   DISPLAY "W97 DB DEL ERR SYSKANRI-KEY =>" SYS-3103-KEY
+               END-IF
+           END-IF
+      *
            .
        4900-DELETE-EXT.
            EXIT.
@@ -1042,9 +1162,32 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMCNDATE-HMS            TO  SYS-9701-UPHMS
       *
            MOVE    SPA-HOSPNUM             TO  SYS-9701-HOSPNUM
-           MOVE    SYS-9701-REC            TO  MCPDATA-REC
+           MOVE    SYS-9701-REC            TO  SYSKANRI-REC
       *    新規
            PERFORM 4901-INSERT-SYORI-SEC
+      *
+           IF    ( SPA-GMN-REPOS-NAME (IDX)    NOT =   SPACE )
+               MOVE    SPACE               TO  SYS-3103-REC
+               INITIALIZE                      SYS-3103-REC
+               MOVE    "3103"              TO  SYS-3103-KANRICD
+               MOVE    SYS-9701-KANRICD    TO  SYS-3103-KBNCD
+               MOVE    "0"                 TO  SYS-3103-KBNCD(5:1)
+               MOVE    SYS-9701-KBNCD(1:2) TO  SYS-3103-KBNCD(6:2)
+               MOVE    "00000000"          TO  SYS-3103-STYUKYMD
+               MOVE    "99999999"          TO  SYS-3103-EDYUKYMD
+      *
+               MOVE    SPA-GMN-REPOS-NAME (IDX)
+                                           TO  SYS-3103-REPOS-NAME
+      *
+               MOVE    SMCNDATE-YMD        TO  SYS-3103-CREYMD
+               MOVE    SMCNDATE-YMD        TO  SYS-3103-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-3103-UPHMS
+      *
+               MOVE    SPA-HOSPNUM         TO  SYS-3103-HOSPNUM
+               MOVE    SYS-3103-REC        TO  SYSKANRI-REC
+      *        新規
+               PERFORM 4901-INSERT-SYORI-SEC
+           END-IF
       *
            .
        4901-KOUSIN-SYORI-EXT.
@@ -1055,6 +1198,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4901-INSERT-SYORI-SEC           SECTION.
       *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -1063,7 +1207,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
            IF      MCP-RC          NOT =   ZERO 
                MOVE    "1001"              TO  SPA-ERRCD
-               DISPLAY "W97 DB INS ERR KEY:" SYS-9701-KEY 
+               DISPLAY "W97 DB INS ERR KEY:" SYS-KEY
            END-IF
            .
        4901-INSERT-SYORI-EXT.
@@ -1148,13 +1292,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  W97-PRTNM (IDX)
                MOVE    SPA-GMN-SHELL  (IDX)
                                            TO  W97-SHELL (IDX)
+               MOVE    SPA-GMN-REPOS-NAME  (IDX)
+                                           TO  W97-REPOS-NAME (IDX)
                MOVE    SPA-GMN-CHK    (IDX)
                                            TO  W97-EXECUTE-VALUE(IDX)
-               IF      SPA-GMN-CHK    (IDX)    =   "T"
+      *        IF      SPA-GMN-CHK    (IDX)    =   "T"
                    MOVE    "実行する"      TO  W97-EXECUTE-LABEL(IDX)
-               ELSE
-                   MOVE    "実行しない"    TO  W97-EXECUTE-LABEL(IDX)
-               END-IF
+      *        ELSE
+      *            MOVE    "実行しない"    TO  W97-EXECUTE-LABEL(IDX)
+      *        END-IF
       *
                MOVE    SPA-GMN-TYPE-G (IDX)
                                            TO  W97-TYPE (IDX)
@@ -1165,7 +1311,28 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-PERFORM
                MOVE    SPA-TYPE-MAX        TO  W97-TYPE-COUNT (IDX)
       *
+               MOVE    "F"             TO  W97-REPOS-NAME-VISIBLE (IDX)
+               IF    ( SPA-MW                  =   SPA-GINBEE )
+                AND  ( SPA-NAI-CUSTOM-VISIBLE  =   "1" )
+                       MOVE    "T"     TO  W97-REPOS-NAME-VISIBLE (IDX)
+                       IF    ( IDX     =   1 )
+                           MOVE    "リポジトリ名"
+                                       TO  W97-LBLREPOS-NAME (IDX)
+                       END-IF
+               END-IF
+      *
            END-PERFORM
+      *
+           MOVE    "red"                   TO  W97-LBLMSG01-STYLE
+           IF    ( SPA-MW                  =   SPA-GINBEE )
+               IF    ( SPA-NAI-CUSTOM-CAUTION  =   "1" )
+                   MOVE    SPACE           TO  W97-LBLMSG01
+                   STRING  "リポジトリ名の設定がある処理・帳票"
+                           "を実行するためには、課金が必要です"
+                   INTO  W97-LBLMSG01
+                   END-STRING
+               END-IF
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -1211,6 +1378,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0005"
                    MOVE    "起動画面を選択して下さい。"
                                                TO  SPA-ERRMSG
+               WHEN    "0006"
+                   MOVE    "リポジトリ名は半角で入力して下さい。"
+                                               TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "登録ができませんでした"
                                                TO  SPA-ERRMSG
@@ -1218,6 +1388,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "更新ができませんでした"
                                                TO  SPA-ERRMSG
                WHEN    "1003"
+               WHEN    "1004"
                    MOVE    "削除ができませんでした"
                                                TO  SPA-ERRMSG
            END-EVALUATE
@@ -1279,9 +1450,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        5001-MAPCUR-SEC             SECTION.
       *
-          IF      SPA-GMN-CUR          =   ZERO
+           IF      SPA-GMN-CUR          =   ZERO
                PERFORM 50011-CUR-SET-SEC
-          END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR          >=  801 )
+            AND  ( SPA-GMN-CUR          <=  810 )
+               COMPUTE WRK-NEXT-CUR =   SPA-GMN-CUR - 800 + 500
+               IF    ( SPA-MW           =   SPA-GINBEE )
+                AND  ( SPA-NAI-CUSTOM-VISIBLE  =   "1" )
+                   CONTINUE
+               ELSE
+                   MOVE    WRK-NEXT-CUR    TO  SPA-GMN-CUR
+               END-IF
+           END-IF
       *
           EVALUATE    SPA-GMN-CUR
                 WHEN    1
@@ -1308,6 +1490,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE     SPA-GMN-CUR       TO  IDX2
                     MOVE     "EXECUTE"         TO  MCP-WIDGET
                     MOVE     IDX2              TO  MCP-WIDGET(8:2)
+                WHEN    801  THRU  810
+                    MOVE     SPA-GMN-CUR       TO  IDX2
+                    MOVE     "REPOS_NAME"      TO  MCP-WIDGET
+                    MOVE     IDX2              TO  MCP-WIDGET(11:2)
       *
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
@@ -1336,7 +1522,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    WRK-MCP-WIDGET(1:5)     =   "SHELL"
                    MOVE    WRK-MCP-WIDGET(6:2)     TO  IDX2
                    COMPUTE SPA-GMN-CUR         =   IDX2
-                                               +   500
+                                               +   800
       *
                WHEN    WRK-MCP-WIDGET(1:5)     =   "PRTNM"
                    MOVE    WRK-MCP-WIDGET(6:2)     TO  IDX2
@@ -1347,6 +1533,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    WRK-MCP-WIDGET(5:2)     TO  IDX2
                    COMPUTE SPA-GMN-CUR         =   IDX2
                                                +   700
+      *
+               WHEN    WRK-MCP-WIDGET(1:10)    =   "REPOS_NAME"
+                   MOVE    WRK-MCP-WIDGET(11:2)     TO  IDX2
+                   COMPUTE SPA-GMN-CUR         =   IDX2
+                                               +   500
       *
                WHEN    WRK-MCP-WIDGET(1:7)     =   "EXECUTE"
                    MOVE    WRK-MCP-WIDGET(8:2)     TO  IDX2

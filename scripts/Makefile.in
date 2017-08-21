@@ -20,7 +20,6 @@ utf8_shell_sources = \
 	allways/orcbsf03.sh.in \
 	allways/orhcml09.sh.in \
 	allways/print.sh.in \
-	allways/print_prv.sh.in \
 	allways/print_stop.sh.in \
 	allways/preprint.sh.in \
 	allways/orc_file_del.sh.in \
@@ -131,7 +130,7 @@ shell_sources = \
 	daily/export_blob.sh.in \
 	daily/import_blob.sh.in \
 	daily/rpmain1.sh.in \
-
+	allways/print_prv.sh.in \
 
 ruby_sources = \
 	daily/print_parent2.rb.in \

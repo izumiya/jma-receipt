@@ -2559,17 +2559,13 @@
            END-PERFORM
       *
       *    ユーザープログラム
-           IF    ( SPA-MW          =   SPA-GINBEE )
-               CONTINUE
-           ELSE
-               MOVE    SPA-GMN-I04-USERPG      TO  I04-USERPG
-               MOVE    SPA-GMN-I04-USERPG-CNT  TO  I04-USERPG-CNT
-               PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL     ( IDX1    >   SPA-GMN-I04-USERPG-CNT   )
-                   MOVE    SPA-GMN-I04-USERPG-ITM (IDX1)
-                                               TO  I04-USERPG-ITM (IDX1)
-               END-PERFORM
-           END-IF
+           MOVE    SPA-GMN-I04-USERPG      TO  I04-USERPG
+           MOVE    SPA-GMN-I04-USERPG-CNT  TO  I04-USERPG-CNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-I04-USERPG-CNT   )
+               MOVE    SPA-GMN-I04-USERPG-ITM (IDX1)
+                                           TO  I04-USERPG-ITM (IDX1)
+           END-PERFORM
       *!!
       *    院外処方せん印刷
            MOVE    SPA-GMN-I04-SHOHOU      TO  I04-SHOHOSEN
@@ -2829,12 +2825,6 @@
                    MOVE    WIDGET-INSENSITIVE
                                    TO  I04-NYUKIN-STT
                END-IF
-           END-IF
-      *
-           IF    ( SPA-MW          =   SPA-GINBEE )
-               MOVE    WIDGET-INSENSITIVE
-                                   TO  I04-USERPG-STT
-                                       I04-USERPG-ITM-STT
            END-IF
       *
            .
@@ -3190,12 +3180,8 @@
            END-IF
       *
       *    ユーザープログラムチェック処理
-           IF    ( SPA-MW          =   SPA-GINBEE )
-               CONTINUE
-           ELSE
-               IF    ( SPA-ERRCD       =   SPACE )
-                   PERFORM 4100-USERPG-CHK-SEC
-               END-IF
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4100-USERPG-CHK-SEC
            END-IF
       *
            .
@@ -6709,11 +6695,7 @@
       *****************************************************************
        4801-USERPG-SEC                 SECTION.
       *
-           IF    ( SPA-MW          =   SPA-GINBEE )
-               CONTINUE
-           ELSE
-               PERFORM 48011-USERPG-SEC
-           END-IF
+           PERFORM 48011-USERPG-SEC
       *
            .
        4801-USERPG-EXT.

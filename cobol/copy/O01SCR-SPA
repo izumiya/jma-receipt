@@ -91,6 +91,8 @@
       *
                05  SPA-NAI-O03-AREA.
                    07  SPA-NAI-O03-SRYYM               PIC X(06).
+                   07  SPA-NAI-O03-CUSTOM-ENABLED      PIC X(01).
+                   07  SPA-NAI-O03-REPOS-NAME          PIC X(128).
                    07  SPA-NAI-O03-TBL.
                        09  SPA-NAI-O03-TBL-OCC         OCCURS  50.
                            11  SPA-NAI-O03-TBL-G       OCCURS  30.

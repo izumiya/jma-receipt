@@ -43,7 +43,7 @@ PRT_FILE_FULL=${MCP_TEMPDIR}/${PRT_FILE_BASE}
         fi
         
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBPRT1 -parameter $1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${ERR_FILE_BASE},${13},${14},${15},${16},${17},${18},${19},${20},${PRT_FILE_BASE},${22}
-        if  [ -e ${12} ]; then
+        if  [ -e ${ERR_FILE_FULL} ]; then
             exit
         else
 	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${13}${14},${18}

@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.08.00    NACL-多々納  16/06/22  伝票番号追加対応
+      *  05.00.00    NACL-太田    17/08/10  Ginbee対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -128,6 +129,11 @@ grpsys*
            MOVE    WRK-SHELL-USERPG    TO  MKPASS-IN-01
            CALL    "ORCSMKPASSSITE"    USING   ORCSMKPASSAREA
            MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-HOSPNUM
+           MOVE    ORCSUSERPG-REPOS-NAME
+                                       TO  SHELLTBL-REPOS-NAME
+      *
+           DISPLAY "@@REPOS-NAME="  SHELLTBL-REPOS-NAME
       *
       *    パラメタセット
       *

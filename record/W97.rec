@@ -60,6 +60,76 @@ W97 {
     SYORINM10 {
       textdata varchar(30);
     };
+    LBLREPOS_NAME01 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME02 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME03 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME04 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME05 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME06 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME07 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME08 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME09 {
+      textdata varchar(20);
+    };
+    LBLREPOS_NAME10 {
+      textdata varchar(20);
+    };
+    REPOS_NAME01 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME02 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME03 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME04 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME05 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME06 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME07 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME08 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME09 {
+      visible  bool;
+      textdata varchar(128);
+    };
+    REPOS_NAME10 {
+      visible  bool;
+      textdata varchar(128);
+    };
     PRTNM01 {
       textdata varchar(16);
     };
@@ -223,6 +293,10 @@ W97 {
       };
       count int;
         item varchar(20)[2];
+    };
+    LBLMSG01 {
+      style varchar(20);
+      textdata varchar(80);
     };
   };
 };

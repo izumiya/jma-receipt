@@ -178,6 +178,7 @@
            COPY  "CPSK9700.INC".
       *    ユーザプログラム起動
            COPY  "CPSK9701.INC".
+           COPY  "CPSK3103.INC".
       *
       *    患者マスタ−
        01  PTINF-REC.
@@ -211,6 +212,9 @@
       *
       *    ユーザプログラム起動サブパラメタ
            COPY    "CPORCSUSERPG.INC".
+      *
+      *    課金チェック
+           COPY    "CPORCSBILLINGCHECK.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -338,6 +342,17 @@
            INITIALIZE                  SPA-XD01
       *
            MOVE    SPA-MOTOPG          TO  SPA-MAE-MOTOPG
+      *
+           IF    ( SPA-MW              =   SPA-GINBEE )
+               INITIALIZE                          SBC-AREA
+               CALL    "ORCSBILLINGCHECK"  USING   SBC-AREA
+                                                   SPA-AREA
+               IF    ( SBC-BILLINGUSER =   "1" )
+                   MOVE    "1"         TO  SPA-NAI-CUSTOM-ENABLED
+               END-IF
+           ELSE
+               MOVE    "1"             TO  SPA-NAI-CUSTOM-ENABLED
+           END-IF
       *
       *    処理区分
            EVALUATE    SPA-MAE-MOTOPG
@@ -579,8 +594,17 @@
            PERFORM UNTIL       (IDX            >=  10   )  OR
                                (FLG-SYSKANRI   =   1    )
                MOVE    MCPDATA-REC             TO  SYS-9701-REC
-               IF      SYS-9701-EXECUTE-SW     =   "1"
-                   PERFORM 30012-SYORINM-HEN-SEC
+      *
+               PERFORM 900-SYS-3103-READ-SEC
+      *
+               IF      SPA-MW                  =   SPA-GINBEE
+                AND    SPA-NAI-CUSTOM-ENABLED  =   SPACE
+                AND    SYS-3103-REPOS-NAME NOT =   SPACE
+                   CONTINUE
+               ELSE
+                   IF      SYS-9701-EXECUTE-SW     =   "1"
+                       PERFORM 30012-SYORINM-HEN-SEC
+                   END-IF
                END-IF
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -1388,10 +1412,17 @@
            PERFORM 990-DBCLOSE-SEC
            IF      FLG-SYSKANRI       =   ZERO
                MOVE    MCPDATA-REC             TO  SYS-9701-REC
-               IF     (SYS-9701-KBNCD      =   SPA-NAI-TKBNCD (IDX))
-                  AND (SYS-9701-EXECUTE-SW =   "1"    )
-      *            ユーザプログラム起動処理
-                   PERFORM 41201-SHELL-CALL-SEC
+               PERFORM 900-SYS-3103-READ-SEC
+               IF      SPA-MW                  =   SPA-GINBEE
+                AND    SPA-NAI-CUSTOM-ENABLED  =   SPACE
+                AND    SYS-3103-REPOS-NAME NOT =   SPACE
+                   CONTINUE
+               ELSE
+                   IF     (SYS-9701-KBNCD      =   SPA-NAI-TKBNCD (IDX))
+                      AND (SYS-9701-EXECUTE-SW =   "1"    )
+      *                ユーザプログラム起動処理
+                       PERFORM 41201-SHELL-CALL-SEC
+                   END-IF
                END-IF
            END-IF
       *
@@ -1440,7 +1471,14 @@
       *H28.6
       *    伝票番号
            IF      SPA-MAE-MOTOPG      =   "K03"
-               MOVE    SPA-NAI-DENPNUM     TO  ORCSUSERPG-DENPNUM
+               MOVE    SPA-NAI-DENPNUM TO  ORCSUSERPG-DENPNUM
+           END-IF
+      *
+      *    リポジトリ名
+           IF      SPA-MW                  =   SPA-GINBEE
+            AND    SPA-NAI-CUSTOM-ENABLED  =   "1"
+               MOVE    SYS-3103-REPOS-NAME
+                                       TO  ORCSUSERPG-REPOS-NAME
            END-IF
       *
            CALL    "ORCSUSERPG"        USING
@@ -1762,6 +1800,39 @@
        900-PTINF-READ-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    システム管理読込処理
+      *****************************************************************
+       900-SYS-3103-READ-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SYS-3103-REC
+           INITIALIZE                      SYS-3103-REC
+           MOVE    "3103"              TO  SYS-3103-KANRICD
+           MOVE    SYS-9701-KANRICD    TO  SYS-3103-KBNCD
+           MOVE    "0"                 TO  SYS-3103-KBNCD(5:1)
+           MOVE    SYS-9701-KBNCD(1:2) TO  SYS-3103-KBNCD(6:2)
+           MOVE    SPA-SYSYMD          TO  SYS-3103-STYUKYMD
+           MOVE    SPA-SYSYMD          TO  SYS-3103-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-3103-HOSPNUM
+           MOVE    SYS-3103-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           MOVE    SPACE               TO  SYS-3103-REC
+           INITIALIZE                      SYS-3103-REC
+           IF  MCP-RC              =   ZERO
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF    ( FLG-SYSKANRI    =   ZERO )
+                   MOVE    MCPDATA-REC TO  SYS-3103-REC
+               END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYS-3103-READ-EXT.
+           EXIT.
       *****************************************************************
       *    システム管理読込処理
       *****************************************************************

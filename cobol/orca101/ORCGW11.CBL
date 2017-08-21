@@ -581,6 +581,26 @@
            MOVE    2                   TO  SPA-GMN-ORGPGNM04-MAX
       *----(04.02.02)--ADD-END-----
       *
+           MOVE    2                   TO  SPA-GMN-CSTPGNMLST-MAX (1)
+           MOVE    "A21000H01A4"       TO  SPA-GMN-CSTPGNMMEIL (1 1)
+           MOVE    "A21000H01B5"       TO  SPA-GMN-CSTPGNMMEIL (1 2)
+      *
+           MOVE    2                   TO  SPA-GMN-CSTPGNMLST-MAX (2)
+           MOVE    "A00000H02"         TO  SPA-GMN-CSTPGNMMEIL (2 1)
+           MOVE    "A21000H02"         TO  SPA-GMN-CSTPGNMMEIL (2 2)
+      *
+           MOVE    6                   TO  SPA-GMN-CSTPGNMLST-MAX (3)
+           MOVE    "A00000H03"         TO  SPA-GMN-CSTPGNMMEIL (3 1)
+           MOVE    "A00000H03A4"       TO  SPA-GMN-CSTPGNMMEIL (3 2)
+           MOVE    "A00000H03A5"       TO  SPA-GMN-CSTPGNMMEIL (3 3)
+           MOVE    "A21000H03"         TO  SPA-GMN-CSTPGNMMEIL (3 4)
+           MOVE    "A00000H03A5P"      TO  SPA-GMN-CSTPGNMMEIL (3 5)
+           MOVE    "A00000H03A5L"      TO  SPA-GMN-CSTPGNMMEIL (3 6)
+      *
+           MOVE    2                   TO  SPA-GMN-CSTPGNM-NLST-MAX (3)
+           MOVE    "A00000H03NA4"      TO  SPA-GMN-CSTPGNM-NMEIL (3 1)
+           MOVE    "A00000H03NA5"      TO  SPA-GMN-CSTPGNM-NMEIL (3 2)
+      *
            INITIALIZE                      SPA-GMN-USERLSTSCROLLE
            INITIALIZE                      SPA-NAI-TBL
            MOVE    ZERO                TO  SPA-GMN-USERLST-MAX
@@ -2087,6 +2107,7 @@
       *****************************************************************
        4101-CSTPGNM-SET-SEC            SECTION.
       *
+      *
            .
       *
        4101-CSTPGNM-SET-EXT.
@@ -3435,6 +3456,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "red"   TO  W11-MSG01-STYLE
                    END-IF
                END-IF
+      *
+               MOVE    SPA-GMN-CSTPGNMLST-MAX (IDZ2)
+                                       TO  W11-ORCACSTNM-COUNT (IDZ2)
+      *
+               PERFORM VARYING IDX2 FROM    1   BY  1
+                       UNTIL ( IDX2 >   W11-ORCACSTNM-COUNT (IDZ2) )
+                   MOVE    SPA-GMN-CSTPGNMMEIL (IDZ2 IDX2)
+                                   TO  W11-ORCACSTNM-ITEM  (IDZ2 IDX2)
+               END-PERFORM
+      *
            END-PERFORM
       *
       *    Æþ±¡
@@ -3510,6 +3541,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "red"   TO  W11-MSG01-STYLE
                    END-IF
                END-IF
+      *
+               MOVE    SPA-GMN-CSTPGNM-NLST-MAX (IDZ2)
+                                       TO  W11-ORCACSTNM-N-COUNT (IDZ2)
+      *
+               PERFORM VARYING IDX2 FROM    1   BY  1
+                       UNTIL ( IDX2 >   W11-ORCACSTNM-N-COUNT (IDZ2) )
+                   MOVE    SPA-GMN-CSTPGNM-NMEIL (IDZ2 IDX2)
+                                   TO  W11-ORCACSTNM-N-ITEM  (IDZ2 IDX2)
+               END-PERFORM
            END-PERFORM
       *
            MOVE    SPA-GMN-SYOHOGEPRTFLG-G   TO  W11-SYOHOGEPRTFLG
