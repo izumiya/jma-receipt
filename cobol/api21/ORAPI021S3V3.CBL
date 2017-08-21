@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.00    NACL-多々納  17/08/XX  前回未収、印刷対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1561,8 +1562,9 @@
        20013-TECHOU-CHK-SEC         SECTION.
       *
            EVALUATE    MDCREQ-PRINT-TECHOU
-               WHEN    "0"
                WHEN    SPACE
+                   CONTINUE
+               WHEN    "0"
                    MOVE    "0"             TO  MDCRES-PRINT-TECHOU
                    MOVE    "発行なし"      TO  MDCRES-PRINT-TECHOU-MEI
                WHEN    "1"
@@ -1583,8 +1585,9 @@
        20013-YOYAKU-CHK-SEC         SECTION.
       *
            EVALUATE    MDCREQ-PRINT-YOYAKU
-               WHEN    "0"
                WHEN    SPACE
+                   CONTINUE
+               WHEN    "0"
                    MOVE    "0"             TO  MDCRES-PRINT-YOYAKU
                    MOVE    "発行なし"      TO  MDCRES-PRINT-YOYAKU-MEI
                WHEN    "1"
