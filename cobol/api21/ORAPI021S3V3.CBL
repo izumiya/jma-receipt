@@ -353,8 +353,8 @@
            COPY    "K01COMMON-SPA".
       *
       *    画面スパ領域
-           COPY    "K02SCR-SPA"     REPLACING
-                                       //SPA-// BY //K02-SPA-//.
+      *    COPY    "K02SCR-SPA"     REPLACING
+      *                                //SPA-// BY //K02-SPA-//.
       *
       *
       *    画面スパ領域
@@ -498,6 +498,7 @@
            INITIALIZE                      WRK-AREA
            INITIALIZE                      SPA-AREA
            INITIALIZE                      CNT-AREA
+           INITIALIZE                      SPA-K03
       *
            MOVE    MCP-TERM            TO  WRK-MCP-TERM
       *
@@ -1330,8 +1331,8 @@
                                                OR  "3"
                                                OR  "4"
                                                OR  "5" )
-                    AND  ((SPA-GMN-ZENMISYU    NOT =   ZERO )  OR
-                          (SPA-GMN-CHOKAKIN    NOT =   ZERO ))
+      **            AND  ((SPA-GMN-ZENMISYU    NOT =   ZERO )  OR
+      **                  (SPA-GMN-CHOKAKIN    NOT =   ZERO ))
                        CONTINUE
                    ELSE
                        MOVE    "60"            TO  WRK-ERRCD
@@ -2564,6 +2565,20 @@
                MOVE    SPATMP-DATA-REC     TO  SPA-K03
            ELSE
                MOVE    "08"                TO  WRK-ERRCD
+           END-IF
+      *
+      *    一括入返金区分チェック処理
+           IF    ( MDCREQ-IC-ALLKBN    =   "1" )
+               IF     (MDCREQ-IC-REQUEST   =   "2"
+                                           OR  "3"
+                                           OR  "4"
+                                           OR  "5" )
+                AND  ((SPA-GMN-ZENMISYU    NOT =   ZERO )  OR
+                      (SPA-GMN-CHOKAKIN    NOT =   ZERO ))
+                   CONTINUE
+               ELSE
+                   MOVE    "60"            TO  WRK-ERRCD
+               END-IF
            END-IF
       *
       *    入金・請求額
