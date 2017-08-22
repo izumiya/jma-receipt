@@ -158,6 +158,10 @@
            03  WRK-DRCD                PIC X(05).
            03  WRK-DRCD-NAME           PIC X(80).
            03  WRK-RENNUM              PIC 9(01).
+      *    …È√¥Œ®°¶≥€ ‘Ω∏
+           03  WRK-FTNRATE             PIC 9(02)V99.
+           03  WRK-Z9                  PIC 9.ZZ.
+           03  WRK-FTNRATEMEI          PIC X(04).
       *
       *    ∆˛±°∆¸
       *    03  WRK-NYUIN-DATE          PIC X(10).
@@ -1415,6 +1419,7 @@
       *     ›∏±¡»πÁ§ª ‘Ω∏
            INITIALIZE                   MDCRES-INSURANCE-G
            MOVE    SPA-HKNCOMBINUM     TO  MDCRES-COMBINATION-NUMBER
+      *
       *     Ò≥Á ¨∆˛Œœ
            IF     (SPA-HKNCOMBINUM     =   "9999" )
                MOVE    9999            TO  WRK-HKNCOMBI
@@ -1422,6 +1427,29 @@
            ELSE
       *         ›∏±¡»πÁ§ª ‘Ω∏ΩËÕ˝
                PERFORM 2002101-HKNHEN-TBL-SEC
+      *
+      *         ›∏±…È√¥≥‰πÁ
+               INITIALIZE                  ORCSAGECHKAREA
+               MOVE    SPA-HOSPNUM         TO  AGECHK-HOSPNUM
+               MOVE    SPA-PTID            TO  AGECHK-PTID
+               MOVE    SPA-SRYYMD          TO  AGECHK-SRYYMD
+               MOVE    SPA-BIRTHDAY        TO  AGECHK-BIRTHDAY
+               MOVE    SPA-HKNCOMBINUM     TO  AGECHK-HKNCOMBINUM
+               MOVE    SPA-NYUGAIKBN       TO  AGECHK-NYUGAIKBN
+               CALL    "ORCSAGECHK"        USING
+                                           ORCSAGECHKAREA
+                                           SPA-AREA
+               IF      AGECHK-FTNRATE  NOT =   ZERO
+      *           …È√¥Œ®
+                   COMPUTE WRK-FTNRATE         =   AGECHK-FTNRATE
+                                               /   100
+                   MOVE    WRK-FTNRATE         TO  WRK-Z9
+                   MOVE    WRK-Z9              TO  WRK-FTNRATEMEI
+                   MOVE    WRK-FTNRATEMEI
+                                       TO  MDCRES-COMBINATION-RATE
+               ELSE
+                   MOVE    "0"         TO  MDCRES-COMBINATION-RATE
+               END-IF
            END-IF
       *
            .
