@@ -27,7 +27,7 @@ xml_medicalsetv2res {
 				Medication_Number	varchar(11);
 				Medication_Money 	varchar(07);
 				Medication_Input_Info {
-					Medication_Input	varchar(08);
+					Medication_Input_Code	varchar(08);
 				} [5];
 				Medication_Continue		varchar(01);
 				Medication_Internal_Kinds	varchar(01);

@@ -76,7 +76,7 @@ xml_medicalv3res4 {
 				Medication_Unit_Code_Name	varchar(24);
 				Medication_Money 	varchar(07);
 				Medication_Input_Info {
-					Medication_Input	varchar(08);
+					Medication_Input_Code	varchar(08);
 				} [5];
 #----->                         フィルム分画数
 				Medication_Film_Comp_Number	varchar(03);

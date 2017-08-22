@@ -66,7 +66,7 @@ xml_medicalv3res2 {
 				Medication_Req_Number	varchar(11);
 				Medication_Req_Money 	varchar(07);
 				Medication_Req_Input_Info {
-					Medication_Req_Input	varchar(08);
+					Medication_Req_Input_Code	varchar(08);
 				} [5];
 #----->                         フィルム分画数
 				Medication_Req_Film_Comp_Number	varchar(03);
@@ -110,7 +110,7 @@ xml_medicalv3res2 {
 				Medication_Unit_Code_Name	varchar(24);
 				Medication_Money 	varchar(07);
 				Medication_Input_Info {
-					Medication_Input	varchar(08);
+					Medication_Input_Code	varchar(08);
 				} [5];
 #----->                         フィルム分画数
 				Medication_Film_Comp_Number	varchar(03);
