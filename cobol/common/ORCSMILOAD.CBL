@@ -58,6 +58,7 @@
       *
       *    イメージデータファイル名
        01  IMAGE-FILENAME          PIC X(256).
+       01  MED-FILENAME            PIC X(512).
       *
       *    コマンド
        01  COMMAND                 PIC X(512).
@@ -78,6 +79,9 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    ファイル存在チェック
+           COPY    "CPORCSACCESS.INC".
       *
       *    共通パラメタ
            COPY    "MCPAREA".
@@ -167,33 +171,35 @@
       *        コマンド実行
                CALL    "system"            USING
                                            COMMAND
-                                           RETURNING   RESULT
+      *        イメージデータから画像ファイル作成コマンド
+               MOVE    SPACE           TO  MED-FILENAME
+               STRING  ORCSMI-TEMPDIR      DELIMITED BY SPACE
+                       "/"                 DELIMITED BY SIZE
+                       WRK-CONS-MEDIMGDIR  DELIMITED BY SIZE
+                       "/"                 DELIMITED BY SIZE
+                       ORCSMI-FILENAME     DELIMITED BY SPACE
+               INTO    MED-FILENAME
+               END-STRING
       *
-               IF      RESULT          NOT =   ZERO
-                   DISPLAY "mkdir RC:[ " RESULT " ]"
-                   MOVE    1                   TO  ORCSMI-RETCD
-               ELSE
-      *            イメージデータから画像ファイル作成コマンド
-                   MOVE    LOW-VALUE       TO  COMMAND
-                   STRING  "base64 -d "        DELIMITED BY SIZE
-                           IMAGE-FILENAME      DELIMITED BY SPACE
-                           " > "               DELIMITED BY SIZE
-                           ORCSMI-TEMPDIR      DELIMITED BY SPACE
-                           "/"                 DELIMITED BY SIZE
-                           WRK-CONS-MEDIMGDIR  DELIMITED BY SIZE
-                           "/"                 DELIMITED BY SIZE
-                           ORCSMI-FILENAME     DELIMITED BY SPACE
-                                       INTO    COMMAND
-                   END-STRING
-      *            コマンド実行
-                   CALL    "system"            USING
-                                               COMMAND
-                                               RETURNING   RESULT
+               MOVE    LOW-VALUE       TO  COMMAND
+               STRING  "base64 -d "        DELIMITED BY SIZE
+                       IMAGE-FILENAME      DELIMITED BY SPACE
+                       " > "               DELIMITED BY SIZE
+                       MED-FILENAME        DELIMITED BY SPACE
+                       " || rm -f "        DELIMITED BY SIZE
+                       MED-FILENAME        DELIMITED BY SPACE
+               INTO    COMMAND
+               END-STRING
+      *        コマンド実行
+               CALL    "system"            USING
+                                           COMMAND
       *
-                   IF      RESULT          NOT =   ZERO
-                       DISPLAY "base64 RC:[ " RESULT " ]"
-                       MOVE    1                   TO  ORCSMI-RETCD
-                   END-IF
+               INITIALIZE                  SACCESS-AREA
+               MOVE    MED-FILENAME    TO  SACCESS-IN-FILENAME
+               CALL    "ORCSACCESS"        USING
+                                           SACCESS-AREA
+               IF    ( SACCESS-RC      NOT =   ZERO )
+                   MOVE    1           TO  ORCSMI-RETCD
                END-IF
            END-IF
       *
@@ -216,7 +222,6 @@
       *    コマンド実行
            CALL    "system"            USING
                                        COMMAND
-                                       RETURNING   RESULT
            .
        300-TERM-EXT.
            EXIT.
@@ -237,7 +242,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    "DBFETCH"       TO  MCP-FUNC
                MOVE    "tbl_med_image" TO  MCP-TABLE
@@ -245,7 +249,6 @@
                CALL    "MONFUNC"           USING
                                            MCPAREA
                                            MCPREC
-                                           SPA-AREA
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO            TO  FLG-MEDIMAGE
                    MOVE    MCPREC          TO  MEDIMAGE-REC
@@ -262,7 +265,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            .
        900-MEDIMAGE-READ-EXT.
            EXIT.

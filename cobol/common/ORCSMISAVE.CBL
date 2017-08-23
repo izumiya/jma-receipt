@@ -65,7 +65,6 @@
        01  COMMAND                 PIC X(512).
       *
       *    返却値
-       01  RESULT                  PIC S9(09).
        01  FILESIZE                PIC 9(09).
       *
       *    画像ファイルフォルダ名
@@ -141,38 +140,33 @@
                    ORCSMI-FILENAME     DELIMITED BY SPACE
                    " > "               DELIMITED BY SIZE
                    IMAGE-FILENAME      DELIMITED BY SPACE
+                   " || rm -f  "       DELIMITED BY SIZE
+                   IMAGE-FILENAME      DELIMITED BY SPACE
                                INTO    COMMAND
            END-STRING
       *    コマンド実行
            CALL    "system"            USING
                                        COMMAND
-                                       RETURNING   RESULT
       *
-           IF      RESULT          NOT =   ZERO
-               DISPLAY "base64 RC:[ " RESULT " ]"
+      *    イメージデータファイル読み込み
+           OPEN    INPUT               IMAGE-FILE
+           IF      STS-IMAGE       NOT =   ZERO
+               DISPLAY "ORCSMISAVE IMAGE FILE OPEN ERROR"
                MOVE    1                   TO  ORCSMI-RETCD
                MOVE    1                   TO  FLG-END
            ELSE
-      *        イメージデータファイル読み込み
-               OPEN    INPUT               IMAGE-FILE
-               IF      STS-IMAGE       NOT =   ZERO
-                   DISPLAY "ORCSMISAVE IMAGE FILE OPEN ERROR"
-                   MOVE    1                   TO  ORCSMI-RETCD
+               MOVE    LOW-VALUE           TO  IMAGE-REC
+               READ    IMAGE-FILE
+                   AT  END
+                       MOVE    1               TO  FLG-END
+               END-READ
+               IF      IMAGE-REC-2 (1:10)  NOT =   LOW-VALUE
+                   DISPLAY "ORCSMISAVE IMAGE FILE SIZE OVER"
+                   MOVE    2                   TO  ORCSMI-RETCD
                    MOVE    1                   TO  FLG-END
-               ELSE
-                   MOVE    LOW-VALUE           TO  IMAGE-REC
-                   READ    IMAGE-FILE
-                       AT  END
-                           MOVE    1               TO  FLG-END
-                   END-READ
-                   IF      IMAGE-REC-2 (1:10)  NOT =   LOW-VALUE
-                       DISPLAY "ORCSMISAVE IMAGE FILE SIZE OVER"
-                       MOVE    2                   TO  ORCSMI-RETCD
-                       MOVE    1                   TO  FLG-END
-                   END-IF
                END-IF
-               MOVE    1               TO  FLG-OPEN
            END-IF
+           MOVE    1               TO  FLG-OPEN
       *
       *    ファイルサイズチェックの判定
            IF      ORCSMI-SRYCD        =   "misizechk"
@@ -230,7 +224,6 @@
       *    コマンド実行
            CALL    "system"            USING
                                        COMMAND
-                                       RETURNING   RESULT
            .
        300-TERM-EXT.
            EXIT.
@@ -250,7 +243,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    "DBFETCH"       TO  MCP-FUNC
                MOVE    "tbl_med_image" TO  MCP-TABLE
@@ -258,7 +250,6 @@
                CALL    "MONFUNC"           USING
                                            MCPAREA
                                            MCPREC
-                                           SPA-AREA
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO            TO  FLG-MEDIMAGE
                ELSE
@@ -274,7 +265,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            .
        900-MEDIMAGE-READ-EXT.
            EXIT.
@@ -290,7 +280,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "ORCSMISAVE INSERT ERROR :"  MCP-RC "."
                MOVE    1                   TO  ORCSMI-RETCD
@@ -310,7 +299,6 @@
            CALL    "MONFUNC"           USING
                                        MCPAREA
                                        MCPREC
-                                       SPA-AREA
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "ORCSMISAVE UPDATE ERROR :"  MCP-RC "."
                MOVE    1                   TO  ORCSMI-RETCD
