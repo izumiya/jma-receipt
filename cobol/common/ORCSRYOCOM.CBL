@@ -30,6 +30,9 @@
       *  03.05.00    NACL-小豆沢  07/05/29  グループ診療対応
       *  03.05.00    NACL-小豆沢  07/08/20  ＡＤＬ点数の直接入力対応
       *  04.02.00    NACL-小豆沢  08/04/08  医療区分コメント改定対応
+      *  05.00.00    NACL-小豆沢  17/08/23  特定入院料の算定要件外で
+      *                                     療養病棟入院料算定日はコメ
+      *                                     ント出力しない
       *****************************************************************
       *
       *
@@ -49,6 +52,7 @@
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-NYUINACT                PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
+           03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-RYOUYOCOM               PIC 9(01).
            03  FLG-RYOYO-NYUIN             PIC 9(01).
            03  FLG-SYSKANRI                PIC 9(01).
@@ -61,6 +65,8 @@
            03  SIDX1                       PIC 9(04).
            03  SIDX2                       PIC 9(04).
            03  SIDX3                       PIC 9(04).
+           03  IDX-ST                      PIC 9(02).
+           03  IDX-ED                      PIC 9(02).
       *
       *    コンスタント値
        01  CONSTANT-AREA.
@@ -308,6 +314,10 @@
            03  WRK-GAIHAKU-AREA.
              05  WRK-GAIHAKU       PIC X(01)   OCCURS   31.
       *
+      *    特定入院料算定要件外退避エリア
+           03  WRK-TOKUGAI-AREA.
+             05  WRK-TOKUGAI       PIC X(01)   OCCURS   31.
+      *
       *    診療コード計集計用
            03  WRK-SRYCD-X                 PIC X(09).
            03  WRK-SRYCD-9    REDEFINES    WRK-SRYCD-X
@@ -372,6 +382,10 @@
       *    療養レセプトコメントマスタ−
        01  RYOUYOCOM-REC.
            COPY    "CPRYOCOM.INC".
+      *
+      *    患者入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *    点数マスタ−
            COPY    "CPTENSU.INC".
@@ -516,6 +530,66 @@
                    MOVE    "key17"                 TO  MCP-PATHNAME
                    PERFORM   910-DB-CLOSE-SEC
                END-IF
+           END-IF
+      *
+      *    特定入院料の算定要件外で入院している日は療養コメントを
+      *    返却しない（患者入院履歴から取得）
+           INITIALIZE    WRK-TOKUGAI-AREA
+           IF      LNK-RYOCOM-RC    =    ZERO
+               INITIALIZE                      PTNYUINRRK-REC
+               MOVE    LNK-RYOCOM-HOSPNUM  TO  PTNYUINRRK-HOSPNUM
+               MOVE    LNK-RYOCOM-PTID     TO  PTNYUINRRK-PTID
+               MOVE    LNK-RYOCOM-SANTEIYM TO  PTNYUINRRK-TENNYUYMD(1:6)
+               MOVE    "31"                TO  PTNYUINRRK-TENNYUYMD(7:2)
+               MOVE    LNK-RYOCOM-SANTEIYM TO  PTNYUINRRK-TENSTUYMD(1:6)
+               MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD(7:2)
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key41"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-SELECT-SEC
+               IF      FLG-PTNYUINRRK      =   ZERO
+                   MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+                   MOVE    "key41"         TO  MCP-PATHNAME
+                   PERFORM 910-PTNYUINRRK-READ-SEC
+                   PERFORM    UNTIL   FLG-PTNYUINRRK  =   1
+                        IF    PTNYUINRRK-TENNYUYMD(1:6)  < 
+                                                   LNK-RYOCOM-SANTEIYM
+                            MOVE   1       TO  IDX-ST
+                        END-IF
+                        IF    PTNYUINRRK-TENNYUYMD(1:6)  = 
+                                                   LNK-RYOCOM-SANTEIYM
+                            MOVE   PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
+                        END-IF
+                        IF    PTNYUINRRK-TENSTUYMD(1:6)  > 
+                                                   LNK-RYOCOM-SANTEIYM
+                            MOVE   31       TO  IDX-ED
+                        END-IF
+                        IF    PTNYUINRRK-TENSTUYMD(1:6)  = 
+                                                   LNK-RYOCOM-SANTEIYM
+                            MOVE   PTNYUINRRK-TENSTUYMD(7:2)  TO  IDX-ED
+                        END-IF
+      *                  DISPLAY "PTNYUINRRK-TENNYUYMD = "
+      *                           PTNYUINRRK-TENNYUYMD
+      *                  DISPLAY "PTNYUINRRK-TENSTUYMD = "
+      *                           PTNYUINRRK-TENSTUYMD
+      *                  DISPLAY "IDX-ST = " IDX-ST
+      *                  DISPLAY "IDX-ED = " IDX-ED
+                        PERFORM   VARYING   IDX    FROM   IDX-ST  BY  1
+                          UNTIL   IDX       >      IDX-ED
+                          IF   PTNYUINRRK-TOKU-SANTEIYOUKENKBN   = "1"
+                             MOVE "1"  TO  WRK-TOKUGAI(IDX)
+                          ELSE
+                             MOVE  SPACE   TO  WRK-TOKUGAI(IDX)
+                          END-IF
+                        END-PERFORM
+                     MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+                     MOVE    "key41"          TO  MCP-PATHNAME
+                     PERFORM 910-PTNYUINRRK-READ-SEC
+                   END-PERFORM
+               END-IF
+      *        患者入院履歴クローズ
+               MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+               MOVE    "key41"                 TO  MCP-PATHNAME
+               PERFORM   910-DB-CLOSE-SEC
            END-IF
       *
       *    療養入院算定のチェック（入院会計マスター検索）
@@ -969,7 +1043,8 @@
                                PERFORM  VARYING   IDX1 FROM 1 BY 1
                                  UNTIL  ( IDX1     >   31 )
                                  IF  (NACCT-DAY(IDX1)    =   1)   AND
-                                     (WRK-GAIHAKU(IDX1)  =   SPACE)
+                                     (WRK-GAIHAKU(IDX1)  =   SPACE) AND
+                                     (WRK-TOKUGAI(IDX1)  =   SPACE)
                                       MOVE "1"  TO  LNK-RYOCOM-NYUINKBN
                                                                 (IDX1)
                                       MOVE  1     TO  FLG-RYOYO-NYUIN
@@ -1721,6 +1796,47 @@
       *
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者入院履歴マスター検索
+      *****************************************************************
+       910-PTNYUINRRK-SELECT-SEC        SECTION.
+      *
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"   USING MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-PTNYUINRRK
+           ELSE
+               MOVE    1                  TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       910-PTNYUINRRK-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者入院履歴マスター読込
+      *****************************************************************
+       910-PTNYUINRRK-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"   USING MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  PTNYUINRRK-REC
+               MOVE    ZERO               TO  FLG-PTNYUINRRK
+           ELSE
+               INITIALIZE                     PTNYUINRRK-REC
+               MOVE    1                  TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           .
+       910-PTNYUINRRK-READ-EXT.
            EXIT.
       *
       *****************************************************************
