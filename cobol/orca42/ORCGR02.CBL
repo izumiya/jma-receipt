@@ -159,6 +159,7 @@
       *  04.08.04    NACL-藤原    16/08/24  持参薬対応
       *  04.08.05    NACL-藤原    17/02/14  編綴順指定時の特別療養費（国保）
       *                                     のパラメタ設定の修正
+      *  04.08.06    NACL-藤原    17/08/29  一時保存テーブル削除対応
       *
       *  04.09.01    NACL-藤原    16/12/12  ＨＡＯＲＩ対応
       *****************************************************************
@@ -8687,6 +8688,16 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            INITIALIZE                      SPATMP-REC
            MOVE    "R02"               TO  SPATMP-GYOUMUID
+           MOVE    SPA-TERMID          TO  SPATMP-TERMID
+           MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
+      *
+           MOVE    SPATMP-REC          TO  MCPDATA2-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "del2"              TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-CALL-SEC
+      *
+           INITIALIZE                      SPATMP-REC
+           MOVE    "R01"               TO  SPATMP-GYOUMUID
            MOVE    SPA-TERMID          TO  SPATMP-TERMID
            MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
       *
