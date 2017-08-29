@@ -255,6 +255,8 @@
            COPY    "CPORCSMCNDATE.INC".
       *    COMMON-SPA 初期編集
            COPY    "CPORCSCOMMON.INC".
+      *    数字変換領域
+           COPY    "CPORCSNUM.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -850,6 +852,19 @@
        4110-SRYKA-CHK-SEC                 SECTION.
       *
            MOVE    M95-SRYKA           TO  SPA-M95GMN-SRYKA
+      *H29.9
+      *    数値変換
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    M95-SRYKA           TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-MINKBN     NOT =   SPACE )   OR
+                  (SNUM-SYOKBN     NOT =   SPACE )
+               MOVE    "0101"              TO  SPA-ERRCD
+           ELSE
+               MOVE    SNUM-OUTEDT(14:2)   TO  SPA-M95GMN-SRYKA
+           END-IF
       *
            MOVE    ZERO                TO  FLG-CHK
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -1810,6 +1825,7 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
                    MOVE    SPACE               TO  SPA-MIDCD
                    PERFORM 4020-PAGE2-TOROKU-SEC
                END-IF
+      *
            END-IF
       *
            .
@@ -1891,7 +1907,10 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
       *****************************************************************
        4020-PAGE2-TOROKU-SEC            SECTION.
       *
-           PERFORM 4021-SYS1011-UPDATE-SEC
+           IF      SPA-M95-SYORI       =   2
+      *H29.9   ドクター登録タブのみ登録
+               PERFORM 4021-SYS1011-UPDATE-SEC
+           END-IF
       *
       *    担当医一覧表示
            IF      SPA-ERRCD           =   SPACE
@@ -2136,8 +2155,9 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
                                            TO  M95-TDRCDMEI (IDX)
                MOVE    "F"                 TO  M95-SYSLIST-SELECT(IDX)
                IF      SPA-M95-SYORI       =   2
-                   IF      SPA-M95GMN-TRENNUM (IDX)
-                                           =   SPA-M95GMN-RENNUM
+                   IF     (SPA-M95GMN-TRENNUM (IDX)
+                                           =   SPA-M95GMN-RENNUM )
+                      AND (SPA-M95GMN-RENNUM   NOT =   SPACE     )
                    MOVE    "T"             TO  M95-SYSLIST-SELECT(IDX)
                    MOVE    IDX             TO  M95-SYSLIST-ROW
                    MOVE    2               TO  M95-SYSLIST-ROWATTR
@@ -2288,6 +2308,7 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
        520-MIDSET-SEC              SECTION.
       *
            MOVE    SPACE               TO  MID1
+           INITIALIZE                      MID1
            EVALUATE    SPA-MIDCD
                WHEN    "0102"
                    STRING  "表示されているすべての担当医を削除します。"
@@ -2340,6 +2361,7 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
        520-MIDSET2-SEC             SECTION.
       *
            MOVE    SPACE               TO  MID2
+           INITIALIZE                      MID2
            EVALUATE    SPA-MIDCD
                WHEN    "0106"
                    MOVE    SPA-M95GMN-TAINNUM  TO  WRK-NUM-1-X
