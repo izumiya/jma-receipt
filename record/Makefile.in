@@ -534,6 +534,7 @@ RECORD_files = \
 	incomev3.rec \
  	Q05.rec \
 	patientlst6v2.rec \
+	tmedicalmodv2.rec \
 
 DEF_files = \
 
@@ -1003,6 +1004,8 @@ DB_files = \
 	fm_prescription_h.db  \
 	fm_order_injection.db \
 	fm_order_direction.db \
+	xml_tmedicalmodv2req.db \
+	xml_tmedicalmodv2res.db \
 
 	
 
