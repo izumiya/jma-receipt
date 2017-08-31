@@ -77,7 +77,8 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
-      *  04.08.03   NACL-藤原    16/08/24  持参薬対応
+      *  04.08.03   NACL-藤原     16/08/24  持参薬対応
+      *  04.08.04    NACL-藤原    17/08/29  一時保存テーブル削除対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -294,6 +295,10 @@
       *
            COPY    "CPRCF008.INC".
       *
+      *    ＳＰＡ一時テーブル
+       01  SPATMP-REC.
+           COPY    "CPSPA-TMP.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -314,6 +319,7 @@
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+           COPY    "MCPDATA2.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -1500,6 +1506,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    戻る　処理
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
+      *
+      *    一時保存テーブル削除処理
+           PERFORM 900-SPATMP-DBDELETE-SEC
       *
            MOVE    SPACE           TO  SPA-R99-FLG
            MOVE    SPACE           TO  SPA-RIDCD
@@ -3003,6 +3012,39 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
                                    SPA-AREA
            .
        900-CALL-ORCSJOB-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一時保存テーブル削除処理
+      *****************************************************************
+       900-SPATMP-DBDELETE-SEC         SECTION.
+      *
+           INITIALIZE                      SPATMP-REC
+           MOVE    "R01"               TO  SPATMP-GYOUMUID
+           MOVE    SPA-TERMID          TO  SPATMP-TERMID
+           MOVE    SPA-HOSPNUM         TO  SPATMP-HOSPNUM
+      *
+           MOVE    SPATMP-REC          TO  MCPDATA2-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "del2"              TO  MCP-PATHNAME
+           PERFORM 900-SPATMP-CALL-SEC
+      *
+           .
+       900-SPATMP-DBDELETE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一時保存テーブル検索処理
+      *****************************************************************
+       900-SPATMP-CALL-SEC                SECTION.
+      *
+           MOVE    "tbl_spa_tmp"       TO  MCP-TABLE
+           CALL    "ORCDBSPATMP"       USING   MCPAREA
+                                               MCPDATA2-REC
+                                               SPA-AREA
+      *
+           .
+       900-SPATMP-CALL-EXT.
            EXIT.
       *
       *****************************************************************
