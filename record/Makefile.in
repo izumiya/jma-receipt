@@ -535,6 +535,7 @@ RECORD_files = \
  	Q05.rec \
 	patientlst6v2.rec \
 	tmedicalmodv2.rec \
+	diseasev3.rec \
 
 DEF_files = \
 
@@ -1007,6 +1008,8 @@ DB_files = \
 	fm_order_direction.db \
 	xml_tmedicalmodv2req.db \
 	xml_tmedicalmodv2res.db \
+	xml_diseasev3req.db \
+	xml_diseasev3res.db \
 
 	
 
