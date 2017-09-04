@@ -701,6 +701,9 @@
       *        API送信なし
                MOVE    "0"             TO  PARA-API-DATA
            END-IF
+           IF      ORCHC04-PRTKBN      =   "1"
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
       *    HAORI対応
            IF      SPA-API-FLG         =   1
                MOVE    "1"             TO  PARA-API-DATA
@@ -2648,9 +2651,11 @@
                                                      (IDX-API)
                END-IF
       *        円
-               MOVE    ORCHC04SUB-H-ENKBN (IDX)
+               IF    ( PARA-GOKEITANI      =   "1" )
+                   MOVE    ORCHC04SUB-H-ENKBN (IDX)
                                            TO  FMMEISAI-TENSU-MARK
                                                      (IDX-API)
+               END-IF
       *        回数
                MOVE    ORCHC04SUB-H-KAISU (IDX)
                                            TO  FMMEISAI-KAISU

@@ -999,6 +999,7 @@ DB_files = \
 	fm_medicine_notebook.db \
 	fm_medicine_notebook_h.db \
 	fm_payment_certificate.db \
+	fm_invoice_receipt_h.db \
 	fm_statement_h.db \
 	push_medical01.db \
 	fm_prescription_h.db  \

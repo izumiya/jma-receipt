@@ -1186,10 +1186,15 @@
       *
       *
       *    API_DATA
-           MOVE    "API_DATA"      TO  WRK-PARA-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           IF    ( WRK-PARA        =   "1" )
-               MOVE    WRK-PARA    TO  TPARA-API-DATA
+           IF    ( ORCHC03-SIZE    =   "V1" OR "V2" )
+            OR   ( ORCHC03-PRTKBN  =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    "API_DATA"      TO  WRK-PARA-NAME
+               PERFORM 1001-OPTION-CALL-SEC
+               IF    ( WRK-PARA        =   "1" )
+                   MOVE    WRK-PARA    TO  TPARA-API-DATA
+               END-IF
            END-IF
       *
            IF     ( SPA-API-FLG    NOT =   ZERO )

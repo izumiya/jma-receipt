@@ -49,13 +49,6 @@
                                                OCCURS   3.
       *         ∞ÂŒ≈µ°¥ÿ≈≈œ√»÷πÊ
                 07  FMSEIKYUN-HOSP-TEL         PIC X(15).
-      *
-      *       º¬∆¸øÙ
-              05  FMSEIKYUN-JNISSU             PIC X(03).
-      *       ø«Œ≈¥¸¥÷∂Ë ¨
-              05  FMSEIKYUN-SRYKIKANKBN        PIC X(01).
-      *       ø«Œ≈«Ø∑Ó
-              05  FMSEIKYUN-SRYYM              PIC X(07).
       *       ≥´ªœø«Œ≈∆¸
               05  FMSEIKYUN-STSRYYMD           PIC X(10).
       *       Ω™Œªø«Œ≈∆¸
@@ -89,51 +82,59 @@
       *           ¿¡µ·π‡Ã‹Ãæ
                   07  FMSEIKYUN-HKNTEN-NAME    PIC X(20).
       *           ¿¡µ·≈¿øÙ
-                  07  FMSEIKYUN-HKNTEN         PIC X(08).
+                  07  FMSEIKYUN-HKNTEN         PIC X(10).
       *           ¿¡µ·∂‚≥€°  ›∏±≈¨Õ—≥∞°À
-                  07  FMSEIKYUN-TGMONEY        PIC X(08).
+                  07  FMSEIKYUN-TGMONEY        PIC X(10).
       *       ≈¿øÙπÁ∑◊
-              05  FMSEIKYUN-TOTAL-TEN          PIC X(08).
+              05  FMSEIKYUN-TOTAL-TEN          PIC X(10).
       *       ¥µº‘∞Ï…Ù…È√¥∂‚
-              05  FMSEIKYUN-HKNTEKMONEY                 PIC X(08).
+              05  FMSEIKYUN-HKNTEKMONEY                 PIC X(10).
       *       ¥µº‘∞Ï…Ù…È√¥∂‚•È•Ÿ•Î° œ´∫“ø«Œ≈Œ¡≈˘∫∆∑«°À
               05  FMSEIKYUN-LBL-RSI-TOTAL               PIC X(20).
       *       ¥µº‘∞Ï…Ù…È√¥∂‚° œ´∫“ø«Œ≈Œ¡≈˘∫∆∑«°À
-              05  FMSEIKYUN-RSI-TOTAL                   PIC X(08).
-      *       ø©ªˆ°¶¿∏≥Ë…È√¥∂‚
-              05  FMSEIKYUN-SKJ-FTN                     PIC X(08).
+              05  FMSEIKYUN-RSI-TOTAL                   PIC X(10).
       *       ∏¯»Ò∞Ï…Ù…È√¥∂‚
-              05  FMSEIKYUN-KOH-FTN                     PIC X(08).
+              05  FMSEIKYUN-KOH-FTN                     PIC X(10).
+      *       ø©ªˆŒ≈Õ‹»Ò
+              05  FMSEIKYUN-SKJRYOYO                    PIC X(10).
+      *       ø©ªˆ…È√¥∂‚
+              05  FMSEIKYUN-SKJ-FTN                     PIC X(10).
+      *       ¿∏≥ËŒ≈Õ‹»Ò
+              05  FMSEIKYUN-LIFERYOYO                    PIC X(10).
+      *       ¿∏≥Ë…È√¥∂‚
+              05  FMSEIKYUN-LIFE-FTN                     PIC X(10).
       *        ›∏±≈¨Õ—≥∞πÁ∑◊
-              05  FMSEIKYUN-TOTAL-TGMONEY               PIC X(08).
+              05  FMSEIKYUN-TOTAL-TGMONEY               PIC X(10).
       *        ›∏±≈¨Õ—≥∞πÁ∑◊æ√»Ò¿«∫∆∑«
-              05  FMSEIKYUN-TOTAL-TGMONEY-TAX           PIC X(08).
+              05  FMSEIKYUN-TOTAL-TGMONEY-TAX           PIC X(10).
       *       §Ω§Œ¬æº´»Ò
               05  FMSEIKYUN-JIHI-OCC                    OCCURS  10.
       *             §Ω§Œ¬æº´»ÒÃææŒ
                 07  FMSEIKYUN-JIHI-NAME                 PIC X(20).
       *             §Ω§Œ¬æº´»Ò∂‚≥€
-                07  FMSEIKYUN-JIHI                      PIC X(08).
+                07  FMSEIKYUN-JIHI                      PIC X(10).
       *       §Ω§Œ¬æº´»ÒπÁ∑◊∂‚≥€
-              05  FMSEIKYUN-JIHI-TOTAL                  PIC X(08).
+              05  FMSEIKYUN-JIHI-TOTAL                  PIC X(10).
       *       §Ω§Œ¬æº´»ÒπÁ∑◊∂‚≥€æ√»Ò¿«∫∆∑«
-              05  FMSEIKYUN-JIHI-TOTAL-TAX              PIC X(08).
+              05  FMSEIKYUN-JIHI-TOTAL-TAX              PIC X(10).
       *       ººŒ¡∫π≥€
-              05  FMSEIKYUN-RMSAGAKU                    PIC X(08).
+              05  FMSEIKYUN-RMSAGAKU                    PIC X(10).
+      *       ººŒ¡∫π≥€æ√»Ò¿«∫∆∑«
+              05  FMSEIKYUN-RMSAGAKU-TAX                PIC X(10).
       *       ƒ¥¿∞∂‚£±
-              05  FMSEIKYUN-CHOSEI1                     PIC X(08).
+              05  FMSEIKYUN-CHOSEI1                     PIC X(10).
       *       ƒ¥¿∞∂‚£≤
-              05  FMSEIKYUN-CHOSEI2                     PIC X(08).
+              05  FMSEIKYUN-CHOSEI2                     PIC X(10).
       *       ∫£≤Û¿¡µ·≥€
-              05  FMSEIKYUN-SKYMONEY                    PIC X(08).
+              05  FMSEIKYUN-SKYMONEY                    PIC X(10).
       *       ∫£≤Û¿¡µ·≥€æ√»Ò¿«∫∆∑«
-              05  FMSEIKYUN-SKYMONEY-TAX                PIC X(08).
+              05  FMSEIKYUN-SKYMONEY-TAX                PIC X(10).
       *       ∫£≤Û∆˛∂‚≥€
-              05  FMSEIKYUN-NYUKIN                      PIC X(08).
+              05  FMSEIKYUN-NYUKIN                      PIC X(10).
       *       ∆˛±°Ã§º˝≥€
-              05  FMSEIKYUN-NYU-MISYU                   PIC X(08).
+              05  FMSEIKYUN-NYU-MISYU                   PIC X(10).
       *       ≥∞ÕËÃ§º˝≥€
-              05  FMSEIKYUN-GAI-MISYU                   PIC X(08).
+              05  FMSEIKYUN-GAI-MISYU                   PIC X(10).
       *
       *       √Ì∞’ΩÒ§≠° ¿¡µ·ΩÒ…Ù ¨°À
               05  FMSEIKYUN-SKY-CAUTION                 PIC X(100).
