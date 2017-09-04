@@ -2227,6 +2227,7 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -3547,6 +3548,14 @@
                    STRING  "保険組合せ・診療科の組合せ件数が"
                            "上限件数を超えています。"
                            "選択できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *H29.9
+               WHEN    "K300"
+                   STRING  "警告！当月に受診があります。"
+                           "登録済みの診療内容の"
+                           "包括確認をして下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
