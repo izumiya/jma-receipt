@@ -43,6 +43,7 @@
       *                                     対象テーブル２００へ
       *  04.08.00    NACL-多々納  17/01/17  翌月入院料チェック対応
       *  04.08.00    NACL-多々納  17/04/XX  短術３検体検査管理加算対応
+      *  04.08.00    NACL-多々納  17/09/XX  当月受診ありチェック対応
       *****************************************************************
       *
       *
@@ -65,8 +66,9 @@
            03  FLG-HKTSRYCD            PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-SANTEI              PIC 9(01).
-           03  FLG-NYUINACT           PIC 9(01).
+           03  FLG-NYUINACT            PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
+           03  FLG-JYURRK              PIC 9(01).
       *
            03  FLG-CHK                 PIC 9(01).
            03  FLG-CHK2                PIC 9(01).
@@ -84,8 +86,11 @@
            03  FLG-INPUTOK2            PIC 9(01).
            03  FLG-INPUTOK6            PIC 9(01).
       *H29.4
-           03  FLG-TANKI3HKT-OK         PIC 9(01).
-           03  FLG-TANKI3HKT-NO         PIC 9(01).
+           03  FLG-TANKI3HKT-OK        PIC 9(01).
+           03  FLG-TANKI3HKT-NO        PIC 9(01).
+      *H29.9
+           03  FLG-TEISEI-ARI          PIC 9(01).
+           03  FLG-JYURRK-CHK          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -257,6 +262,10 @@
       *    入院行為マスタ−
        01  NYUINACT-REC.
            COPY    "CPNYUINACT.INC".
+      *
+      *    受診履歴
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -763,6 +772,12 @@
                            PERFORM 2001-HKTSRYCD-CHK-SEC
                            IF      FLG-CHK2            =   1
                                MOVE    1               TO  FLG-CHK
+      *H29.9
+      *                        月毎の包括チェック
+                               IF      TBL-SANTEI-KBN(IDX) =   "3"
+                                   PERFORM 2002-SANTEI03-CHEK-SEC
+                               END-IF
+      *
                            END-IF
                        ELSE
       *                外来診療料チェックは再診区分があれば対象
@@ -825,6 +840,127 @@
            .
        2001-HKTSRYCD-CHK-EXT.
            EXIT.
+      *
+      *H29.9
+      *****************************************************************
+      *    月毎の包括チェックチェック処理
+      *****************************************************************
+       2002-SANTEI03-CHEK-SEC            SECTION.
+      *
+           IF     (ORCSCHKTCHK-PG      =   "K02" )
+               IF      SPA-SYORIFLG       =   0
+      *            新規
+                   PERFORM 20021-SANTEI03-CHEK02-SEC
+               ELSE
+      *            訂正
+                   PERFORM 20022-SANTEI03-CHEK03-SEC
+               END-IF
+           END-IF
+           .
+       2002-SANTEI03-CHEK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    月毎の包括チェックチェック処理
+      *****************************************************************
+       20021-SANTEI03-CHEK02-SEC            SECTION.
+      *
+      *    当月の受診履歴登録判定
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-PTID            TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+      *    １日から月末まで
+           MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
+           MOVE    "01"                TO  JYURRK-SRYYMD(7:2)
+           MOVE    WRK-SRYYMD          TO  JYURRK-UPSRYYMD
+           MOVE    "31"                TO  JYURRK-UPSRYYMD(7:2)
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key33"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key33"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-JYURRK-CHK
+           IF      SPA-SYORIFLG        =   1
+      *        訂正
+               PERFORM UNTIL      (FLG-JYURRK      =   1 )
+                            OR    (FLG-JYURRK-CHK  =   1 )
+                   IF     (SPA-DENPNUM         =   JYURRK-DENPNUM)
+                      OR  (SPA-DENPNUM         =   JYURRK-GRP-DENPNUM)
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-JYURRK-CHK
+                   END-IF
+                   MOVE    "key33"             TO  MCP-PATHNAME
+                   PERFORM 970-JYURRK-READ-SEC
+               END-PERFORM
+           ELSE
+               IF      FLG-JYURRK          =   ZERO
+                   MOVE    1               TO  FLG-JYURRK-CHK
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key33"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-JYURRK-CHK      =   1
+               IF      SPA-COM-KZMFLG9  (IDX-Z)  =   SPACE
+                   MOVE   "K300"           TO  SPA-ERRCD
+                   MOVE   "1"              TO  SPA-COM-CUR
+                                                      (IDX-Z)
+                   MOVE   "1"              TO  SPA-COM-KZMFLG9
+                                                      (IDX-Z)
+               END-IF
+           END-IF
+      *
+           .
+       20021-SANTEI03-CHEK02-EXT.
+           EXIT.
+      *****************************************************************
+      *    訂正時、包括診療チェック処理
+      *****************************************************************
+       20022-SANTEI03-CHEK03-SEC            SECTION.
+      *
+           MOVE    ZERO                    TO  FLG-TEISEI-ARI
+           PERFORM VARYING IDZ     FROM    1   BY  1
+                   UNTIL   (IDZ        >   SPA-MAX-LINE )  OR
+                           (LNK-ORCSC-TEI-SRYCD(IDZ)
+                                           =   SPACE )
+                        OR (FLG-TEISEI-ARI =   1     )
+               IF      LNK-ORCSC-TEI-SRYCD(IDZ)
+                                           =   WRK-SRYCD
+                   MOVE    1               TO  FLG-TEISEI-ARI
+               END-IF
+               PERFORM VARYING     IDY     FROM    1   BY  1
+                       UNTIL      (IDY     >   200   )  OR
+                                  (TBL-SRYCD (IDX IDY) =   SPACE)
+                                OR (FLG-TEISEI-ARI =   1     )
+                   IF       LNK-ORCSC-TEI-SRYCD(IDZ)
+                                               =   TBL-SRYCD (IDX IDY)
+                       MOVE    1               TO  FLG-TEISEI-ARI
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+      *
+      *    前回と同じ包括はチェックなし
+           IF      FLG-TEISEI-ARI      =   ZERO
+               PERFORM 20021-SANTEI03-CHEK02-SEC
+           END-IF
+      *
+           .
+       20022-SANTEI03-CHEK03-EXT.
+           EXIT.
+      *H29.9
+      *
       *
       *****************************************************************
       *    算定履歴による包括診療チェック処理
@@ -2355,7 +2491,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                  AND ( LNK-NYUINDAY-TANKI2-KBN (IDX-D)
                                            NOT =   SPACE     )
                    MOVE    1               TO  NACCT-DAY (IDX-D)
-      *TEST
+      *
       *H29.1
                    MOVE    IDX-D           TO  WRK-TANKI-DAY
                END-IF
@@ -2710,6 +2846,24 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF.
       *
        930-NYUINACT-RAED-EXT.
+           EXIT.
+      *****************************************************************
+      *    受診履歴マスター読込
+      *****************************************************************
+       970-JYURRK-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+               MOVE    ZERO            TO  FLG-JYURRK
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           .
+       970-JYURRK-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
