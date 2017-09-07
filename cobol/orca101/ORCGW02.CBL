@@ -73,6 +73,7 @@
       *  04.06.01    NACL-伊藤    11/01/28  リアルタイム送信
       *  04.06.02    NACL-伊藤    11/06/17  感染症区分送信
       *  04.07.00    NACL-太田    11/07/14  自費名称一括登録対応
+      *  04.08.00    NACL-多々納  17/09/05  自費コード端数区分対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -399,6 +400,18 @@
                                13  SPA-GMN-DATAINFECT-LST  PIC X(14)
                                                       OCCURS   5.
                                13  SPA-GMN-DATAINFECT-MAX  PIC 9(02).
+      *
+      *H29.9            自費コード端数区分
+                        09  SPA-GMN-JIHIHASUKBN-LST-G.
+                           11  SPA-GMN-JIHIHASUKBN-LST    PIC X(40)
+                                                      OCCURS  5.
+                           11  SPA-GMN-JIHIHASUKBN-MAX    PIC 9(02).
+                        09  SPA-GMN-JIHIHASUKBN-G.
+                           11  SPA-GMN-JIHIHASUKBN    PIC X(01).
+                           11  SPA-GMN-F19            PIC X(01).
+                           11  SPA-GMN-JIHIHASUKBN-MEI
+                                                      PIC X(38).
+      *
       *----(01.00.09) LINE ADD END   ----------------------------------
                    07  SPA-GMN-1002-AREA.
                        09  SPA-GMN-POST           PIC X(07).
@@ -1145,6 +1158,17 @@
            END-IF
            MOVE    SPA-GMN-TAX-HASU-KBNLST (2)
                                TO  SPA-GMN-TAX-HASU-KBN-G
+      *H29.9
+      *    自費コード端数処理
+           MOVE    "1 １円未満四捨五入"
+                               TO  SPA-GMN-JIHIHASUKBN-LST (1)
+           MOVE    "2 １円未満切り捨て"
+                               TO  SPA-GMN-JIHIHASUKBN-LST (2)
+           MOVE    "3 １円未満切り上げ"
+                               TO  SPA-GMN-JIHIHASUKBN-LST (3)
+           MOVE    3           TO  SPA-GMN-JIHIHASUKBN-MAX
+           MOVE    SPA-GMN-JIHIHASUKBN-LST (2)
+                               TO  SPA-GMN-JIHIHASUKBN-G
       *
            MOVE    "1"         TO  SPA-GMN-HIWARIKBNL    (1)
            MOVE    "日割計算しない"  
@@ -1957,6 +1981,23 @@
                 END-IF
            END-PERFORM
       *
+      *H29.9
+      *    自費コード端数 空白の時、"2"とする
+           IF      SYS-1001-JIHI-HASU-KBN   =   SPACE
+               MOVE    "2"             TO  SYS-1001-JIHI-HASU-KBN
+           END-IF
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-JIHIHASUKBN-MAX
+               IF      SYS-1001-JIHI-HASU-KBN
+                                       =   SPA-GMN-JIHIHASUKBN-LST
+                                                      (IDY)(1:1)
+                   MOVE    SPA-GMN-JIHIHASUKBN-LST (IDY)
+                                           TO  SPA-GMN-JIHIHASUKBN-G
+                   MOVE    SPA-GMN-JIHIHASUKBN-MAX
+                                           TO  IDY
+                END-IF
+           END-PERFORM
+      *
       *    更生・育成限度額日割計算区分 空白の時、"1"とする
            IF      SYS-1001-HIWARIKBN   =   SPACE
                MOVE    "1"             TO  SYS-1001-HIWARIKBN
@@ -2322,6 +2363,8 @@
            MOVE    W02-DAISANKBN       TO  SPA-GMN-DAISANKBN-G
            MOVE    W02-GENTAIKBN       TO  SPA-GMN-GENTAIKBN-G
            MOVE    W02-TAXHASU         TO  SPA-GMN-TAX-HASU-KBN-G
+      *    自費コード端数処理
+           MOVE    W02-JIHIHASUKBN     TO  SPA-GMN-JIHIHASUKBN-G
            MOVE    W02-HIWARIKBN       TO  SPA-GMN-HIWARIKBN-G
            MOVE    W02-DATACREATE      TO  SPA-GMN-DATACREATE-G
            MOVE    W02-DATATEISYU      TO  SPA-GMN-DATATEISYUTU-G
@@ -2554,6 +2597,12 @@
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4131-JIHIPOSITION-CHK-SEC
+           END-IF
+      *
+      *H29.9
+      *    自費コード端数処理
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4131-JIHIHASUKBN-CHK-SEC
            END-IF
       *
            .
@@ -3686,6 +3735,30 @@
        4131-JIHIPOSITION-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    自費コード端数区分設定
+      *****************************************************************
+       4131-JIHIHASUKBN-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-JIHIHASUKBN-MAX
+               IF      SPA-GMN-JIHIHASUKBN
+                                       =   SPA-GMN-JIHIHASUKBN-LST
+                                                        (IDY)(1:1)
+                   MOVE    SPA-GMN-JIHIHASUKBN-LST (IDY)
+                                       TO  SPA-GMN-JIHIHASUKBN-G
+                   MOVE    1           TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0221"          TO  SPA-ERRCD
+               MOVE    222              TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4131-JIHIHASUKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    郵便番号チェック処理
       *****************************************************************
        4112-POST-CHK-SEC           SECTION.
@@ -4323,6 +4396,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SYS-1001-DATAINFECTIONKBN
                    MOVE    SPA-GMN-JIHIPOSITION
                                        TO  SYS-1001-JIHIPOSITION
+      *            自費コード端数設定
+                   MOVE    SPA-GMN-JIHIHASUKBN
+                                       TO  SYS-1001-JIHI-HASU-KBN
                    MOVE    SYS-1001-REC    TO  SYSKANRI-REC
       * 
       *    医療機関情報ー所在地、連絡先情報
@@ -5064,6 +5140,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W02-JIHIPOSITION-ITEM (IDX)
            END-PERFORM
            MOVE    3                   TO  W02-JIHIPOSITION-COUNT
+      *
+      *    自費コード端数設定
+           MOVE    SPA-GMN-JIHIHASUKBN-G   TO  W02-JIHIHASUKBN
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       SPA-GMN-JIHIHASUKBN-MAX
+               MOVE    SPA-GMN-JIHIHASUKBN-LST (IDX)
+                                       TO  W02-JIHIHASUKBN-ITEM (IDX)
+           END-PERFORM
+           MOVE    3                   TO  W02-JIHIHASUKBN-COUNT
       *----(01.00.09) LINE ADD END   ----------------------------------
       *
       *    医療機関情報ー所在地、連絡先情報
@@ -5251,6 +5336,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    エラーメッセージ表示理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
+      *
            MOVE    SPACE               TO  SPA-ERRMSG
       *
            EVALUATE    SPA-ERRCD
@@ -5439,6 +5525,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0031"
                    MOVE    "旧総合病院であるとき主科設定はできません。"
                                                TO  SPA-ERRMSG
+               WHEN    "0221"
+                   STRING  "自費コード端数区分がありません。"
+                                               DELIMITED BY  SIZE
+                   INTO  SPA-ERRMSG
+                   END-STRING
       *----(01.00.09) LINE ADD END   ----------------------------------
                WHEN    "0032"
                    MOVE    "半角で入力して下さい。"
@@ -5494,6 +5585,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            MOVE    SPACE                TO  WID1
+           INITIALIZE                       WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE
            MOVE    WRK-WIDMSG           TO  WID1-ID1MSG
            MOVE    "B12"                TO  MCP-WIDGET
@@ -5641,6 +5733,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO   MCP-WIDGET
                 WHEN    218
                     MOVE  "DATAINFECT"     TO   MCP-WIDGET
+      *         自費コード端数区分
+                WHEN    222
+                    MOVE  "JIHIHASUKBN"    TO   MCP-WIDGET
       *
                 WHEN    40
                     MOVE  "TEIRITU"        TO   MCP-WIDGET
@@ -5734,7 +5829,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(01.00.09) LINE ADD START ----------------------------------
                 WHEN    32  THRU    39
       *          WHEN    32  THRU    33
-                WHEN    201 THRU    221
+                WHEN    201 THRU    222
                     MOVE    0                TO  W02-PAGENO
       *----(01.00.09) LINE ADD END   ----------------------------------
                 WHEN    20  THRU    29
@@ -5846,7 +5941,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   MOVE    205              TO  SPA-GMN-CUR
               WHEN    "HIWARIKBN"
       *********   MOVE    01               TO  SPA-GMN-CUR
-                  MOVE     01              TO  SPA-GMN-CUR
+      *H29.9      MOVE     01              TO  SPA-GMN-CUR
+                  MOVE     222             TO  SPA-GMN-CUR
+              WHEN    "JIHIHASUKBN"
+                  MOVE    01               TO  SPA-GMN-CUR
+      *
               WHEN    "DATACREATE"
                   MOVE    204              TO  SPA-GMN-CUR
               WHEN    "DATATEISYU"

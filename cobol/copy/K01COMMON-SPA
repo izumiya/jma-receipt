@@ -267,6 +267,9 @@
       *H27.6
       *        セット全展開
                05  SPA-SETALLKBN              PIC  X(01).
+      *H29.9
+      *        自費コード端数処理
+               05  SPA-JIHI-HASU-KBN          PIC  X(01).
       *
            03  SPA-K01SET-AREA.
       *処理フラグ（０：通常、１：訂正）
