@@ -5526,7 +5526,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "旧総合病院であるとき主科設定はできません。"
                                                TO  SPA-ERRMSG
                WHEN    "0221"
-                   STRING  "自費コード端数区分がありません。"
+                   STRING  "自費コード数量計算端数区分がありません。"
                                                DELIMITED BY  SIZE
                    INTO  SPA-ERRMSG
                    END-STRING
