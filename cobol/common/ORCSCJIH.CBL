@@ -31,6 +31,7 @@
       * 01.00.02     NACL-多々納  03/04/30  剤別点数追加
       * 04.07.00     NACL-多々納  14/10/03  消費税計算＠、.961対応
       * 04.08.00     NACL-多々納  17/06/XX  商品コード対応他
+      * 04.08.00     NACL-多々納  17/09/XX  自費コード端数処理対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -48,6 +49,7 @@
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
       *
            03  FLG-ERR             PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -67,14 +69,15 @@
            03  WRK-MOJI            PIC X(01). 
       *
            03  WRK-ERRCD           PIC X(04). 
-      *
-           03  WRK-KINGAK-9        PIC 9(08)V99.
+      *H29.9   小数点以下５桁へ
+      *    03  WRK-KINGAK-9        PIC 9(08)V99.
+           03  WRK-KINGAK-9        PIC 9(08)V9(5).
            03  WRK-KINGAK          PIC 9(08).
       *
            03  WRK-ZEIKIN-9        PIC 9(08)V9(5).
            03  WRK-ZEIKIN          PIC 9(08).
-           03  WRK-TANKA           PIC 9(08)V99.
-           03  WRK-KISOTEN         PIC 9(08)V99.
+           03  WRK-TANKA           PIC 9(08)V9(5).
+           03  WRK-KISOTEN         PIC 9(08)V9(5).
       *
            03  WRK-ZEIRITU         PIC 9(01)V99.
       *
@@ -92,6 +95,11 @@
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+      *
+           COPY    "CPSK1001.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -113,6 +121,9 @@
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
       *****COPY    "CPORCMCP.INC".
+      *H29.9
+      *    診療行為用共通パラメタ
+           COPY    "K01COMMON-SPA".
       *
       *****************************************************************
       *    連絡　領域
@@ -142,6 +153,16 @@
       *    主　　処理
       *****************************************************************
        000-PROC-SEC                SECTION.
+      *
+           INITIALIZE                  WRK-AREA
+           INITIALIZE                  FLG-AREA
+      *H29.9
+      *    自費コード端数処理設定
+           IF      LNK-ORCSC-PG        =   "J04"
+               PERFORM 400-JIHI-HASU-SEC
+           ELSE
+               MOVE    SPA-WORK        TO  SPA-K01KYOUTU
+           END-IF
       *
       *
            EVALUATE    LNK-ORCSC-KBN
@@ -414,19 +435,35 @@
                                                             (IDX-Z)
                                                *   WRK-COM-SURYO(IDX-Z)
                        PERFORM 10021-ZEIKEISEN-SEC
-                       MOVE    WRK-TANKA       TO  WRK-KINGAK
+                       MOVE    WRK-TANKA       TO  WRK-KINGAK-9
                    ELSE
       *
                        MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-KISOTEN
                        PERFORM 10021-ZEIKEISEN-SEC
-                       COMPUTE WRK-KINGAK      =   WRK-TANKA
+                       COMPUTE WRK-KINGAK-9    =   WRK-TANKA
                                                *   WRK-COM-SURYO(IDX-Z)
                    END-IF
                ELSE
                    MOVE    WRK-COM-KISOTEN (IDX-Z)  TO  WRK-TANKA
-                   COMPUTE WRK-KINGAK      =   WRK-TANKA
+                   COMPUTE WRK-KINGAK-9    =   WRK-TANKA
                                            *   WRK-COM-SURYO(IDX-Z)
                END-IF
+      *
+      *H29.9
+      *        端数処理
+               EVALUATE    SPA-JIHI-HASU-KBN
+               WHEN    "1"
+      *        小数点以下四捨五入
+                   COMPUTE WRK-KINGAK      =   WRK-KINGAK-9
+                                           +   0.5
+               WHEN    "3"
+      *        小数点以下切り上げ
+                   COMPUTE WRK-KINGAK      =   WRK-KINGAK-9
+                                           +   0.9999
+               WHEN    OTHER
+      *        小数点以下切り捨て
+                   MOVE    WRK-KINGAK-9    TO  WRK-KINGAK
+               END-EVALUATE
            END-IF
       *
            .
@@ -609,6 +646,41 @@
            EXIT.
       *
       *****************************************************************
+      *    自費コード端数設定処理
+      *****************************************************************
+       400-JIHI-HASU-SEC                SECTION.
+      *
+           INITIALIZE                   SPA-K01KYOUTU
+      *    システム管理検索（医療機関情報）
+           MOVE    SPACE               TO  SYS-1001-REC
+           INITIALIZE                  SYS-1001-REC
+           MOVE    "1001"              TO  SYS-1001-KANRICD
+           MOVE    "*"                 TO  SYS-1001-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1001-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1001-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
+           MOVE    SYS-1001-REC        TO  SYSKANRI-REC
+      *
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
+      *        自費コード端数設定
+               MOVE    SYS-1001-JIHI-HASU-KBN  TO  SPA-JIHI-HASU-KBN
+           END-IF
+      *
+      *    端数切上げが初期
+           IF      SPA-JIHI-HASU-KBN   =   SPACE
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
+           END-IF
+           IF      SPA-SRYYMD          <   "20170901"
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
+           END-IF
+          .
+       400-JIHI-HASU-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
       *    全診療行為チェック処理
       *****************************************************************
        200-ALL-SYORI-SEC                SECTION.
@@ -625,5 +697,81 @@
       *
            .
        300-AUTO-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    管理マスター読込（キー）
+      *****************************************************************
+       900-SYSKANRI-INV-SEC         SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYSKANRI-REC
+               ELSE
+                   MOVE    1                   TO  FLG-SYSKANRI
+                   MOVE    SPACE               TO  SYSKANRI-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+               MOVE    SPACE               TO  SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYSKANRI-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクロース処理
+      *****************************************************************
+       990-DBCLOSE-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       990-DBCLOSE-EXT.
            EXIT.
       *

@@ -37,7 +37,8 @@
       * 04.08.00     NACL-多々納  15/03/XX  平成２７年４月改正対応
       * 04.08.00     NACL-多々納  16/08/XX  相互作用チェック区分追加
       * 04.08.00     NACL-多々納  16/10/04  要介護状態表示対応
-      *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算区分追加
+      * 04.08.00     NACL-多々納  17/07/XX  心身療法２０未満加算区分追加
+      * 04.08.00     NACL-多々納  17/09/XX  自費コード端数処理区分追加
       *****************************************************************
       *
       *
@@ -245,8 +246,19 @@
                END-IF
       *        消費税端数設定
                MOVE    SYS-1001-TAX-HASU-KBN   TO  SPA-TAX-HASU-KBN
+      *H29.9
+      *        自費コード端数設定
+               MOVE    SYS-1001-JIHI-HASU-KBN  TO  SPA-JIHI-HASU-KBN
            END-IF
       *
+      *H29.9
+      *    端数切上げが初期
+           IF      SPA-JIHI-HASU-KBN   =   SPACE
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
+           END-IF
+           IF      SPA-SRYYMD          <   "20170901"
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
+           END-IF
       *
       *    職員情報より発行フラグ再設定
            IF     (LNK-SC95-PG         =   "K02" )
@@ -1299,8 +1311,21 @@
                END-IF
       *        消費税端数設定
                MOVE    SYS-1001-TAX-HASU-KBN   TO  SPA-TAX-HASU-KBN
+      *H29.9
+      *        自費コード端数設定
+               MOVE    SYS-1001-JIHI-HASU-KBN  TO  SPA-JIHI-HASU-KBN
            ELSE
                MOVE    SPACE                   TO  SPA-TAX-HASU-KBN
+               MOVE    "2"                     TO  SPA-JIHI-HASU-KBN
+           END-IF
+      *
+      *H29.9
+      *    端数切上げが初期
+           IF      SPA-JIHI-HASU-KBN   =   SPACE
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
+           END-IF
+           IF      SPA-SRYYMD          <   "20170901"
+               MOVE    "2"                 TO  SPA-JIHI-HASU-KBN
            END-IF
       *
       *    診療科

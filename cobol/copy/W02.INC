@@ -167,6 +167,12 @@
                     06  W02-YYKHYOFLG-COUNT   PIC S9(9)   BINARY.
                     06  W02-YYKHYOFLG-ITEM
                             PIC X(20)   OCCURS  5 TIMES.
+                  05  W02-JIHIHASUKBN-COMB.
+                    06  W02-JIHIHASUKBN.
+                      07  W02-VALUE   PIC X(40).
+                    06  W02-JIHIHASUKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W02-JIHIHASUKBN-ITEM
+                            PIC X(40)   OCCURS  5 TIMES.
                 04  W02-N01-STATE   PIC S9(9)   BINARY.
                 04  W02-FIXED24.
                   05  W02-POST.
