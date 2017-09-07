@@ -137,6 +137,7 @@
       *                                     条件追加
       *  04.08.03    NACL-藤原    16/02/10  自院病名への補足コメント追加
       *                                     対応
+      *  04.08.04    NACL-藤原    17/07/10  移行、置換時の特定疾患の表示
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -263,6 +264,28 @@
                                    PIC 9(03).
            03  WRK-GMN-C03-BUNRUIMEI-OLD
                                    PIC X(30).
+      *
+      *    退避警告メッセージ
+           03  WRK-SPA-CIDCD-AREA.
+               05  WRK-SPA-CIDCD   PIC X(04).
+               05  WRK-SPA-CIDCD2  PIC X(04).
+               05  WRK-SPA-CIDCD3  PIC X(04).
+               05  WRK-SPA-CIDCD4  PIC X(04).
+               05  WRK-SPA-CIDCD5  PIC X(04).
+               05  WRK-SPA-CIDCD6  PIC X(04).
+           03  WRK-SPA-CID1-AREA.
+               05  WRK-SPA-CID1-FLG
+                                   PIC X(02).
+               05  WRK-SPA-CID2-FLG
+                                   PIC X(02).
+               05  WRK-SPA-CID3-FLG
+                                   PIC X(03).
+               05  WRK-SPA-CID4-FLG
+                                   PIC X(03).
+               05  WRK-SPA-CID5-FLG
+                                   PIC X(03).
+               05  WRK-SPA-CID6-FLG
+                                   PIC X(03).
       *
       *    ファイルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
@@ -588,6 +611,9 @@
       *****************************************************************
        340-CID2-SET-SEC            SECTION.
       *
+           MOVE    SPA-CIDCD-AREA  TO  WRK-SPA-CIDCD-AREA
+           MOVE    SPA-CID1-AREA   TO  WRK-SPA-CID1-AREA
+      *
            EVALUATE    SPA-CIDCD2
                WHEN    "0101"
                WHEN    "0102"
@@ -645,6 +671,8 @@
            INITIALIZE                  SPA-C03-IKOSAKI-AREA
                                        SPA-C03-CHANGE-AREA
                                        SPA-C03-HAISI-AREA
+           INITIALIZE                  WRK-SPA-CIDCD-AREA
+                                       WRK-SPA-CID1-AREA
            .
        340-CID2-SET-EXT.
            EXIT.
@@ -906,6 +934,9 @@
       *****************************************************************
        370-CID6-SET-SEC            SECTION.
       *
+           MOVE    SPA-CIDCD-AREA  TO  WRK-SPA-CIDCD-AREA
+           MOVE    SPA-CID1-AREA   TO  WRK-SPA-CID1-AREA
+      *
            EVALUATE    SPA-CIDCD6
                WHEN    "0101"
                WHEN    "0102"
@@ -1090,6 +1121,8 @@
            INITIALIZE                  SPA-C03-IKOSAKI-AREA
                                        SPA-C03-CHANGE-AREA
                                        SPA-C03-HAISI-AREA
+           INITIALIZE                  WRK-SPA-CIDCD-AREA
+                                       WRK-SPA-CID1-AREA
            .
        370-CID6-SET-EXT.
            EXIT.
@@ -3294,7 +3327,7 @@
                  MOVE    SPACE               TO  SPA-GMN-C03-UTAGAIFLG-G
              END-IF 
              PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >         WRK-CONS-BYOMEICD-MAX
+                     UNTIL   IDX >         WRK-CONS-BYOMEICD-MAX
                    OR      SPA-GMN-C03-UTAGAIFLG   =   "3"
                EVALUATE    SPA-NAI-C03-UTAGAIFLG   (IDX)
                    WHEN    "1"
@@ -3318,9 +3351,19 @@
              PERFORM 5001-UTAGAIFLG-HENSYU-SEC
       *            
       *    慢性区分編集
-             MOVE    SPACE                 TO  SPA-GMN-C03-MANSEIKBN-G  
-             MOVE    ZERO                  TO  SPA-NAI-C03-NANBYOCD
-                                               SPA-NAI-C03-MANSEIKBN
+             IF  ( ( WRK-SPA-CIDCD2  NOT =   SPACE )
+                 AND
+                   ( WRK-SPA-CID2-FLG    =   SPACE ) )
+             OR  ( ( WRK-SPA-CIDCD6  NOT =   SPACE )
+                 AND
+                   ( WRK-SPA-CID6-FLG    =   SPACE ) )
+      *          移行等の病名をそのまま表示するときは初期化しない  
+                 CONTINUE
+             ELSE
+                 MOVE    SPACE               TO  SPA-GMN-C03-MANSEIKBN-G
+                 MOVE    ZERO                TO  SPA-NAI-C03-NANBYOCD
+                                                 SPA-NAI-C03-MANSEIKBN
+             END-IF
              PERFORM VARYING IDX FROM    1   BY  1
                      UNTIL   IDX >       WRK-CONS-BYOMEICD-MAX
                  IF      SPA-NAI-C03-NANBYOCD-O (IDX)  NOT =   ZERO
@@ -3332,7 +3375,7 @@
                  END-IF   
              END-PERFORM
              PERFORM VARYING IDX   FROM    1   BY  1
-                   UNTIL   IDX >   WRK-CONS-BYOMEICD-MAX
+                     UNTIL   IDX   >   WRK-CONS-BYOMEICD-MAX
                  IF      SPA-NAI-C03-TOKSKNCD (IDX)   NOT =   ZERO
                      MOVE    SPA-NAI-C03-TOKSKNCD (IDX)
                                          TO  SPA-NAI-C03-MANSEIKBN
