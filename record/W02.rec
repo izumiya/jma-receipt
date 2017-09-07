@@ -266,6 +266,13 @@ W02 {
           count int;
             item varchar(20)[5];
         };
+        JIHIHASUKBN_COMB {
+          JIHIHASUKBN {
+            textdata varchar(40);
+          };
+          count int;
+            item varchar(40)[5];
+        };
       };
       N01 {
         state int;
