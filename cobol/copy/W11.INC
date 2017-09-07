@@ -181,3 +181,5 @@
                 04  W11-N02-STATE              PIC S9(9)    BINARY.
               03  W11-STYUKYMD                 PIC X(9).
               03  W11-EDYUKYMD                 PIC X(9).
+              03  W11-USE-PRINT-SERVER         PIC X.
+              03  W11-USE-PRINT-SERVER-STATE   PIC S9(9)   BINARY.

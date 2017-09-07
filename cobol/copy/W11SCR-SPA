@@ -35,6 +35,7 @@
                05  SPA-GMN-AREA.
                    07  SPA-GMN-STYUKYMD    PIC X(09).
                    07  SPA-GMN-EDYUKYMD    PIC X(09).
+                   07  SPA-GMN-USE-PRINT-SERVER    PIC X(01).
       *
                    07  SPA-GMN-PAGENO      PIC 9(01).
       *            出力先プリンタ割り当て情報

@@ -761,5 +761,9 @@ W11 {
     EDYUKYMD {
       textdata varchar(9);
     };
+    USE_PRINT_SERVER {
+      isactive bool;
+      state int;
+    };
   };
 };

@@ -72,6 +72,7 @@
       * 04.07.00     NACL-太田    13/03/13  プログラム存在チェック追加
       * 04.08.00     NACL-太田    13/09/17  ＡＤＬ区分・医療区分評価票追加
       * 04.08.01     NACL-森脇    16/12/16  請求書兼領収書５追加
+      * 05.00.00     NACL-森脇    17/09/06  PUSH通知によるサーバ印刷追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -219,6 +220,10 @@
       *    帳票プログラム選択情報 （入院）
            COPY  "CPSK1035.INC".
       *----(01.00.03) LINE UPD END   --------------------------
+      *----(05.00.00)--ADD-START---
+      *    PUSH通知情報
+           COPY  "CPSK9901.INC".
+      *----(05.00.00)--ADD-END-----
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
@@ -365,6 +370,9 @@
       *
            MOVE    SPA-W01-STYUKYMDH   TO  SPA-GMN-STYUKYMD
            MOVE    SPA-W01-EDYUKYMDH   TO  SPA-GMN-EDYUKYMD
+      *----(05.00.00)--ADD-START---
+           MOVE    "F"                 TO  SPA-GMN-USE-PRINT-SERVER
+      *----(05.00.00)--ADD-END-----
       *
            EVALUATE    SPA-W01-KANRICD
       *
@@ -374,6 +382,12 @@
       *
       *    出力先プリンタ割り当て情報
            WHEN    "1031"
+      *----(05.00.00)--ADD-START---
+               IF    ( SPA-MW      =   SPA-GINBEE )
+      *            PUSH通知情報
+                   PERFORM 3101-SYS9901-SYOKI-SEC
+               END-IF
+      *----(05.00.00)--ADD-END-----
       *----(02.00.03)--UPD-START---
       *        端末区分初期処理
                PERFORM 3101-USERKBN-SYOKI-SEC
@@ -389,7 +403,30 @@
            .
        310-SPASET-EXT.
            EXIT.
+      *----(05.00.00)--ADD-START---
+      *****************************************************************
+      *    PUSH通知情報初期処理
+      *****************************************************************
+       3101-SYS9901-SYOKI-SEC          SECTION.
       *
+           MOVE    SPACE               TO  SYSKANRI-REC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "9901"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF  (   FLG-SYSKANRI        =   ZERO )
+               MOVE    SYSKANRI-REC    TO  SYS-9901-REC
+               IF      SYS-9901-USE-PRINT-SERVER   =   1
+                   MOVE    "T"         TO  SPA-GMN-USE-PRINT-SERVER
+               ELSE
+                   MOVE    "F"         TO  SPA-GMN-USE-PRINT-SERVER
+               END-IF
+           END-IF
+      *
+           .
+       3101-SYS9901-SYOKI-EXT.
+           EXIT.
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    帳票編集区分情報初期処理
       *****************************************************************
@@ -1423,6 +1460,10 @@
                IF      SPA-W01-KANRICD     =   "1031"
                    PERFORM 460-W62-SYORI-SEC
                END-IF
+      *----(05.00.00)--ADD-START---
+           WHEN    "CLICKED"       ALSO    "USE-PRINT-SERVER"
+               PERFORM 4101-GMN-SPA-SET-SEC
+      *----(05.00.00)--ADD-END-----
       *
            END-EVALUATE
            .
@@ -1657,6 +1698,11 @@
       *----(02.00.12)--ADD-START---
            MOVE    W11-GAZOFOLDER      TO  SPA-GMN-GAZOFOLDER
       *----(02.00.12)--ADD-END-----
+      *
+      *----(05.00.00)--ADD-START---
+           MOVE    W11-USE-PRINT-SERVER
+                                       TO  SPA-GMN-USE-PRINT-SERVER
+      *----(05.00.00)--ADD-END-----
       *
            .
        4101-GMN-SPA-SET-EXT.
@@ -2503,6 +2549,12 @@
       *            職員毎登録
                    PERFORM 4902-SYS1031-SYOUIN-SEC
                END-IF
+      *----(05.00.00)--ADD-START---
+               IF    ( SPA-MW      =   SPA-GINBEE )
+      *            PUSH通知情報
+                   PERFORM 490-SYS-9901-KOUSHIN-SEC
+               END-IF
+      *----(05.00.00)--ADD-END-----
       *        初期画面へ
                IF      SPA-ERRCD           =   SPACE
                    PERFORM 310-SPASET-SEC
@@ -2575,7 +2627,6 @@
        490-SAKUJYO-EXT.
            EXIT.
       *----(02.00.03)--ADD-END-----
-      *
       *****************************************************************
       *       出力先プリンタ割り当て情報・標準登録
       *****************************************************************
@@ -2936,7 +2987,6 @@
       *
        490-SYS-1030-KOUSHIN-EXT.
            EXIT.
-      *
       *****************************************************************
       *       帳票区分削除処理
       *****************************************************************
@@ -2961,6 +3011,39 @@
        490-SYS-1030-DELETE-EXT.
            EXIT.
       *----(02.00.03)--ADD-START---
+      *----(05.00.00)--ADD-START---
+      *****************************************************************
+      *    PUSH通知更新処理
+      *****************************************************************
+       490-SYS-9901-KOUSHIN-SEC    SECTION.
+      *
+           MOVE    SPACE               TO  SYS-9901-REC
+           INITIALIZE                      SYS-9901-REC
+           MOVE    "9901"              TO  SYS-9901-KANRICD
+           MOVE    "*"                 TO  SYS-9901-KBNCD
+      *
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-9901-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-9901-EDYUKYMD
+           IF      SPA-GMN-USE-PRINT-SERVER    =   "T"
+               MOVE    1               TO  SYS-9901-USE-PRINT-SERVER
+           ELSE
+               MOVE    0               TO  SYS-9901-USE-PRINT-SERVER
+           END-IF
+      *
+           MOVE    SYS-9901-REC        TO  SYSKANRI-REC
+      *
+           PERFORM 900-SYSKANRI-INV2-SEC
+           MOVE    SYS-9901-REC        TO  SYSKANRI-REC
+      *
+           PERFORM 490-SYSKANRI-KOUSHIN-SEC
+           IF    ( MCP-RC          NOT =   ZERO )
+               MOVE    "4006"          TO  SPA-ERRCD
+           END-IF
+           .
+      *
+       490-SYS-9901-KOUSHIN-EXT.
+           EXIT.
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *       出力先プリンタ割り当て情報
       *****************************************************************
@@ -3590,6 +3673,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-GMN-STYUKYMD     TO  W11-STYUKYMD
            MOVE    SPA-GMN-EDYUKYMD     TO  W11-EDYUKYMD
+      *
+      *----(05.00.00)--ADD-START---
+           MOVE    SPA-GMN-USE-PRINT-SERVER
+                                        TO  W11-USE-PRINT-SERVER
+           IF    ( SPA-W01-KANRICD      =   "1031" )   AND
+                 ( SPA-MW               =   SPA-GINBEE )
+               MOVE    WIDGET-NORMAL    TO  W11-USE-PRINT-SERVER-STATE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE
+                                        TO  W11-USE-PRINT-SERVER-STATE
+           END-IF
+      *----(05.00.00)--ADD-END-----
       *
            MOVE    WIDGET-NORMAL        TO  W11-B03-STATE
                                             W11-B04-STATE
