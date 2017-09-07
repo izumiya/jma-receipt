@@ -177,6 +177,8 @@
       *              NACL-小豆沢  17/07/27  再診の時間外加算対応
       *                                     RECE641-NYUSAIFLG="1"の時、
       *                                     順序番号(E-6,F-6)の振り直し追加
+      *              NACL-小豆沢  17/09/07  同日再入院日の入退院日記録修正時の
+      *                                     不具合修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5651,11 +5653,13 @@
               AND  WRK-NYUIN-RIREKI-TAIINYMD (IDW)
                                        >=  WRK-EDYMD
       *同日再入院日の診療行為は次の入院履歴に変更する
-               IF  RECE641-KAISU(1 WRK-EDDD) = RECE641-KAISU(3 WRK-EDDD)
-                   IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
-                       ADD    1     TO   IDW
-                   END-IF
-               END-IF
+             IF (RECE62-PTID       =    RECE641-PTID)    AND
+                (RECE641-SRYSYUKBN   NOT =  SPACE)       AND
+                (RECE641-KAISU(1 WRK-EDDD) = RECE641-KAISU(3 WRK-EDDD))
+                  IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
+                      ADD    1     TO   IDW
+                  END-IF
+             END-IF
       *退院年月日
                IF (WRK-NYUIN-RIREKI-TAIINYMD (IDW)
                                        =   "99999999")  OR
