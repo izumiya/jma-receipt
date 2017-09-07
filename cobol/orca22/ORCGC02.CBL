@@ -7200,6 +7200,13 @@ grpsys                         MOVE    SPA-HOSPNUM
       *       
            EVALUATE    WRK-SEIGYO
                WHEN    "-"
+      *            クリアした自院病名の補足コメントと同一のとき、補足コメントをクリア
+                   IF      SPA-NAI-C02-US-HOSOKU-COMMENT(IDZ)
+                                               =
+                                           SPA-GMN-C02-HOSOKU-COMMENT
+                           INITIALIZE      SPA-GMN-C02-HOSOKUCD-G
+                                           SPA-GMN-C02-HOSOKU-COMMENT
+                   END-IF
                    PERFORM VARYING IDX FROM    IDZ BY  1
                            UNTIL   IDX >       6
                        IF      IDX             =   6
@@ -7215,12 +7222,6 @@ grpsys                         MOVE    SPA-HOSPNUM
                    END-PERFORM                           
                    PERFORM 41021-BYOMEICD-HENSYU-SEC
                    MOVE    SPACE           TO  WRK-SEIGYO     
-      *            病名コード未入力の時、補足コメントをクリア
-                   IF      SPA-NAI-C02-BYOMEICD-MAX
-                                           =   ZERO
-                       INITIALIZE          SPA-GMN-C02-HOSOKUCD-G
-                                           SPA-GMN-C02-HOSOKU-COMMENT
-                   END-IF
                    GO  TO  4102-BYOMEICD-CHK-EXT
                WHEN    "+"
                    PERFORM VARYING IDX FROM    6   BY  -1
