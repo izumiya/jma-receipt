@@ -430,14 +430,18 @@
                                                            PIC 9(02).
                                        17  SPA-NAI-C02-NANBYOCD-O
                                                            PIC 9(02).
+                                       17  SPA-NAI-C02-HAISIYMD
+                                                           PIC 9(08).
                                        17  SPA-NAI-C02-US-TOKSKNCD
                                                            PIC 9(02).
                                        17  SPA-NAI-C02-US-BYOMEIHENFLG
                                                            PIC X(01).
                                        17  SPA-NAI-C02-US-HKNBYOMEIFLG
                                                            PIC X(01).
-                                       17  SPA-NAI-C02-HAISIYMD
-                                                           PIC 9(08).
+                                       17  SPA-NAI-C02-US-HOSOKU-COMMENT
+                                                           PIC X(80).
+                                       17  SPA-NAI-C02-US-UTAGAIFLG
+                                                           PIC X(01).
                                        17  SPA-NAI-C02-BYOMEICD-O
                                                            PIC X(07)
                                                            OCCURS  21.
