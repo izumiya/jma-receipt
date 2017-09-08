@@ -1360,6 +1360,34 @@ class Receden_check < Receden_common
 
     re = rece.re.first
 
+    if re["SRYYM"].wtos >= H270101 and re["SRYYM"].wtos < H290801
+      if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
+        if rece.tokki.any?{|t| ("31".."35").include?(t)}
+          @errors.push("30090",rece,re,"TOKKI")
+        end
+      end
+    end
+
+    if re["SRYYM"].wtos >= H290801
+      if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
+        if rece.tokki.any?{|t| ["31", "32", "33", "35"].include?(t)}
+          @errors.push("30090",rece,re,"TOKKI")
+        end
+      end
+      if !([ HONNIN, ROKUSAI, KAZOKU, KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
+        if rece.tokki.any?{|t| t == "34" }
+          @errors.push("30090",rece,re,"TOKKI")
+        end
+      end
+      if !( rece.ko.any?{|k| k["FTNNUM"].value =~ /^(51..601|52|54)/})
+        if ([ KOREIIPN, KOUKIIPN ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN)
+          if rece.tokki.any?{|t| t == "34" }
+            @errors.push("30160",rece,re,"TOKKI")
+          end
+        end
+      end
+    end
+
     if re["SRYYM"].wtos >= H270101
       if rece.tokki.any?{|t| ("23".."24").include?(t)}
         @errors.push("30070",rece,re,"TOKKI")
@@ -1368,12 +1396,6 @@ class Receden_check < Receden_common
       if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk))
         if rece.tokki.any?{|t| ("26".."30").include?(t)}
           @errors.push("30080",rece,re,"TOKKI")
-        end
-      end
-
-      if !([ HONNIN, ROKUSAI, KAZOKU ].include?(rece.sbt.honkzk) && rece.sbt.nyugai == NYUIN )
-        if rece.tokki.any?{|t| ("31".."35").include?(t)}
-          @errors.push("30090",rece,re,"TOKKI")
         end
       end
 
