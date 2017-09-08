@@ -1741,7 +1741,9 @@
                    MOVE    CONS-FORM-ID        TO  QR-FILE-FORM-ID
                    MOVE    SPA-TERMID          TO  QR-FILE-TERMID
                    MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
+                   MOVE    ".qr_"              TO  QR-FILE-TYPE
                    MOVE    WRK-FILE-CNT        TO  QR-FILE-ID
+                   MOVE    ".png"              TO  QR-FILE-EXT
       *v4.8
       *            一時ファイル名取得
                    INITIALIZE                      SGETTEMP-AREA
@@ -1987,10 +1989,10 @@
            MOVE    "okusuri_techo_n"   TO  FMMNOTEN-FORM-ID
            MOVE    SYS-1034-PRTNM(11)  TO  FMMNOTEN-PRINTER
       *
-      *    診療日 YYYY-MM-DD
+      *    交付日 YYYY-MM-DD
            MOVE    ORCHCN62-SRYYMD     TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  FMMNOTEN-SRYYMD
+           MOVE    WRK-HEN-DATE        TO  FMMNOTEN-KOFYMD
       *    伝票番号
       *     MOVE    ORCHCN62-DENPNUM    TO  FMMNOTEN-DENPNUM
       *    病棟番号

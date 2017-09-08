@@ -8,7 +8,6 @@ fm_medicine_information_h{
 		Custom_ID				varchar(30);
 		Printer					varchar(20);
 		Style_Class			varchar(1);
- 		Perform_Date			varchar(10);
 		IssuedDate				varchar(10);
 		Ward_Number					varchar(02);
 		Ward_Name						varchar(20);

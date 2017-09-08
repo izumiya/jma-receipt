@@ -27,8 +27,8 @@
                05  FMMNOTEN-CUSTOM-ID               PIC X(30).
       *            プリンタ名
                05  FMMNOTEN-PRINTER                 PIC X(20).
-      *            診療日 YYYY-MM-DD
-               05  FMMNOTEN-SRYYMD                  PIC X(10).
+      *            発行日 YYYY-MM-DD
+               05  FMMNOTEN-KOFYMD                  PIC X(10).
       *            病棟番号
                05  FMMNOTEN-BTUNUM                  PIC X(2).
       *            病棟名称

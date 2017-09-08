@@ -2002,10 +2002,6 @@
       *
            MOVE    SPA-SRYYMD      TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE    TO  FMYAKUJON-SRYYMD
-      *
-           MOVE    SPA-SYSYMD      TO  WRK-SYMD
-           PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE    TO  FMYAKUJON-KOFYMD
       *
            MOVE    SPA-PTNUM       TO  FMYAKUJON-PTNUM

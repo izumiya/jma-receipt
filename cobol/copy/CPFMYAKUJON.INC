@@ -25,9 +25,6 @@
               05  FMYAKUJON-CUSTOM-ID            PIC X(30).
               05  FMYAKUJON-PRINTER              PIC X(20).
               05  FMYAKUJON-STYLE                PIC X(1).
-      *       ¿ÇÎÅÆü
-              05  FMYAKUJON-SRYYMD               PIC X(10).
-      *       ¸òÉÕÆü
               05  FMYAKUJON-KOFYMD               PIC X(10).
               05  FMYAKUJON-BTUNUM               PIC X(2).
               05  FMYAKUJON-BTUNAME              PIC X(20).
