@@ -111,6 +111,8 @@
       *              NACL-小豆沢  16/12/20  外来の包括分は出来高実績点数
       *                                     をゼロ点で記録する
       *              NACL-門脇    17/03/22  後発品変更可（処方単位）
+      *              NACL-小豆沢  17/09/08  きざみ計算の出来高実績点数
+      *                                     端数処理追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4273,7 +4275,7 @@
                   (WRK-KZM-TEN2        >   ZERO )
                MOVE    WRK-KZM-TEN2    TO  WRK-FEDT-DEKIDAKA-TEN
            ELSE
-               MOVE    TNS-TEN         TO  WRK-FEDT-DEKIDAKA-TEN
+               COMPUTE    WRK-FEDT-DEKIDAKA-TEN   =  TNS-TEN  + 0.5
            END-IF
            .
        200799-KZM-DEKIDAKA-EXT.
