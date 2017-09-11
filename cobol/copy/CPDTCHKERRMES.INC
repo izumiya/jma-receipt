@@ -838,6 +838,18 @@
            05 PIC  X(30)   VALUE   "療行為入力を行ってください    ".
            05 PIC  X(30)   VALUE   "                              ".
       *
+           05 PIC  X(06)   VALUE   "990038".
+           05 PIC  X(30)   VALUE   "患者負担額が計算できません。入".
+           05 PIC  X(30)   VALUE   "院基本設定「入院時食事療養」が".
+           05 PIC  X(30)   VALUE   "未設定です                    ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
+           05 PIC  X(06)   VALUE   "990039".
+           05 PIC  X(30)   VALUE   "患者負担額が計算できません。適".
+           05 PIC  X(30)   VALUE   "用できない低所得１の入力があり".
+           05 PIC  X(30)   VALUE   "ます                          ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
@@ -845,7 +857,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  130.
+           05 ERRMES-OCC   OCCURS  132.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   130.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   132.

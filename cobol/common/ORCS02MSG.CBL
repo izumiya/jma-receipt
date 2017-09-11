@@ -34,7 +34,7 @@
        WORKING-STORAGE             SECTION.
       *
        01  WRK-AREA.
-           03  WRK-MSG                 PIC X(100).
+           03  WRK-MSG                 PIC X(100)  OCCURS 3.
       *
       ****************************************************************
        LINKAGE                         SECTION.
@@ -57,126 +57,139 @@
            INITIALIZE                  S02MSG-MSG-AREA
       *
            EVALUATE    S02MSG-S02-RC
+           WHEN    ZERO
+               CONTINUE
            WHEN    13
                STRING  "退院計算に必要な会計情報が作成されていません"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    14
                STRING  "入院料と異なる保険の入院料加算があります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    15
                STRING  "外泊日に入院料加算が算定されています"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    16
                STRING  "入院料の算定が無い日に入院料加算が"
                                            DELIMITED   BY  SIZE
                        "算定されています"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    17
                STRING  "入院料の有効期間が切れています"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    18
                STRING  "保険組合せの有効期間が切れています"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    19
                STRING  "包括点数の治験減点分の点数を"
                                            DELIMITED   BY  SIZE
                        "確認してください"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    20
                STRING  "入院点数に誤りがあります。"
                                            DELIMITED   BY  SIZE
                        "異動処理をしてください"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    21
                STRING  "救急搬送診療料の算定日に"
                                            DELIMITED   BY  SIZE
-                       "入院料（加算）が算定されています"
+                       "入院料（加算）の算定があります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    22
                STRING  "他医受診（外泊）の入力に誤りがあります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    23
                STRING  "同日再入院日に実日数算定コード"
                                            DELIMITED   BY  SIZE
                        "を入力してください"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    24
                STRING  "同日再入院日の再入院分に入院料加算"
                                            DELIMITED   BY  SIZE
                        "が算定されています"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    25
                STRING  "薬剤料減点数を確認してください"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    26
                STRING  "特定時間退院減算（外泊）の入力に誤りがあります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    27
                STRING  "特定曜日入退院減算（外泊）の入力に"
                                            DELIMITED   BY  SIZE
                        "誤りがあります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    29
                STRING  "入院時食事療養（２）算定時に特別食"
                                            DELIMITED   BY  SIZE
                        "加算の算定があります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    30
                STRING  "保険組合せの数が多すぎます"
                                            DELIMITED   BY  SPACE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    31
                STRING  "入院時生活療養（２）算定時に流動食"
                                            DELIMITED   BY  SIZE
                        "の入力があります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
+               END-STRING
+           WHEN    33
+               STRING  "入院基本設定「入院時食事療養」が未設定です"
+                                           DELIMITED   BY  SIZE
+               INTO    WRK-MSG (1)
+               END-STRING
+           WHEN    34
+               STRING  "適用できない低所得１の入力があります"
+                                           DELIMITED   BY  SIZE
+               INTO    WRK-MSG (1)
                END-STRING
            WHEN    101
                STRING  "包括入院期間に算定できない入院料加算"
                                            DELIMITED   BY  SIZE
                        "の算定があります"
                                            DELIMITED   BY  SIZE
-               INTO    WRK-MSG
+               INTO    WRK-MSG (1)
                END-STRING
            END-EVALUATE
       *
-           MOVE    WRK-MSG             TO  S02MSG-MSG (1)
+           MOVE    WRK-MSG (1)         TO  S02MSG-MSG (1)
                                            S02MSG-MSG (2)
                                            S02MSG-MSG (3)
+      *
       *
            .
            EXIT PROGRAM

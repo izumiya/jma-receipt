@@ -2804,9 +2804,6 @@
                                    TO   WRK-ZAIHKNNUM
            END-IF
            PERFORM 2001111-TAISYO-HKN-CHK-SEC
-           DISPLAY "PTNUM-PTNUM  =" PTNUM-PTNUM
-           DISPLAY "WRK-ZAIHKNNUM=" WRK-ZAIHKNNUM
-           DISPLAY "FLG-TAISYO-HKN=" FLG-TAISYO-HKN
            IF    ( FLG-TAISYO-HKN      =   1 )
            AND   ( DCACCT-STS-NYUINDAY =   ZERO )
       *
@@ -11298,6 +11295,10 @@
                    MOVE    "990035"    TO  WRK-ERRCD
                WHEN    31
                    MOVE    "990036"    TO  WRK-ERRCD
+               WHEN    33
+                   MOVE    "990038"    TO  WRK-ERRCD
+               WHEN    34
+                   MOVE    "990039"    TO  WRK-ERRCD
                WHEN    101
                    MOVE    "990034"    TO  WRK-ERRCD
                WHEN    OTHER

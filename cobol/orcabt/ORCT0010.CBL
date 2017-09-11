@@ -186,7 +186,8 @@
            03  ERR-WARNING                 PIC 9(01).
            03  ERR-PTID                    PIC 9(10).
            03  ERR-PTNUM                   PIC X(20).
-           03  ERR-ERRCD                   PIC X(04).
+           03  ERR-ERRCD.
+               05  ERR-ERRCD-NUM           PIC 9(04).
            03  ERR-ERRMSG                  PIC X(80).
            03  ERR-HEN-ERRMSG              PIC X(80).
       *
@@ -199,8 +200,6 @@
                "患者情報の取得に失敗しました".
            03  ERR-MSG04                   PIC X(100)    VALUE
                "通算日数の取得に失敗しました".
-           03  ERR-MSG05                   PIC X(100)    VALUE
-               "会計情報の取得に失敗しました".
            03  ERR-MSG06                   PIC X(100)    VALUE
                "収納データの取得に失敗しました".
            03  ERR-MSG07                   PIC X(100)    VALUE
@@ -211,42 +210,6 @@
                "処理対象のデータがありませんでした".
            03  ERR-MSG10                   PIC X(100)    VALUE
                "定期請求管理情報の取得に失敗しました".
-           03  ERR-MSG11                   PIC X(100)    VALUE
-               "入院料加算の保険組合せを確認してください".
-           03  ERR-MSG12                   PIC X(100)    VALUE
-               "外泊日に入院料加算が算定されています".
-           03  ERR-MSG13                   PIC X(100)    VALUE
-               "入院料の算定が無い日に入院料加算が算定されています".
-           03  ERR-MSG14                   PIC X(100)    VALUE
-               "入院料の有効期間が切れています".
-           03  ERR-MSG15                   PIC X(100)    VALUE
-               "保険組合せの有効期間が切れています".
-           03  ERR-MSG16                   PIC X(100)    VALUE
-               "包括点数の治験減点分の点数を確認してください".
-           03  ERR-MSG17                   PIC X(100)    VALUE
-               "入院点数に誤りがあります。".
-           03  ERR-MSG18                   PIC X(100)    VALUE
-               "救急搬送診療料算定日に入院料（加算）が算定されています".
-           03  ERR-MSG19                   PIC X(100)    VALUE
-               "他医受診（外泊）の入力に誤りがあります".
-           03  ERR-MSG20                   PIC X(100)    VALUE
-               "同日再入院日に実日数算定コードを入力してください".
-           03  ERR-MSG21                   PIC X(100)    VALUE
-               "同日再入院日の再入院分に入院料加算が算定されています".
-           03  ERR-MSG22                   PIC X(100)    VALUE
-               "薬剤料減点数を確認してください".
-           03  ERR-MSG26                   PIC X(100)    VALUE
-               "特定時間退院減算（外泊）の入力に誤りがあります".
-           03  ERR-MSG27                   PIC X(100)    VALUE
-               "特定曜日入退院減算（外泊）の入力に誤りがあります".
-           03  ERR-MSG29                   PIC X(100)    VALUE
-               "入院時食事療養（２）算定時に特別食加算の算定があります".
-           03  ERR-MSG30                  PIC X(100)    VALUE
-               "保険組合せの数が多すぎます".
-           03  ERR-MSG31                  PIC X(100)    VALUE
-               "入院時生活療養（２）算定時に流動食の入力があります".
-           03  ERR-MSG101                  PIC X(100)    VALUE
-               "包括入院期間に算定できない入院料加算の算定があります".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -340,6 +303,9 @@
        01  LNK-SYUDAY-REC-T.
          02 LNK-SYUDAY-REC     OCCURS 10.
            COPY  "CPSYUDAY.INC"  REPLACING  //SDAY-// BY //LNK-SDAY-//.
+      *
+      *    負担金計算サブエラーメッセージ
+           COPY    "CPORCS02MSG.INC".
       *
       *    同日入院チェックサブ
            COPY    "CPORCSDNTCHK.INC".
@@ -905,10 +871,12 @@
            MOVE    SPACE           TO  LNK-ORCS02-REC
                                        LNK-SYUNOU-REC-T
                                        LNK-SYUDAY-REC-T
+                                       S02MSG-AREA
       *
            INITIALIZE                  LNK-ORCS02-REC
                                        LNK-SYUNOU-REC-T
                                        LNK-SYUDAY-REC-T
+                                       S02MSG-AREA
       *
            INITIALIZE                  SBUNBENCHK-AREA
            MOVE    PTNYUINRRK-PTID TO  SBUNBENCHK-PTID
@@ -961,49 +929,22 @@
                                    LNK-SYUNOU-REC-T
                                    LNK-SYUDAY-REC-T
            IF    ( LNK-S02-RC      NOT = ZERO )
+      *
+               INITIALIZE              S02MSG-AREA
+               MOVE    LNK-S02-RC  TO  S02MSG-S02-RC
+               CALL    "ORCS02MSG"     USING
+                                       S02MSG-AREA
+                                       SPA-AREA
+      *
+               IF    ( S02MSG-MSG (1)  =   SPACE )
+                   MOVE    "0006"  TO  ERR-ERRCD
+               ELSE
+                   COMPUTE ERR-ERRCD-NUM
+                       =   3000
+                       +   LNK-S02-RC
+               END-IF
+      *
                MOVE    PTNYUINRRK-PTID TO  ERR-PTID
-               EVALUATE LNK-S02-RC
-               WHEN    13
-                   MOVE    "0005"      TO  ERR-ERRCD
-               WHEN    14
-                   MOVE    "0011"      TO  ERR-ERRCD
-               WHEN    15
-                   MOVE    "0012"      TO  ERR-ERRCD
-               WHEN    16
-                   MOVE    "0013"      TO  ERR-ERRCD
-               WHEN    17
-                   MOVE    "0014"      TO  ERR-ERRCD
-               WHEN    18
-                   MOVE    "0015"      TO  ERR-ERRCD
-               WHEN    19
-                   MOVE    "0016"      TO  ERR-ERRCD
-               WHEN    20
-                   MOVE    "0017"      TO  ERR-ERRCD
-               WHEN    21
-                   MOVE    "0018"      TO  ERR-ERRCD
-               WHEN    22
-                   MOVE    "0019"      TO  ERR-ERRCD
-               WHEN    23
-                   MOVE    "0020"      TO  ERR-ERRCD
-               WHEN    24
-                   MOVE    "0021"      TO  ERR-ERRCD
-               WHEN    25
-                   MOVE    "0022"      TO  ERR-ERRCD
-               WHEN    26
-                   MOVE    "0026"      TO  ERR-ERRCD
-               WHEN    27
-                   MOVE    "0027"      TO  ERR-ERRCD
-               WHEN    29
-                   MOVE    "0029"      TO  ERR-ERRCD
-               WHEN    30
-                   MOVE    "0030"      TO  ERR-ERRCD
-               WHEN    31
-                   MOVE    "0031"      TO  ERR-ERRCD
-               WHEN    101
-                   MOVE    "0101"      TO  ERR-ERRCD
-               WHEN    OTHER
-                   MOVE    "0006"      TO  ERR-ERRCD
-               END-EVALUATE
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
@@ -1621,8 +1562,6 @@
                MOVE    ERR-MSG03       TO  ERR-ERRMSG
            WHEN    "0004"
                MOVE    ERR-MSG04       TO  ERR-ERRMSG
-           WHEN    "0005"
-               MOVE    ERR-MSG05       TO  ERR-ERRMSG
            WHEN    "0006"
                MOVE    ERR-MSG06       TO  ERR-ERRMSG
            WHEN    "0007"
@@ -1633,42 +1572,8 @@
                MOVE    ERR-MSG09       TO  ERR-ERRMSG
            WHEN    "0010"
                MOVE    ERR-MSG10       TO  ERR-ERRMSG
-           WHEN    "0011"
-               MOVE    ERR-MSG11       TO  ERR-ERRMSG
-           WHEN    "0012"
-               MOVE    ERR-MSG12       TO  ERR-ERRMSG
-           WHEN    "0013"
-               MOVE    ERR-MSG13       TO  ERR-ERRMSG
-           WHEN    "0014"
-               MOVE    ERR-MSG14       TO  ERR-ERRMSG
-           WHEN    "0015"
-               MOVE    ERR-MSG15       TO  ERR-ERRMSG
-           WHEN    "0016"
-               MOVE    ERR-MSG16       TO  ERR-ERRMSG
-           WHEN    "0017"
-               MOVE    ERR-MSG17       TO  ERR-ERRMSG
-           WHEN    "0018"
-               MOVE    ERR-MSG18       TO  ERR-ERRMSG
-           WHEN    "0019"
-               MOVE    ERR-MSG19       TO  ERR-ERRMSG
-           WHEN    "0020"
-               MOVE    ERR-MSG20       TO  ERR-ERRMSG
-           WHEN    "0021"
-               MOVE    ERR-MSG21       TO  ERR-ERRMSG
-           WHEN    "0022"
-               MOVE    ERR-MSG22       TO  ERR-ERRMSG
-           WHEN    "0026"
-               MOVE    ERR-MSG26       TO  ERR-ERRMSG
-           WHEN    "0027"
-               MOVE    ERR-MSG27       TO  ERR-ERRMSG
-           WHEN    "0029"
-               MOVE    ERR-MSG29       TO  ERR-ERRMSG
-           WHEN    "0030"
-               MOVE    ERR-MSG30       TO  ERR-ERRMSG
-           WHEN    "0031"
-               MOVE    ERR-MSG31       TO  ERR-ERRMSG
-           WHEN    "0101"
-               MOVE    ERR-MSG101      TO  ERR-ERRMSG
+           WHEN    "3000"      THRU    "3999"
+               MOVE    S02MSG-MSG (1)  TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE
