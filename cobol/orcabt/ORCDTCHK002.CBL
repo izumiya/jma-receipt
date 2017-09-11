@@ -11304,6 +11304,10 @@
                    MOVE    "990035"    TO  WRK-ERRCD
                WHEN    31
                    MOVE    "990036"    TO  WRK-ERRCD
+               WHEN    33
+                   MOVE    "990038"    TO  WRK-ERRCD
+               WHEN    34
+                   MOVE    "990039"    TO  WRK-ERRCD
                WHEN    101
                    MOVE    "990034"    TO  WRK-ERRCD
                WHEN    OTHER

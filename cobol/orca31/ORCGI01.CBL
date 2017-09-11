@@ -605,6 +605,8 @@
       *
       *    出生児体重
            03  WRK-WEIGHT                  PIC 9(04).
+           03  WRK-ERRCD.
+               05  WRK-ERRCD-NUM           PIC 9(04).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -1001,6 +1003,9 @@
        01  LNK-SYUDAY-REC-T.
          02 LNK-SYUDAY-REC     OCCURS 10.
            COPY  "CPSYUDAY.INC"  REPLACING  //SDAY-// BY //LNK-SDAY-//.
+      *
+      *    負担金計算サブエラーメッセージ
+           COPY    "CPORCS02MSG.INC".
       *
       *    通算日数取得サブ
            COPY "CPORCSTUSAN.INC".
@@ -18320,48 +18325,19 @@
            DISPLAY "I0SUB02-S02-RC=" I0SUB02-S02-RC
            EVALUATE    TRUE
            WHEN  ( I0SUB02-S02-RC  NOT =   ZERO )
-               EVALUATE    I0SUB02-S02-RC
-               WHEN    13
-                   MOVE    "2012"  TO  SPA-ERRCD
-               WHEN    14
-                   MOVE    "2013"  TO  SPA-ERRCD
-               WHEN    15
-                   MOVE    "2014"  TO  SPA-ERRCD
-               WHEN    16
-                   MOVE    "2015"  TO  SPA-ERRCD
-               WHEN    17
-                   MOVE    "2016"  TO  SPA-ERRCD
-               WHEN    18
-                   MOVE    "2017"  TO  SPA-ERRCD
-               WHEN    19
-                   MOVE    "2018"  TO  SPA-ERRCD
-               WHEN    20
-                   MOVE    "2019"  TO  SPA-ERRCD
-               WHEN    21
-                   MOVE    "2020"  TO  SPA-ERRCD
-               WHEN    22
-                   MOVE    "2021"  TO  SPA-ERRCD
-               WHEN    23
-                   MOVE    "2022"  TO  SPA-ERRCD
-               WHEN    24
-                   MOVE    "2023"  TO  SPA-ERRCD
-               WHEN    25
-                   MOVE    "2025"  TO  SPA-ERRCD
-               WHEN    26
-                   MOVE    "2026"  TO  SPA-ERRCD
-               WHEN    27
-                   MOVE    "2027"  TO  SPA-ERRCD
-               WHEN    29
-                   MOVE    "2029"  TO  SPA-ERRCD
-               WHEN    30
-                   MOVE    "2030"  TO  SPA-ERRCD
-               WHEN    31
-                   MOVE    "2031"  TO  SPA-ERRCD
-               WHEN    101
-                   MOVE    "2101"  TO  SPA-ERRCD
-               WHEN    OTHER
-                   MOVE    "2008"  TO  SPA-ERRCD
-               END-EVALUATE
+      *
+               INITIALIZE                  S02MSG-AREA
+               MOVE    I0SUB02-S02-RC  TO  S02MSG-S02-RC
+               CALL    "ORCS02MSG"         USING
+                                           S02MSG-AREA
+                                           SPA-AREA
+               IF    ( S02MSG-MSG (1)  =   SPACE )
+                   MOVE    "2008"      TO  SPA-ERRCD
+               ELSE
+                   COMPUTE WRK-ERRCD-NUM = 3000 + I0SUB02-S02-RC
+                   MOVE    WRK-ERRCD   TO  SPA-ERRCD
+               END-IF
+      *
            WHEN  ( I0SUB02-RC     NOT =   ZERO )
                    MOVE    "2008"  TO  SPA-ERRCD
            WHEN    OTHER
@@ -19984,164 +19960,18 @@
            WHEN    "1049"
                MOVE    "入院登録時は選択できない食事区分です"
                                        TO  SPA-ERRMSG
-           WHEN    "2012"
-               MOVE    "退院計算に必要な会計情報が作成されていません"
-                                       TO  SPA-ERRMSG
-           WHEN    "2013"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "入院料と異なる保険の入院料加算があります。"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2014"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "外泊日に入院料加算が算定されています。"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2015"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "入院料の算定が無い日に入院料加算が"
-                                           DELIMITED   BY  SPACE
-                       "算定されています。"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2016"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "入院料の有効期間が切れています。"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2017"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "保険組合せの有効期間が切れています。"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2018"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "包括点数の治験減点分の点数を"
-                                           DELIMITED   BY  SPACE
-                       "確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2019"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "入院点数に誤りがあります。"
-                                           DELIMITED   BY  SPACE
-                       "異動処理をしてください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2020"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "救急搬送診療料の算定日に"
-                                           DELIMITED   BY  SPACE
-                       "入院料（加算）が算定されています"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2021"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "他医受診（外泊）の入力に誤りがあります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2022"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "同日再入院日に実日数算定コード"
-                                           DELIMITED   BY  SPACE
-                       "を入力してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2023"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "同日再入院日の再入院分に入院料加算"
-                                           DELIMITED   BY  SPACE
-                       "が算定されています"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2025"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "薬剤料減点数を確認してください"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2026"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "特定時間退院減算（外泊）の入力に誤りがあります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2027"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                     "特定曜日入退院減算（外泊）の入力に誤りがあります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2029"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                "入院時食事療養（２）算定時に特別食加算の算定があります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2030"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                       "保険組合せの数が多すぎます"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2031"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                   "入院時生活療養（２）算定時に流動食の入力があります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
-           WHEN    "2101"
-               MOVE    SPACE           TO  SPA-ERRMSG
-               STRING  "負担金計算に失敗しました。"
-                                           DELIMITED   BY  SPACE
-                  "包括入院期間に算定できない入院料加算の算定があります"
-                                           DELIMITED   BY  SPACE
-               INTO    SPA-ERRMSG
-               END-STRING
            WHEN    "2008"
                MOVE    "負担金計算に失敗しました"
                                        TO  SPA-ERRMSG
+           WHEN    "3000"    THRU      "3999"
+      *
+               MOVE    SPACE       TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                       DELIMITED BY SIZE
+                       S02MSG-MSG (1)  DELIMITED BY SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+      *
            WHEN    "4001"  THRU    "4999"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
