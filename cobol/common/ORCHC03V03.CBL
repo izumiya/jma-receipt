@@ -2237,9 +2237,11 @@
                                                      (IDX-API)
                END-IF
       *        ±ß
-               MOVE    ORCHC04SUB-H-ENKBN (IDX)
+               IF    ( TPARA-GOKEITANI     =   "1" )
+                   MOVE    ORCHC04SUB-H-ENKBN (IDX)
                                            TO  FMSEIKYU-TENSU-MARK
                                                      (IDX-API)
+               END-IF
       *        ²ó¿ô
                MOVE    ORCHC04SUB-H-KAISU (IDX)
                                            TO  FMSEIKYU-KAISU
