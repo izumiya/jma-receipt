@@ -1462,6 +1462,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                              TO  WRK-SRT-EDYMD
                      PERFORM 570111-SEHIDX-SORT-SEC
                    END-IF
+                   ADD     1           TO  WRK-RCOMB-MAX
+                   MOVE    WRK-KCOMB-REC (IDX2)
+                                       TO  WRK-RCOMB-REC
+                                                 (WRK-RCOMB-MAX)
                    IF  WRK-SRT-SEH-CNT       >   ZERO
       *              生保を検索
                      PERFORM     VARYING   IDZ   FROM  1   BY  1
@@ -1471,20 +1475,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *###
                        PERFORM 570144-FUTAN-KONZAI-SEH-SEC
                      END-PERFORM
-                     IF  WRK-KCOMB-TEKSTYMD (IDX2)
-      *@@>                            NOT =  WRK-KCOMB-TEKEDYMD (IDX2)
-                                      <=     WRK-KCOMB-TEKEDYMD (IDX2)
-      ****(2005.10.25)                <=     WRK-KCOMB-TEKEDYMD (IDX2)
-                       ADD     1           TO  WRK-RCOMB-MAX
-                       MOVE    WRK-KCOMB-REC (IDX2)
-                                           TO  WRK-RCOMB-REC
-                                                     (WRK-RCOMB-MAX)
-                     END-IF
-                   ELSE
-                     ADD     1             TO  WRK-RCOMB-MAX
-                     MOVE    WRK-KCOMB-REC (IDX2)
-                                           TO  WRK-RCOMB-REC
-                                                     (WRK-RCOMB-MAX)
                    END-IF
                  END-PERFORM
       *

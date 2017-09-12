@@ -55,6 +55,8 @@
       *  04.08.07    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
       *  04.08.08    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
+      *  04.08.09    NACL-門脇    17/08/28  平成２９年１０月改正
+      *                                     （入院時生活療養の見直し）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1034,53 +1036,6 @@
       *    退院年月日
            03  WRK-CONS-TAIIN-SRYCD   PIC X(09)   VALUE   "840000013".
       *
-      *    標準負担額
-           03  WRK-CONS-HYOJYUN-FUTAN-G.
-      *        標準負担額（一般）
-               05  WRK-CONS-HYOJYUN-FUTAN1
-                                      PIC X(09)   VALUE   "197000810".
-      *        標準負担額（低所得１）
-               05  WRK-CONS-HYOJYUN-FUTAN2
-                                      PIC X(09)   VALUE   "197001110".
-      *        標準負担額（低所得２・９０日以下）
-               05  WRK-CONS-HYOJYUN-FUTAN3
-                                      PIC X(09)   VALUE   "197000910".
-      *        標準負担額（低所得２・９０日超）
-               05  WRK-CONS-HYOJYUN-FUTAN4
-                                      PIC X(09)   VALUE   "197001010".
-      *        生活療養・標準負担額
-               05  WRK-CONS-HYOJYUN-FUTAN5
-                                      PIC X(09)   VALUE   "197001910".
-      *        生活療養（１）・標準負担額（一般）
-               05  WRK-CONS-HYOJYUN-FUTAN6
-                                      PIC X(09)   VALUE   "197002010".
-      *        生活療養（２）・標準負担額（一般）
-               05  WRK-CONS-HYOJYUN-FUTAN7
-                                      PIC X(09)   VALUE   "197002110".
-      *        生活療養・標準負担額（低２）
-               05  WRK-CONS-HYOJYUN-FUTAN8
-                                      PIC X(09)   VALUE   "197002210".
-      *        生活療養・標準負担額（低１）
-               05  WRK-CONS-HYOJYUN-FUTAN9
-                                      PIC X(09)   VALUE   "197002310".
-      *        生活療養・標準負担額（老人低１（老福以外））
-               05  WRK-CONS-HYOJYUN-FUTAN10
-                                      PIC X(09)   VALUE   "197002410".
-      *        生活療養・標準負担額（老人低１（老福））
-               05  WRK-CONS-HYOJYUN-FUTAN11
-                                      PIC X(09)   VALUE   "197002510".
-      *        生活療養・標準負担額（医療区分２・３）（一般）
-               05  WRK-CONS-HYOJYUN-FUTAN12
-                                      PIC X(09)   VALUE   "197002710".
-      *        生活療養・標準負担額（医療区分２・３）（低２・９０日以下）
-               05  WRK-CONS-HYOJYUN-FUTAN13
-                                      PIC X(09)   VALUE   "197002810".
-      *        生活療養・標準負担額（医療区分２・３）（低２・９０日超）
-               05  WRK-CONS-HYOJYUN-FUTAN14
-                                      PIC X(09)   VALUE   "197002910".
-      *        生活療養・標準負担額（医療区分２・３）（低１）
-               05  WRK-CONS-HYOJYUN-FUTAN15
-                                      PIC X(09)   VALUE   "197003010".
       *    レセプトコメント
            03  WRK-CONS-RECECOM-MAX
                                    PIC 9(02)   VALUE   48.
