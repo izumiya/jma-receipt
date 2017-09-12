@@ -997,54 +997,6 @@
       *    ¬‡±°«Ø∑Ó∆¸
            03  WRK-CONS-TAIIN-SRYCD   PIC X(09)   VALUE   "840000013".
       *
-      *    …∏Ω‡…È√¥≥€
-           03  WRK-CONS-HYOJYUN-FUTAN-G.
-      *        …∏Ω‡…È√¥≥€° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN1
-                                      PIC X(09)   VALUE   "197000810".
-      *        …∏Ω‡…È√¥≥€° ƒ„ΩÍ∆¿£±°À
-               05  WRK-CONS-HYOJYUN-FUTAN2
-                                      PIC X(09)   VALUE   "197001110".
-      *        …∏Ω‡…È√¥≥€° ƒ„ΩÍ∆¿£≤°¶£π£∞∆¸∞ ≤º°À
-               05  WRK-CONS-HYOJYUN-FUTAN3
-                                      PIC X(09)   VALUE   "197000910".
-      *        …∏Ω‡…È√¥≥€° ƒ„ΩÍ∆¿£≤°¶£π£∞∆¸ƒ∂°À
-               05  WRK-CONS-HYOJYUN-FUTAN4
-                                      PIC X(09)   VALUE   "197001010".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€
-               05  WRK-CONS-HYOJYUN-FUTAN5
-                                      PIC X(09)   VALUE   "197001910".
-      *        ¿∏≥ËŒ≈Õ‹° £±°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN6
-                                      PIC X(09)   VALUE   "197002010".
-      *        ¿∏≥ËŒ≈Õ‹° £≤°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN7
-                                      PIC X(09)   VALUE   "197002110".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£≤°À
-               05  WRK-CONS-HYOJYUN-FUTAN8
-                                      PIC X(09)   VALUE   "197002210".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£±°À
-               05  WRK-CONS-HYOJYUN-FUTAN9
-                                      PIC X(09)   VALUE   "197002310".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °∞ ≥∞°À°À
-               05  WRK-CONS-HYOJYUN-FUTAN10
-                                      PIC X(09)   VALUE   "197002410".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °°À°À
-               05  WRK-CONS-HYOJYUN-FUTAN11
-                                      PIC X(09)   VALUE   "197002510".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN12
-                                      PIC X(09)   VALUE   "197002710".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
-               05  WRK-CONS-HYOJYUN-FUTAN13
-                                      PIC X(09)   VALUE   "197002810".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
-               05  WRK-CONS-HYOJYUN-FUTAN14
-                                      PIC X(09)   VALUE   "197002910".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
-               05  WRK-CONS-HYOJYUN-FUTAN15
-                                      PIC X(09)   VALUE   "197003010".
-      *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.
       *
       *    ≤˛π‘•≥°º•…
