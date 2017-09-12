@@ -27,6 +27,12 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *
+      *平成２９年１０月改正対応
+      *  05.00.00    NACL-小豆沢  17/08/16  ２９年１０月以降は患者負担
+      *                                     コードが細分化されることから
+      *                                     低所得者で難病据え置き時は
+      *                                     返却する区分をクリアしない
       *****************************************************************
       *
       *
@@ -421,7 +427,17 @@
                 PERFORM   VARYING   IDX   FROM   1  BY  1
                           UNTIL     IDX   >    31
                     IF    LNK-SYOTOKU-SKJKBN(IDX)  NOT =  SPACE
-                         MOVE    SPACE   TO  LNK-SKJKEEP-KBN(IDX)
+      *                ２９年１０月以降の難病据え置き時は低所得者で
+      *                あっても返却する区分をクリアしない
+                       IF   LNK-SKJKEEP-SANTEIYM  <=   "201709"
+                           MOVE    SPACE   TO  LNK-SKJKEEP-KBN(IDX)
+                       ELSE
+                           IF      LNK-SKJKEEP-KBN(IDX)   =   "1"
+                               CONTINUE
+                           ELSE
+                               MOVE    SPACE   TO  LNK-SKJKEEP-KBN(IDX)
+                           END-IF
+                       END-IF
                     END-IF
                 END-PERFORM
            END-IF

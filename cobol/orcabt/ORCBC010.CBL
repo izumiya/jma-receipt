@@ -82,6 +82,7 @@
       *
       *  04.08.01    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.02    NACL-小豆沢  16/08/25  平成２８年１０月持参薬対応
+      *  05.00.01    NACL-小豆沢  17/08/17  生活療養標準負担額コード追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -581,6 +582,46 @@
       *        生活療養食事療養標準負担額（精神１年超・医療区分２・３）（一般）
                05  WRK-CONS-HYOJYUN-FUTAN20
                                       PIC X(09)   VALUE   "197003710".
+      *        平成２９年１０月改定の追加分
+      *        生活療養環境療養標準負担額（医療区分２・３）
+               05  WRK-CONS-HYOJYUN-FUTAN21
+                                      PIC X(09)   VALUE   "197003810".
+      *        生活療養食事療養標準負担額（低）
+               05  WRK-CONS-HYOJYUN-FUTAN22
+                                      PIC X(09)   VALUE   "197003910".
+      *        生活療養食事療養標準負担額（境界層該当）（低）
+               05  WRK-CONS-HYOJYUN-FUTAN23
+                                      PIC X(09)   VALUE   "197004010".
+      *        生活療養食事療養標準負担額（境界層該当）（低１）
+               05  WRK-CONS-HYOJYUN-FUTAN24
+                                      PIC X(09)   VALUE   "197004110".
+      *        生活療養食事療養標準負担額（医療区分２・３）（低・９０日以下）
+               05  WRK-CONS-HYOJYUN-FUTAN25
+                                      PIC X(09)   VALUE   "197004210".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（低・９０日以下）
+               05  WRK-CONS-HYOJYUN-FUTAN26
+                                      PIC X(09)   VALUE   "197004310".
+      *        生活療養食事療養標準負担額（医療区分２・３）（低・９０日超）
+               05  WRK-CONS-HYOJYUN-FUTAN27
+                                      PIC X(09)   VALUE   "197004410".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（低・９０日超）
+               05  WRK-CONS-HYOJYUN-FUTAN28
+                                      PIC X(09)   VALUE   "197004510".
+      *        生活療養食事療養標準負担額（境界層該当）（医療区分２・３）（低）
+               05  WRK-CONS-HYOJYUN-FUTAN29
+                                      PIC X(09)   VALUE   "197004610".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（低２・９０日以下）
+               05  WRK-CONS-HYOJYUN-FUTAN30
+                                      PIC X(09)   VALUE   "197004710".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（低２・９０日超）
+               05  WRK-CONS-HYOJYUN-FUTAN31
+                                      PIC X(09)   VALUE   "197004810".
+      *        生活療養食事療養標準負担額（指定難病）（医療区分２・３）（低１）
+               05  WRK-CONS-HYOJYUN-FUTAN32
+                                      PIC X(09)   VALUE   "197004910".
+      *        生活療養食事療養標準負担額（境界層該当）（医療区分２・３）（低１）
+               05  WRK-CONS-HYOJYUN-FUTAN33
+                                      PIC X(09)   VALUE   "197005010".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1395,7 +1436,20 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
                                        OR  WRK-CONS-HYOJYUN-FUTAN17
                                        OR  WRK-CONS-HYOJYUN-FUTAN18
                                        OR  WRK-CONS-HYOJYUN-FUTAN19
-                                       OR  WRK-CONS-HYOJYUN-FUTAN20 )
+                                       OR  WRK-CONS-HYOJYUN-FUTAN20
+                                       OR  WRK-CONS-HYOJYUN-FUTAN21
+                                       OR  WRK-CONS-HYOJYUN-FUTAN22
+                                       OR  WRK-CONS-HYOJYUN-FUTAN23
+                                       OR  WRK-CONS-HYOJYUN-FUTAN24
+                                       OR  WRK-CONS-HYOJYUN-FUTAN25
+                                       OR  WRK-CONS-HYOJYUN-FUTAN26
+                                       OR  WRK-CONS-HYOJYUN-FUTAN27
+                                       OR  WRK-CONS-HYOJYUN-FUTAN28
+                                       OR  WRK-CONS-HYOJYUN-FUTAN29
+                                       OR  WRK-CONS-HYOJYUN-FUTAN30
+                                       OR  WRK-CONS-HYOJYUN-FUTAN31
+                                       OR  WRK-CONS-HYOJYUN-FUTAN32
+                                       OR  WRK-CONS-HYOJYUN-FUTAN33 )
                    MOVE    SPACE           TO  COLDAT02-REC
                    INITIALIZE                  COLDAT02-REC
       *            診療会計データ編集

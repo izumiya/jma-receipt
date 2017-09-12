@@ -177,6 +177,7 @@
       *              NACL-æÆ∆¶¬Ù  17/07/27  ∫∆ø«§Œª˛¥÷≥∞≤√ªª¬–±˛
       *                                     RECE641-NYUSAIFLG="1"§Œª˛°¢
       *                                     ΩÁΩ¯»÷πÊ(E-6,F-6)§Œø∂§Íƒæ§∑ƒ…≤√
+      *              NACL-æÆ∆¶¬Ù  17/08/17  ¿∏≥ËŒ≈Õ‹…∏Ω‡…È√¥≥€•≥°º•…ƒ…≤√¬–±˛
       *              NACL-æÆ∆¶¬Ù  17/09/07  ∆±∆¸∫∆∆˛±°∆¸§Œ∆˛¬‡±°∆¸µ≠œøΩ§¿µª˛§Œ
       *                                     …‘∂ÒπÁΩ§¿µ
       *              NACL-æÆ∆¶¬Ù  17/09/08  §≠§∂§ﬂ∑◊ªª§ŒΩ–ÕËπ‚º¬¿”≈¿øÙ√ºøÙΩËÕ˝ƒ…≤√
@@ -1141,52 +1142,95 @@
       *        …∏Ω‡…È√¥≥€° ƒ„ΩÍ∆¿£≤°¶£π£∞∆¸ƒ∂°À
                05  WRK-CONS-HYOJYUN-FUTAN4
                                       PIC X(09)   VALUE   "197001010".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€
+      *        ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° œ´∫“∆˛±°√Ê°À
                05  WRK-CONS-HYOJYUN-FUTAN5
-                                      PIC X(09)   VALUE   "197001910".
-      *        ¿∏≥ËŒ≈Õ‹° £±°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
+                                      PIC X(09)   VALUE   "197001210".
+      *        ¿∏≥ËŒ≈Õ‹¥ƒ∂≠Œ≈Õ‹…∏Ω‡…È√¥≥€
                05  WRK-CONS-HYOJYUN-FUTAN6
-                                      PIC X(09)   VALUE   "197002010".
-      *        ¿∏≥ËŒ≈Õ‹° £≤°À°¶…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
+                                      PIC X(09)   VALUE   "197001910".
+      *        ¿∏≥ËŒ≈Õ‹° £±°Àø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
                05  WRK-CONS-HYOJYUN-FUTAN7
-                                      PIC X(09)   VALUE   "197002110".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£≤°À
+                                      PIC X(09)   VALUE   "197002010".
+      *        ¿∏≥ËŒ≈Õ‹° £≤°Àø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞Ï»Ã°À
                05  WRK-CONS-HYOJYUN-FUTAN8
-                                      PIC X(09)   VALUE   "197002210".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ƒ„£±°À
+                                      PIC X(09)   VALUE   "197002110".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ƒ„£≤°À
                05  WRK-CONS-HYOJYUN-FUTAN9
-                                      PIC X(09)   VALUE   "197002310".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °∞ ≥∞°À°À
+                                      PIC X(09)   VALUE   "197002210".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ƒ„£±°À
                05  WRK-CONS-HYOJYUN-FUTAN10
-                                      PIC X(09)   VALUE   "197002410".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °°À°À
+                                      PIC X(09)   VALUE   "197002310".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °∞ ≥∞°À°À
                05  WRK-CONS-HYOJYUN-FUTAN11
-                                      PIC X(09)   VALUE   "197002510".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+                                      PIC X(09)   VALUE   "197002410".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° œ∑øÕƒ„£±° œ∑ °°À°À
                05  WRK-CONS-HYOJYUN-FUTAN12
-                                      PIC X(09)   VALUE   "197002710".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
+                                      PIC X(09)   VALUE   "197002510".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
                05  WRK-CONS-HYOJYUN-FUTAN13
-                                      PIC X(09)   VALUE   "197002810".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
+                                      PIC X(09)   VALUE   "197002710".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
                05  WRK-CONS-HYOJYUN-FUTAN14
-                                      PIC X(09)   VALUE   "197002910".
-      *        ¿∏≥ËŒ≈Õ‹°¶…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
+                                      PIC X(09)   VALUE   "197002810".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
                05  WRK-CONS-HYOJYUN-FUTAN15
+                                      PIC X(09)   VALUE   "197002910".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN16
                                       PIC X(09)   VALUE   "197003010".
       *         ø¿Æ£≤£∏«Ø≈Ÿ≤˛ƒÍ§Œƒ…≤√ ¨
       *        ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°¶æÆª˘À˝¿≠∆√ƒÍº¿…¬¥µº‘°À° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN16
+               05  WRK-CONS-HYOJYUN-FUTAN17
                                       PIC X(09)   VALUE   "197003310".
       *        ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ¿∫ø¿£±«Øƒ∂°À° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN17
+               05  WRK-CONS-HYOJYUN-FUTAN18
                                       PIC X(09)   VALUE   "197003410".
       *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN18
+               05  WRK-CONS-HYOJYUN-FUTAN19
                                       PIC X(09)   VALUE   "197003610".
       *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ¿∫ø¿£±«Øƒ∂°¶∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
-               05  WRK-CONS-HYOJYUN-FUTAN19
+               05  WRK-CONS-HYOJYUN-FUTAN20
                                       PIC X(09)   VALUE   "197003710".
+      *         ø¿Æ£≤£π«Ø£±£∞∑Ó≤˛ƒÍ§Œƒ…≤√ ¨
+      *        ¿∏≥ËŒ≈Õ‹¥ƒ∂≠Œ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À
+               05  WRK-CONS-HYOJYUN-FUTAN21
+                                      PIC X(09)   VALUE   "197003810".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ƒ„°À
+               05  WRK-CONS-HYOJYUN-FUTAN22
+                                      PIC X(09)   VALUE   "197003910".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∂≠≥¶¡ÿ≥∫≈ˆ°À° ƒ„°À
+               05  WRK-CONS-HYOJYUN-FUTAN23
+                                      PIC X(09)   VALUE   "197004010".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∂≠≥¶¡ÿ≥∫≈ˆ°À° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN24
+                                      PIC X(09)   VALUE   "197004110".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„°¶£π£∞∆¸∞ ≤º°À
+               05  WRK-CONS-HYOJYUN-FUTAN25
+                                      PIC X(09)   VALUE   "197004210".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„°¶£π£∞∆¸∞ ≤º°À
+               05  WRK-CONS-HYOJYUN-FUTAN26
+                                      PIC X(09)   VALUE   "197004310".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„°¶£π£∞∆¸ƒ∂°À
+               05  WRK-CONS-HYOJYUN-FUTAN27
+                                      PIC X(09)   VALUE   "197004410".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„°¶£π£∞∆¸ƒ∂°À
+               05  WRK-CONS-HYOJYUN-FUTAN28
+                                      PIC X(09)   VALUE   "197004510".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∂≠≥¶¡ÿ≥∫≈ˆ°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„°À
+               05  WRK-CONS-HYOJYUN-FUTAN29
+                                      PIC X(09)   VALUE   "197004610".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸∞ ≤º°À
+               05  WRK-CONS-HYOJYUN-FUTAN30
+                                      PIC X(09)   VALUE   "197004710".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£≤°¶£π£∞∆¸ƒ∂°À
+               05  WRK-CONS-HYOJYUN-FUTAN31
+                                      PIC X(09)   VALUE   "197004810".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ªÿƒÍ∆Ò…¬°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN32
+                                      PIC X(09)   VALUE   "197004910".
+      *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∂≠≥¶¡ÿ≥∫≈ˆ°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
+               05  WRK-CONS-HYOJYUN-FUTAN33
+                                      PIC X(09)   VALUE   "197005010".
       *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.
       *
@@ -4998,25 +5042,39 @@
                            WHEN    OTHER
                                IF    (  LNK-DPCNYUIN-SRYCD
                                                        (IDZ1 IDZ2 IDXZ)
-                                           =   WRK-CONS-HYOJYUN-FUTAN1
-                                           OR  WRK-CONS-HYOJYUN-FUTAN2
-                                           OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4
-                                           OR  WRK-CONS-HYOJYUN-FUTAN5
-                                           OR  WRK-CONS-HYOJYUN-FUTAN6
-                                           OR  WRK-CONS-HYOJYUN-FUTAN7
-                                           OR  WRK-CONS-HYOJYUN-FUTAN8
-                                           OR  WRK-CONS-HYOJYUN-FUTAN9
-                                           OR  WRK-CONS-HYOJYUN-FUTAN10
-                                           OR  WRK-CONS-HYOJYUN-FUTAN11
-                                           OR  WRK-CONS-HYOJYUN-FUTAN12
-                                           OR  WRK-CONS-HYOJYUN-FUTAN13
-                                           OR  WRK-CONS-HYOJYUN-FUTAN14
-                                           OR  WRK-CONS-HYOJYUN-FUTAN15
-                                           OR  WRK-CONS-HYOJYUN-FUTAN16
-                                           OR  WRK-CONS-HYOJYUN-FUTAN17
-                                           OR  WRK-CONS-HYOJYUN-FUTAN18
-                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
+                                         =   WRK-CONS-HYOJYUN-FUTAN1
+                                         OR  WRK-CONS-HYOJYUN-FUTAN2
+                                         OR  WRK-CONS-HYOJYUN-FUTAN3
+                                         OR  WRK-CONS-HYOJYUN-FUTAN4
+                                         OR  WRK-CONS-HYOJYUN-FUTAN5
+                                         OR  WRK-CONS-HYOJYUN-FUTAN6
+                                         OR  WRK-CONS-HYOJYUN-FUTAN7
+                                         OR  WRK-CONS-HYOJYUN-FUTAN8
+                                         OR  WRK-CONS-HYOJYUN-FUTAN9
+                                         OR  WRK-CONS-HYOJYUN-FUTAN10
+                                         OR  WRK-CONS-HYOJYUN-FUTAN11
+                                         OR  WRK-CONS-HYOJYUN-FUTAN12
+                                         OR  WRK-CONS-HYOJYUN-FUTAN13
+                                         OR  WRK-CONS-HYOJYUN-FUTAN14
+                                         OR  WRK-CONS-HYOJYUN-FUTAN15
+                                         OR  WRK-CONS-HYOJYUN-FUTAN16
+                                         OR  WRK-CONS-HYOJYUN-FUTAN17
+                                         OR  WRK-CONS-HYOJYUN-FUTAN18
+                                         OR  WRK-CONS-HYOJYUN-FUTAN19
+                                         OR  WRK-CONS-HYOJYUN-FUTAN20
+                                         OR  WRK-CONS-HYOJYUN-FUTAN21
+                                         OR  WRK-CONS-HYOJYUN-FUTAN22
+                                         OR  WRK-CONS-HYOJYUN-FUTAN23
+                                         OR  WRK-CONS-HYOJYUN-FUTAN24
+                                         OR  WRK-CONS-HYOJYUN-FUTAN25
+                                         OR  WRK-CONS-HYOJYUN-FUTAN26
+                                         OR  WRK-CONS-HYOJYUN-FUTAN27
+                                         OR  WRK-CONS-HYOJYUN-FUTAN28
+                                         OR  WRK-CONS-HYOJYUN-FUTAN29
+                                         OR  WRK-CONS-HYOJYUN-FUTAN30
+                                         OR  WRK-CONS-HYOJYUN-FUTAN31
+                                         OR  WRK-CONS-HYOJYUN-FUTAN32
+                                         OR  WRK-CONS-HYOJYUN-FUTAN33 )
                                    CONTINUE
                                ELSE
                                     IF    IDXZ       =  1
@@ -5136,25 +5194,39 @@
                            WHEN    OTHER
                                IF    (  LNK-DPCNYUIN-SRYCD
                                                        (IDZ1 IDZ2 IDXZ)
-                                           =   WRK-CONS-HYOJYUN-FUTAN1
-                                           OR  WRK-CONS-HYOJYUN-FUTAN2
-                                           OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4
-                                           OR  WRK-CONS-HYOJYUN-FUTAN5
-                                           OR  WRK-CONS-HYOJYUN-FUTAN6
-                                           OR  WRK-CONS-HYOJYUN-FUTAN7
-                                           OR  WRK-CONS-HYOJYUN-FUTAN8
-                                           OR  WRK-CONS-HYOJYUN-FUTAN9
-                                           OR  WRK-CONS-HYOJYUN-FUTAN10
-                                           OR  WRK-CONS-HYOJYUN-FUTAN11
-                                           OR  WRK-CONS-HYOJYUN-FUTAN12
-                                           OR  WRK-CONS-HYOJYUN-FUTAN13
-                                           OR  WRK-CONS-HYOJYUN-FUTAN14
-                                           OR  WRK-CONS-HYOJYUN-FUTAN15
-                                           OR  WRK-CONS-HYOJYUN-FUTAN16
-                                           OR  WRK-CONS-HYOJYUN-FUTAN17
-                                           OR  WRK-CONS-HYOJYUN-FUTAN18
-                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
+                                         =   WRK-CONS-HYOJYUN-FUTAN1
+                                         OR  WRK-CONS-HYOJYUN-FUTAN2
+                                         OR  WRK-CONS-HYOJYUN-FUTAN3
+                                         OR  WRK-CONS-HYOJYUN-FUTAN4
+                                         OR  WRK-CONS-HYOJYUN-FUTAN5
+                                         OR  WRK-CONS-HYOJYUN-FUTAN6
+                                         OR  WRK-CONS-HYOJYUN-FUTAN7
+                                         OR  WRK-CONS-HYOJYUN-FUTAN8
+                                         OR  WRK-CONS-HYOJYUN-FUTAN9
+                                         OR  WRK-CONS-HYOJYUN-FUTAN10
+                                         OR  WRK-CONS-HYOJYUN-FUTAN11
+                                         OR  WRK-CONS-HYOJYUN-FUTAN12
+                                         OR  WRK-CONS-HYOJYUN-FUTAN13
+                                         OR  WRK-CONS-HYOJYUN-FUTAN14
+                                         OR  WRK-CONS-HYOJYUN-FUTAN15
+                                         OR  WRK-CONS-HYOJYUN-FUTAN16
+                                         OR  WRK-CONS-HYOJYUN-FUTAN17
+                                         OR  WRK-CONS-HYOJYUN-FUTAN18
+                                         OR  WRK-CONS-HYOJYUN-FUTAN19
+                                         OR  WRK-CONS-HYOJYUN-FUTAN20
+                                         OR  WRK-CONS-HYOJYUN-FUTAN21
+                                         OR  WRK-CONS-HYOJYUN-FUTAN22
+                                         OR  WRK-CONS-HYOJYUN-FUTAN23
+                                         OR  WRK-CONS-HYOJYUN-FUTAN24
+                                         OR  WRK-CONS-HYOJYUN-FUTAN25
+                                         OR  WRK-CONS-HYOJYUN-FUTAN26
+                                         OR  WRK-CONS-HYOJYUN-FUTAN27
+                                         OR  WRK-CONS-HYOJYUN-FUTAN28
+                                         OR  WRK-CONS-HYOJYUN-FUTAN29
+                                         OR  WRK-CONS-HYOJYUN-FUTAN30
+                                         OR  WRK-CONS-HYOJYUN-FUTAN31
+                                         OR  WRK-CONS-HYOJYUN-FUTAN32
+                                         OR  WRK-CONS-HYOJYUN-FUTAN33 )
                                    CONTINUE
                                ELSE
                                     IF    IDXZ       =  1
