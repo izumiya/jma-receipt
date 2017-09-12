@@ -5656,6 +5656,10 @@
       *同日再入院日の診療行為は次の入院履歴に変更する
              IF (RECE62-PTID       =    RECE641-PTID)    AND
                 (RECE641-SRYSYUKBN   NOT =  SPACE)       AND
+                (RECE641-SRYSYUKBN   NOT =  "900")       AND
+                (RECE641-SRYSYUKBN   NOT =  "920")       AND
+                (RECE641-SRYSYUKBN   NOT =  "970")       AND
+                (RECE641-KAISU(1 WRK-EDDD)   NOT =  ZERO)  AND
                 (RECE641-KAISU(1 WRK-EDDD) = RECE641-KAISU(3 WRK-EDDD))
                   IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
                       ADD    1     TO   IDW
