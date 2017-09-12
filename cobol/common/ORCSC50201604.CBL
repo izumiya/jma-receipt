@@ -1800,6 +1800,10 @@
                       (WRK-COM-TSUSOKUAGE(IDXF)    =   "1")
                    MOVE    1               TO  FLG-KASAN-ARI2
                END-IF
+      *        中心静脈乳幼児加算
+               IF     (WRK-COM-INPUTCD(IDXF)       =   "130009870")
+                   MOVE    1               TO  FLG-KASAN-ARI2
+               END-IF
            END-PERFORM
       *
       *    時間外算定有の時、時間外算定不可の手技料があればエラー
