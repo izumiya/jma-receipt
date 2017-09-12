@@ -421,6 +421,8 @@
       *  04.08.16    NACL-ÌçÏÆ    17/03/27  ÀÁµá¶â³Û£°±ß¥ì¥»¥×¥ÈºîÀ®ÂÐ±þ
       *  04.08.17    NACL-ÌçÏÆ    17/07/03  ¡ÊºÒ£±¡ËÅù¤Îµ­Ï¿¤ò³ç¸Ì¤Ê¤·¤Ç
       *                                     µ­Ï¿¤¹¤ë¤è¤¦ÊÑ¹¹
+      *  04.08.18    NACL-ÌçÏÆ    17/08/28  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
+      *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1716,6 +1718,45 @@
       *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡ÊÀº¿À£±Ç¯Ä¶¡¦°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡Ê°ìÈÌ¡Ë
                05  WRK-CONS-HYOJYUN-FUTAN19
                                       PIC X(09)   VALUE   "197003710".
+      *        À¸³èÎÅÍÜ´Ä¶­ÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN20
+                                      PIC X(09)   VALUE   "197003810".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡ÊÄã¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN21
+                                      PIC X(09)   VALUE   "197003910".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê¶­³¦ÁØ³ºÅö¡Ë¡ÊÄã¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN22
+                                      PIC X(09)   VALUE   "197004010".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê¶­³¦ÁØ³ºÅö¡Ë¡ÊÄã£±¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN23
+                                      PIC X(09)   VALUE   "197004110".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã¡¦£¹£°Æü°Ê²¼¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN24
+                                      PIC X(09)   VALUE   "197004210".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê»ØÄêÆñÉÂ¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã¡¦£¹£°Æü°Ê²¼¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN25
+                                      PIC X(09)   VALUE   "197004310".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã¡¦£¹£°ÆüÄ¶¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN26
+                                      PIC X(09)   VALUE   "197004410".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê»ØÄêÆñÉÂ¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã¡¦£¹£°ÆüÄ¶¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN27
+                                      PIC X(09)   VALUE   "197004510".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê¶­³¦ÁØ³ºÅö¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN28
+                                      PIC X(09)   VALUE   "197004610".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê»ØÄêÆñÉÂ¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã£²¡¦£¹£°Æü°Ê²¼¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN29
+                                      PIC X(09)   VALUE   "197004710".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê»ØÄêÆñÉÂ¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã£²¡¦£¹£°ÆüÄ¶¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN30
+                                      PIC X(09)   VALUE   "197004810".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê»ØÄêÆñÉÂ¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã£±¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN31
+                                      PIC X(09)   VALUE   "197004910".
+      *        À¸³èÎÅÍÜ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡Ê¶­³¦ÁØ³ºÅö¡Ë¡Ê°åÎÅ¶èÊ¬£²¡¦£³¡Ë¡ÊÄã£±¡Ë
+               05  WRK-CONS-HYOJYUN-FUTAN32
+                                      PIC X(09)   VALUE   "197005010".
       *
            03  WRK-CONS-SRYYM-200604   PIC 9(06)   VALUE   200604. 
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
@@ -2844,32 +2885,60 @@
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬
-           IF     (RECE62-KOUREI           = "1"  )
-           AND    (RECE62-TEISYOTOKU   NOT = SPACE)
-             EVALUATE    RECE62-TEISYOTOKU
-               WHEN    "1"
-                   MOVE    "3"             TO  WRK-DATA
-               WHEN    "2"
-                   MOVE    "1"             TO  WRK-DATA
-                   IF   RECE62-TEISYOTOKU3 = "3"
-                     MOVE  "2"             TO  WRK-DATA
-                   END-IF
-      **       WHEN    "3"
-      **           MOVE    "2"             TO  WRK-DATA
-               WHEN    "4"
-                   MOVE    "4"             TO  WRK-DATA
-             END-EVALUATE
+           IF      RECE62-SRYYM  >=  "201710"
+             IF     (RECE62-KOUREI           = "1"  )
+             AND    (RECE62-TEISYOTOKU   NOT = SPACE)
+               EVALUATE    RECE62-TEISYOTOKU
+                 WHEN    "1"
+                 WHEN    "4"
+                     MOVE    "3"       TO  WRK-DATA
+                 WHEN    "2"
+                     MOVE    "1"       TO  WRK-DATA
+                     IF   RECE62-TEISYOTOKU3 = "3"
+                       MOVE  "2"       TO  WRK-DATA
+                     END-IF
+               END-EVALUATE
+             ELSE
+               EVALUATE    RECE62-TEISYOTOKU3
+                 WHEN    "1"
+                 WHEN    "4"
+                     MOVE    "3"       TO  WRK-DATA
+                 WHEN    "2"
+                     MOVE    "1"       TO  WRK-DATA
+                 WHEN    "3"
+                     MOVE    "2"       TO  WRK-DATA
+               END-EVALUATE
+             END-IF
+             IF     (RECE62-TEISYOTOKU3      =  "4")
+             AND    (RECE62-SEIKATURYOYO     =  "1")
+                     MOVE    "4"       TO  WRK-DATA
+             END-IF
            ELSE
-             EVALUATE    RECE62-TEISYOTOKU3
-               WHEN    "1"
-                   MOVE    "3"             TO  WRK-DATA
-               WHEN    "2"
-                   MOVE    "1"             TO  WRK-DATA
-               WHEN    "3"
-                   MOVE    "2"             TO  WRK-DATA
-               WHEN    "4"
-                   MOVE    "4"             TO  WRK-DATA
-             END-EVALUATE
+             IF     (RECE62-KOUREI           = "1"  )
+             AND    (RECE62-TEISYOTOKU   NOT = SPACE)
+               EVALUATE    RECE62-TEISYOTOKU
+                 WHEN    "1"
+                     MOVE    "3"       TO  WRK-DATA
+                 WHEN    "2"
+                     MOVE    "1"       TO  WRK-DATA
+                     IF   RECE62-TEISYOTOKU3 = "3"
+                       MOVE  "2"       TO  WRK-DATA
+                     END-IF
+                 WHEN    "4"
+                     MOVE    "4"       TO  WRK-DATA
+               END-EVALUATE
+             ELSE
+               EVALUATE    RECE62-TEISYOTOKU3
+                 WHEN    "1"
+                     MOVE    "3"       TO  WRK-DATA
+                 WHEN    "2"
+                     MOVE    "1"       TO  WRK-DATA
+                 WHEN    "3"
+                     MOVE    "2"       TO  WRK-DATA
+                 WHEN    "4"
+                     MOVE    "4"       TO  WRK-DATA
+               END-EVALUATE
+             END-IF
            END-IF
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
@@ -7674,7 +7743,20 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN16
                                            OR  WRK-CONS-HYOJYUN-FUTAN17
                                            OR  WRK-CONS-HYOJYUN-FUTAN18
-                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
+                                           OR  WRK-CONS-HYOJYUN-FUTAN19
+                                           OR  WRK-CONS-HYOJYUN-FUTAN20
+                                           OR  WRK-CONS-HYOJYUN-FUTAN21
+                                           OR  WRK-CONS-HYOJYUN-FUTAN22
+                                           OR  WRK-CONS-HYOJYUN-FUTAN23
+                                           OR  WRK-CONS-HYOJYUN-FUTAN24
+                                           OR  WRK-CONS-HYOJYUN-FUTAN25
+                                           OR  WRK-CONS-HYOJYUN-FUTAN26
+                                           OR  WRK-CONS-HYOJYUN-FUTAN27
+                                           OR  WRK-CONS-HYOJYUN-FUTAN28
+                                           OR  WRK-CONS-HYOJYUN-FUTAN29
+                                           OR  WRK-CONS-HYOJYUN-FUTAN30
+                                           OR  WRK-CONS-HYOJYUN-FUTAN31
+                                           OR  WRK-CONS-HYOJYUN-FUTAN32)
                                    EVALUATE    WRK-FTNKBN
                                        WHEN    "5"
                                        WHEN    "7"
@@ -7744,7 +7826,20 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN16
                                            OR  WRK-CONS-HYOJYUN-FUTAN17
                                            OR  WRK-CONS-HYOJYUN-FUTAN18
-                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
+                                           OR  WRK-CONS-HYOJYUN-FUTAN19
+                                           OR  WRK-CONS-HYOJYUN-FUTAN20
+                                           OR  WRK-CONS-HYOJYUN-FUTAN21
+                                           OR  WRK-CONS-HYOJYUN-FUTAN22
+                                           OR  WRK-CONS-HYOJYUN-FUTAN23
+                                           OR  WRK-CONS-HYOJYUN-FUTAN24
+                                           OR  WRK-CONS-HYOJYUN-FUTAN25
+                                           OR  WRK-CONS-HYOJYUN-FUTAN26
+                                           OR  WRK-CONS-HYOJYUN-FUTAN27
+                                           OR  WRK-CONS-HYOJYUN-FUTAN28
+                                           OR  WRK-CONS-HYOJYUN-FUTAN29
+                                           OR  WRK-CONS-HYOJYUN-FUTAN30
+                                           OR  WRK-CONS-HYOJYUN-FUTAN31
+                                           OR  WRK-CONS-HYOJYUN-FUTAN32)
                                        CONTINUE
                                    ELSE
                                       IF    ( RECE62-HKNNUM (1:2)
@@ -7773,7 +7868,20 @@
                                            OR  WRK-CONS-HYOJYUN-FUTAN16
                                            OR  WRK-CONS-HYOJYUN-FUTAN17
                                            OR  WRK-CONS-HYOJYUN-FUTAN18
-                                           OR  WRK-CONS-HYOJYUN-FUTAN19)
+                                           OR  WRK-CONS-HYOJYUN-FUTAN19
+                                           OR  WRK-CONS-HYOJYUN-FUTAN20
+                                           OR  WRK-CONS-HYOJYUN-FUTAN21
+                                           OR  WRK-CONS-HYOJYUN-FUTAN22
+                                           OR  WRK-CONS-HYOJYUN-FUTAN23
+                                           OR  WRK-CONS-HYOJYUN-FUTAN24
+                                           OR  WRK-CONS-HYOJYUN-FUTAN25
+                                           OR  WRK-CONS-HYOJYUN-FUTAN26
+                                           OR  WRK-CONS-HYOJYUN-FUTAN27
+                                           OR  WRK-CONS-HYOJYUN-FUTAN28
+                                           OR  WRK-CONS-HYOJYUN-FUTAN29
+                                           OR  WRK-CONS-HYOJYUN-FUTAN30
+                                           OR  WRK-CONS-HYOJYUN-FUTAN31
+                                           OR  WRK-CONS-HYOJYUN-FUTAN32)
                                            CONTINUE
                                        ELSE
                                            MOVE    1   TO  FLG-PRT
@@ -7801,7 +7909,20 @@
                                            WRK-CONS-HYOJYUN-FUTAN16 OR
                                            WRK-CONS-HYOJYUN-FUTAN17 OR
                                            WRK-CONS-HYOJYUN-FUTAN18 OR
-                                           WRK-CONS-HYOJYUN-FUTAN19)
+                                           WRK-CONS-HYOJYUN-FUTAN19 OR
+                                           WRK-CONS-HYOJYUN-FUTAN20 OR
+                                           WRK-CONS-HYOJYUN-FUTAN21 OR
+                                           WRK-CONS-HYOJYUN-FUTAN22 OR
+                                           WRK-CONS-HYOJYUN-FUTAN23 OR
+                                           WRK-CONS-HYOJYUN-FUTAN24 OR
+                                           WRK-CONS-HYOJYUN-FUTAN25 OR
+                                           WRK-CONS-HYOJYUN-FUTAN26 OR
+                                           WRK-CONS-HYOJYUN-FUTAN27 OR
+                                           WRK-CONS-HYOJYUN-FUTAN28 OR
+                                           WRK-CONS-HYOJYUN-FUTAN29 OR
+                                           WRK-CONS-HYOJYUN-FUTAN30 OR
+                                           WRK-CONS-HYOJYUN-FUTAN31 OR
+                                           WRK-CONS-HYOJYUN-FUTAN32)
                                      PERFORM  200773-SKJFTNFLG-CHECK-SEC
                                    END-IF
                                END-IF   

@@ -30,29 +30,40 @@
            03  LNK-SYOTOKU-PTID            PIC 9(10).
       *    処理年月
            03  LNK-SYOTOKU-SRYYM           PIC X(06).
-      *    食事区分チェックフラグ（認定証等）
+      *    食事区分チェック＋【食事用】返却項目編集
            03  LNK-SYOTOKU-SKJCHKFLG       PIC X(01).
-      *    保険組み合わせ（食事区分インデックス（レセプト用）の取得用）
+      *    【食事用】食事区分インデックス（レセプト用）取得用の保険組み合わせ
            03  LNK-SYOTOKU-HKNCOMBIINF.
                05  LNK-SYOTOKU-HKNCOMBI    PIC 9(04)   OCCURS  10.
       *返却項目
            03  LNK-SYOTOKU-HENKYAKU-AREA.
                05  LNK-SYOTOKU-HENKYAKU-TABLE     OCCURS  31.
-      *主保険・全国公費用
+      *主保険・全国公費区分
       *  （空白：一般　１：低１　２：低２　４：低１（老齢））
                    07  LNK-SYOTOKU-SYUKBN         PIC  X(01).
-      *地方公費用
+      *地方公費区分
       *  （空白：一般　１：低１　２：低２）
                    07  LNK-SYOTOKU-CHIKBN         PIC  X(01).
-      *食事用（食事区分チェック後）
+      *食事区分
       *  （空白：一般　１：低１　２：低２　３：低２（９０日超）　４：低１（老齢））
                    07  LNK-SYOTOKU-SKJKBN         PIC  X(01).
-      *食事用（食事区分チェック前）
-      *  （空白：一般　１：低１　２：低２　３：低２（９０日超）　４：低１（老齢））
-                   07  LNK-SYOTOKU-SKJKBN-OLD     PIC  X(01).
       *
-      *食事区分インデックス（レセプト用）
-               05  LNK-SYOTOKU-SKJIDX      PIC 9(02).
+      *【食事用】境界層区分
+      *  （空白：非該当　１：該当）
+                   07  LNK-SYOTOKU-KKSKBN         PIC  X(01).
+      *【食事用】食事算定保険組み合わせ
+                   07  LNK-SYOTOKU-SKJHKNCOMBI    PIC  9(04).
+      *【食事用】食事算定保険組み合わせ（同日再入院）
+                   07  LNK-SYOTOKU-SKJHKNCOMBI-DOU
+                                                  PIC  9(04).
+      *【食事用】年齢区分
+      *  （食事算定保険組み合わせ（同日再入院分も含む）が
+      *    0000・特療費・労災・自賠責・公害・自費・治験の場合は空白）
+      *  （空白：対象外　１：高齢者　２：７０歳未満）
+                   07  LNK-SYOTOKU-AGEKBN         PIC  X(01).
+      *
+      *【食事用】食事区分インデックス（レセプト用）
+               05  LNK-SYOTOKU-SKJIDX             PIC  9(02).
       *
       *復帰コード（１：処理年月エラー　２：患者ＩＤエラー）
       *          （３：低１エラー　　　４：低２エラー　　）

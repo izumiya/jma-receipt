@@ -449,6 +449,8 @@
       *  04.08.12    NACL-ÌçÏÆ    17/03/27  ÀÁµá¶â³Û£°±ß¥ì¥»¥×¥ÈºîÀ®ÂÐ±þ
       *  04.08.13    NACL-ÌçÏÆ    17/07/03  ¡ÊºÒ£±¡ËÅù¤Îµ­Ï¿¤ò³ç¸Ì¤Ê¤·¤Ç
       *                                     µ­Ï¿¤¹¤ë¤è¤¦ÊÑ¹¹
+      *  04.08.14    NACL-ÌçÏÆ    17/08/28  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
+      *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *
       *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
       *****************************************************************
@@ -2534,8 +2536,20 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    ÉÂÅï¶èÊ¬
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    °ìÉôÉéÃ´¶â¡¦¿©»öÎÅÍÜÈñÉ¸½àÉéÃ´³Û¶èÊ¬
-           IF    ( RECE02-TEISYOTOKU   NOT =   SPACE )
-           AND   ( RECE02-ZAITAKU          =   "1"   )
+           IF      RECE02-SRYYM  >=  "201710"
+             IF    ( RECE02-TEISYOTOKU   NOT =   SPACE )
+             AND   ( RECE02-ZAITAKU          =   "1"   )
+               EVALUATE    RECE02-TEISYOTOKU
+                   WHEN    "1"
+                   WHEN    "4"
+                       MOVE    "3"             TO  WRK-DATA
+                   WHEN    "2"
+                       MOVE    "1"             TO  WRK-DATA
+               END-EVALUATE
+             END-IF
+           ELSE
+             IF    ( RECE02-TEISYOTOKU   NOT =   SPACE )
+             AND   ( RECE02-ZAITAKU          =   "1"   )
                EVALUATE    RECE02-TEISYOTOKU
                    WHEN    "1"
                        MOVE    "3"             TO  WRK-DATA
@@ -2544,6 +2558,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                    WHEN    "4"
                        MOVE    "4"             TO  WRK-DATA
                END-EVALUATE
+             END-IF
            END-IF
            MOVE    1                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         

@@ -776,6 +776,8 @@
       *  04.08.47    NACL-ÌçÏÆ    17/06/29  Ê¿À®£²£¹Ç¯£¸·î²þÀµ
       *                                     ¡Ê¹â³ÛÎÅÍÜÈñÀ©ÅÙ¤Î¸«Ä¾¤·¡Ë
       *  04.08.48    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
+      *  04.08.49    NACL-ÌçÏÆ    17/08/28  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
+      *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -27674,12 +27676,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   (RECE02-TEISYOTOKU  NOT =   SPACE  ))
                EVALUATE    RECE02-TEISYOTOKU
                    WHEN    "1"
+                   WHEN    "4"
                        MOVE    "3"   TO   RECE02-SHOKUJIFTNKBN
                    WHEN    "2"
                        MOVE    "1"   TO   RECE02-SHOKUJIFTNKBN
-                   WHEN    "4"
-                       MOVE    "4"   TO   RECE02-SHOKUJIFTNKBN
                END-EVALUATE
+      **@      IF   (RECE02-SRYYM      >=  "201204"  )
+      **@      AND  (RECE02-ZAITAKU     =  "2" OR "3")
+      **@      AND  (RECE02-TEISYOTOKU  =  "1" OR "4")
+      **@              MOVE    "1"   TO   RECE02-SHOKUJIFTNKBN
+      **@              DISPLAY "SHOKUJIFTNKBN OKIKAE"
+      **@      END-IF
            END-IF
            PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                      UNTIL    KOHFTN-IDX     >    4
@@ -27688,8 +27695,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  MOVE   "3"  TO   RECE02-SHOKUJIFTNKBN2(KOHFTN-IDX)
                WHEN    "2"
                  MOVE   "1"  TO   RECE02-SHOKUJIFTNKBN2(KOHFTN-IDX)
-      **       WHEN    "4"
-      **         MOVE   "4"  TO   RECE02-SHOKUJIFTNKBN2(KOHFTN-IDX)
              END-EVALUATE
            END-PERFORM
       *

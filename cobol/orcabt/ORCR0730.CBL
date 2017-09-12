@@ -239,6 +239,8 @@
       *                                     共済組合を追加
       *  04.08.19    NACL-門脇    17/07/03  （災１）等の記載を括弧なしで
       *                                     記載するよう変更
+      *  04.08.20    NACL-門脇    17/08/28  平成２９年１０月改正
+      *                                     （入院時生活療養の見直し）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6551,9 +6553,6 @@
                          MOVE "低所得２　３月超"
                                           TO  HC06-GENGAKUMEI
                       END-IF
-      **           WHEN    "3"
-      **              MOVE    "低所得２　３月超"
-      **                                  TO  HC06-GENGAKUMEI
                END-EVALUATE
            ELSE
                EVALUATE    RECE62-TEISYOTOKU3
