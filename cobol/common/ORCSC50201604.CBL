@@ -50,6 +50,7 @@
       * 04.08.00     NACL-多々納  16/09/XX  労災四肢加算区分対応
       *                                     端数処理対応
       *                                     K142（脊椎固定術等）きざみ値対応
+      * 04.08.00     NACL-多々納  17/09/12  複数手技料チェック対応
       *****************************************************************
       *
       *
@@ -205,6 +206,18 @@
            03  WRK-K142-CNT2           PIC 9(03).
            03  WRK-K142-SURYO          PIC 9(05).
            03  IDX-HZN                 PIC 9(04).
+      *
+      *H29.9
+      *    手技料の時間加算チェック
+           03  FLG-TIME-NAS            PIC 9(01).
+           03  FLG-TIME-ARI            PIC 9(01).
+           03  FLG-KASAN-ARI           PIC 9(01).
+           03  FLG-KASAN-ARI2          PIC 9(01).
+           03  FLG-NEN-ARI             PIC 9(01).
+           03  FLG-NEN-NAS             PIC 9(01).
+           03  IDXF                    PIC 9(04).
+           03  IDX-F                   PIC 9(04).
+           03  IDX-N                   PIC 9(04).
       *
       *    保存用
        01  HOZ-SCR-REC.
@@ -396,6 +409,14 @@
                MOVE    SPACE              TO  SPA-ERRCD
                PERFORM 1002-JIDO-KASAN-SEC
                MOVE    WRK-ERRCD          TO  SPA-ERRCD
+           END-IF
+      *
+      *H29.9
+      *    １剤１手技判定
+           IF     (SPA-ERRCD           =   SPACE)
+             AND  (IDX-ZS              >   ZERO )
+             AND (SPA-SRYYMD           >=  "20170401" )
+               PERFORM 1009-SYUGI-CHEK-SEC
            END-IF
       *
            .
@@ -1118,6 +1139,10 @@
            IF      FLG-ARI             =   ZERO
       *        最後の通則年齢加算位置
                MOVE    IDX-NEN             TO  IDX-S
+      *H29.9
+               IF      IDX-NEN             =   ZERO
+                   MOVE    IDX-ZS              TO  IDX-S
+               END-IF
            END-IF
       *    加算料追加処理
            PERFORM 1002-KASAN-SET-SEC
@@ -1149,6 +1174,10 @@
                IF      FLG-ARI             =   ZERO
       *            最後の通則年齢加算位置
                    MOVE    IDX-NEN             TO  IDX-S
+      *H29.9
+                   IF      IDX-NEN             =   ZERO
+                       MOVE    IDX-ZS              TO  IDX-S
+                   END-IF
                END-IF
       *        加算料追加処理
                PERFORM 1002-KASAN-SET-SEC
@@ -1707,6 +1736,98 @@
            .
         10052-KASAN-CHK05-EXT.
            EXIT.
+      *
+      *H29.9
+      *****************************************************************
+      *    時間外加算・通則年齢と手技判定処理
+      *****************************************************************
+       1009-SYUGI-CHEK-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  IDX-F
+           MOVE    ZERO                TO  IDX-N
+           MOVE    ZERO                TO  FLG-TIME-NAS
+           MOVE    ZERO                TO  FLG-TIME-ARI
+           MOVE    ZERO                TO  FLG-NEN-ARI
+           MOVE    ZERO                TO  FLG-NEN-NAS
+           MOVE    ZERO                TO  FLG-KASAN-ARI
+           MOVE    ZERO                TO  FLG-KASAN-ARI2
+           PERFORM VARYING     IDXF    FROM    1   BY  1
+                   UNTIL      (IDXF    >   SPA-MAX-LINE  )   OR
+                             ((WRK-COM-INPUTCD(IDXF)   =   SPACE ) AND
+                              (WRK-GMN-INPUTCD(IDXF)   =   SPACE ))
+      *        手技料の時間加算区分判定
+               IF     (WRK-COM-INPUTCD(IDXF)(1:1)  =   "1")
+                  AND (WRK-COM-DATAKBN(IDXF)       =   "1")
+                   IF    (WRK-COM-TIMEKSNKBN (IDXF)    =   ZERO)
+                   AND   (WRK-COM-TUSOKUGAIKBN(IDXF)   =   "0" )
+      *                時間外加算不可で、通則対象は剤分離
+                       MOVE    1               TO  FLG-TIME-NAS
+                       MOVE    IDXF            TO  IDX-F
+                   ELSE
+                       MOVE    1               TO  FLG-TIME-ARI
+                   END-IF
+      *
+                   IF    (WRK-COM-TSUSOKUAGE (IDXF)    =   ZERO)
+                   AND   (WRK-COM-TUSOKUGAIKBN(IDXF)   =   "0" )
+                       IF    (WRK-COM-INPUTCD (IDXF)(1:3)
+                                                       =   "101")
+                           MOVE    1                   TO  FLG-NEN-ARI
+                       ELSE
+      *                    通則年齢不可で、通則対象は剤分離
+                           MOVE    1               TO  FLG-NEN-NAS
+                           MOVE    IDXF            TO  IDX-N
+                       END-IF
+                   ELSE
+                       MOVE    1               TO  FLG-NEN-ARI
+                   END-IF
+               END-IF
+      *        時間外加算
+               IF    ((WRK-COM-INPUTCD(IDXF)(1:1)  =   "1")  AND
+                      (WRK-COM-INPUTCD(IDXF)(1:3)
+                                               NOT =   "101")) AND
+                      (WRK-COM-DATAKBN(IDXF)       =   "2")  AND
+                      (WRK-COM-TENSIKIBETU (IDXF)
+                                                   =   5
+                                                   OR  6  )  AND
+                      (WRK-COM-TIMEKSNKBN (IDXF)
+                                               NOT =   ZERO )
+                   MOVE    1               TO  FLG-KASAN-ARI
+               END-IF
+      *        通則年齢
+               IF     (WRK-COM-INPUTCD(IDXF)(1:1)  =   "1")  AND
+                      (WRK-COM-DATAKBN(IDXF)       =   "2")  AND
+                      (WRK-COM-TENSIKIBETU(IDXF)   =   5  )  AND
+                      (WRK-COM-TSUSOKUAGE(IDXF)    =   "1")
+                   MOVE    1               TO  FLG-KASAN-ARI2
+               END-IF
+      *        中心静脈乳幼児加算
+               IF     (WRK-COM-INPUTCD(IDXF)       =   "130009870")
+                   MOVE    1               TO  FLG-KASAN-ARI2
+               END-IF
+           END-PERFORM
+      *
+      *    時間外算定有の時、時間外算定不可の手技料があればエラー
+           IF      (FLG-KASAN-ARI      =   1  )
+               AND (FLG-TIME-NAS       =   1  )
+               AND (FLG-TIME-ARI       =   1  )
+               MOVE    "0542"          TO  SPA-ERRCD
+               MOVE    "1"             TO  WRK-COM-CUR (IDX-F)
+           END-IF
+      *
+      *    通則年齢有の時、なしの手技料があればエラー
+           IF      (FLG-KASAN-ARI2     =   1  )
+               AND (FLG-NEN-NAS        =   1  )
+               AND (FLG-NEN-ARI        =   1  )
+               IF      SPA-ERRCD           =   SPACE
+                   MOVE    "0542"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR (IDX-N)
+               END-IF
+           END-IF
+      *
+           .
+       1009-SYUGI-CHEK-EXT.
+           EXIT.
+      *H29.9
       *
       *****************************************************************
       *    点数計算編集処理

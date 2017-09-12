@@ -2227,6 +2227,13 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H29.9
+               WHEN    "0542"
+                   STRING  "加算の所定点数に該当しない項目があります。"
+                           "別剤として入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *
            END-EVALUATE
            .
