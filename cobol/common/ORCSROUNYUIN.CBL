@@ -4371,9 +4371,19 @@
                            END-IF
                        END-PERFORM
                      ELSE
-                       IF  (ACCT-SRYCDTOTAL(6:9)  =  CONS-ROSAICHIRYO
-                                                 OR  CONS-BYOUI
-                                                 OR  CONS-TOKUKANSI)
+      *                 IF  (ACCT-SRYCDTOTAL(6:9)  =  CONS-ROSAICHIRYO
+      *                                           OR  CONS-BYOUI
+      *                                           OR  CONS-TOKUKANSI)
+                       IF  (SRY-SRYCD(1)  =   CONS-ROSAICHIRYO)  OR
+                           (SRY-SRYCD(2)  =   CONS-ROSAICHIRYO)  OR
+                           (SRY-SRYCD(3)  =   CONS-ROSAICHIRYO)  OR
+                           (SRY-SRYCD(4)  =   CONS-ROSAICHIRYO)  OR
+                           (SRY-SRYCD(5)  =   CONS-ROSAICHIRYO)  OR
+                           (SRY-SRYCD(1)  =   CONS-BYOUI)  OR
+                           (SRY-SRYCD(2)  =   CONS-BYOUI)  OR
+                           (SRY-SRYCD(3)  =   CONS-BYOUI)  OR
+                           (SRY-SRYCD(4)  =   CONS-BYOUI)  OR
+                           (SRY-SRYCD(5)  =   CONS-BYOUI)  
                        OR  (ACCT-ZAIKBN           =    2           )
       *                  ∆˛±°Œ¡≤√ªª§Œ¬‡»Ú
                         IF  ACCT-ZAIKBN  =  2

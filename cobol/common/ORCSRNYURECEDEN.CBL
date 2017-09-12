@@ -985,7 +985,15 @@
       *        ÉÂ°áÂßÍ¿ÎÁ¤ÈÏ«ºÒ¼£ÎÅ·×²è²Ã»»¤Ï"ORCSRNYURECEDEN"¤ÎÊÖµÑ
       *        ÂÐ¾Ý³°¤È¤¹¤ë
                IF    NSRY-SRYCD(1)     =    "101910050"  OR
-                                            "101910060"
+                     NSRY-SRYCD(2)     =    "101910050"  OR
+                     NSRY-SRYCD(3)     =    "101910050"  OR
+                     NSRY-SRYCD(4)     =    "101910050"  OR
+                     NSRY-SRYCD(5)     =    "101910050"  OR
+                     NSRY-SRYCD(1)     =    "101910060"  OR
+                     NSRY-SRYCD(2)     =    "101910060"  OR
+                     NSRY-SRYCD(3)     =    "101910060"  OR
+                     NSRY-SRYCD(4)     =    "101910060"  OR
+                     NSRY-SRYCD(5)     =    "101910060"
                    MOVE   "9999"       TO   TNS-CHUKSNCD
                    MOVE   999          TO   TNS-CDKBN-KBNNUM
                END-IF
@@ -1045,8 +1053,16 @@
       *        ¹ð¼¨Åù¼±ÊÌ¶èÊ¬¡Ê£±¡Ë¤¬£·¡Ê²Ã»»¹àÌÜ¡Ë°Ê³°¤ÎÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                IF   TNS-KOKUJISKBKBN1   NOT =   7
       *          ÉÂ°áÂßÍ¿ÎÁ¤ÈÏ«ºÒ¼£ÎÅ·×²è²Ã»»¤Ï½èÍýÂÐ¾Ý³°
-                 IF    NSRY-SRYCD(1)    =    "101910050"  OR
-                                             "101910060"
+                 IF    NSRY-SRYCD(1)     =    "101910050"  OR
+                       NSRY-SRYCD(2)     =    "101910050"  OR
+                       NSRY-SRYCD(3)     =    "101910050"  OR
+                       NSRY-SRYCD(4)     =    "101910050"  OR
+                       NSRY-SRYCD(5)     =    "101910050"  OR
+                       NSRY-SRYCD(1)     =    "101910060"  OR
+                       NSRY-SRYCD(2)     =    "101910060"  OR
+                       NSRY-SRYCD(3)     =    "101910060"  OR
+                       NSRY-SRYCD(4)     =    "101910060"  OR
+                       NSRY-SRYCD(5)     =    "101910060"
                      CONTINUE
                  ELSE
                    ADD    1         TO  IDX-CHUKSN0
@@ -1215,7 +1231,15 @@
       *                   ÉÂ°áÂßÍ¿ÎÁ¤ÈÏ«ºÒ¼£ÎÅ·×²è²Ã»»¤Ï
       *                   "ORCSRNYURECEDEN"¤ÎÊÖµÑÂÐ¾Ý³°¤È¤¹¤ë
                            IF    SRY-SRYCD(1)     =    "101910050"  OR
-                                                       "101910060"
+                                 SRY-SRYCD(2)     =    "101910050"  OR
+                                 SRY-SRYCD(3)     =    "101910050"  OR
+                                 SRY-SRYCD(4)     =    "101910050"  OR
+                                 SRY-SRYCD(5)     =    "101910050"  OR
+                                 SRY-SRYCD(1)     =    "101910060"  OR
+                                 SRY-SRYCD(2)     =    "101910060"  OR
+                                 SRY-SRYCD(3)     =    "101910060"  OR
+                                 SRY-SRYCD(4)     =    "101910060"  OR
+                                 SRY-SRYCD(5)     =    "101910060"
                                MOVE   "9999"      TO   TNS-CHUKSNCD
                                MOVE   999         TO   TNS-CDKBN-KBNNUM
                            END-IF
@@ -1304,7 +1328,15 @@
                      IF   TNS-KOKUJISKBKBN1   NOT =   7
       *                ÉÂ°áÂßÍ¿ÎÁ¤ÈÏ«ºÒ¼£ÎÅ·×²è²Ã»»¤Ï½èÍýÂÐ¾Ý³°
                        IF    SRY-SRYCD(1)     =    "101910050"  OR
-                                                   "101910060"
+                             SRY-SRYCD(2)     =    "101910050"  OR
+                             SRY-SRYCD(3)     =    "101910050"  OR
+                             SRY-SRYCD(4)     =    "101910050"  OR
+                             SRY-SRYCD(5)     =    "101910050"  OR
+                             SRY-SRYCD(1)     =    "101910060"  OR
+                             SRY-SRYCD(2)     =    "101910060"  OR
+                             SRY-SRYCD(3)     =    "101910060"  OR
+                             SRY-SRYCD(4)     =    "101910060"  OR
+                             SRY-SRYCD(5)     =    "101910060"
                            CONTINUE
                        ELSE
                          ADD    1         TO  IDX-CHUKSN0
