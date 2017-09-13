@@ -155,6 +155,7 @@
       *  04.08.04    NACL-ÂÀÅÄ    16/11/30  PRT-REC¤ò¥³¥Ô¡¼¶ç¤ËÊÑ¹¹
       *
       *  05.00.01    NACL-Æ£¸¶    17/02/07  £È£Á£Ï£Ò£ÉÂÐ±þ
+      *  05.00.02    NACL-Æ£¸¶    17/07/04  £Ð£Õ£Ó£ÈÄÌÃÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -243,6 +244,32 @@
                    07  WRK-HEN-FL1     PIC X(01).
                    07  WRK-HEN-RENNUM2 PIC ZZZ9.
                    07  WRK-HEN-FL2     PIC X(01).
+      *
+           03  WRK-SYMD.
+               05  WRK-SYY             PIC 9(04).
+               05  WRK-SMM             PIC 9(02).
+               05  WRK-SDD             PIC 9(02).
+      *
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+           03  WRK-THMS.
+               05  WRK-THH             PIC X(02).
+               05  WRK-TMM             PIC X(02).
+               05  WRK-TSS             PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH         PIC X(02).
+               05  WRK-HEN-T1          PIC X(01).
+               05  WRK-HEN-TMM         PIC X(02).
+               05  WRK-HEN-T2          PIC X(01).
+               05  WRK-HEN-TSS         PIC X(02).
+      *
+           03  WRK-CNT                 PIC 9(10).
+           03  WRK-CNT-X   REDEFINES   WRK-CNT
+                                       PIC X(10).
       *
       *    °ì»þ¥Ç¥£¥ì¥¯¥È¥êÌ¾
            03  WRK-SGETTEMP-TEMPDIR    PIC X(1024).
@@ -405,6 +432,9 @@
       *
            COPY    "CPORCSGETTEMP.INC".
       *
+      *    PUSH
+           COPY    "CPPUSHBATCH01.INC".
+      *
       ****************************************************************
        LINKAGE                 SECTION.
        01  COMMAND-PARAM.
@@ -475,6 +505,10 @@
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            DISPLAY "WRK-PARA-JOB-PARAM=" WRK-PARA-JOB-PARAM
+      *??
+           DISPLAY "LNK-PRTKANRI-SRYYM=" LNK-PRTKANRI-SRYYM
+           DISPLAY "WRK-PARA-SRYYM=" WRK-PARA-SRYYM
+      *??
       *
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAME
@@ -771,7 +805,12 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            MOVE    SYS-1044-OFFSET-Y   TO  PRT-OFFSET-Y
       *
            MOVE    "1"                 TO  PRT-SITEKBN
-           MOVE    WRK-PARA-PRTKBN     TO  PRT-PRTKBN
+      *    £È£Á£Ï£Ò£É¤Î¤È¤­¡Ö£·¡×¤òÀßÄê
+           IF      WRK-PARA-JOB-PARAM  =   SPACE
+               MOVE    WRK-PARA-PRTKBN     TO  PRT-PRTKBN
+           ELSE
+               MOVE    "7"                 TO  PRT-PRTKBN
+           END-IF
       **** MOVE    "/var/lib/jma-receipt/orca_ps/"
            MOVE    WRK-SGETTEMP-TEMPDIR
                                        TO  PRT-OUT
@@ -1585,6 +1624,12 @@ grpsys                     PERFORM 900-CALL-ORCSJOB-SEC
 grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *
+      *    £Ð£Õ£Ó£ÈÄÌÃÎ½èÍý
+           IF    ( WRK-PARA-SHELLID
+                                   NOT =   "RECEPTX" )
+               PERFORM 3001-PUSH-SEC
+           END-IF
+      *
            PERFORM 900-DBDISCONNECT-SEC
       *
            DISPLAY "*** ORCR0102 IN  "  CNT-IN
@@ -1592,6 +1637,73 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            DISPLAY "*** ORCR0102 END ***"
            .
        300-END-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ð£Õ£Ó£ÈÄÌÃÎ½èÍý
+      *****************************************************************
+       3001-PUSH-SEC        SECTION.
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
+           IF    ( SJOBKANRI-RETURN
+                                   =   ZERO  )
+           AND   ( JOB-PARAM   NOT =   SPACE )
+               INITIALIZE                  PUSHBA01-REC
+               MOVE    JOB-PARAM (1:36)
+                                       TO  PUSHBA01API-ORCA-UID
+               MOVE    JOB-PARAM (37:36)
+                                       TO  PUSHBA01API-KARTE-UID
+               MOVE    "000"           TO  PUSHBA01API-RESULT
+               MOVE    "receipt_print" TO  PUSHBA01-EVENT
+               IF      WRK-PARA-SYOKBN  =   "2"
+                   MOVE    "9999-12"       TO  PUSHBA01-PERFORM-MONTH
+               ELSE
+                   MOVE    LNK-PRTKANRI-SRYYM
+                                       TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE (1:7)
+                                           TO  PUSHBA01-PERFORM-MONTH
+               END-IF
+               MOVE    CNT-OUT         TO  WRK-CNT
+               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
+      *??
+             display "push=" PUSHBA01-REC "#"
+      *??
+               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
+               MOVE    "PUSHEVENT"     TO  MCP-FUNC
+               MOVE    "push_batch01"  TO  MCP-TABLE
+               MOVE    "push_batch01"  TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           END-IF
+           .
+       3001-PUSH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆüÉÕÊÔ½¸½èÍý
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYMD (1:4)      TO  WRK-HEN-YY
+               MOVE    WRK-SYMD (5:2)      TO  WRK-HEN-MM
+               MOVE    WRK-SYMD (7:2)      TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+           .
+       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************
