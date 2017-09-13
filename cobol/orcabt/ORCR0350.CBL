@@ -423,6 +423,8 @@
       *                                     記録するよう変更
       *  04.08.18    NACL-門脇    17/08/28  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
+      *
+      *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -812,8 +814,15 @@
       *    処置の加算項目の有無フラグ
            03  WRK-SRYKBN40-KOKUJISKBKBN1
                                        PIC 9(01).
+      *
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
       *
            03  WRK-HENYMDG             PIC 9(08).
            03  WRK-HENYMDGR            REDEFINES   WRK-HENYMDG.
@@ -825,6 +834,10 @@
            03  WRK-EDYMD-R             REDEFINES   WRK-EDYMD.
                05  FILLER              PIC X(06).
                05  WRK-EDDD            PIC 9(02).
+      *
+           03  WRK-CNT                 PIC 9(10).
+           03  WRK-CNT-X               REDEFINES   WRK-CNT
+                                       PIC X(10).
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
@@ -1864,6 +1877,8 @@
       *
            COPY    "MCPAREA".
       *
+      *    PUSH
+           COPY    "CPPUSHBATCH01.INC".
       *
       ****************************************************************
        LINKAGE                 SECTION.
@@ -9808,6 +9823,9 @@
                    RECE68-FILE
                    RECE655-FILE
       *
+      *    ＰＵＳＨ通知処理
+           PERFORM 3001-PUSH-SEC
+      *
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
@@ -9824,6 +9842,49 @@
       *
            .
        300-TERM-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＰＵＳＨ通知処理
+      *****************************************************************
+       3001-PUSH-SEC        SECTION.
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
+           IF    ( SJOBKANRI-RETURN
+                                   =   ZERO  )
+           AND   ( JOB-PARAM   NOT =   SPACE )
+               INITIALIZE                  PUSHBA01-REC
+               MOVE    JOB-PARAM (1:36)
+                                       TO  PUSHBA01API-ORCA-UID
+               MOVE    JOB-PARAM (37:36)
+                                       TO  PUSHBA01API-KARTE-UID
+               MOVE    "000"           TO  PUSHBA01API-RESULT
+               MOVE    "receipt_make"  TO  PUSHBA01-EVENT
+               IF      WRK-PARA-SRYYM  =   ZERO
+                   MOVE    "9999-12"       TO  PUSHBA01-PERFORM-MONTH
+               ELSE
+                   MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE (1:7)
+                                           TO  PUSHBA01-PERFORM-MONTH
+               END-IF
+               MOVE    JOB-UPDCNT1     TO  WRK-CNT
+               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
+      *??
+             display "push=" PUSHBA01-REC "#"
+      *??
+               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
+               MOVE    "PUSHEVENT"     TO  MCP-FUNC
+               MOVE    "push_batch01"  TO  MCP-TABLE
+               MOVE    "push_batch01"  TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           END-IF
+           .
+       3001-PUSH-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10272,6 +10333,29 @@
            MOVE    WRK-PARA-HOSPNUM    TO  RECEDAT1PARA-HOSPNUM
            .
        800-FILENM-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYMD (1:4)      TO  WRK-HEN-YY
+               MOVE    WRK-SYMD (5:2)      TO  WRK-HEN-MM
+               MOVE    WRK-SYMD (7:2)      TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+           .
+       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************

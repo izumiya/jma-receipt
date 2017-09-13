@@ -70,6 +70,8 @@
       *  04.08.01    NACL-Æ£¸¶    12/01/08  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­
       *                                     ºÜÂÐ±þ
       *  04.08.02    NACL-Æ£¸¶    14/07/07  °ì»þ¥Ç¥£¥ì¥¯¥È¥êÂÐ±þ
+      *
+      *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -376,6 +378,17 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY      PIC X(04).
+               05  WRK-HEN-H1      PIC X(01).
+               05  WRK-HEN-MM      PIC X(02).
+               05  WRK-HEN-H2      PIC X(01).
+               05  WRK-HEN-DD      PIC X(02).
+      *
+           03  WRK-CNT             PIC 9(10).
+           03  WRK-CNT-X           REDEFINES   WRK-CNT
+                                   PIC X(10).
+      *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(1500).
            03  WRK-ERRMSG                          PIC X(1500).
@@ -486,8 +499,6 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  WRK-JINISSU2.
                05  WRK-JINISSU2Z   PIC  Z9.
            03  WRK-TOTALTENZ       PIC ZZ,ZZZ,ZZ9.
-      *
-       01  WRK-CNT                 PIC  9(5).
       *
       *    Á´³ÑÊÑ´¹ÎÎ°è
        01  TBL-SUUJI-AREA.
@@ -650,6 +661,9 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            COPY    "CPORCSMCNDATE.INC".
       *
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    PUSH
+           COPY    "CPPUSHBATCH01.INC".
       *
       ****************************************************************
        LINKAGE                 SECTION.
@@ -3265,6 +3279,12 @@ grpsys                     PERFORM 900-ORCDBMAIN-SEC
            CLOSE                       RECE110-FILE
            CLOSE                       RECE140-FILE
       *
+      *    £Ð£Õ£Ó£ÈÄÌÃÎ½èÍý
+           IF    ( WRK-PARA-SHELLID
+                                   NOT =   "RECEPTX" )
+               PERFORM 3001-PUSH-SEC
+           END-IF
+      *
            DISPLAY "RECE100  CNT-IN  :"  CNT-RECE100
            DISPLAY "         PAGE    :"  CNT-OUT
            DISPLAY "*** ORCR1060 END ***"
@@ -3274,6 +3294,7 @@ grpsys                     PERFORM 900-ORCDBMAIN-SEC
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    CNT-OUT         TO  JOB-UPDCNT
+               MOVE    CNT-RECE100     TO  JOB-UPDCNT1
 grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *
@@ -3281,6 +3302,49 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
        300-END-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ð£Õ£Ó£ÈÄÌÃÎ½èÍý
+      *****************************************************************
+       3001-PUSH-SEC        SECTION.
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
+           IF    ( SJOBKANRI-RETURN
+                                   =   ZERO  )
+           AND   ( JOB-PARAM   NOT =   SPACE )
+               INITIALIZE                  PUSHBA01-REC
+               MOVE    JOB-PARAM (1:36)
+                                       TO  PUSHBA01API-ORCA-UID
+               MOVE    JOB-PARAM (37:36)
+                                       TO  PUSHBA01API-KARTE-UID
+               MOVE    "000"           TO  PUSHBA01API-RESULT
+               MOVE    "receipt_make"  TO  PUSHBA01-EVENT
+               IF      WRK-PARA-SRYYM  =   ZERO
+                   MOVE    "9999-12"       TO  PUSHBA01-PERFORM-MONTH
+               ELSE
+                   MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE (1:7)
+                                           TO  PUSHBA01-PERFORM-MONTH
+               END-IF
+               MOVE    CNT-RECE100     TO  WRK-CNT
+               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
+      *??
+             display "push=" PUSHBA01-REC "#"
+      *??
+               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
+               MOVE    "PUSHEVENT"     TO  MCP-FUNC
+               MOVE    "push_batch01"  TO  MCP-TABLE
+               MOVE    "push_batch01"  TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           END-IF
+           .
+       3001-PUSH-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3295,6 +3359,29 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                        TO  TEMPFLPARA (SGETTEMP-ST:)
            .
        800-FILENM-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÆüÉÕÊÔ½¸½èÍý
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYMD (1:4)      TO  WRK-HEN-YY
+               MOVE    WRK-SYMD (5:2)      TO  WRK-HEN-MM
+               MOVE    WRK-SYMD (7:2)      TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+           .
+       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************

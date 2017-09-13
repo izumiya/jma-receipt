@@ -73,6 +73,9 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *  04.08.03    NACL-門脇    16/04/15  平成２８年４月改正対応
+      *
+      *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -386,7 +389,7 @@
            03  WRK-KGK9                        PIC ZZZ,ZZZ,ZZ9.
            03  WRK-KGK7                        PIC ZZZZ,ZZ9.
            03  WRK-KGK6                        PIC ZZZ,ZZ9.
-           03  WRK-KGK4                        PIC ZZZ9.
+           03  WRK-KGK4                        PIC ZZZZ.
            03  WRK-KGK2                        PIC Z9.
            03  WRK-KGK10                       PIC ZZ,ZZZ,ZZ9.
       *
@@ -421,6 +424,18 @@
            03  WRK-SRYKANAME       PIC X(40).
       *
            03  WRK-SYOKUJIKEI      PIC 9(07).
+      *
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY      PIC X(04).
+               05  WRK-HEN-H1      PIC X(01).
+               05  WRK-HEN-MM      PIC X(02).
+               05  WRK-HEN-H2      PIC X(01).
+               05  WRK-HEN-DD      PIC X(02).
+      *
+           03  WRK-CNT             PIC 9(10).
+           03  WRK-CNT-X           REDEFINES   WRK-CNT
+                                   PIC X(10).
+      *
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -531,8 +546,6 @@
            03  WRK-TOTALTENZ       PIC  ZZ,ZZZ,ZZ9.
            03  WRK-TENSU2.
                05  WRK-TENSU2Z     PIC  ------Z.
-      *
-       01  WRK-CNT                 PIC  9(5).
       *
        01  WRK-ERR-MSG-AREA.
            03  WRK-ERR-MSG-1.
@@ -648,6 +661,10 @@
        01  BTPARA-REC.
            COPY    "CPBTPARA.INC".
       *
+      *    ジョブ管理マスタ
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -675,13 +692,8 @@
       *
            COPY    "CPORCSGETTEMP.INC".
       *
-      *****************************************************************
-      *    ファイルレイアウト
-      *****************************************************************
-      *
-      *    ジョブ管理マスタ
-       01  JOBKANRI-REC.
-           COPY    "CPJOBKANRI.INC".
+      *    PUSH
+           COPY    "CPPUSHBATCH01.INC".
       *
       ****************************************************************
        LINKAGE                 SECTION.
@@ -2006,7 +2018,7 @@
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >       4
-               IF      RECE200-SHOKUJIKHNRYO (IDX) >   ZERO      
+               IF      RECE200-SHOKUJIKHNNISSU (IDX) >   ZERO
                    MOVE    RECE200-SHOKUJIKHNRYO (IDX)
                                                TO  WRK-KGK4
                    MOVE    WRK-KGK4            TO  HCN58-SYOKHNTEN (IDX)          
@@ -2014,10 +2026,18 @@
                                                TO  WRK-KGK2
                    MOVE    WRK-KGK2            TO  HCN58-SYOKAISU  (IDX)
       *
-                   COMPUTE WRK-SYOKUJIKEI = RECE200-SHOKUJIKHNRYO  (IDX)
-                                          * RECE200-SHOKUJIKHNNISSU(IDX)
-                   MOVE    WRK-SYOKUJIKEI      TO  WRK-TENSUZ
-                   MOVE    WRK-TENSU           TO  HCN58-SYOKINGAKU(IDX)
+                   IF   RECE200-SRYYM   >=  "201604"
+                   AND  IDX              =   1
+                     MOVE    RECE200-SHOKUJIKHNRYO-KEI
+                                               TO  WRK-TENSUZ
+                     MOVE    WRK-TENSU         TO  HCN58-SYOKINGAKU(IDX)
+                   ELSE
+                     COMPUTE WRK-SYOKUJIKEI =
+                             RECE200-SHOKUJIKHNRYO(IDX) *
+                             RECE200-SHOKUJIKHNNISSU(IDX)
+                     MOVE    WRK-SYOKUJIKEI    TO  WRK-TENSUZ
+                     MOVE    WRK-TENSU         TO  HCN58-SYOKINGAKU(IDX)
+                   END-IF
                    EVALUATE    IDX
                      WHEN    4
                            MOVE    "円×"      TO  HCN58-SYOKAKERU
@@ -3536,6 +3556,12 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            CLOSE                       RECE240-FILE
            CLOSE                       RECE250-FILE
       *
+      *    ＰＵＳＨ通知処理
+           IF    ( WRK-PARA-SHELLID
+                                   NOT =   "RECEPTX" )
+               PERFORM 3001-PUSH-SEC
+           END-IF
+      *
            DISPLAY "RECE200  IN   " CNT-RECE200   
            DISPLAY "         PAGE " CNT-OUT
            DISPLAY "*** ORCR1270 END ***"
@@ -3545,6 +3571,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    CNT-OUT         TO  JOB-UPDCNT
+               MOVE    CNT-RECE200     TO  JOB-UPDCNT1
                PERFORM   900-CALL-ORCSJOB-SEC
            END-IF
       *
@@ -3552,6 +3579,49 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *
            .
        300-END-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＰＵＳＨ通知処理
+      *****************************************************************
+       3001-PUSH-SEC        SECTION.
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
+           IF    ( SJOBKANRI-RETURN
+                                   =   ZERO  )
+           AND   ( JOB-PARAM   NOT =   SPACE )
+               INITIALIZE                  PUSHBA01-REC
+               MOVE    JOB-PARAM (1:36)
+                                       TO  PUSHBA01API-ORCA-UID
+               MOVE    JOB-PARAM (37:36)
+                                       TO  PUSHBA01API-KARTE-UID
+               MOVE    "000"           TO  PUSHBA01API-RESULT
+               MOVE    "receipt_make"  TO  PUSHBA01-EVENT
+               IF      WRK-PARA-SRYYM  =   ZERO
+                   MOVE    "9999-12"       TO  PUSHBA01-PERFORM-MONTH
+               ELSE
+                   MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE (1:7)
+                                           TO  PUSHBA01-PERFORM-MONTH
+               END-IF
+               MOVE    CNT-RECE200     TO  WRK-CNT
+               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
+      *??
+             display "push=" PUSHBA01-REC "#"
+      *??
+               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
+               MOVE    "PUSHEVENT"     TO  MCP-FUNC
+               MOVE    "push_batch01"  TO  MCP-TABLE
+               MOVE    "push_batch01"  TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           END-IF
+           .
+       3001-PUSH-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3566,6 +3636,29 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        TO  TEMPFLPARA (SGETTEMP-ST:)
            .
        800-FILENM-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYMD (1:4)      TO  WRK-HEN-YY
+               MOVE    WRK-SYMD (5:2)      TO  WRK-HEN-MM
+               MOVE    WRK-SYMD (7:2)      TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+           .
+       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************

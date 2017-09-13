@@ -48,6 +48,8 @@
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
+      *
+      *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3834,6 +3836,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    CNT-OUT         TO  JOB-UPDCNT
+               MOVE    CNT-RECE82      TO  JOB-UPDCNT1
                PERFORM   900-CALL-ORCSJOB-SEC
            END-IF
       *

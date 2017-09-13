@@ -95,6 +95,8 @@
       *  04.08.01    NACL-藤原    12/01/08  包括診療分の点検用レセプト記
       *                                     載対応
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
+      *
+      *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2517,6 +2519,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            CLOSE                       RECE43-FILE
            CLOSE                       RECE47-FILE
       *
+      *
       *****IF      CNT-OUT            =   ZERO 
       *****    MOVE    "対象データがありませんでした" TO  WRK-RECEERR
       *****    PERFORM 500-ERR-HENSYU-SEC
@@ -2530,6 +2533,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    CNT-OUT         TO  JOB-UPDCNT
+               MOVE    CNT-RECE41      TO  JOB-UPDCNT1
 grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *

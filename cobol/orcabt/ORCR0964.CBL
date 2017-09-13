@@ -50,6 +50,8 @@
       *  04.08.03    NACL-Æ£¸¶    17/03/02  Ì¤¥³¡¼¥É²½ÆÃÄê´ïºà¥³¡¼¥ÉÇÑ»ßÂÐ±þ
       *  04.08.04    NACL-ÌçÏÆ    17/06/19  Ì¤¥³¡¼¥É²½ÆÃÄê´ïºà¥³¡¼¥ÉÇÑ»ßÂÐ±þ
       *                                     ½¤Àµ
+      *
+      *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3559,6 +3561,7 @@
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    CNT-OUT         TO  JOB-UPDCNT
+               MOVE    CNT-RECE82      TO  JOB-UPDCNT1
                PERFORM   900-CALL-ORCSJOB-SEC
            END-IF
       *
