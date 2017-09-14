@@ -1581,6 +1581,24 @@
                MOVE    "0013"          TO  SPA-ERRCD
                MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
            END-IF
+      *
+      *H29.9
+      *    時間外加算の時、手技料のチェック
+           IF     (SPA-ERRCD           =   SPACE )
+             AND  (WRK-COM-INPUTCD(IDX-Z)(1:3)
+                                           NOT =   "101")
+             AND  (WRK-COM-TENSIKIBETU(IDX-Z)  =   5    )
+             AND  (WRK-COM-TIMEKSNKBN (IDX-Z)
+                                           NOT =   ZERO )
+               IF    (WRK-COM-TIMEKSNKBN (IDX-SYU2)    =   ZERO)
+               AND   (WRK-COM-TUSOKUGAIKBN(IDX-SYU2)   =   "0" )
+      *           時間外加算不可で、通則対象は剤分離
+                   MOVE    "0010"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
+               END-IF
+           END-IF
+      *
+      *
       *    低体重児加算チェック
            IF      SPA-ERRCD           =   SPACE
                IF      WRK-COM-INPUTCD(IDX-Z)   =   "150306890" 
