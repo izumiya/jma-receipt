@@ -655,7 +655,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
                                        TO  SHELLTBL-ARG7
                         
                MOVE    SHELLTBL        TO  MCPDATA-REC
-               MOVE    "SHELL"         TO  MCP-FUNC
+               IF    ( WRK-PARA-PRTFLG     =  "7" )
+                   MOVE    "EXCOMMAND" TO  MCP-FUNC
+               ELSE
+                   MOVE    "SHELL"     TO  MCP-FUNC
+               END-IF
                MOVE    "shell"         TO  MCP-TABLE
                MOVE    "daily"         TO  MCP-PATHNAME
 grpsys         PERFORM 900-ORCDBMAIN-SEC

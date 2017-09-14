@@ -238,7 +238,7 @@ class Jma_print
       @items.each {|item| create_pdf(item)}
     end
 
-    if ["3", "4", "5", "6" ].include?(@print_order)
+    if ["3", "4", "5", "6", "7" ].include?(@print_order)
       threads=[]
       MAX_THREADS.times.each_with_index do |index|
         threads << Thread.start do
@@ -248,7 +248,7 @@ class Jma_print
       threads.each {|t| t.join}
     end
 
-    concatenate_pdf if ["5", "6"].include?(@print_order)
+    concatenate_pdf if ["5", "6", "7"].include?(@print_order)
 
     @items.clear
     @print_data.clear
@@ -266,9 +266,15 @@ class Jma_print
       execute("#{ENV['MONUPLOAD']} -t report -T \"#{@report_title}\" #{monupload_options} #{out_file}")
     when "6"
       execute("lpr -P #{printer} #{out_file}")
+    when "7"
+      item = @items.first
+      execute("mv #{out_file} #{@mcp_temp_dir}/#{item[:tbl_key]}#{item[:tbl_group]}.pdf")
     end
 
     File.delete(out_file) if File.exist?(out_file)
+    pdf_files.each do |pdf_file|
+      File.delete(pdf_file) if File.exist?(pdf_file)
+    end
   end
 
   def concatenate_pdf
@@ -276,7 +282,7 @@ class Jma_print
     pdf_files=Array.new
 
     @print_data.each do |data|
-      if @show_dialog == false
+      unless @show_dialog == false or @print_order == "7"
         unless printer == data[:lp_name]
           execute_concat(pdf_files,printer)
           pdf_files.clear
