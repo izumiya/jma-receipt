@@ -1,4 +1,4 @@
-fm_invoice_receipt {
+fm_invoice_receipt_h {
   context  int;
   object  object;
   mode  int;

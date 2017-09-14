@@ -27,10 +27,10 @@
       *
       *       患者番号
               05  FMMEISAIN-PTNUM             PIC X(20).
-      *       患者カナ氏名
-              05  FMMEISAIN-KANANAME          PIC X(50).
       *       患者氏名
               05  FMMEISAIN-NAME              PIC X(50).
+      *       患者カナ氏名
+              05  FMMEISAIN-KANANAME          PIC X(50).
       *
       *       医療機関情報
               05  FMMEISAIN-HOSP-AREA.

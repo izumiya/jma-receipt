@@ -9,8 +9,8 @@ fm_statement_h {
     Printer               varchar(20);
     Patient  {
       ID                  varchar(20);
-      KanaName            varchar(50);
       Name                varchar(50);
+      KanaName            varchar(50);
     };
     Hospital  {
       Name                varchar(120)[3];
