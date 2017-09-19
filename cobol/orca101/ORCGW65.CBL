@@ -3349,7 +3349,15 @@
            MOVE    "°„Ã§À˛°‰¥µº‘…È√¥§ §∑°„∞ æÂ°‰¥µº‘…È√¥§¢§Í° ¡¥≥€°À"
                                    TO  SPA-GMN-IRYOKEIKBNMEIL (2)
       *
-           MOVE    2               TO  SPA-GMN-IRYOKEIKBN-MAX
+           MOVE    "2"             TO  SPA-GMN-IRYOKEIKBNL    (3)
+           STRING  "°„Ã§À˛°‰¥µº‘…È√¥§ §∑°„∞ æÂ°‰¥µº‘…È√¥§¢§Í° ¡¥≥€°À"
+                                       DELIMITED BY SIZE
+                   "°⁄≈¿øÙ¬–±˛°€"
+                                       DELIMITED BY SIZE
+           INTO    SPA-GMN-IRYOKEIKBNMEIL (3)
+           END-STRING
+      *
+           MOVE    3               TO  SPA-GMN-IRYOKEIKBN-MAX
       *
            .
        3110-IRYOKEIKBNLST-EXT.
