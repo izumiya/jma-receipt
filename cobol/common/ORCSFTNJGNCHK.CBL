@@ -107,6 +107,7 @@
       *  04.08.01    NACL-ÌçÏÆ    15/10/13  ÀÁµá¥¼¥í¥Õ¥é¥°ÊÔ½¸
       *  04.08.02    NACL-ÌçÏÆ    15/12/02  £°ÅÀÃÏ°è¸øÈñµ­ºÜÂÐ±þ
       *  04.08.03    NACL-ÌçÏÆ    17/06/13  ¸ºÌÈ»þ¤ÎÈ½Äê½¤Àµ
+      *  04.08.04    NACL-ÌçÏÆ    17/09/15  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -888,6 +889,15 @@
                     MOVE  "1"  TO WRK-IRYOKEIKBN-G
                   END-IF
                END-EVALUATE
+             WHEN      "2"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-G
+                 WHEN        "0"
+                    MOVE  "2"  TO WRK-IRYOKEIKBN-G
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "2"  TO WRK-IRYOKEIKBN-G
+                  END-IF
+               END-EVALUATE
            END-EVALUATE
       *
            EVALUATE  SYS-2010-IRYOKEIKBN-N
@@ -900,6 +910,15 @@
                  WHEN        "1"
                   IF   WRK-TEISYOTOKU2  NOT =  SPACE
                     MOVE  "1"  TO WRK-IRYOKEIKBN-N
+                  END-IF
+               END-EVALUATE
+             WHEN      "2"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-N
+                 WHEN        "0"
+                    MOVE  "2"  TO WRK-IRYOKEIKBN-N
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "2"  TO WRK-IRYOKEIKBN-N
                   END-IF
                END-EVALUATE
            END-EVALUATE
@@ -2398,10 +2417,10 @@
       *****************************************************************
        2004114-FTNJGNCHK-HENSYU-SEC            SECTION.
       *
-           IF ((LNK-FTNJGNCHK-NYUGAIKBN = "2") AND
-               (WRK-IRYOKEIKBN-G        = "1"))
-           OR ((LNK-FTNJGNCHK-NYUGAIKBN = "1") AND
-               (WRK-IRYOKEIKBN-N        = "1"))
+           IF ((LNK-FTNJGNCHK-NYUGAIKBN = "2"   ) AND
+               (WRK-IRYOKEIKBN-G    NOT =  SPACE))
+           OR ((LNK-FTNJGNCHK-NYUGAIKBN = "1"   ) AND
+               (WRK-IRYOKEIKBN-N    NOT =  SPACE))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF
