@@ -91,6 +91,7 @@ Q02A.glade	orca13	(Q02A)患者照会−検索結果（点数情報）
 Q02B.glade	orca13	(Q02B)患者照会−検索結果（診療行為情報）
 Q03.glade	orca13	(Q03)他業務連携確認
 Q04.glade	orca13	(Q04)検索条件登録
+Q05.glade	orca13	(Q05)条件並び順変更画面
 Q96.glade	orca13	(Q96)診療行為一覧選択
 Q97.glade	orca13	(Q97)処理結果
 Q98.glade	orca13	(Q98)住所検索
