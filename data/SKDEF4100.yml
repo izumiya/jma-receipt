@@ -1,0 +1,29 @@
+kanri_cd    : "4100"
+name        : "给巢板闻怠簇攫鼠"
+class_cd    : "*"
+item_max    : 4
+item_list   :
+- item_no   : 1
+  item      : "KGIIRYOKBN"
+  item_jp   : "给巢回年板闻怠簇惰尸"
+  type      : "X"
+  start     : 1
+  length    : 1
+- item_no   : 2
+  item      : "KGIIRYOCD"
+  item_jp   : "给巢板闻怠簇コ〖ド"
+  type      : "X"
+  start     : 2
+  length    : 20
+- item_no   : 3
+  item      : "KGISKYKBN"
+  item_jp   : "给巢壳闻鼠椒懒滇今惰尸"
+  type      : "X"
+  start     : 22
+  length    : 2
+- item_no   : 4
+  item      : "YOBI"
+  item_jp   : "徒洒"
+  type      : "X"
+  start     : 24
+  length    : 477

@@ -1,0 +1,53 @@
+kanri_cd    : "9101"
+name        : "医療情報連携基盤用情報"
+class_cd    : "*"
+item_max    : 8
+item_list   :
+- item_no   : 1
+  item      : "COOPBASE"
+  item_jp   : "連携基盤用データ作成"
+  type      : "X"
+  start     : 1
+  length    : 1
+- item_no   : 2
+  item      : "FILE-DIR"
+  item_jp   : "連携基盤用データファイルデイレクトリ"
+  type      : "X"
+  start     : 2
+  length    : 200
+- item_no   : 3
+  item      : "SYREC"
+  item_jp   : "傷病名レコード記録"
+  type      : "X"
+  start     : 202
+  length    : 1
+- item_no   : 4
+  item      : "JIHI"
+  item_jp   : "自費保険分作成"
+  type      : "X"
+  start     : 203
+  length    : 1
+- item_no   : 5
+  item      : "PTNUM"
+  item_jp   : "患者番号記録"
+  type      : "X"
+  start     : 204
+  length    : 1
+- item_no   : 6
+  item      : "SYBYO"
+  item_jp   : "傷病名名称全記録"
+  type      : "X"
+  start     : 205
+  length    : 1
+- item_no   : 7
+  item      : "SYBYO"
+  item_jp   : "診療行為・医薬品名称記録"
+  type      : "X"
+  start     : 206
+  length    : 1
+- item_no   : 8
+  item      : "YOBI"
+  item_jp   : "予備"
+  type      : "X"
+  start     : 207
+  length    : 294

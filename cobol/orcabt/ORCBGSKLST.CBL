@@ -191,13 +191,14 @@
       *
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC"    REPLACING  //SYS//
+                                       BY         //SYS2//.
       *
       *    施設基準コード
            COPY    "CPSK0031.INC".
       *    帳票プログラム選択情報 
            COPY    "CPSK1032.INC".
-      *    出力プリンタ情報（入院）
-           COPY    "CPSK1034.INC".
       *    帳票プログラム選択情報（入院）
            COPY    "CPSK1035.INC".
       *
@@ -449,6 +450,19 @@
                    WHEN    "1035"
       *                出力先プリンタはまとめるので対象外
                        CONTINUE
+                   WHEN    "1901"
+      *                医療機関編集情報
+                       PERFORM 220-MAIN-PRTADRS-SEC
+                   WHEN    "1902"
+                   WHEN    "1903"
+      *                医療機関編集情報はまとめるので対象外
+                       CONTINUE
+                   WHEN    "5000"
+      *                医療機関情報−入院基本
+                       PERFORM 220-MAIN-NYUIN-SEC
+                   WHEN    "5020"
+      *                医療機関情報−入院基本はまとめるので対象外
+                       CONTINUE
                    WHEN    OTHER
       *                システム管理定義取得サブチェック
                        PERFORM 220-MAIN-SUBCHK-SEC
@@ -555,24 +569,12 @@
            PERFORM 230-PRTPRO-1032-SEC
       *
       *    出力先プリンタ情報（入院）
-           INITIALIZE                  SYS-1034-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-1034-HOSPNUM
-           MOVE    "1034"          TO  SYS-1034-KANRICD
-           MOVE    SYS-KBNCD       TO  SYS-1034-KBNCD
-           MOVE    SYS-STYUKYMD    TO  SYS-1034-STYUKYMD
-           MOVE    SYS-EDYUKYMD    TO  SYS-1034-EDYUKYMD
-           MOVE    SYS-1034-REC    TO  MCPDATA-REC
-           PERFORM 900-SYS-KEY10-DBREAD-SEC
+           MOVE     "1034"         TO  WRK-KANRICD
+           PERFORM 220-MAIN-SUBCHK2-SEC
       *
-           IF      FLG-SYSKANRI2   =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1034-REC
-           ELSE
-               INITIALIZE                  SYS-1034-REC
+           IF      FLG-SYSKANRI2   =   1
                GO  TO  220-MAIN-PRTPRO-EXT
            END-IF
-      *
-      *    システム管理定義取得サブチェック
-           PERFORM 230-PRTPRO-1034-SEC
       *
       *    帳票プログラム選択情報 
            PERFORM 230-PRTPRO-1035-SEC
@@ -662,33 +664,6 @@
       *****************************************************************
       *    帳票プログラム選択情報 
       *****************************************************************
-       230-PRTPRO-1034-SEC         SECTION.
-      *
-           INITIALIZE                  ORCSSKDEFAREA
-           MOVE    "1034"          TO  ORCSSKDEF-KANRICD
-           CALL    "ORCSSKDEF"         USING
-                                       ORCSSKDEFAREA
-           MOVE     "1034"         TO  WRK-KANRICD
-      *
-           MOVE    TOKEI-MAX       TO  IDX-PRT
-           MOVE    SYS-1034-TBL    TO  WRK-MEISAI
-      *
-      *    項目をセットする
-           PERFORM VARYING IDX-MAX FROM    1   BY  1
-                   UNTIL ( IDX-MAX >   500 )
-                   OR    ( IDX-MAX >   ORCSSKDEF-ITEM-MAX )
-               PERFORM 230-TOKEI-SET-SEC
-           END-PERFORM
-      *
-           MOVE    IDX-PRT         TO  TOKEI-MAX
-      *
-           REWRITE TOKEI-REC
-           .
-       230-PRTPRO-1034-EXT.
-           EXIT.
-      *****************************************************************
-      *    帳票プログラム選択情報 
-      *****************************************************************
        230-PRTPRO-1035-SEC         SECTION.
       *
            MOVE    SPACE           TO  WRK-PRTPRO-G
@@ -760,6 +735,79 @@
            REWRITE TOKEI-REC
            .
        230-PRTPRO-1035-EXT.
+           EXIT.
+      *****************************************************************
+      *    医療機関編集情報チェック
+      *****************************************************************
+       220-MAIN-PRTADRS-SEC        SECTION.
+      *
+      *    システム管理定義取得サブチェック
+           PERFORM 220-MAIN-SUBCHK-SEC
+      *
+           MOVE     "1902"         TO  WRK-KANRICD
+           PERFORM 220-MAIN-SUBCHK2-SEC
+      *
+           MOVE     "1903"         TO  WRK-KANRICD
+           PERFORM 220-MAIN-SUBCHK2-SEC
+      *
+           .
+       220-MAIN-PRTADRS-EXT.
+           EXIT.
+      *****************************************************************
+      *    医療機関情報−入院基本チェック
+      *****************************************************************
+       220-MAIN-NYUIN-SEC        SECTION.
+      *
+      *    システム管理定義取得サブチェック
+           PERFORM 220-MAIN-SUBCHK-SEC
+      *
+           MOVE     "5020"         TO  WRK-KANRICD
+           PERFORM 220-MAIN-SUBCHK2-SEC
+      *
+           .
+       220-MAIN-NYUIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票プログラム選択情報 
+      *****************************************************************
+       220-MAIN-SUBCHK2-SEC        SECTION.
+      *
+           INITIALIZE                  SYS2KANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS2-HOSPNUM
+           MOVE    WRK-KANRICD     TO  SYS2-KANRICD
+           MOVE    SYS-KBNCD       TO  SYS2-KBNCD
+           MOVE    SYS-STYUKYMD    TO  SYS2-STYUKYMD
+           MOVE    SYS-EDYUKYMD    TO  SYS2-STYUKYMD
+           MOVE    SYS2KANRI-REC   TO  MCPDATA-REC
+           PERFORM 900-SYS-KEY10-DBREAD-SEC
+      *
+           IF      FLG-SYSKANRI2   =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS2KANRI-REC
+           ELSE
+               INITIALIZE                  SYS2KANRI-REC
+               GO  TO  220-MAIN-SUBCHK2-SEC
+           END-IF
+      *
+           INITIALIZE                  ORCSSKDEFAREA
+           MOVE    WRK-KANRICD     TO  ORCSSKDEF-KANRICD
+           CALL    "ORCSSKDEF"         USING
+                                       ORCSSKDEFAREA
+      *
+           MOVE    TOKEI-MAX       TO  IDX-PRT
+           MOVE    SYS2-KANRITBL   TO  WRK-MEISAI
+      *
+      *    項目をセットする
+           PERFORM VARYING IDX-MAX FROM    1   BY  1
+                   UNTIL ( IDX-MAX >   500 )
+                   OR    ( IDX-MAX >   ORCSSKDEF-ITEM-MAX )
+               PERFORM 230-TOKEI-SET-SEC
+           END-PERFORM
+      *
+           MOVE    IDX-PRT         TO  TOKEI-MAX
+      *
+           REWRITE TOKEI-REC
+           .
+       220-MAIN-SUBCHK2-EXT.
            EXIT.
       *****************************************************************
       *    システム管理定義取得サブチェック
@@ -984,6 +1032,10 @@
       *
            IF     ( TOKEI-KANRICD  =   "1010" )    AND
                   ( TOKEI-ITEM(IDX-MAX)    =   "業務処理権限−未使用" )
+               GO  TO  330-MEISAI-HENSYU-EXT
+           END-IF
+           IF    ( TOKEI-ITEM(IDX-MAX)    =   "未設定" )   OR
+                 ( TOKEI-ITEM(IDX-MAX)    =   "予備" )
                GO  TO  330-MEISAI-HENSYU-EXT
            END-IF
       *

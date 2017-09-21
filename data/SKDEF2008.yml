@@ -1,0 +1,53 @@
+kanri_cd    : "2008"
+name        : "レセプト編綴順情報"
+class_cd    : "*"
+item_max    : 8
+item_list   :
+- item_no   : 1
+  item      : "PREFKBN-PRTJYUN"
+  item_jp   : "県内県外"
+  type      : "X"
+  start     : 1
+  length    : 1
+- item_no   : 2
+  item      : "HKNJANUM-PRTJYUN"
+  item_jp   : "保険者"
+  type      : "X"
+  start     : 2
+  length    : 1
+- item_no   : 3
+  item      : "RECESYUBETU-PRTJYUN"
+  item_jp   : "レセプト種別"
+  type      : "X"
+  start     : 3
+  length    : 1
+- item_no   : 4
+  item      : "ZAITAKU"
+  item_jp   : "在総診・在医総"
+  type      : "X"
+  start     : 4
+  length    : 1
+- item_no   : 5
+  item      : "CHOUKI"
+  item_jp   : "長期（長期高額療養費）"
+  type      : "X"
+  start     : 5
+  length    : 1
+- item_no   : 6
+  item      : "HKNJANUM"
+  item_jp   : "医療機関の所在地保険者"
+  type      : "X"
+  start     : 6
+  length    : 8
+- item_no   : 7
+  item      : "HKNJANUM-PRTKBN"
+  item_jp   : "医療機関の所在地保険者印刷位置"
+  type      : "X"
+  start     : 14
+  length    : 1
+- item_no   : 8
+  item      : "YOBI"
+  item_jp   : "予備"
+  type      : "X"
+  start     : 15
+  length    : 486
