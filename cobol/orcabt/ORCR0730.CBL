@@ -241,6 +241,8 @@
       *                                     µ­ºÜ¤¹¤ë¤è¤¦ÊÑ¹¹
       *  04.08.20    NACL-ÌçÏÆ    17/08/28  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
+      *  04.08.21    NACL-ÌçÏÆ    17/09/26  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
+      *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *
       *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
       *****************************************************************
@@ -7447,8 +7449,11 @@
       *
            MOVE    ZERO            TO  FLG-LINE
       *
-           IF    ( RECE62-TEISYOTOKU3  =   "4" )
-           AND   ( RECE62-SEIKATURYOYO =   "1" )
+           IF   ((RECE62-TEISYOTOKU3          =   "4"    ) AND
+                 (RECE62-SEIKATURYOYO         =   "1"    ))
+           OR   ((RECE62-TEISYOTOKU3-KKSKBN   =   "1"    ) AND
+                 (RECE62-SEIKATURYOYO         =   "1"    ) AND
+                 (RECE62-SRYYM               >=  "201710"))
       *        Å¦Í×Íó¤ËÉÂÌ¾¤¬É½¼¨¤µ¤ì¤Æ¤¤¤ë¾ì¹ç¡¢£±¹Ô¤¢¤±¤ë
                IF  WRK-LINETEK             >   ZERO
       *
@@ -7465,18 +7470,34 @@
                    PERFORM 34120-PAGE-SEC
                END-IF
                ADD     1               TO  WRK-LINETEK
-               IF      CNT-PAGE        =   1   
-                   MOVE    "Ï·Ê¡"          TO  HC06-TEKIYO (WRK-LINETEK)
-               ELSE
+               IF   (RECE62-TEISYOTOKU3   = "4")
+               AND  (RECE62-SEIKATURYOYO  = "1")
+                 IF    CNT-PAGE        =   1
+                       MOVE  "Ï·Ê¡"        TO  HC06-TEKIYO (WRK-LINETEK)
+                 ELSE
                    EVALUATE    SYS-2005-NEXTPRTKBN
-                       WHEN    "0"   
-                           MOVE    "Ï·Ê¡"  TO  HC061-TEKIYO(WRK-LINETEK)
-                       WHEN    "1"   
-                           MOVE    "Ï·Ê¡"  TO  HC062-TEKIYO(WRK-LINETEK)
-                       WHEN    "2"   
-                           MOVE    "Ï·Ê¡"  TO  HC063-TEKIYO(WRK-LINETEK)
+                     WHEN    "0"
+                       MOVE  "Ï·Ê¡"        TO  HC061-TEKIYO(WRK-LINETEK)
+                     WHEN    "1"
+                       MOVE  "Ï·Ê¡"        TO  HC062-TEKIYO(WRK-LINETEK)
+                     WHEN    "2"
+                       MOVE  "Ï·Ê¡"        TO  HC063-TEKIYO(WRK-LINETEK)
                    END-EVALUATE
-               END-IF    
+                 END-IF
+               ELSE
+                 IF    CNT-PAGE        =   1
+                       MOVE  "¶­³¦ÁØ³ºÅö"  TO  HC06-TEKIYO (WRK-LINETEK)
+                 ELSE
+                   EVALUATE    SYS-2005-NEXTPRTKBN
+                     WHEN    "0"
+                       MOVE  "¶­³¦ÁØ³ºÅö"  TO  HC061-TEKIYO(WRK-LINETEK)
+                     WHEN    "1"
+                       MOVE  "¶­³¦ÁØ³ºÅö"  TO  HC062-TEKIYO(WRK-LINETEK)
+                     WHEN    "2"
+                       MOVE  "¶­³¦ÁØ³ºÅö"  TO  HC063-TEKIYO(WRK-LINETEK)
+                   END-EVALUATE
+                 END-IF
+               END-IF
       *
                MOVE    ZERO            TO  FLG-LINE
            END-IF

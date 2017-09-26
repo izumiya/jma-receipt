@@ -240,6 +240,8 @@
       *                                     個々に項目を設ける事に伴う修正
       *  04.08.05    NACL-藤原    16/07/20  ＥＦファイル作成対応
       *  04.08.06    NACL-藤原    17/03/31  同日再入院の入退院履歴のチェック
+      *  04.08.07    NACL-門脇    17/09/26  平成２９年１０月改正
+      *                                     （入院時生活療養の見直し）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2194,6 +2196,8 @@
                    ELSE
                      MOVE  LNK-SYOTOKU-SKJKBN(LNK-SYOTOKU-SKJIDX)
                                     TO  RECE62-TEISYOTOKU3
+                     MOVE  LNK-SYOTOKU-KKSKBN(LNK-SYOTOKU-SKJIDX)
+                                    TO  RECE62-TEISYOTOKU3-KKSKBN
                    END-IF
                 ELSE
                    MOVE  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX)

@@ -749,6 +749,8 @@
       *                                     （高額療養費制度の見直し）
       *  04.08.41    NACL-門脇    17/08/28  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
+      *  04.08.42    NACL-門脇    17/09/26  平成２９年１０月改正
+      *                                     （入院時生活療養の見直し）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -26871,6 +26873,7 @@
              AND  (RECE62-SHOKUJIRYOYOHI(4) = ZERO )
              AND  (RECE62-SHOKUJIRYOYOHI(5) = ZERO )
                MOVE   SPACE   TO   RECE62-TEISYOTOKU3
+               MOVE   SPACE   TO   RECE62-TEISYOTOKU3-KKSKBN
              END-IF
            END-IF
       *
