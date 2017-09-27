@@ -2672,7 +2672,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-COM-CUR (IDX)   =   SPACE
                    MOVE    SPA-GMN-INPUTCD(IDX)
                                            TO  SPA-MAE-INPUTCD(IDX)
+      *H29.10
+      *   追加前の警告表示対応
+               ELSE
+      *            エラーがあれば再チェック
+                   MOVE    SPACE           TO  SPA-MAE-INPUTCD(IDX)
+                   IF     (IDX             <=  IDX-STR2)
+                     AND  (SPA-ERRCD(1:1)  =   "K"     )
+      *                追加前の警告フラグクリアする
+                       MOVE    "C"         TO  SPA-COM-KZMFLG (IDX)
+                   END-IF
                END-IF
+      *!!!
       *        追加時にエラーがあれば、再読込みを行う
                IF    ((WRK-ERRCD1      NOT =   SPACE )  OR
                       (WRK-ERRCD3      NOT =   SPACE ))
@@ -2694,10 +2705,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *H27.12
       *    警告フラグクリア
-           PERFORM VARYING IDX     FROM    IDX-STR3   BY  1
+      ***  PERFORM VARYING IDX     FROM    IDX-STR3   BY  1
+      *H29.10
+           PERFORM VARYING IDX     FROM    1          BY  1
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+      *H29.10
+            IF   (IDX              >=  IDX-STR3 )
+             OR  (SPA-COM-KZMFLG (IDX) =   "C"  )
                MOVE    SPACE           TO  SPA-COM-KZMFLGAREA (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1(IDX)
@@ -2706,6 +2722,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPACE               TO  SPA-COM-HKEIFLG (IDX)
                    MOVE    SPACE               TO  SPA-COM-HCHKFLG (IDX)
                END-IF
+              END-IF
            END-PERFORM
       *
            MOVE    SPACE               TO  SPA-ERRCD
@@ -13718,7 +13735,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "red"               TO  K02-KOHMSG-STYLE
                MOVE    SPA-GMN-KOHMSG      TO  K02-KOHMSG-VALUE
            END-IF
-      *TEST
+      *
       *H28.5
       *    処方名切替え
            IF     (SPA-GMN-PTNUM   NOT =   SPACE     )
@@ -13986,7 +14003,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        5002-SURYO-HEN-EXT.
            EXIT.
-      *TEST
+      *
       *H26.10
       *****************************************************************
       *    診療人数合計編集処理
@@ -14015,8 +14032,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        50021-MEISYOHEN-SEC-EXT.
            EXIT.
-      *TEST
-      *TEST
       *
       *****************************************************************
       *    リハビリ・患者情報編集処理
@@ -15194,7 +15209,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        990-DBCLOSE-EXT.
            EXIT.
-      *TEST
+      *
       *****************************************************************
       *    一時保存テーブル読み込み
       *****************************************************************
@@ -15272,7 +15287,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        910-SPATMP-CALL-EXT.
            EXIT.
-      *TEST
       *
       *****************************************************************
       *    排他制御処理
