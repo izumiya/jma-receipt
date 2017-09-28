@@ -114,7 +114,7 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
-           03  FLG-I001                PIC 9(01).
+           03  FLG-PTSRH               PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTNYUINRRK          PIC 9(01).
       *
@@ -171,6 +171,7 @@
            03  WRK-ENCODING9           REDEFINES WRK-ENCODING
                                        PIC 9(01).
            03  WRK-HKNMEI              PIC X(50).
+           03  WRK-OFFSET              PIC 9(05).
       *
        01  CSV-EDIT-AREA.
            03  CSV-NO                  PIC Z(9)9.
@@ -276,9 +277,16 @@
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
       *
+      *    患者照会
+       01  PTSRH-REC.
+           COPY    "CPPTSRH.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    入院患者照会サブ
+           COPY    "CPI2SUB02.INC".
       *
       *    monpe印刷データ泣き別れ修正サブ
            COPY  "CPORCSFIXREDDATA.INC".
@@ -370,6 +378,7 @@
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
+           MOVE    WRK-PARA-TERMID     TO  SPA-TERMID
       *
       *    ＤＢオープン
            PERFORM 120-DBOPEN-SEC
@@ -470,11 +479,8 @@
            MOVE    ZERO            TO  CNT-LINE
                                        CNT-KNS
       *
-      *    入院患者照会ビュー検索処理
-           PERFORM 900-I001-KEY-SEL-SEC
-      *
-      *    入院患者照会ビュー読み飛ばし処理
-           PERFORM 910-I001-KEY-SKIP-SEC
+      *    患者対象データ検索処理
+           PERFORM 900-PTSRH-ODR-SEL-SEC
       *
       *    処理件数算出
            COMPUTE WRK-PROC-KNS    =   WKBI201-EDKNS
@@ -488,7 +494,15 @@
       *
            PERFORM VARYING CNT-KNS     FROM    1   BY  1
                    UNTIL ( CNT-KNS     >   WRK-PROC-KNS )
-                   OR    ( FLG-I001    =   1 )
+                   OR    ( FLG-PTSRH   =   1 )
+      *
+               INITIALIZE                  I2SUB02-AREA
+               MOVE    "I"             TO  I2SUB02-MODE
+               MOVE    PTSRH-MEMO      TO  I2SUB02-MEMO
+               CALL    "ORCGI2SUB02"       USING
+                                           I2SUB02-AREA
+                                           I001-REC
+                                           SPA-AREA
       *
                PERFORM 900-PTNYUINRRK-KEY-SEL-SEC
       *
@@ -501,7 +515,7 @@
                END-IF
       *
       *        入院患者照会ビュー読込処理
-               PERFORM 900-I001-KEY-FET-SEC
+               PERFORM 900-PTSRH-ODR-FET-SEC
       *
            END-PERFORM
       *
@@ -513,8 +527,8 @@
            END-IF
       *
       *    入院患者照会ビュークローズ処理
-           MOVE    "view_I001"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "odr"           TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -552,6 +566,8 @@
       *        ファイル保存情報更新
                PERFORM 3001-FILE-INFO-INSERT-SEC
            END-IF
+      *
+           PERFORM 900-PTSRH-DEL1-SEC
       *
            PERFORM 900-JOB-STEP-END-SEC
       *
@@ -1195,63 +1211,6 @@
        900-SYSKANRI-KEY10-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    入院患者照会ビュー検索処理
-      *****************************************************************
-       900-I001-KEY-SEL-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-I001
-      *
-           INITIALIZE                  I001-REC
-           MOVE    BI201-SQL       TO  I001-SQL
-           MOVE    I001-REC        TO  MCPDATA-REC
-           MOVE    "view_I001"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  I001-REC
-           ELSE
-               MOVE    1           TO  FLG-I001
-           END-IF
-      *
-           .
-       900-I001-KEY-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    入院患者照会ビュー読込処理
-      *****************************************************************
-       900-I001-KEY-FET-SEC           SECTION.
-      *
-           MOVE    ZERO            TO  FLG-I001
-      *
-           MOVE    "view_I001"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  I001-REC
-           ELSE
-               MOVE    1               TO  FLG-I001
-           END-IF
-      *
-           .
-       900-I001-KEY-FET-EXT.
-           EXIT.
-      *****************************************************************
-      *    入院患者照会ビュー読み飛ばし処理
-      *****************************************************************
-       910-I001-KEY-SKIP-SEC      SECTION.
-      *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1        >=  WKBI201-STKNS )
-                   OR    ( FLG-I001    =   1 )
-      *        入院患者照会ビュー読込処理
-               PERFORM 900-I001-KEY-FET-SEC
-           END-PERFORM
-      *
-           .
-       910-I001-KEY-SKIP-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    ステップ管理開始処理
       *****************************************************************
        900-JOB-STEP-START-SEC      SECTION.
@@ -1331,6 +1290,79 @@
            .
       *
        900-PTNYUINRRK-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会検索処理
+      *****************************************************************
+       900-PTSRH-ODR-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTSRH
+      *
+           COMPUTE WRK-OFFSET = WKBI201-STKNS - 1
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "4"             TO  PTSRH-DATAKBN
+           MOVE    "%"             TO  PTSRH-UPYMD
+           MOVE    "%"             TO  PTSRH-UPHMS
+           STRING  " ORDER BY SEQNUM " DELIMITED BY SIZE
+                   " OFFSET "          DELIMITED BY SIZE
+                   WRK-OFFSET          DELIMITED BY SIZE
+           INTO    PTSRH-SQL
+           END-STRING
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "odr"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTSRH-REC
+           ELSE
+               MOVE    1           TO  FLG-PTSRH
+               INITIALIZE              PTSRH-REC
+           END-IF
+      *
+           .
+      *
+       900-PTSRH-ODR-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会検索処理
+      *****************************************************************
+       900-PTSRH-ODR-FET-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-PTSRH
+      *
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "odr"           TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  PTSRH-REC
+           ELSE
+               MOVE    1           TO  FLG-PTSRH
+               INITIALIZE              PTSRH-REC
+           END-IF
+      *
+           .
+      *
+       900-PTSRH-ODR-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL1-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "4"             TO  PTSRH-DATAKBN
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del1"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL1-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ　接続処理
@@ -1442,4 +1474,32 @@
            .
       *
        910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ追加処理
+      *****************************************************************
+       910-DBINSERT-SEC                 SECTION.
+      *
+           MOVE    "DBINSERT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ削除処理
+      *****************************************************************
+       910-DBDELETE-SEC                 SECTION.
+      *
+           MOVE    "DBDELETE"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBDELETE-EXT.
            EXIT.

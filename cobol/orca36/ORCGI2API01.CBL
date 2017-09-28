@@ -16,14 +16,14 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION      DIVISION.
-       PROGRAM-ID.         ORCGQAPI01.
+       PROGRAM-ID.         ORCGI2API01.
       *****************************************************************
       *  システム名        : 日医標準レセプトソフト
       *  サブシステム名    : API連携用モジュール
-      *  コンポーネント名  : 患者照会
+      *  コンポーネント名  : 入院患者照会
       *  管理者            :
       *  作成日付    作業者        記述
-      *  16/10/31    NACL−太田　新規作成
+      *  17/09/17    NACL−太田　新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
@@ -42,7 +42,7 @@
       *
       *    スパ領域
            COPY    "COMMON-SPA".
-           COPY    "Q01SCR-SPA".
+           COPY    "I2SCR-SPA".
       *
        01  FLG-AREA.
            03  FLG-SYSKANRI            PIC 9(01).
@@ -74,9 +74,9 @@
                05  WRK-TIME-FL2        PIC X(01).
                05  WRK-TIME-SS         PIC 9(02).
       *
-           COPY    "CPFINDV3REQ.INC"  REPLACING
-                                      //XML-//     BY  //TXML-//
-                                      //FINDREQ-// BY  //TFINDREQ-//.
+           COPY    "CPHSFINDV3REQ.INC" REPLACING
+                               //XML-//        BY  //TXML-//
+                               //HSFINDREQ-//  BY  //THSFINDREQ-//.
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -88,9 +88,9 @@
            COPY    "CPORCSMCNDATE.INC".
       *
       *    API XML読み込み用定義体
-           COPY    "CPFINDV3REQ.INC".
+           COPY    "CPHSFINDV3REQ.INC".
       *    API XML書き込み用定義体
-           COPY    "CPFINDV3RES.INC".
+           COPY    "CPHSFINDV3RES.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -108,8 +108,8 @@
             COPY    "ORCA-SPA".
             COPY    "LINKAREA".
       *
-       01  SCRAREA.
-           COPY    "ORCA13SCRAREA.INC".
+       01 SCRAREA.
+           COPY    "ORCA36SCRAREA.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -131,8 +131,8 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  SPA-AREA
       *
-           MOVE    SPACE           TO  SPA-Q01FREE
-           INITIALIZE                  SPA-Q01FREE
+           MOVE    SPACE           TO  SPA-I2FREE
+           INITIALIZE                  SPA-I2FREE
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -159,8 +159,8 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                  XML-FINDV3REQ
-                                       XML-FINDV3RES
+           INITIALIZE                  XML-HSFINDREQ
+                                       XML-HSFINDRES
       *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
@@ -226,22 +226,14 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
-           EVALUATE    FINDREQ-REQNUM
+      *
+           EVALUATE    HSFINDREQ-REQNUM
            WHEN    "01"
-               CALL    "ORCGQAPI01S01" USING
-                                       SCRAREA
-                                       XML-FINDV3REQ
-                                       SPA-AREA
-           WHEN    "02"
-               CALL    "ORCGQAPI01S02" USING
-                                       SCRAREA
-                                       XML-FINDV3REQ
-                                       SPA-AREA
-           WHEN    "99"
-               CALL    "ORCGQAPI01S99" USING
-                                       SCRAREA
-                                       XML-FINDV3REQ
-                                       SPA-AREA
+      *
+               CALL    "ORCGI2API01S01"    USING
+                                           SCRAREA
+                                           XML-HSFINDREQ
+                                           SPA-AREA
            WHEN    OTHER
                MOVE    "0091"          TO  SPA-ERRCD
                PERFORM 990-EXIT-PROGRAM-SEC
@@ -310,9 +302,9 @@
       *
            MOVE    SPA-MOTOPG      TO  WRK-MOTOPG
            MOVE    "API"           TO  SPA-MOTOPG
-           CALL    "ORCGQERRMSG"   USING
+           CALL    "ORCGI2ERRMSG"  USING
                                    SPA-AREA
-                                   SPA-Q01FREE
+                                   SPA-I2FREE
            MOVE    WRK-MOTOPG      TO  SPA-MOTOPG
       *
            .
@@ -322,30 +314,30 @@
       *****************************************************************
       *    XML情報から内容を取り出す
       *****************************************************************
-       900-XML-READ-SEC             SECTION.
+       900-XML-READ-SEC            SECTION.
       *
-           IF    ( QAPI01-BODY     NOT =   LOW-VALUE )
-               DISPLAY "findv3 object is not low_value"
+           IF    ( I2API01-BODY    NOT =   LOW-VALUE )
+               DISPLAY "hsfindv3 object is not low_value"
            END-IF
       *
-           INITIALIZE                      XML-FINDV3REQ
+           INITIALIZE                      XML-HSFINDREQ
       * XML情報取り出し
-           MOVE    "xml_findv3req"     TO  MCP-TABLE
+           MOVE    "xml_hsfindv3req"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    QAPI01-BODY         TO  FINDREQ-OBJECT
-           MOVE    ZERO                TO  FINDREQ-MODE
+           MOVE    I2API01-BODY        TO  HSFINDREQ-OBJECT
+           MOVE    ZERO                TO  HSFINDREQ-MODE
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            CALL    "MONFUNC"           USING
                                        MCPAREA
-                                       XML-FINDV3REQ
+                                       XML-HSFINDREQ
            IF    ( MCP-RC              =   ZERO  OR  1 )
-               MOVE    "xml_findv3req" TO  MCP-TABLE
+               MOVE    "xml_hsfindv3req" TO  MCP-TABLE
                MOVE    "key"           TO  MCP-PATHNAME
-               MOVE    "findv3req"     TO  FINDREQ-RECORDNAME
+               MOVE    "hsfindv3req"   TO  HSFINDREQ-RECORDNAME
                MOVE    "XMLREAD"       TO  MCP-FUNC
                CALL    "MONFUNC"       USING
                                        MCPAREA
-                                       XML-FINDV3REQ
+                                       XML-HSFINDREQ
                IF    ( MCP-RC          =   ZERO  OR  1 )
                    CONTINUE
                ELSE
@@ -357,16 +349,16 @@
                MOVE   "0097"           TO  SPA-ERRCD
            END-IF
       *
-           MOVE    XML-FINDV3REQ       TO  TXML-FINDV3REQ
+           MOVE    XML-HSFINDREQ       TO  TXML-HSFINDREQ
       *
-           MOVE    "xml_findv3req"     TO  MCP-TABLE
+           MOVE    "xml_hsfindv3req"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDV3REQ
+                                           XML-HSFINDREQ
       *
-           MOVE    TXML-FINDV3REQ      TO  XML-FINDV3REQ
+           MOVE    TXML-HSFINDREQ      TO  XML-HSFINDREQ
       *
            .
        900-XML-READ-EXT.
@@ -376,62 +368,59 @@
       *****************************************************************
        900-XML-WRITE-SEC             SECTION.
       *
-           MOVE    FINDREQ-REQNUM            TO  FINDRES-REQNUM
-           MOVE    FINDREQ-KARTE-UID         TO  FINDRES-KARTE-UID
-      *
            MOVE    SMCNDATE-YMD    TO  WRK-SYMD
            PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE        TO  FINDRES-INFORMATION-DATE
+           MOVE    WRK-DATE        TO  HSFINDRES-INFORMATION-DATE
       *
            MOVE    SMCNDATE-HMS    TO  WRK-HMS
            PERFORM 800-TIME-SEC
-           MOVE    WRK-TIME        TO  FINDRES-INFORMATION-TIME
+           MOVE    WRK-TIME        TO  HSFINDRES-INFORMATION-TIME
       *
            PERFORM 890-ERRCD-MSG-SEC
            IF    ( SPA-ERRCD       =   ZERO )
-               MOVE    ZERO        TO  FINDRES-API-RESULT
+               MOVE    ZERO        TO  HSFINDRES-API-RESULT
            ELSE
-               MOVE    "E"         TO  FINDRES-API-RESULT
-               MOVE    SPA-ERRCD   TO  FINDRES-API-RESULT(2:)
+               MOVE    "E"         TO  HSFINDRES-API-RESULT
+               MOVE    SPA-ERRCD   TO  HSFINDRES-API-RESULT(2:)
            END-IF
-           MOVE    SPA-Q01-ERRMSG  TO  FINDRES-API-RESULT-MSG
+           MOVE    SPA-ERRMSG      TO  HSFINDRES-API-RESULT-MSG
       *
-           MOVE    "xml_findv3res"     TO  MCP-TABLE
+           MOVE    "xml_hsfindv3res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    1                   TO  FINDRES-MODE
+           MOVE    1                   TO  HSFINDRES-MODE
            MOVE    "XMLOPEN"           TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDV3RES
+                                           XML-HSFINDRES
            IF    ( MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLOPEN failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_findv3res"     TO  MCP-TABLE
+           MOVE    "xml_hsfindv3res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    "findv3res"         TO  FINDRES-RECORDNAME
+           MOVE    "hsfindv3res"       TO  HSFINDRES-RECORDNAME
            MOVE    "XMLWRITE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDV3RES
+                                           XML-HSFINDRES
            IF     (MCP-RC              =   ZERO  OR  1  )
                CONTINUE
            ELSE
                DISPLAY "XMLWRITE failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_findv3res"     TO  MCP-TABLE
+           MOVE    "xml_hsfindv3res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "XMLCLOSE"          TO  MCP-FUNC
            CALL    "MONFUNC"               USING
                                            MCPAREA
-                                           XML-FINDV3RES
+                                           XML-HSFINDRES
            IF     (MCP-RC              =   ZERO  OR  1  )
-               MOVE    FINDRES-OBJECT  TO  QAPI01-BODY
+               MOVE    HSFINDRES-OBJECT  TO  I2API01-BODY
                MOVE    "application/xml"
-                                       TO  QAPI01-CONTENT-TYPE
+                                       TO  I2API01-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
                DISPLAY "appoint xml write failure "
@@ -446,7 +435,7 @@
        990-EXIT-PROGRAM-SEC            SECTION.
       *
            IF    ( SPA-ERRCD           =   "0099" )
-               MOVE    404             TO  QAPI01-HTTPSTATUS
+               MOVE    404             TO  I2API01-HTTPSTATUS
            ELSE
                PERFORM 900-XML-WRITE-SEC
            END-IF

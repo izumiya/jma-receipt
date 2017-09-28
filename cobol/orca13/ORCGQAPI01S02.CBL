@@ -565,6 +565,7 @@
                MOVE    SPA-SYSYMD  TO  SYS-STYUKYMD
                                        SYS-EDYUKYMD
                PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC TO SYS-5001-REC
                MOVE    SYS-5001-BTU-NAME
                                    TO  FINDRES-BTUNAME (IDXL)
       *

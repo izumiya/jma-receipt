@@ -536,6 +536,7 @@ RECORD_files = \
 	patientlst6v2.rec \
 	tmedicalmodv2.rec \
 	diseasev3.rec \
+	hsfindv3.rec \
 
 DEF_files = \
 
@@ -1010,8 +1011,8 @@ DB_files = \
 	xml_tmedicalmodv2res.db \
 	xml_diseasev3req.db \
 	xml_diseasev3res.db \
-
-	
+	xml_hsfindv3req.db \
+	xml_hsfindv3res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

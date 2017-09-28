@@ -110,6 +110,10 @@
                        09  PTSRH-R4-ZAIKAISU       PIC X(03).
                    07  PTSRH-R4-FIL                PIC X(7965).
       *データ区分
+      *    0:検索中
+      *    1:検索結果
+      *    2:出力用データ(orca13)
+      *    3:出力用データ(orca36)
            03  PTSRH-DATAKBN      PIC X(1).
       *連番
            03  PTSRH-SEQNUM       PIC 9(07).

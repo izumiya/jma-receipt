@@ -71,13 +71,8 @@
       *
            COPY    "LINKAREA".
       *
-       01  SCRAREA.
-           COPY    "I20.INC".
-           COPY    "I21.INC".
-           COPY    "I22.INC".
-           COPY    "I23.INC".
-           COPY    "I2ERR.INC".
-           COPY    "I2ID1.INC".
+       01 SCRAREA.
+           COPY    "ORCA36SCRAREA.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
