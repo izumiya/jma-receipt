@@ -239,9 +239,6 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           INSPECT SPA-TERMID      REPLACING  ALL " "  BY  "0"
-           MOVE    SPACE           TO  SPA-TERMID (37:)
-      *
       *    XML情報取り出し
            PERFORM 900-XML-READ-SEC
            IF    ( WRK-ERRCD           NOT =   SPACE )

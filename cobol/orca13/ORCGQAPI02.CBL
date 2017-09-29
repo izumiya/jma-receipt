@@ -204,9 +204,6 @@
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
       *
-           INSPECT SPA-TERMID      REPLACING  ALL " "  BY  "0"
-           MOVE    SPACE           TO  SPA-TERMID (37:)
-      *
            IF    ( SPA-ERRCD       NOT =   SPACE )
       *
                EVALUATE    SPA-ERRCD
