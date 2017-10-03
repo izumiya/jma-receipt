@@ -22,7 +22,7 @@ fi
 #        $9  ジョブＩＤ
 #        $10 シェルＩＤ
 #        $11 ファイル出力先 1:client
-#        $12 文字コード区分 1:euc 2:s-jis
+#        $12 文字コード区分 1:euc 2:s-jis 3:utf-8
 #        $13 FILENM FOLDER
 #        $14 FILENM 
 #        $15 WKCSVファイル名
@@ -54,13 +54,21 @@ WKCSV_FILE_FULL=${MCP_TEMPDIR}/${15}
                           STDIN.readlines.each{|y| puts y.split(",").each{|x|  x.strip!}.join(",")}' <  ${WKCSV_FILE_FULL} > $2.tmp
 
                 if   [ ${11} = '1' ]; then
-#                   クライアント保存のとき固定ファイルに文字コード変換（ＥＵＣからＳ�・ｊｉｓ）
-                    if  [ ${12} = '2' ]; then
+#                 クライアント保存のとき固定ファイルに文字コード変換
+                  case ${12} in
+                    2)
+#                     EUC => SJIS
                         nkf -s -Lw $2.tmp > ${WKCSV_FILE_FULL}
                         rm  $2.tmp
-                    else 
-                        mv  $2.tmp ${WKCSV_FILE_FULL}
-                    fi
+                      ;;
+                    3)
+#                     EUC => UTF8
+                      nkf --ic=EUC-JIS-2004 --oc=UTF-8 $2.tmp | tru8.rb > ${WKCSV_FILE_FULL}
+                      rm  $2.tmp
+                      ;;
+                    *)
+                      mv  $2.tmp ${WKCSV_FILE_FULL}
+                  esac
                 else
                     mv  $2.tmp $2
                     rm  ${WKCSV_FILE_FULL}

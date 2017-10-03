@@ -163,6 +163,7 @@ ruby_sources = \
 	monthly/rosai_receden_error.rb.in \
 	daily/shrink_rp.rb.in \
 	allways/get_license_access_key.rb.in \
+	allways/tru8.rb.in \
 
 claim_sources = \
 	claim/rb/clm_rcv.rb.in \

@@ -33,10 +33,7 @@
                 04  G02-VALUE   PIC X.
               03  G02-DATAKBN1.
                 04  G02-VALUE   PIC X.
-              03  G02-CDKBN1.
-                04  G02-VALUE   PIC X.
-              03  G02-CDKBN2.
-                04  G02-VALUE   PIC X.
+              03  G02-CDKBN     PIC X OCCURS 3.
               03  G02-FILENM1.
                 04  G02-VALUE   PIC X(150).
               03  G02-FILENM2.

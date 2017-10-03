@@ -253,7 +253,9 @@
            MOVE    "£Å£Õ£Ã"        TO  SPA-GMN-XG02-CDKBNMEIL(1)
            MOVE    "2"             TO  SPA-GMN-XG02-CDKBNL   (2)
            MOVE    "£Ó¡Ý£ê£é£ó"    TO  SPA-GMN-XG02-CDKBNMEIL(2)
-           MOVE    2               TO  SPA-GMN-XG02-CDKBN-MAX
+           MOVE    "3"             TO  SPA-GMN-XG02-CDKBNL   (3)
+           MOVE    "£Õ£Ô£Æ¡Ý£¸"    TO  SPA-GMN-XG02-CDKBNMEIL(3)
+           MOVE    3               TO  SPA-GMN-XG02-CDKBN-MAX
            MOVE    SPA-GMN-XG02-CDKBNLST (1)
                                    TO  SPA-GMN-XG02-CDKBN-G
       *

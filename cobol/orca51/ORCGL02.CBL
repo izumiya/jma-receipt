@@ -381,8 +381,9 @@
       *
            MOVE    "T"             TO  SPA-GMN-L02-KOJINKBN1-VALUE
            MOVE    "F"             TO  SPA-GMN-L02-KOJINKBN2-VALUE
-           MOVE    "T"             TO  SPA-GMN-L02-CDKBN1-VALUE
-           MOVE    "F"             TO  SPA-GMN-L02-CDKBN2-VALUE
+           MOVE    "T"             TO  SPA-GMN-L02-CDKBN-VALUE (1)
+           MOVE    "F"             TO  SPA-GMN-L02-CDKBN-VALUE (2)
+           MOVE    "F"             TO  SPA-GMN-L02-CDKBN-VALUE (3)
       *
            MOVE    1               TO  SPA-GMN-L02-CUR
       *
@@ -470,6 +471,7 @@
       *    文字コード
                WHEN    "CLICKED"       ALSO    "CDKBN1"
                WHEN    "CLICKED"       ALSO    "CDKBN2"
+               WHEN    "CLICKED"       ALSO    "CDKBN3"
                    PERFORM 400-CDKBN-SEC
            END-EVALUATE
       *
@@ -752,8 +754,9 @@
       *    画面をＳＰＡセット
            PERFORM 4101-GMN-SPA-SET-SEC
       *
-           MOVE    L02-CDKBN1      TO  SPA-GMN-L02-CDKBN1-VALUE
-           MOVE    L02-CDKBN2      TO  SPA-GMN-L02-CDKBN2-VALUE
+           MOVE    L02-CDKBN(1)    TO  SPA-GMN-L02-CDKBN-VALUE (1)
+           MOVE    L02-CDKBN(2)    TO  SPA-GMN-L02-CDKBN-VALUE (2)
+           MOVE    L02-CDKBN(3)    TO  SPA-GMN-L02-CDKBN-VALUE (3)
       *
            MOVE    1               TO  SPA-GMN-L02-CUR     
            .
@@ -915,11 +918,16 @@
                WHEN    SPA-GMN-L02-KOJINKBN2-VALUE =   "T"
                    MOVE    "2"         TO  SHELLTBL-ARG11
            END-EVALUATE
+           DISPLAY  SPA-GMN-L02-CDKBN-VALUE(1)
+                    " - " SPA-GMN-L02-CDKBN-VALUE(2)
+                    " - " SPA-GMN-L02-CDKBN-VALUE(3)
            EVALUATE    TRUE
-               WHEN    SPA-GMN-L02-CDKBN1-VALUE    =   "T"
+               WHEN    SPA-GMN-L02-CDKBN-VALUE (1) =   "T"
                    MOVE    "1"         TO  SHELLTBL-ARG12
-               WHEN    SPA-GMN-L02-CDKBN2-VALUE    =   "T"
+               WHEN    SPA-GMN-L02-CDKBN-VALUE (2) =   "T"
                    MOVE    "2"         TO  SHELLTBL-ARG12
+               WHEN    SPA-GMN-L02-CDKBN-VALUE (3) =   "T"
+                   MOVE    "3"         TO  SHELLTBL-ARG12
            END-EVALUATE
            MOVE    WRK-CONS-JOB-JOBID
                                    TO  SHELLTBL-ARG13
@@ -1177,8 +1185,9 @@
       *
            MOVE    SPA-GMN-L02-KOJINKBN1-VALUE TO  L02-KOJINKBN1
            MOVE    SPA-GMN-L02-KOJINKBN2-VALUE TO  L02-KOJINKBN2
-           MOVE    SPA-GMN-L02-CDKBN1-VALUE    TO  L02-CDKBN1
-           MOVE    SPA-GMN-L02-CDKBN2-VALUE    TO  L02-CDKBN2
+           MOVE    SPA-GMN-L02-CDKBN-VALUE (1) TO  L02-CDKBN(1)
+           MOVE    SPA-GMN-L02-CDKBN-VALUE (2) TO  L02-CDKBN(2)
+           MOVE    SPA-GMN-L02-CDKBN-VALUE (3) TO  L02-CDKBN(3)
       *
            MOVE    SPA-GMN-L02-NYUGAIKBN-G     TO  L02-NYUGAIKBN
            PERFORM VARYING IDX FROM    1   BY  1

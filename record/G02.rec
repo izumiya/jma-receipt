@@ -54,6 +54,9 @@ G02 {
     CDKBN2 {
       isactive bool;
     };
+    CDKBN3 {
+      isactive bool;
+    };
     FILENM1 {
       textdata varchar(150);
     };

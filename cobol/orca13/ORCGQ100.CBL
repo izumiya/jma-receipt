@@ -200,7 +200,9 @@
                    MOVE    "£Å£Õ£Ã"        TO  SPA-GMN-Q100-CDKBNMEIL(1)
                    MOVE    "2"             TO  SPA-GMN-Q100-CDKBNL   (2)
                    MOVE    "£Ó¡Ý£ê£é£ó"    TO  SPA-GMN-Q100-CDKBNMEIL(2)
-                   MOVE    2               TO  SPA-GMN-Q100-CDKBN-MAX
+                   MOVE    "3"             TO  SPA-GMN-Q100-CDKBNL   (3)
+                   MOVE    "£Õ£Ô£Æ¡Ý£¸"    TO  SPA-GMN-Q100-CDKBNMEIL(3)
+                   MOVE    3               TO  SPA-GMN-Q100-CDKBN-MAX
                    MOVE    WIDGET-NORMAL   TO  SPA-GMN-Q100-CDKBN-STATE
       *
                    IF    ( SPA-MW          =   SPA-GINBEE )

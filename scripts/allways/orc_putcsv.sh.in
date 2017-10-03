@@ -23,12 +23,12 @@ fi
 #        ${11} シェルＩＤ
 #        ${12} エラーファイル名 
 #        ${13} ファイル出力先
-#        ${14} コード区分（1:EUC 2:S-jis）
+#        ${14} コード区分（1:EUC 2:S-jis 3:utf8）
 #        ${15} TITLE
 #-------------------------------------------#
 
         LOG_FILE="/var/log/jma-receipt/${1}orcputcsv.log"
-        [ -e "${LOG_FILE}"] && rm ${LOG_FILE}
+        [ -e "${LOG_FILE}" ] && rm ${LOG_FILE}
 #
 ##      エラーファイル削除
         echo "errfile = [" ${MCP_TEMPDIR}/${12}  "]" 
@@ -50,42 +50,40 @@ fi
 	rm -f $FILE_1
 	rm -f $FILE_3
 
+
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBPUTCSV -parameter ${1},${2},${3},${4},${5},${8},${10},${11},${15},${12} 
         if  [ -e ${MCP_TEMPDIR}/${12} ]; then
             exit
         fi
 
-
-#       コード区分によりコード変換
-
-        if   [ ${14} = '2' ]; then
-            if   [ ${6} != '1' ]; then
-                 nkf -Esx -Lw $FILE_1 > ${13}
-            else
-                 nkf -Esx -Lw $FILE_1 > $FILE_3
-            fi
-            RC=$?
-            echo "--- nkf end   ---[" $RC  "]" 
-            if  [ $RC -ne '0' ]; then
-                ERRCD='0000'$RC
-                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${10}${11}'  '${ERRCD:${#ERRCD}-4:4},${1} 
-                echo "--- nkf err   ---" 
-                exit
-            fi
+        if   [ ${6} != '1' ]; then
+          CSVFILE=${13}
         else
-            if   [ ${6} != '1' ]; then
-                 cp $FILE_1  ${13}
-            else
-                 cp $FILE_1  $FILE_3
-            fi
+          CSVFILE=$FILE_3
+        fi
+
+        case ${14} in
+          2)
+#           EUC => SJIS
+            nkf -Esx -Lw $FILE_1 > ${CSVFILE}
             RC=$?
-            echo "--- cp end   ---[" $RC  "]" 
-            if  [ $RC -ne '0' ]; then
-                ERRCD='0000'$RC
-                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${10}${11}'  '${ERRCD:${#ERRCD}-4:4},${1} 
-                echo "--- cp err   ---" 
-                exit
-            fi
+            ;;
+          3)
+#           EUC => UTF8
+            nkf --ic=EUC-JIS-2004 --oc=UTF-8 $FILE_1 | tru8.rb > ${CSVFILE}
+            RC=$?
+            ;;
+          *)
+            cp $FILE_1 ${CSVFILE}
+            RC=$?
+        esac
+
+        echo "--- convert_${14} end ---[" $RC  "]" 
+        if  [ $RC -ne '0' ]; then
+          ERRCD='0000'$RC
+          $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${10}${11}'  '${ERRCD:${#ERRCD}-4:4},${1} 
+          echo "--- convert err   ---" 
+          exit
         fi
          
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${10}${11},${1} 

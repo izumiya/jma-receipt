@@ -21,7 +21,7 @@ RENNUM=0
 #        ${17} HOSPNUM
 #        ${18} ＣＳＶフラグ
 #        ${19} クライアント保存
-#        ${20} 漢字コード
+#        ${20} 漢字コード 1:euc 2:s-jis 3:utf8
 #        ${21} ＣＳＶフォルダ名
 #        ${22} ＣＳＶファイル名
 #-------------------------------------------#
@@ -54,13 +54,21 @@ RENNUM=0
                 }'  ${MCP_TEMPDIR}/${22}.wk > ${MCP_TEMPDIR}/${22}.tmp
             fi
             if   [ ${19} = '1' ]; then
-#               クライアント保存のとき固定ファイルに文字コード変換（ＥＵＣからＳ−ｊｉｓ）
-                if  [ ${20} = '2' ]; then
-                    nkf -s -Lw ${MCP_TEMPDIR}/${22}.tmp > ${MCP_TEMPDIR}/${22}.wk
-                    rm  ${MCP_TEMPDIR}/${22}.tmp
-                else
+#             クライアント保存のとき固定ファイルに文字コード変換
+              case ${20} in
+                2)
+#                 EUC => SJIS
+                  nkf -s -Lw ${MCP_TEMPDIR}/${22}.tmp > ${MCP_TEMPDIR}/${22}.wk
+                  rm  ${MCP_TEMPDIR}/${22}.tmp
+                  ;;
+                3)
+#                 EUC => UTF8
+                  nkf --ic=EUC-JIS-2004 --oc=UTF-8 ${MCP_TEMPDIR}/${22}.tmp  | tru8.rb > ${MCP_TEMPDIR}/${22}.wk
+                  rm  ${MCP_TEMPDIR}/${22}.tmp
+                  ;;
+                *)
                     mv  ${MCP_TEMPDIR}/${22}.tmp ${MCP_TEMPDIR}/${22}.wk
-                fi
+              esac
             else
 #           ディレクトリがない場合は作成する
                 if ! [ -d ${21} ]; then

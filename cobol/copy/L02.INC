@@ -17,9 +17,6 @@
                   05  L02-VALUE   PIC X(8).
                 04  L02-NYUGAIKBN-COUNT   PIC S9(9)   BINARY.
                 04  L02-NYUGAIKBN-ITEM    PIC X(8)    OCCURS  2 TIMES.
-              03  L02-CDKBN1.
-                04  L02-VALUE   PIC X.
-              03  L02-CDKBN2.
-                04  L02-VALUE   PIC X.
+              03  L02-CDKBN PIC X OCCURS 3.
               03  L02-FILENM1.
                 04  L02-VALUE   PIC X(150).

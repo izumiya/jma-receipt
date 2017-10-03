@@ -244,9 +244,8 @@
                        09  SPA-GMN-L02-KOJINKBN1-VALUE PIC X(01).
                        09  SPA-GMN-L02-KOJINKBN2-VALUE PIC X(01).
       *
-                   07  SPA-GMN-L02-CDKBN.         
-                       09  SPA-GMN-L02-CDKBN1-VALUE    PIC X(01).
-                       09  SPA-GMN-L02-CDKBN2-VALUE    PIC X(01).
+                   07  SPA-GMN-L02-CDKBN-OCC           OCCURS 3.
+                       09  SPA-GMN-L02-CDKBN-VALUE     PIC X(01).
       *
                05  SPA-NAIB-L02-AREA.
                    07  SPA-NAI-L02-SRYYMD              PIC 9(08).

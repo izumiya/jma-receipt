@@ -31,6 +31,8 @@ fi
 #        ${20} FILENM1 FOLDER（未使用）
 #-------------------------------------------#
 
+export  PATH=$SITESCRIPTSDIR/allways:$PATCHSCRIPTSDIR/allways:$SCRIPTSDIR/allways:$PATH
+
         LOG_FILE="/var/log/jma-receipt/${19}toukei2.log"
         [ -e ${LOG_FILE} ] && rm ${LOG_FILE}
 
@@ -46,6 +48,19 @@ fi
         rm  -f ${MCP_TEMPDIR}/${15}
 
         rm  -f ${MCP_TEMPDIR}/${19}TOKEI1*
+
+
+e2sjis(){
+  echo "--- nkf  [" $1 " sjis =>" $2 "]"
+  nkf -s -Lw $1 > $2
+}
+
+e2utf8(){
+  echo "--- nkf  [" $1 " utf8 =>" $2 "]"
+  nkf --ic=EUC-JIS-2004 --oc=UTF-8 -Lu $1 | tru8.rb > $2
+}
+
+
         
         if  [ ${6} -eq '2' ]; then
 	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBT110 -parameter $1,$2,$4,$5,$6,$9,${10},${13},${14},${19},${15}
@@ -63,15 +78,18 @@ fi
             exit 
         fi
 
-#       漢字コード変換（ＥＵＣからシフトＪＩＳ）
-
-        if  [ ${12} -eq '2' ]; then
-            echo "--- nkf  [" ${MCP_TEMPDIR}/${19}toukei11.dat "=>" ${MCP_TEMPDIR}/$7 "]"
-            nkf -s -Lw ${MCP_TEMPDIR}/${19}toukei11.dat > ${MCP_TEMPDIR}/$7
-        else
+#       漢字コード変換
+        case ${12} in
+          2)
+            e2sjis "${MCP_TEMPDIR}/${19}toukei11.dat" "${MCP_TEMPDIR}/$7"
+            ;;
+          3)
+            e2utf8 "${MCP_TEMPDIR}/${19}toukei11.dat" "${MCP_TEMPDIR}/$7"
+            ;;
+          *)
             echo "--- cp   [" ${MCP_TEMPDIR}/${19}toukei11.dat "=>" ${MCP_TEMPDIR}/$7 "]"
             cp  ${MCP_TEMPDIR}/${19}toukei11.dat ${MCP_TEMPDIR}/$7 
-        fi
+        esac
          
         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${13}${14},${19}
         exit 

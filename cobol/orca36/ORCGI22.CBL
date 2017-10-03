@@ -209,8 +209,10 @@
                MOVE    "1"             TO  SPA-GMN-I22-CDKBNL   (1)
                MOVE    "£Å£Õ£Ã"        TO  SPA-GMN-I22-CDKBNMEIL(1)
                MOVE    "2"             TO  SPA-GMN-I22-CDKBNL   (2)
-               MOVE    "£Ó¡Ý£ê£é£ó"    TO  SPA-GMN-I22-CDKBNMEIL(2)
-               MOVE    2               TO  SPA-GMN-I22-CDKBN-MAX
+               MOVE    "£Ó¡Ý£ê£é£ó"     TO  SPA-GMN-I22-CDKBNMEIL(2)
+               MOVE    "3"             TO  SPA-GMN-I22-CDKBNL   (3)
+               MOVE    "£Õ£Ô£Æ¡Ý£¸"     TO  SPA-GMN-I22-CDKBNMEIL(3)
+               MOVE    3               TO  SPA-GMN-I22-CDKBN-MAX
                MOVE    WIDGET-NORMAL   TO  SPA-GMN-I22-CDKBN-STATE
                MOVE    SPA-GMN-I22-CDKBNLST (1)
                                            TO  SPA-GMN-I22-CDKBN-G

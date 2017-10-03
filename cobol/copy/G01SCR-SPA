@@ -150,9 +150,8 @@
                        09  SPA-GMN-G02-HOUKATUKBN2-VALUE
                                                    PIC X(01).
       *
-                   07  SPA-GMN-G02-CDKBN.         
-                       09  SPA-GMN-G02-CDKBN1-VALUE    PIC X(01).
-                       09  SPA-GMN-G02-CDKBN2-VALUE    PIC X(01).
+                   07  SPA-GMN-G02-CDKBN-OCC       OCCURS 3.
+                       09  SPA-GMN-G02-CDKBN-VALUE PIC X(01).
       *
                05  SPA-NAIB-G02-AREA.
                    07  SPA-NAI-G02-SRYYM           PIC 9(06).
