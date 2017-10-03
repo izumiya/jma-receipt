@@ -443,6 +443,8 @@
       *                                     ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ
       *                                     ¿©»öÎÅÍÜ¡×¤ÎÌ¤ÀßÄê¥Á¥§¥Ã¥¯
       *  04.08.17    NACL-ÌçÏÆ    17/09/15  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.18    NACL-ÌçÏÆ    17/10/02  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ
+      *                                     ¿©»öÎÅÍÜ¡×¤ÎÌ¤ÀßÄê¥Á¥§¥Ã¥¯½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -574,6 +576,7 @@
            03  IDX22                   PIC  9(02).
            03  IDX23                   PIC  9(02).
            03  IDX24                   PIC  9(02).
+           03  IDX25                   PIC  9(02).
            03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
            03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
            03  IDY                     PIC  9(02)  VALUE  ZERO.
@@ -1158,6 +1161,8 @@
       *
            03  WK-IRYOKEIKBN-HANTEITEN PIC 9(08).
            03  WK-IRYOKEIKBN-MAXTEN    PIC 9(08).
+      *
+           03  WK-SHOKUJIRYOYOCD-ERR   PIC 9(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -22271,6 +22276,10 @@
                   PERFORM     23047-SHOKUJI-COUNT200604-SEC
            END-IF
       *
+           IF    WK-SHOKUJIRYOYOCD-ERR     =   1
+                  PERFORM     23048-SHOKUJI-CHECK-SEC
+           END-IF
+      *
            .
       *
        2304-SHOKUJI-KEISAN200604-EXT.
@@ -23127,6 +23136,8 @@
       *
            MOVE    SPACE                TO    WK-BRMSGK-TAXKBN
       *
+           MOVE    ZERO                 TO    WK-SHOKUJIRYOYOCD-ERR
+      *
            INITIALIZE                         SYS-5000-REC
            MOVE    "5000"               TO    SYS-5000-KANRICD
            MOVE    "*"                  TO    SYS-5000-KBNCD
@@ -23171,7 +23182,7 @@
       *
       *              ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ¿©»öÎÅÍÜ¡×¤¬Ì¤ÀßÄê»þ¤Ï¥¨¥é¡¼
                      IF     SYS-5000-SHOKUJIRYOYOCD = SPACE
-                          MOVE    33      TO   LNK-S02-RC
+                          MOVE     1      TO   WK-SHOKUJIRYOYOCD-ERR
                      END-IF
       *
                    END-IF
@@ -23223,7 +23234,7 @@
       *
       *            ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ¿©»öÎÅÍÜ¡×¤¬Ì¤ÀßÄê»þ¤Ï¥¨¥é¡¼
                    IF     SYS-5000-SHOKUJIRYOYOCD = SPACE
-                          MOVE    33      TO   LNK-S02-RC
+                          MOVE     1      TO   WK-SHOKUJIRYOYOCD-ERR
                    END-IF
       *
                    MOVE    "tbl_syskanri" TO   MCP-TABLE
@@ -23240,7 +23251,7 @@
            PERFORM   VARYING   IDX3   FROM   1   BY   1
                       UNTIL    IDX3     >   31
                IF    WK-SHOKUJIRYOYO(IDX3)  =  ZERO
-                  MOVE    33      TO   LNK-S02-RC
+                  MOVE     1      TO   WK-SHOKUJIRYOYOCD-ERR
                END-IF
            END-PERFORM
       *
@@ -24761,6 +24772,66 @@
            .
       *
        230472-SHOKUJI-HEN200604-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ¿©»öÎÅÍÜ¡×Ì¤ÀßÄê»þ¤Î
+      *        ¿©»öÎÅÍÜÈñÅù¤Î»»Äê¥Á¥§¥Ã¥¯
+      ******************************************************************
+       23048-SHOKUJI-CHECK-SEC         SECTION.
+      *
+           MOVE       LNK-SYU-SKYSTYMD(7:2)  TO   IDX-ST
+           MOVE       LNK-SYU-SKYEDYMD(7:2)  TO   IDX-ED
+      *
+           PERFORM    VARYING   IDX25   FROM   IDX-ST   BY   1
+                       UNTIL    IDX25     >    IDX-ED
+      *
+             IF     WK-NYULIFE-KBN(IDX25)   NOT =   SPACE
+      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
+               IF       ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+               AND      ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDX25)       >=   4         ))
+                      MOVE    33      TO   LNK-S02-RC
+               END-IF
+      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
+               IF       ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDX25)       >=   4         ))
+               AND      ( WK-SHOKUJI-KANFLG(IDX25) =  ZERO        )
+                      MOVE    33      TO   LNK-S02-RC
+               END-IF
+             ELSE
+               IF       ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+               AND      ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                         (WK-GAIHAKU(IDX25)       >=   4         ))
+                      MOVE    33      TO   LNK-S02-RC
+               END-IF
+             END-IF
+      *
+             IF         ( WK-ROSAITOKU95(IDX25)  NOT =  ZERO )
+             AND        ( LNK-SYU-DAY(IDX25)         =  "2"  )
+                      MOVE    33      TO   LNK-S02-RC
+             END-IF
+             IF         ( WK-ROSAITOKU96(IDX25)  NOT =  ZERO )
+             AND        ( LNK-SYU-DAY(IDX25)         =  "2"  )
+                      MOVE    33      TO   LNK-S02-RC
+             END-IF
+             IF         ( WK-ROSAITOKU97(IDX25)  NOT =  ZERO       )
+      **>    AND        ( LNK-SYU-DAY(IDX25)         =  "2"        )
+             AND        ( LNK-SYU-DAY(IDX25)         =  "1" OR "2" )
+                      MOVE    33      TO   LNK-S02-RC
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+       23048-SHOKUJI-CHECK-EXT.
            EXIT.
       *
       ******************************************************************
