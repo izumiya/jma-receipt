@@ -472,11 +472,11 @@
            MOVE    "01"                TO  SYS-EDYUKYMD(7:2)
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM   910-SYSKANRI-SELECT-SEC
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    "tbl_syskanri"  TO  MCP-TABLE
-               MOVE    "key5"          TO  MCP-PATHNAME
+               MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM  910-SYSKANRI-READ-SEC
                PERFORM  UNTIL  (FLG-SYSKANRI   =   1)  OR
                                (IDX-SYS        =   100)
@@ -493,13 +493,13 @@
       **                       WRK-SYSBTU-TSRYCD(IDX-SYS)
                  END-IF
                  MOVE    "tbl_syskanri" TO  MCP-TABLE
-                 MOVE    "key5"         TO  MCP-PATHNAME
+                 MOVE    "key2"         TO  MCP-PATHNAME
                  PERFORM  910-SYSKANRI-READ-SEC
                END-PERFORM
            END-IF
       *    システム管理クローズ
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
       *    事前に病室情報（システム管理）から病室コードを取得しておく
@@ -516,11 +516,11 @@
            MOVE    "01"                TO  SYS-EDYUKYMD(7:2)
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM   910-SYSKANRI-SELECT-SEC
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    "tbl_syskanri"  TO  MCP-TABLE
-               MOVE    "key5"          TO  MCP-PATHNAME
+               MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM  910-SYSKANRI-READ-SEC
                PERFORM  UNTIL  (FLG-SYSKANRI   =   1)  OR
                                (IDX-SYS        =   500)
@@ -537,13 +537,13 @@
       **                       WRK-SYSBRM-TSRYCD(IDX-SYS)
                  END-IF
                  MOVE    "tbl_syskanri" TO  MCP-TABLE
-                 MOVE    "key5"         TO  MCP-PATHNAME
+                 MOVE    "key2"         TO  MCP-PATHNAME
                  PERFORM  910-SYSKANRI-READ-SEC
                END-PERFORM
            END-IF
       *    システム管理クローズ
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
       *
