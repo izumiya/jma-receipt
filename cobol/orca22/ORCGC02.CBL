@@ -341,6 +341,11 @@
       *                                     のクリア
       *  04.08.13    NACL-藤原    17/07/25  自院コード検索より戻った時の
       *                                     疾患区分等の表示をする
+      *  04.08.14    NACL-藤原    17/10/05  原疾患区分が未入力の時
+      *                                     合併症区分の登録を可能とする
+      *
+      *  05.00.01    NACL-藤原    17/10/05  開始日の未来日入力の警告表示
+      *                                     の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6937,6 +6942,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
            IF      SPA-GMN-C02-SRYYMD
                                     NOT =   SPA-GMN-C02-SRYYMD-OLD
                MOVE   9                     TO  SPA-NAI-C02-UPDOWN
+               MOVE   0                     TO  SPA-NAI-C02-SRYYMD-CHK
            END-IF  
       *
            IF     SPA-GMN-C02-SRYYMD    =   SPACE
@@ -6965,12 +6971,21 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                END-IF
            END-IF
            IF      SPA-ERRCD           =   SPACE
-      *        未来日入力チェック（警告）登録時以外チェック
-               IF    ( SPA-NAI-C02-SRYYMD  >   SPA-NAI-C02-SYSYMD )
-               AND   ( FLG-TOUROKU         =   ZERO               )
-                   MOVE    "0039"          TO  SPA-ERRCD
-               END-IF
-      *
+               IF    ( MCP-WIDGET          =   "SRYYMD" )
+               OR    ( SPA-NAI-C02-SRYYMD-CHK
+                                           =   ZERO     )
+      *            未来日入力チェック（警告）登録時以外チェック
+                   IF    ( SPA-NAI-C02-SRYYMD  >   SPA-NAI-C02-SYSYMD )
+      *************AND   ( FLG-TOUROKU         =   ZERO               )
+                       MOVE    "0039"              TO  SPA-ERRCD
+                   END-IF
+      *            修正時の開始日入力以外はエラーとしない
+                   IF    ( SPA-NAI-C02-SELNO   >   ZERO     )
+                   AND   ( MCP-WIDGET      NOT =   "SRYYMD" )
+                       MOVE    SPACE               TO  SPA-ERRCD
+                   END-IF
+                   MOVE    1               TO  SPA-NAI-C02-SRYYMD-CHK
+               END-IF 
       *        レセ電エラーフラグ
       *****    PERFORM 41041-RECEDENFLG-CHK-SEC
            ELSE
@@ -11523,8 +11538,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    MOVE    SPA-GMN-C02-CLASS1
                                        TO  WRK-PTBYO-CLASS1 (IDXX)
                END-IF
-               IF      SPA-GMN-C02-CLASS1  =   SPACE
-                   MOVE    ZERO        TO  WRK-PTBYO-CLASS1 (IDXX)
+               IF      SPA-GMN-C02-CLASS2  =   SPACE
+                   MOVE    ZERO        TO  WRK-PTBYO-CLASS2 (IDXX)
                ELSE                            
                    MOVE    SPA-GMN-C02-CLASS2
                                        TO  WRK-PTBYO-CLASS2 (IDXX)
