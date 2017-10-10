@@ -337,6 +337,8 @@
       *                                     のクリア
       *  04.08.13    NACL-藤原    17/07/25  自院コード検索より戻った時の
       *                                     疾患区分等の表示をする
+      *  04.08.14    NACL-藤原    17/10/05  原疾患区分が未入力の時
+      *                                     合併症区分の登録を可能とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11293,8 +11295,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    MOVE    SPA-GMN-C02-CLASS1
                                        TO  WRK-PTBYO-CLASS1 (IDXX)
                END-IF
-               IF      SPA-GMN-C02-CLASS1  =   SPACE
-                   MOVE    ZERO        TO  WRK-PTBYO-CLASS1 (IDXX)
+               IF      SPA-GMN-C02-CLASS2  =   SPACE
+                   MOVE    ZERO        TO  WRK-PTBYO-CLASS2 (IDXX)
                ELSE                            
                    MOVE    SPA-GMN-C02-CLASS2
                                        TO  WRK-PTBYO-CLASS2 (IDXX)
