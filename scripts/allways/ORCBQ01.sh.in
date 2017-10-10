@@ -50,8 +50,17 @@ WKCSV_FILE_FULL=${MCP_TEMPDIR}/${15}
 ##      ＣＳＶファイル作成
         if  [ $1 -eq "0" ]; then
             if  [ -e ${WKCSV_FILE_FULL} ]; then
-		%RUBY% -e 'Encoding.default_external = "ascii-8bit" if defined?(Encoding) && Encoding.respond_to?("default_external"); \
-                          STDIN.readlines.each{|y| puts y.split(",").each{|x|  x.strip!}.join(",")}' <  ${WKCSV_FILE_FULL} > $2.tmp
+                awk ' {
+                #     行頭の空白を取り除く
+                      sub(/^ */,"");
+                #     行末の空白を取り除く
+                      sub(/ *$/,"");
+                #     カンマの後の空白を取り除く
+                      gsub(/, */,",");
+                #     カンマの前の空白を取り除く
+                      gsub(/ *,/,",");
+                      print $0
+                }'  ${WKCSV_FILE_FULL} > $2.tmp
 
                 if   [ ${11} = '1' ]; then
 #                 クライアント保存のとき固定ファイルに文字コード変換
