@@ -246,7 +246,7 @@
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
-           MOVE    "1"             TO  PTSRH-DATAKBN
+           MOVE    "b"             TO  PTSRH-DATAKBN
            MOVE    SEL-UPYMD       TO  PTSRH-CREYMD
                                        PTSRH-UPYMD
            MOVE    SEL-UPHMS       TO  PTSRH-UPHMS
@@ -290,7 +290,7 @@
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
-           MOVE    "0"             TO  PTSRH-DATAKBN
+           MOVE    "a"             TO  PTSRH-DATAKBN
            MOVE    SEL-UPYMD       TO  PTSRH-CREYMD
                                        PTSRH-UPYMD
            MOVE    SEL-UPHMS       TO  PTSRH-UPHMS
@@ -645,9 +645,11 @@
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "a"             TO  PTSRH-VSTR(1)
+           MOVE    "b"             TO  PTSRH-VSTR(2)
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
-           MOVE    "del3"          TO  MCP-PATHNAME
+           MOVE    "del5"          TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
       *
            .

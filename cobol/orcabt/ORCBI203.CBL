@@ -222,7 +222,7 @@
        01  CONST-AREA.
            03  CONST-FORMID            PIC X(20)   VALUE  "HCN71.red".
            03  CONST-LINE              PIC 9(05)   VALUE   16.
-           03  CONST-DATAKBN           PIC X(01)   VALUE   "3".
+           03  CONST-DATAKBN           PIC X(01)   VALUE   "c".
       *
        01  BTUSUM-AREA.
            COPY    "CPBTUSUM.INC".

@@ -264,3 +264,15 @@ path	del4 	{
    ;
 	};
 };
+
+path	del5 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptsrh
+		WHERE	HOSPNUM    =    :HOSPNUM
+		AND     TERMID     =    :TERMID
+		AND     DATAKBN    in  (:VSTR1,:VSTR2)
+   ;
+	};
+};
+

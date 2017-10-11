@@ -1525,7 +1525,7 @@
            INITIALIZE                      PTSRH-REC
            MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID          TO  PTSRH-TERMID
-           MOVE    "0"                 TO  PTSRH-DATAKBN
+           MOVE    "a"                 TO  PTSRH-DATAKBN
            MOVE    SPA-NAI-I21-SELYMD  TO  PTSRH-UPYMD
            MOVE    SPA-NAI-I21-SELHMS  TO  PTSRH-UPHMS
            MOVE    PTSRH-REC           TO  MCPDATA-REC
@@ -1557,7 +1557,7 @@
            INITIALIZE                      PTSRH-REC
            MOVE    SPA-HOSPNUM         TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID          TO  PTSRH-TERMID
-           MOVE    "1"                 TO  PTSRH-DATAKBN
+           MOVE    "b"                 TO  PTSRH-DATAKBN
            MOVE    SPA-NAI-I21-SELYMD  TO  PTSRH-UPYMD
            MOVE    SPA-NAI-I21-SELHMS  TO  PTSRH-UPHMS
            MOVE    PTSRH-REC           TO  MCPDATA-REC
@@ -1601,18 +1601,18 @@
       *****************************************************************
        900-PTSRH-INS2-SEC              SECTION.
       *
-           MOVE    "3"             TO  WRK-DATAKBN
+           MOVE    "c"             TO  WRK-DATAKBN
            PERFORM 900-PTSRH-DEL1-SEC
       *
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
-           MOVE    "3"             TO  PTSRH-DATAKBN
+           MOVE    "c"             TO  PTSRH-DATAKBN
            MOVE    SPA-NAI-I21-BTULIST-SELYMD
                                    TO  PTSRH-UPYMD
            MOVE    SPA-NAI-I21-BTULIST-SELHMS
                                    TO  PTSRH-UPHMS
-           MOVE    "1"             TO  PTSRH-UPDATAKBN
+           MOVE    "b"             TO  PTSRH-UPDATAKBN
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
            MOVE    "ins2"          TO  MCP-PATHNAME
@@ -1646,9 +1646,11 @@
            INITIALIZE                  PTSRH-REC
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    "a"             TO  PTSRH-VSTR (1)
+           MOVE    "b"             TO  PTSRH-VSTR (2)
            MOVE    PTSRH-REC       TO  MCPDATA-REC
            MOVE    "tbl_ptsrh"     TO  MCP-TABLE
-           MOVE    "del3"          TO  MCP-PATHNAME
+           MOVE    "del5"          TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
       *
            .
