@@ -1518,7 +1518,7 @@
            MOVE    ORCSDIVCSV-D(4)     TO  TNS-SRYCD
       *
            PERFORM 900-TENSU-READ-SEC
-           IF      FLG-TENSU       =   ZERO
+      *     IF      FLG-TENSU       =   ZERO
                PERFORM VARYING WRK-REC-LENGTH  FROM    1  BY  1
                        UNTIL ( WRK-REC-LENGTH  >   2500 )
                        OR    ( RECEDEN-RECEDATA(WRK-REC-LENGTH:1)
@@ -1535,7 +1535,7 @@
                                        INTO        WRK-REC
                END-STRING
                MOVE    WRK-REC         TO  RECEDEN-RECEDATA
-           END-IF
+      *     END-IF
       *
            .
        2002-NAME-HENSYU-EXT.
