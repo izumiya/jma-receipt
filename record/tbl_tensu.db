@@ -1661,3 +1661,15 @@ path	key34 	{
 	};
 };
 
+path	key35 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key35_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensu
+			WHERE HOSPNUM    =   :HOSPNUM
+			AND   UPYMD      >=  :UPYMD
+			ORDER  BY  SRYCD
+		;
+	};
+};
+

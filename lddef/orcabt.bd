@@ -305,11 +305,15 @@ bind    "ORCL0050"      "OpenCOBOL";
 bind	"ORCBI203"	    "OpenCOBOL";
 bind	"ORCBSETSYSBASE"	"OpenCOBOL";
 bind	"ORCBM400"	"OpenCOBOL";
-bind	"ORCBSTC001"	"OpenCOBOL";
 bind	"ORCBAPIFMTERM"	"OpenCOBOL";
+bind	"ORAPI052BR1V3"	"OpenCOBOL";
+bind	"ORAPI052BR2V3"	"OpenCOBOL";
+bind    "ORCBBLOBIMPORT"    "OpenCOBOL";
+bind	"ORAPI052BR3V3"	"OpenCOBOL";
 
 db "xml2" {
  fm_payment_certificate;
+ xml_stock1;
 };
 
 #include "orcadb.inc"
@@ -323,5 +327,9 @@ db "push" {
         push_find;
         push_print001;
         push_batch01;
+};
+
+db "monblob" {
+ monblob;
 };
 

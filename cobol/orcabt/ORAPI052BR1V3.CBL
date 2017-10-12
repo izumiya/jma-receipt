@@ -1,0 +1,706 @@
+      *******************************************************************
+      * Project code name "ORCA"
+      * 日医標準レセプトソフト（JMA standard receipt software）
+      * Copyright(C) 2002 JMA (Japan Medical Association)
+      *
+      * This program is part of "JMA standard receipt software".
+      *
+      *     This program is distributed in the hope that it will be useful
+      * for further advancement in medical care, according to JMA Open
+      * Source License, but WITHOUT ANY WARRANTY.
+      *     Everyone is granted permission to use, copy, modify and
+      * redistribute this program, but only under the conditions described
+      * in the JMA Open Source License. You should have received a copy of
+      * this licence along with this program. If not, stop using this
+      * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
+      * 113-8621, Japan.
+      ********************************************************************
+       IDENTIFICATION          DIVISION.
+       PROGRAM-ID.             ORAPI052BR1V3.
+      *****************************************************************
+      *  システム名        : ＯＲＣＡ
+      *  サブシステム名    : API連携用モジュール
+      *  コンポーネント名  : 病名マスタ返却
+      *  管理者            : 
+      *  作成日付    作業者        記述
+      *  17/06/19    NACL−藤原    新規作成
+      *****************************************************************
+      *  プログラム修正履歴
+      * Maj/Min/Rev  修正者       日付      内容
+      *****************************************************************
+      *
+       ENVIRONMENT                 DIVISION.
+       CONFIGURATION               SECTION.
+       INPUT-OUTPUT                SECTION.
+       FILE-CONTROL.
+      *
+      *    病名データ
+           SELECT  BYOMEILST-FILE  ASSIGN  BYOMEILSTPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
+                                   FILE    STATUS  IS  STS-BYOMEILST.
+      *    エラーファイル
+           SELECT  RECEERR-FILE    ASSIGN  RECEERR
+                                   FILE    STATUS  IS  STS-RECEERR.
+      *
+       DATA                        DIVISION.
+       FILE                        SECTION.
+      *
+      *    病名データ
+       FD  BYOMEILST-FILE.
+       01  BYOMEILST-REC.
+           03  BYOMEILST-BYOMEICD      PIC X(07).
+           03  BYOMEILST-BYOMEI        PIC X(200).
+           03  BYOMEILST-BYOMEIMOJI    PIC 9(03).
+           03  BYOMEILST-TANBYOMEI     PIC X(200).
+           03  BYOMEILST-TANBYOMEIMOJI PIC 9(03).
+           03  BYOMEILST-BYOMEIKANA    PIC X(200).
+           03  BYOMEILST-IKOSAKICD     PIC X(07).
+           03  BYOMEILST-TOKSKNCD      PIC 9(02).
+           03  BYOMEILST-NANBYOCD      PIC 9(02).
+           03  BYOMEILST-UTAGAIFLG     PIC X(01).
+           03  BYOMEILST-TANDOKUKBN    PIC 9(02).
+           03  BYOMEILST-HKNSKYKBN     PIC 9(01).
+           03  BYOMEILST-HYOJUNCD      PIC X(08).
+           03  BYOMEILST-SAITAKUKBN    PIC X(01).
+           03  BYOMEILST-BYOMEICHGCD   PIC X(04).
+           03  BYOMEILST-ICD10-1       PIC X(05).
+           03  BYOMEILST-ICD10-2       PIC X(05).
+           03  BYOMEILST-ICD10-1-2     PIC X(05).
+           03  BYOMEILST-ICD10-2-2     PIC X(05).
+           03  BYOMEILST-SYUSAIYMD     PIC X(10).
+           03  BYOMEILST-CHGYMD        PIC X(10).
+           03  BYOMEILST-HAISIYMD      PIC X(10).
+      *****03  BYOMEILST-TERMID        PIC X(32).
+      *****03  BYOMEILST-OPID          PIC X(16).
+           03  BYOMEILST-CREYMD        PIC X(10).
+           03  BYOMEILST-UPYMD         PIC X(10).
+           03  BYOMEILST-UPHMS         PIC X(08).
+      *
+      *    エラーファイル
+       FD  RECEERR-FILE.
+       01  RECEERR-REC             PIC X(200).
+      *
+       WORKING-STORAGE             SECTION.
+           COPY    "CPCOMMONDAT5.INC"
+                                   REPLACING  //TEIKI01PARA//
+                                   BY         //BYOMEILSTPARA//.
+      *
+      *    一時ファイル対応
+           COPY    "CPRECEERR.INC".
+      *
+      *    スパ領域
+       01  STS-AREA.
+           03  STS-BYOMEILST       PIC X(02).
+           03  STS-RECEERR         PIC X(02).
+      *
+      *    フラグ領域
+       01  FLG-AREA.
+           03  FLG-END             PIC 9(01).
+           03  FLG-BYOMEI          PIC 9(01).
+      *
+      *    カウント領域
+       01  CNT-AREA.
+           03  CNT-OUT             PIC 9(10).
+      *
+      *    添字領域
+       01  IDX-AREA.
+           03  IDX                 PIC 9(04).
+      *
+      *    システム領域
+       01  SYS-AREA.
+           03  SYS-YMD.
+               05  SYS-YY          PIC 9(02).
+               05  SYS-MM          PIC 9(02).
+               05  SYS-DD          PIC 9(02).
+      *
+      *    パラメタ領域
+       01  WRK-PARA.
+           COPY    "CPORCSPRTLNK.INC".
+           03  WRK-PARA-JOBID      PIC 9(07).
+           03  WRK-PARA-SHELLID    PIC X(08).
+           03  WRK-PARA-HOSPNUM    PIC X(02).
+           03  WRK-PARA-TERMID     PIC X(64).
+           03  WRK-PARA-BASE-YMD   PIC X(08).
+           03  WRK-PARA-ERRFILE    PIC X(64).
+      *
+      *    一時領域
+       01  WRK-AREA.
+           03  WRK-RECEERR         PIC X(200).
+           03  WRK-ERRMSG          PIC X(300).
+      *
+           03  WRK-CNT             PIC 9(10).
+           03  WRK-CNT-X           REDEFINES   WRK-CNT
+                                   PIC X(10).
+      *
+           03  WRK-PARAM.
+               05  WRK-PARAM-ORCA-UID  PIC X(36).
+               05  WRK-PARAM-KARTE-UID PIC X(36).
+      *
+           03  WRK-SYMD.
+               05  WRK-SYY         PIC X(04).
+               05  WRK-SMM         PIC X(02).
+               05  WRK-SDD         PIC X(02).
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY      PIC X(04).
+               05  WRK-HEN-H1      PIC X(01).
+               05  WRK-HEN-MM      PIC X(02).
+               05  WRK-HEN-H2      PIC X(01).
+               05  WRK-HEN-DD      PIC X(02).
+      *
+           03  WRK-THMS.
+               05  WRK-THH         PIC X(02).
+               05  WRK-TMM         PIC X(02).
+               05  WRK-TSS         PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH     PIC X(02).
+               05  WRK-HEN-T1      PIC X(01).
+               05  WRK-HEN-TMM     PIC X(02).
+               05  WRK-HEN-T2      PIC X(01).
+               05  WRK-HEN-TSS     PIC X(02).
+      *
+      *****************************************************************
+      *    ファイルレイアウト
+      *****************************************************************
+      *
+      *    病名
+       01  BYOMEI-REC.
+           COPY    "CPBYOMEI.INC".
+      *
+      *    ジョブ管理マスタ
+       01  JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC".
+      *
+      *
+      *****************************************************************
+      *    サブプロ用領域
+      *****************************************************************
+      *
+      *    ジョブ管理ＤＢ制御サブ
+           COPY    "CPORCSJOBKANRI.INC".
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
+      *
+      *    一時ファイル名取得
+           COPY    "CPORCSGETTEMP.INC".
+      *
+      *    ＤＢ検索
+           COPY    "MCPAREA".
+      *
+           COPY    "MCPDATA.INC".
+           COPY    "CPORCMCP.INC".
+      *
+           COPY    "COMMON-SPA".
+      *
+      *    PUSH
+           COPY    "CPPUSHBATCH01.INC".
+      *
+      *****************************************************************
+      *    連絡領域
+      *****************************************************************
+       LINKAGE                     SECTION.
+      *
+       01  COMMAND-PARAM.
+           02  FILLER              PIC X(256).
+      *
+      ******************************************************************
+      *
+       PROCEDURE               DIVISION
+                                   USING
+                                   COMMAND-PARAM.
+      *
+      *****************************************************************
+      *    主処理
+      *****************************************************************
+       000-PROC-SEC                SECTION.
+      *
+           PERFORM 100-INIT-SEC
+      *
+           PERFORM 200-MAIN-SEC
+                   UNTIL       FLG-END     =   1
+      *
+           PERFORM 300-END-SEC
+      *
+           STOP    RUN
+           .
+      *
+      *****************************************************************
+      *    初期処理
+      *****************************************************************
+       100-INIT-SEC                SECTION.
+      *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  STS-AREA
+           INITIALIZE                  SYS-AREA
+           INITIALIZE                  WRK-AREA
+           INITIALIZE                  IDX-AREA
+           INITIALIZE                  SPA-AREA
+                                       CNT-AREA
+      *
+           UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
+                                       INTO    LNK-PRTKANRI-RENNUM
+                                               LNK-PRTKANRI-TBL-KEY
+                                               LNK-PRTKANRI-TBL-GROUP
+                                               LNK-PRTKANRI-SHORI-RENNUM
+                                               LNK-PRTKANRI-SRYYM
+                                               LNK-PRTKANRI-SKYYMD
+                                               LNK-PRTKANRI-SHELLID
+                                               LNK-PRTKANRI-PRIORITY
+                                               LNK-PRTKANRI-TERMID
+                                               LNK-PRTKANRI-OPID
+                                               LNK-PRTKANRI-PRTNM
+                                               WRK-PARA-JOBID
+                                               WRK-PARA-SHELLID
+                                               WRK-PARA-HOSPNUM
+                                               RECEERR
+                                               WRK-PARA-BASE-YMD
+           END-UNSTRING
+      *
+           MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+      *
+           MOVE    "BYOMEI01"          TO  BYOMEILSTPARA-FILE-ID
+           MOVE    LNK-PRTKANRI-TERMID TO  BYOMEILSTPARA-TERMID
+           MOVE    WRK-PARA-HOSPNUM    TO  BYOMEILSTPARA-HOSPNUM
+      *
+           INITIALIZE                      SGETTEMP-AREA
+           MOVE    RECEERR             TO  SGETTEMP-BASENAMES  (1)
+           MOVE    BYOMEILSTPARA-BASENAME
+                                       TO  SGETTEMP-BASENAMES  (2)
+           CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
+           MOVE    SPACE               TO  RECEERR
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  RECEERR
+           MOVE    SGETTEMP-FULLNAMES (2)
+                                       TO  BYOMEILSTPARA-FULLNAME
+      *
+           PERFORM 100-DBOPEN-SEC
+      *
+      *    ステップ管理開始処理
+           MOVE    "STS"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    "ORAPI052BR1V3"     TO  JOB-PGID
+           MOVE    "病名マスタ返却"    TO  JOB-SHELLMSG
+           PERFORM 900-CALL-ORCSJOB-SEC
+      *
+      *    ファイルオープン
+           OPEN    OUTPUT              BYOMEILST-FILE
+           IF      STS-BYOMEILST   =   "00"
+                CONTINUE
+            ELSE
+                MOVE   SPACE           TO  WRK-RECEERR
+                STRING "病名データＯＰＥＮエラー　STS="
+                                           DELIMITED  BY  SIZE
+                       STS-BYOMEILST       DELIMITED  BY  SIZE
+                                           INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    主処理
+      *****************************************************************
+       200-MAIN-SEC                SECTION.
+      *      
+           INITIALIZE                      BYOMEI-REC
+           MOVE    WRK-PARA-BASE-YMD   TO  BYO-UPYMD
+           MOVE    BYOMEI-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_byomei"        TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_byomei"        TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-BYOMEI-READ-N-SEC
+           ELSE
+               INITIALIZE                      BYOMEI-REC
+               MOVE    1                   TO  FLG-BYOMEI
+           END-IF
+      *
+      *    病名マスタ編集処理
+           PERFORM     UNTIL   FLG-BYOMEI  =   1
+               PERFORM 2001-BYOMEILST-HENSYU-SEC
+      *
+               MOVE    "tbl_byomei"        TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-BYOMEI-READ-N-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_byomei"        TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    病名マスタ編集処理
+      *****************************************************************
+       2001-BYOMEILST-HENSYU-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  BYOMEILST-REC
+           INITIALIZE                      BYOMEILST-REC
+      *
+           IF      BYO-BYOMEICD (1:3)  =   "ZZZ"
+               MOVE    BYO-BYOMEICD (4:4)  TO  BYOMEILST-BYOMEICD
+           ELSE
+               MOVE    BYO-BYOMEICD        TO  BYOMEILST-BYOMEICD
+           END-IF
+           MOVE    BYO-BYOMEI          TO  BYOMEILST-BYOMEI
+           MOVE    BYO-BYOMEIMOJI      TO  BYOMEILST-BYOMEIMOJI
+           MOVE    BYO-TANBYOMEI       TO  BYOMEILST-TANBYOMEI
+           MOVE    BYO-TANBYOMEIMOJI   TO  BYOMEILST-TANBYOMEIMOJI
+           MOVE    BYO-BYOMEIKANA      TO  BYOMEILST-BYOMEIKANA
+           MOVE    BYO-IKOSAKICD       TO  BYOMEILST-IKOSAKICD
+           MOVE    BYO-TOKSKNCD        TO  BYOMEILST-TOKSKNCD
+           MOVE    BYO-NANBYOCD        TO  BYOMEILST-NANBYOCD
+           MOVE    BYO-UTAGAIFLG       TO  BYOMEILST-UTAGAIFLG
+           MOVE    BYO-TANDOKUKBN      TO  BYOMEILST-TANDOKUKBN
+           MOVE    BYO-HKNSKYKBN       TO  BYOMEILST-HKNSKYKBN
+           MOVE    BYO-HYOJUNCD        TO  BYOMEILST-HYOJUNCD
+           MOVE    BYO-SAITAKUKBN      TO  BYOMEILST-SAITAKUKBN
+           MOVE    BYO-BYOMEICHGCD     TO  BYOMEILST-BYOMEICHGCD
+           MOVE    BYO-ICD10-1         TO  BYOMEILST-ICD10-1
+           MOVE    BYO-ICD10-2         TO  BYOMEILST-ICD10-2
+           MOVE    BYO-ICD10-1-2       TO  BYOMEILST-ICD10-1-2
+           MOVE    BYO-ICD10-2-2       TO  BYOMEILST-ICD10-2-2
+           MOVE    BYO-SYUSAIYMD       TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-SYUSAIYMD
+           MOVE    BYO-CHGYMD          TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CHGYMD
+           MOVE    BYO-HAISIYMD        TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-HAISIYMD
+      *****MOVE    BYO-TERMID          TO  BYOMEILST-TERMID
+      *****MOVE    BYO-OPID            TO  BYOMEILST-OPID
+           MOVE    BYO-CREYMD          TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CREYMD
+           MOVE    BYO-UPYMD           TO  WRK-SYMD
+           MOVE    BYO-UPHMS           TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-UPYMD
+           MOVE    WRK-HEN-TIME        TO  BYOMEILST-UPHMS
+      *
+           WRITE       BYOMEILST-REC
+           IF      STS-BYOMEILST       =   "00"
+                ADD    1                   TO  CNT-OUT
+            ELSE
+                MOVE   SPACE               TO  WRK-RECEERR
+                STRING "病名データ書き込みエラー　STS="
+                                               DELIMITED  BY  SIZE
+                       STS-BYOMEILST           DELIMITED  BY  SIZE
+                                               INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
+           .
+       2001-BYOMEILST-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           INITIALIZE                  WRK-HEN-TIME
+           MOVE    WRK-THH             TO  WRK-HEN-THH
+           MOVE    WRK-TMM             TO  WRK-HEN-TMM
+           MOVE    WRK-TSS             TO  WRK-HEN-TSS
+           MOVE    ":"                 TO  WRK-HEN-T1
+           MOVE    ":"                 TO  WRK-HEN-T2
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *****************************************************************
+      *    日付変換編集処理
+      *****************************************************************
+       802-DAYHEN02-SEC                SECTION.
+      *
+           INITIALIZE                  WRK-SYMD
+           MOVE    WRK-HEN-YY          TO  WRK-SYY
+           MOVE    WRK-HEN-MM          TO  WRK-SMM
+           MOVE    WRK-HEN-DD          TO  WRK-SDD
+           IF      WRK-SYMD            =   "99991231"
+               MOVE    "99"                TO  WRK-SMM
+               MOVE    "99"                TO  WRK-SDD
+           END-IF
+      *
+           INITIALIZE                  WRK-THMS
+           MOVE    WRK-HEN-THH         TO  WRK-THH
+           MOVE    WRK-HEN-TMM         TO  WRK-TMM
+           MOVE    WRK-HEN-TSS         TO  WRK-TSS
+           .
+       802-DAYHEN02-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    終了処理
+      *****************************************************************
+       300-END-SEC                 SECTION.
+      *
+           CLOSE   BYOMEILST-FILE
+      *
+      **** IF      CNT-OUT         =   ZERO
+      ****     MOVE    "処理対象のデータがありませんでした"
+      ****                             TO  WRK-RECEERR
+      ****     PERFORM 500-ERR-HENSYU-SEC
+      **** END-IF
+      *
+      *    ＰＵＳＨ通知処理
+           PERFORM 3001-PUSH-SEC
+      *     
+      *    ステップ管理終了処理
+           MOVE    "STE"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    CNT-OUT         TO  JOB-UPDCNT
+           PERFORM 900-CALL-ORCSJOB-SEC
+      *
+           PERFORM 900-DBDISCONNECT-SEC
+      *
+           DISPLAY "*** ORAPI052BR1V3 OUT:" CNT-OUT
+           DISPLAY "*** ORAPI052BR1V3 END ***"
+      *
+           .
+       300-END-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＰＵＳＨ通知処理
+      *****************************************************************
+       3001-PUSH-SEC        SECTION.
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
+           IF    ( SJOBKANRI-RETURN
+                                   =   ZERO  )
+           AND   ( JOB-PARAM   NOT =   SPACE )
+               INITIALIZE                  PUSHBA01-REC
+               MOVE    JOB-PARAM       TO  WRK-PARAM
+               MOVE    WRK-PARAM-KARTE-UID
+                                       TO  PUSHBA01API-KARTE-UID
+               MOVE    WRK-PARAM-ORCA-UID
+                                       TO  PUSHBA01API-ORCA-UID
+               MOVE    "000"           TO  PUSHBA01API-RESULT
+               MOVE    "disease_master_make"
+                                       TO  PUSHBA01-EVENT
+               MOVE    WRK-PARA-BASE-YMD
+                                       TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE    TO  PUSHBA01-PERFORM-DATE
+               MOVE    CNT-OUT         TO  WRK-CNT
+               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
+      *??
+               display "push=" PUSHBA01-REC "#"
+               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
+               MOVE    "PUSHEVENT"     TO  MCP-FUNC
+               MOVE    "push_batch01"  TO  MCP-TABLE
+               MOVE    "push_batch01"  TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           END-IF
+           .
+       3001-PUSH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー出力処理
+      *****************************************************************
+       500-ERR-HENSYU-SEC          SECTION.
+      *
+           OPEN    INPUT   RECEERR-FILE
+           IF      STS-RECEERR         =   ZERO
+               CLOSE   RECEERR-FILE
+           ELSE
+               OPEN    OUTPUT              RECEERR-FILE
+      *
+               MOVE    WRK-RECEERR         TO  RECEERR-REC
+               WRITE   RECEERR-REC
+               CLOSE   RECEERR-FILE
+      *
+      *        ジョブ管理開始処理
+               MOVE    "JBE"           TO  SJOBKANRI-MODE
+               INITIALIZE                  JOBKANRI-REC
+               MOVE    WRK-RECEERR     TO  JOB-YOBI
+               MOVE    "9999"          TO  JOB-ERRCD
+               PERFORM 900-CALL-ORCSJOB-SEC
+           END-IF
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-ERRMSG
+           STRING  "ORAPI052BR1V3 "    DELIMITED  BY  SIZE
+                   WRK-RECEERR         DELIMITED  BY  SIZE
+                   LOW-VALUE           DELIMITED  BY  SIZE
+                                       INTO    WRK-ERRMSG
+           END-STRING
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ジョブ管理ＤＢ制御処理
+      *****************************************************************
+       900-CALL-ORCSJOB-SEC            SECTION.
+      *
+           MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
+           MOVE    WRK-PARA-SHELLID
+                                   TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"       USING
+                                   ORCSJOBKANRIAREA
+                                   JOBKANRI-REC
+                                   SPA-AREA
+           .
+       900-CALL-ORCSJOB-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    病名マスター読込
+      *****************************************************************
+       900-BYOMEI-READ-N-SEC         SECTION.
+      *
+           MOVE    "tbl_byomei"        TO  MCP-TABLE
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-BYOMEI
+               MOVE    MCPDATA-REC     TO  BYOMEI-REC
+           ELSE
+              MOVE    1               TO  FLG-BYOMEI
+           END-IF
+           .
+       900-BYOMEI-READ-N-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクロース処理
+      *****************************************************************
+       990-DBCLOSE-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+       990-DBCLOSE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢ　オープン処理
+      *****************************************************************
+       100-DBOPEN-SEC                SECTION.
+      *
+           MOVE    "DBOPEN"            TO  MCP-FUNC.
+           MOVE    LOW-VALUE           TO  MCP-TABLE.
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME.
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           MOVE    "DBSTART"           TO  MCP-FUNC.
+           MOVE    LOW-VALUE           TO  MCP-TABLE.
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME.
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           .
+       100-DBOPEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢ　クローズ処理
+      *****************************************************************
+       900-DBDISCONNECT-SEC            SECTION.
+      *
+           MOVE    "DBCOMMIT"          TO  MCP-FUNC.
+           MOVE    LOW-VALUE           TO  MCP-TABLE.
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME.
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           MOVE    "DBDISCONNECT"      TO  MCP-FUNC.
+           MOVE    LOW-VALUE           TO  MCP-TABLE.
+           MOVE    LOW-VALUE           TO  MCP-PATHNAME.
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           .
+       900-DBDISCONNECT-EXT.
+           EXIT.

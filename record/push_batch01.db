@@ -7,6 +7,8 @@ push_batch01 {
 		Api_Result	varchar(03);
 #---> 診療年月
 		Perform_Month	varchar(07);
+#--->
+		Perform_Date	varchar(10);
 #---> 処理件数
 		Output_Count	varchar(10);
 	};

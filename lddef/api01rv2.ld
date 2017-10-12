@@ -31,7 +31,6 @@ bindapi	"claimfrontv2"	"OpenCOBOL"	"ORAPICLAIMR1V2";
 bindapi	"claimaccountv2"	"OpenCOBOL"	"ORAPICLAIMR2V2";
 bindapi	"formdatagetv2"	"OpenCOBOL"	"ORAPI001R1V2";
 bindapi	"contraindicationcheckv2"	"OpenCOBOL"	"ORAPI021R4V2";
-bindapi	"stock1v2"	"OpenCOBOL"	"ORAPI052R1V2";
 bindapi	"okusurigetv2"	"OpenCOBOL"	"ORAPIRELR1V2";
 bindapi	"okusuriputv2"	"OpenCOBOL"	"ORAPIRELR2V2";
 bindapi	"imagegetv2"	"OpenCOBOL"	"ORAPI000R2V2";
@@ -72,7 +71,6 @@ data	{
 		claimaccountv2;
 		formdatagetv2;
 		contraindicationcheckv2;
-		stock1v2;
 		okusurigetv2;
 		okusuriputv2;
 	        imagegetv2;
@@ -142,8 +140,6 @@ db "xml2" {
  xml_formdatagetv2req;
  xml_contraindication_checkv2req;
  xml_contraindication_checkv2res;
- xml_stock1v2req;
- xml_stock1v2res;
  xml_okusurigetv2req;
  xml_okusurigetv2res;
  xml_okusuriputv2req;

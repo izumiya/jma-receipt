@@ -102,6 +102,8 @@ utf8_shell_sources = \
 	daily/red2pdf.sh.in \
 	allways/zaiko01.sh.in \
 	allways/convert_image.sh.in \
+	allways/disease_masterlst.sh.in \
+	allways/medication_masterlst.sh.in \
 
 shell_sources = \
 	allways/master_standard_upgrade.sh.in \

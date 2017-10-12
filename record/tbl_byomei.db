@@ -145,3 +145,14 @@ path	key9	{
 	};
 };
 
+path	key10	{ 	
+	DBSELECT	{
+		DECLARE tbl_byomei_key10_csr CURSOR FOR
+		SELECT *
+		FROM tbl_byomei
+			WHERE   UPYMD        >=   :UPYMD
+			ORDER BY             BYOMEICD
+		;
+	};
+};
+

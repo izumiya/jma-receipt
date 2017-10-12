@@ -26,5 +26,7 @@
                05  PUSHBA01API-RESULT          PIC X(3).
       *        診療年月
                05  PUSHBA01-PERFORM-MONTH      PIC X(7).
+      *        基準日
+               05  PUSHBA01-PERFORM-DATE       PIC X(10).
       *        処理件数
                05  PUSHBA01-OUTPUT-COUNT       PIC X(10).

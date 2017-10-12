@@ -53,3 +53,7 @@
               05  STOCKRES-INOUT             PIC X(01).
       *       ·ï¿ô
               05  STOCKRES-OUTPUT-COUNT      PIC X(10).
+      *
+              05  STOCKRES-DATA-ID-INFORMATION   OCCURS  10.
+                  07  STOCKRES-DATA-ID       PIC X(37).
+                  07  STOCKRES-PRINT-ID      PIC X(37).
