@@ -207,6 +207,12 @@
            AT  END
                MOVE    1           TO  FLG-SAVE
            END-READ
+           IF    ( STS-SAVE    =   "00" OR "10" )
+               CONTINUE
+           ELSE
+               DISPLAY "READ ERROR[" STS-SAVE "]" ASS-SAVE
+               MOVE    1           TO  FLG-SAVE
+           END-IF
       *
            .
        900-SAVE-READ-EXT.
