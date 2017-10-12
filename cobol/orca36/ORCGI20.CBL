@@ -2311,10 +2311,12 @@
                MOVE    1           TO  SPA-GMN-PAGE
                MOVE    SPACE       TO  SPA-GMN-SELYMD
                                        SPA-GMN-SELHMS
+      *
+               PERFORM 800-MCNDATE-SEC
+               PERFORM 4501-KENSAKU-SEC
                PERFORM 450-KENSAKU-SEC
                PERFORM 4504-COUNT-GET-SEC
                IF    ( SPA-NAI-TOTAL   >   ZERO )
-                   PERFORM 800-MCNDATE-SEC
                    MOVE    SMCNDATE-YMD    TO  SPA-GMN-SELYMD
                    MOVE    SMCNDATE-HMS    TO  SPA-GMN-SELHMS
                END-IF
@@ -2334,8 +2336,6 @@
                                        SPA-GMN-SELNUM
       *
            MOVE    ZERO                TO  SPA-GMN-MAX
-      *
-           PERFORM 4501-KENSAKU-SEC
       *
            COMPUTE WRK-LIMIT
                =   CONST-GMN-MAX   +   1
@@ -2473,7 +2473,6 @@
                PERFORM 45031-SQL-ORDER-SEC
                MOVE    WRK-ORDER       TO  I2SUB02-SORT-ORDER (3)
            END-IF
-           PERFORM 800-MCNDATE-SEC
            MOVE    SMCNDATE-YMD        TO  I2SUB02-SELYMD
            MOVE    SMCNDATE-HMS        TO  I2SUB02-SELHMS
            MOVE    SPACE               TO  I2SUB02-ORCA-UID
