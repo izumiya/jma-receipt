@@ -747,7 +747,7 @@
                                        TO  LNK-PRTKANRI-TBL-GROUP
            MOVE    "000000"            TO  LNK-PRTKANRI-SRYYM
            MOVE    SPA-SYSYMD          TO  LNK-PRTKANRI-SKYYMD
-           MOVE    "medication_masterlst.sh"
+           MOVE    "medication_masterlst"
                                        TO  LNK-PRTKANRI-SHELLID
            MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
            MOVE    SPA-TERMID          TO  LNK-PRTKANRI-TERMID
