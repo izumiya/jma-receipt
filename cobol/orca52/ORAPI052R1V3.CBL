@@ -55,10 +55,6 @@
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
       *
-      *    カウント領域
-       01  CNT-AREA.
-           03  CNT-SRYCNT              PIC 9(04).
-      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SYMD.
@@ -95,6 +91,8 @@
            03  WRK-PARAM.
                05  WRK-PARAM-ORCA-UID  PIC X(36).
                05  WRK-PARAM-KARTE-UID PIC X(36).
+      *
+           03  WRK-MONBLOB-ID          PIC X(37).
       *
        01  WRK-LNK-AREA.
            COPY    "CPORCSPRTLNK.INC".
@@ -144,6 +142,11 @@
       *
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
+      *
+      *    一時ディレクトリ作成作成
+           COPY    "CPORCSTEMPDIR.INC".
+      *
+           COPY    "MONBLOB".
       *
       *    ＵＩＤ取得用エリア
        01  UIDIO-AREA.
@@ -204,7 +207,6 @@
            INITIALIZE                      IDX-AREA
            INITIALIZE                      WRK-AREA
            INITIALIZE                      SPA-AREA
-           INITIALIZE                      CNT-AREA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -422,6 +424,7 @@
                IF      WRK-ERRCD           =   SPACE
                    MOVE   LSTREQ-ORCA-UID      TO  LSTRES-ORCA-UID
                END-IF
+               MOVE    WRK-MONBLOB-ID          TO  LSTRES-DATA-ID (1)
            ELSE
                MOVE   LSTREQ-ORCA-UID  TO  LSTRES-ORCA-UID
            END-IF
@@ -608,9 +611,6 @@
                                        ORCSCOMMONAREA
                                        SYS-1010-REC
       *
-           INSPECT SPA-TERMID      REPLACING   ALL " " BY  "0"
-           MOVE    SPACE           TO  SPA-TERMID (37:)
-      *
       *    一時ディレクトリのルートディレクトリ取得
            ACCEPT  WRK-TEMPDIR-ROOT
                                FROM    ENVIRONMENT "MCP_TEMPDIR_ROOT"
@@ -785,6 +785,15 @@
            MOVE    ERRFLPARA-BASENAME
                                        TO  SHELLTBL-ARG15
            MOVE    WRK-BASE-YMD        TO  SHELLTBL-ARG16
+      *
+           MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "monblob"           TO  MCP-TABLE
+           CALL    "MONFUNC"           USING
+                                           MCPAREA
+                                           MONBLOB
+           MOVE    MONBLOB-ID          TO  SHELLTBL-ARG17
+                                           WRK-MONBLOB-ID
       *
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC

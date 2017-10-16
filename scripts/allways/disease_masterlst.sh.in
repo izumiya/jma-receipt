@@ -17,20 +17,21 @@ fi
 #        ${14} 医療機関番号 
 #        ${15} エラーファイル名 
 #        ${16} 基準日
+#        ${17} MONBLOB-ID
 #-------------------------------------------#
 
 cleanup(){
-echo "${PARA_FILE_FULL}" >> $LOG
 ##      パラメータファイル削除
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
 ##      環境変数［ORCA_UID］が設定されていた場合、一時ディレクトリを削除
         if  [ -n "${ORCA_UID}" ]; then
+            echo "remove!! ${MCP_TEMPDIR}"
             rm  -rf ${MCP_TEMPDIR}
         fi
 }
-trap cleanup 1 2 3 15
+trap cleanup EXIT
 
 RENNUM=0
 
@@ -44,11 +45,19 @@ echo $(basename ${LOG_FILE})
 [ -e ${ERR_FILE_FULL} ] && rm  ${ERR_FILE_FULL} 
 
 echo $#
+echo "arg17  = [" ${17} "]" 
 
 RENNUM=$(expr $RENNUM + 1) 
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORAPI052BR1V3 -parameter "$1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16}"
 if  [ -e ${ERR_FILE_FULL} ]; then
-	exit
+     exit
+else
+     FILENM="disease_masterlst.xml"
+     echo "filenm=[" $FILENM "]"
+     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"xml",${17}
+     if  [ -e ${ERR_FILE_FULL} ]; then
+         exit
+     fi
 fi
     
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBE${12}${13},${14}"

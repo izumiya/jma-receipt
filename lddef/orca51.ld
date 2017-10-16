@@ -72,9 +72,9 @@ db "xml2" {
  xml_stock1v2res;
 };
 
-db "monblob" {
- monblob;
-};
+#db "monblob" {
+# monblob;
+#};
 
 db	{
 	tbl_syskanri;

@@ -314,6 +314,7 @@ bind	"ORAPI052BR3V3"	"OpenCOBOL";
 db "xml2" {
  fm_payment_certificate;
  xml_stock1;
+ xml_disease_masterlst;
 };
 
 #include "orcadb.inc"
@@ -329,7 +330,7 @@ db "push" {
         push_batch01;
 };
 
-db "monblob" {
- monblob;
-};
+#db "monblob" {
+# monblob;
+#};
 

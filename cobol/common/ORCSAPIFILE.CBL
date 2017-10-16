@@ -139,6 +139,10 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
+           INITIALIZE              COUNT-AREA
+                                   FLG-AREA
+                                   WRK-AREA
+      *
       *    チェック
            IF    ( SAPIFILE-IN-DIRNAME
                                    =   SPACE )

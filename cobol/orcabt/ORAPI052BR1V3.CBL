@@ -34,10 +34,6 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-      *    病名データ
-           SELECT  BYOMEILST-FILE  ASSIGN  BYOMEILSTPARA
-                                   ORGANIZATION    IS  LINE SEQUENTIAL
-                                   FILE    STATUS  IS  STS-BYOMEILST.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -45,52 +41,16 @@
        DATA                        DIVISION.
        FILE                        SECTION.
       *
-      *    病名データ
-       FD  BYOMEILST-FILE.
-       01  BYOMEILST-REC.
-           03  BYOMEILST-BYOMEICD      PIC X(07).
-           03  BYOMEILST-BYOMEI        PIC X(200).
-           03  BYOMEILST-BYOMEIMOJI    PIC 9(03).
-           03  BYOMEILST-TANBYOMEI     PIC X(200).
-           03  BYOMEILST-TANBYOMEIMOJI PIC 9(03).
-           03  BYOMEILST-BYOMEIKANA    PIC X(200).
-           03  BYOMEILST-IKOSAKICD     PIC X(07).
-           03  BYOMEILST-TOKSKNCD      PIC 9(02).
-           03  BYOMEILST-NANBYOCD      PIC 9(02).
-           03  BYOMEILST-UTAGAIFLG     PIC X(01).
-           03  BYOMEILST-TANDOKUKBN    PIC 9(02).
-           03  BYOMEILST-HKNSKYKBN     PIC 9(01).
-           03  BYOMEILST-HYOJUNCD      PIC X(08).
-           03  BYOMEILST-SAITAKUKBN    PIC X(01).
-           03  BYOMEILST-BYOMEICHGCD   PIC X(04).
-           03  BYOMEILST-ICD10-1       PIC X(05).
-           03  BYOMEILST-ICD10-2       PIC X(05).
-           03  BYOMEILST-ICD10-1-2     PIC X(05).
-           03  BYOMEILST-ICD10-2-2     PIC X(05).
-           03  BYOMEILST-SYUSAIYMD     PIC X(10).
-           03  BYOMEILST-CHGYMD        PIC X(10).
-           03  BYOMEILST-HAISIYMD      PIC X(10).
-      *****03  BYOMEILST-TERMID        PIC X(32).
-      *****03  BYOMEILST-OPID          PIC X(16).
-           03  BYOMEILST-CREYMD        PIC X(10).
-           03  BYOMEILST-UPYMD         PIC X(10).
-           03  BYOMEILST-UPHMS         PIC X(08).
-      *
       *    エラーファイル
        FD  RECEERR-FILE.
        01  RECEERR-REC             PIC X(200).
       *
        WORKING-STORAGE             SECTION.
-           COPY    "CPCOMMONDAT5.INC"
-                                   REPLACING  //TEIKI01PARA//
-                                   BY         //BYOMEILSTPARA//.
       *
-      *    一時ファイル対応
            COPY    "CPRECEERR.INC".
       *
       *    スパ領域
        01  STS-AREA.
-           03  STS-BYOMEILST       PIC X(02).
            03  STS-RECEERR         PIC X(02).
       *
       *    フラグ領域
@@ -101,6 +61,8 @@
       *    カウント領域
        01  CNT-AREA.
            03  CNT-OUT             PIC 9(10).
+           03  FLG-COUNT           PIC 9(06).
+           03  FLG-XMLCOUNT        PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
@@ -122,6 +84,7 @@
            03  WRK-PARA-TERMID     PIC X(64).
            03  WRK-PARA-BASE-YMD   PIC X(08).
            03  WRK-PARA-ERRFILE    PIC X(64).
+           03  WRK-PARA-MONBLOB-ID PIC X(37).
       *
       *    一時領域
        01  WRK-AREA.
@@ -158,6 +121,36 @@
                05  WRK-HEN-T2      PIC X(01).
                05  WRK-HEN-TSS     PIC X(02).
       *
+      *    病名データ
+       01  BYOMEILST-REC.
+           03  BYOMEILST-BYOMEICD      PIC X(07).
+           03  BYOMEILST-BYOMEI        PIC X(200).
+           03  BYOMEILST-BYOMEIMOJI    PIC 9(03).
+           03  BYOMEILST-TANBYOMEI     PIC X(200).
+           03  BYOMEILST-TANBYOMEIMOJI PIC 9(03).
+           03  BYOMEILST-BYOMEIKANA    PIC X(200).
+           03  BYOMEILST-IKOSAKICD     PIC X(07).
+           03  BYOMEILST-TOKSKNCD      PIC 9(02).
+           03  BYOMEILST-NANBYOCD      PIC 9(02).
+           03  BYOMEILST-UTAGAIFLG     PIC X(01).
+           03  BYOMEILST-TANDOKUKBN    PIC 9(02).
+           03  BYOMEILST-HKNSKYKBN     PIC 9(01).
+           03  BYOMEILST-HYOJUNCD      PIC X(08).
+           03  BYOMEILST-SAITAKUKBN    PIC X(01).
+           03  BYOMEILST-BYOMEICHGCD   PIC X(04).
+           03  BYOMEILST-ICD10-1       PIC X(05).
+           03  BYOMEILST-ICD10-2       PIC X(05).
+           03  BYOMEILST-ICD10-1-2     PIC X(05).
+           03  BYOMEILST-ICD10-2-2     PIC X(05).
+           03  BYOMEILST-SYUSAIYMD     PIC X(10).
+           03  BYOMEILST-CHGYMD        PIC X(10).
+           03  BYOMEILST-HAISIYMD      PIC X(10).
+      *****03  BYOMEILST-TERMID        PIC X(32).
+      *****03  BYOMEILST-OPID          PIC X(16).
+           03  BYOMEILST-CREYMD        PIC X(10).
+           03  BYOMEILST-UPYMD         PIC X(10).
+           03  BYOMEILST-UPHMS         PIC X(08).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -189,9 +182,14 @@
            COPY    "MCPAREA".
       *
            COPY    "MCPDATA.INC".
-           COPY    "CPORCMCP.INC".
       *
            COPY    "COMMON-SPA".
+      *
+           COPY    "MONBLOB".
+           COPY    "XMLDATA.INC".
+           COPY    "ORCA-BLOB".
+      *
+           COPY    "CPORCSAPIFILE.INC".
       *
       *    PUSH
            COPY    "CPPUSHBATCH01.INC".
@@ -255,24 +253,19 @@
                                                WRK-PARA-HOSPNUM
                                                RECEERR
                                                WRK-PARA-BASE-YMD
+                                               WRK-PARA-MONBLOB-ID
            END-UNSTRING
+      *
+           DISPLAY "MONBLOB-ID=" WRK-PARA-MONBLOB-ID
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
-           MOVE    "BYOMEI01"          TO  BYOMEILSTPARA-FILE-ID
-           MOVE    LNK-PRTKANRI-TERMID TO  BYOMEILSTPARA-TERMID
-           MOVE    WRK-PARA-HOSPNUM    TO  BYOMEILSTPARA-HOSPNUM
-      *
            INITIALIZE                      SGETTEMP-AREA
            MOVE    RECEERR             TO  SGETTEMP-BASENAMES  (1)
-           MOVE    BYOMEILSTPARA-BASENAME
-                                       TO  SGETTEMP-BASENAMES  (2)
            CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
            MOVE    SPACE               TO  RECEERR
            MOVE    SGETTEMP-FULLNAMES (1)
                                        TO  RECEERR
-           MOVE    SGETTEMP-FULLNAMES (2)
-                                       TO  BYOMEILSTPARA-FULLNAME
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -282,21 +275,6 @@
            MOVE    "ORAPI052BR1V3"     TO  JOB-PGID
            MOVE    "病名マスタ返却"    TO  JOB-SHELLMSG
            PERFORM 900-CALL-ORCSJOB-SEC
-      *
-      *    ファイルオープン
-           OPEN    OUTPUT              BYOMEILST-FILE
-           IF      STS-BYOMEILST   =   "00"
-                CONTINUE
-            ELSE
-                MOVE   SPACE           TO  WRK-RECEERR
-                STRING "病名データＯＰＥＮエラー　STS="
-                                           DELIMITED  BY  SIZE
-                       STS-BYOMEILST       DELIMITED  BY  SIZE
-                                           INTO    WRK-RECEERR
-               END-STRING
-               PERFORM 500-ERR-HENSYU-SEC
-               PERFORM 500-COBABORT-SEC
-           END-IF
            .
        100-INIT-EXT.
            EXIT.
@@ -392,21 +370,61 @@
            MOVE    WRK-HEN-DATE        TO  BYOMEILST-UPYMD
            MOVE    WRK-HEN-TIME        TO  BYOMEILST-UPHMS
       *
-           WRITE       BYOMEILST-REC
-           IF      STS-BYOMEILST       =   "00"
-                ADD    1                   TO  CNT-OUT
-            ELSE
-                MOVE   SPACE               TO  WRK-RECEERR
-                STRING "病名データ書き込みエラー　STS="
-                                               DELIMITED  BY  SIZE
-                       STS-BYOMEILST           DELIMITED  BY  SIZE
-                                               INTO    WRK-RECEERR
-               END-STRING
-               PERFORM 500-ERR-HENSYU-SEC
-               PERFORM 500-COBABORT-SEC
-           END-IF
+           ADD     1                   TO  FLG-XMLCOUNT
+           PERFORM 910-XMLEXPORT-SEC
+      *
+           ADD     1                   TO  CNT-OUT
            .
        2001-BYOMEILST-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    EXPORT 処理
+      *****************************************************************
+       910-XMLEXPORT-SEC          SECTION.
+      *
+           INITIALIZE                  XMLDATA-REC
+           MOVE   BYOMEILST-REC    TO  XMLDATA-DATA
+      *
+           MOVE    1               TO  XMLDATA-MODE
+           MOVE    "xml_disease_masterlst"
+                                   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "XMLOPEN"       TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       XMLDATA-REC
+      *
+           MOVE    "disease_masterlst"
+                                   TO  XMLDATA-RECORDNAME
+           MOVE    "XMLWRITE"      TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       XMLDATA-REC
+      *
+           INITIALIZE                   ORCA-BLOB
+           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "blob"          TO  MCP-TABLE
+           MOVE    XMLDATA-OBJECT  TO  ORCA-BLOB-OBJECT
+           INITIALIZE                  SGETTEMP-AREA
+           STRING  "disease_masterlst"
+                                   DELIMITED   BY  SIZE
+                   FLG-XMLCOUNT    DELIMITED   BY  SIZE
+                   ".xml"          DELIMITED   BY  SIZE
+                                   INTO        SGETTEMP-BASENAMES  (1)
+           END-STRING
+           CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  ORCA-BLOB-FILE
+      *??
+           display "ORCA-BLOB-FILE="  ORCA-BLOB-FILE
+      *??
+           MOVE    "BLOBEXPORT"    TO  MCP-FUNC
+           CALL    "MONFUNC"       USING
+                                       MCPAREA
+                                       ORCA-BLOB
+           .
+       910-XMLEXPORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -465,16 +483,38 @@
       *****************************************************************
        300-END-SEC                 SECTION.
       *
-           CLOSE   BYOMEILST-FILE
-      *
-      **** IF      CNT-OUT         =   ZERO
+           IF      CNT-OUT         =   ZERO
+               CONTINUE 
       ****     MOVE    "処理対象のデータがありませんでした"
       ****                             TO  WRK-RECEERR
       ****     PERFORM 500-ERR-HENSYU-SEC
-      **** END-IF
+           ELSE
+               INITIALIZE                 ORCSAPIFILEAREA
+               MOVE    SGETTEMP-TEMPDIR
+                                       TO  SAPIFILE-IN-DIRNAME
+               MOVE    "disease_masterlst"
+                                       TO  SAPIFILE-IN-FILENAME
+               MOVE    "xml"           TO  SAPIFILE-IN-FILE-TYPE
+               MOVE    1               TO  SAPIFILE-IN-RENNUM
+               MOVE    FLG-XMLCOUNT    TO  SAPIFILE-IN-COUNT
+               MOVE    SGETTEMP-TEMPDIR
+                                       TO  SAPIFILE-OT-DIRNAME
+               MOVE    "disease_masterlst.xml"
+                                       TO  SAPIFILE-OT-FILENAME
+               CALL    "ORCSAPIFILE"   USING   ORCSAPIFILEAREA
       *
-      *    ＰＵＳＨ通知処理
-           PERFORM 3001-PUSH-SEC
+               IF      SAPIFILE-RC     =   0
+      *            ＰＵＳＨ通知処理
+                   PERFORM 3001-PUSH-SEC
+               ELSE
+                   STRING   "ｘｍｌファイル作成エラー RC="
+                                           DELIMITED   BY  SIZE
+                            SAPIFILE-RC    DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+               END-IF
+           END-IF
       *     
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE

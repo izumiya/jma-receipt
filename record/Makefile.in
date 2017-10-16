@@ -1021,6 +1021,7 @@ DB_files = \
 	xml_medication_masterlstv3res.db \
 	monblob.db \
 	xml_stock1.db \
+	xml_disease_masterlst.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
