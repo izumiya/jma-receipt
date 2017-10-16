@@ -92,6 +92,8 @@
                        09  SPA-MAE-SRYKA        PIC X(02).
                        09  SPA-M95GMN-SRYKAMEI  PIC X(20).
                        09  SPA-M95-KOUSIN       PIC 9(01).
+      *H29.10
+                       09  SPA-M95-DELONL       PIC 9(01).
       *
                        09  SPA-M95GMN-INPUT-G.
                            11  SPA-M95GMN-RENNUM       PIC X(04).
@@ -849,7 +851,7 @@
       *****************************************************************
       *     診療科入力チェック処理
       *****************************************************************
-       4110-SRYKA-CHK-SEC                 SECTION.
+       4110-SRYKA-CHK-SEC              SECTION.
       *
            MOVE    M95-SRYKA           TO  SPA-M95GMN-SRYKA
       *H29.9
@@ -862,13 +864,37 @@
                   (SNUM-MINKBN     NOT =   SPACE )   OR
                   (SNUM-SYOKBN     NOT =   SPACE )
                MOVE    "0101"              TO  SPA-ERRCD
+               MOVE    10                  TO  SPA-M95-CUR
+               GO      TO      4110-SRYKA-CHK-EXT
            ELSE
                MOVE    SNUM-OUTEDT(14:2)   TO  SPA-M95GMN-SRYKA
            END-IF
       *
            MOVE    ZERO                TO  FLG-CHK
+      *
+      *H29.10
+      *    １桁の診療科登録チェック
+           MOVE    ZERO            TO  SPA-M95-DELONL
+           IF     (M95-SRYKA       NOT =   SPA-M95GMN-SRYKA)
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-M95GMN-MAX )
+                               OR (FLG-CHK     =   1          )
+                   IF      M95-SRYKA       =   SPA-M95GMN-TSRYKA
+                                                          (IDX)
+                       MOVE    SPA-M95GMN-TSRYKAMEI (IDX)
+                                               TO  WRK-SRYKAMEI
+                       MOVE    IDX             TO  IDX-S
+                       MOVE    1               TO  FLG-CHK
+                       MOVE    1               TO  SPA-M95-DELONL
+                       MOVE    M95-SRYKA       TO  SPA-M95GMN-SRYKA
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-M95GMN-MAX
+                   UNTIL      (IDX     >   SPA-M95GMN-MAX )
+                          OR  (FLG-CHK =   1    )
                IF      SPA-M95GMN-SRYKA    =   SPA-M95GMN-TSRYKA
                                                           (IDX)
                    MOVE    SPA-M95GMN-TSRYKAMEI (IDX)
@@ -878,6 +904,7 @@
                    MOVE    SPA-M95GMN-MAX  TO  IDX
                END-IF
            END-PERFORM
+      *
            PERFORM VARYING     IDX     FROM    1       BY  1
                    UNTIL      (IDX     >   SPA-SRYKA-MAX )
                           OR  (FLG-CHK =   1    )
@@ -888,6 +915,7 @@
                    MOVE    IDX             TO  IDX-S
                END-IF
            END-PERFORM
+      *
       *
            IF      SPA-M95-SYORI       =   2
                IF      SPA-M95GMN-SRYKA    NOT =   SPA-MAE-SRYKA
@@ -930,6 +958,10 @@
                    MOVE    ORCSDR-IN-DRCD-G    TO  SPA-M95GMN-DRCD-G 
       *
                    MOVE    11                  TO  SPA-M95-CUR
+      *H29.10
+                   IF      SPA-M95-DELONL      =   1
+                       MOVE    21                  TO  SPA-M95-CUR
+                   END-IF
                END-IF
            END-IF
       *
@@ -995,6 +1027,14 @@
       *     診療科入力チェック処理
       *****************************************************************
        4120-RENNUM-CHK-SEC                 SECTION.
+      *
+      *H29.10
+           IF      SPA-M95-DELONL      =   1
+               MOVE    21                  TO  SPA-M95-CUR
+               MOVE    "0107"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-M95GMN-RENNUM
+               GO      TO      4120-RENNUM-CHK-EXT
+           END-IF
       *
            MOVE    M95-RENNUM          TO  SPA-M95GMN-RENNUM
            MOVE    ZERO                TO  FLG-CHK
@@ -2229,6 +2269,8 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
                    MOVE  "DRCD"      TO  MCP-WIDGET
                WHEN    20
                    MOVE  "B10"       TO  MCP-WIDGET
+               WHEN    21
+                   MOVE  "B04"       TO  MCP-WIDGET
       *        他院切替
                WHEN    31
                    MOVE  "TAINNUM"   TO  MCP-WIDGET
@@ -2264,6 +2306,12 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
                WHEN    "0106"
                    MOVE    "診療科は変更できません。"
                                                TO  SPA-ERRMSG
+               WHEN    "0107"
+                   STRING  "診療科が２桁ではありません。"
+                           "削除して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0109"
                    STRING  "２０件以上になります。"
                            "これ以上登録できません。"
