@@ -19,6 +19,10 @@ xml_receipt_printv3res {
 #---- (Receipt_Print 固定値)
 		Reskey			varchar(100);
 		Perform_Month		varchar(7);
+		Data_Id_Information {
+			Data_Id		varchar(37);
+			Print_Id	varchar(37);
+		} [10];
 		All_Number_Of_Sheets    varchar(5);
 #---     エラー明細一覧(実際の明細と内容の異なるもの)
 		Err_Receipt_Information {

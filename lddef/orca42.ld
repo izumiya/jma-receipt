@@ -105,3 +105,7 @@ db	{
 
 /* #include "orcadb.inc" */
 #include "orcadbh.inc"
+
+#db "monblob" {
+# monblob;
+#};

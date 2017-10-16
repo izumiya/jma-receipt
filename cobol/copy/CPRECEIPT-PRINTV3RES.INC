@@ -53,7 +53,11 @@
                03  RECEPRINTS-RESKEY            PIC X(100).
       *
                03  RECEPRINTS-PERFORM-MONTH     PIC X(7).
-      *        
+      *
+               03  RECEPRINTS-DATA-ID-INFORMATION  OCCURS  10.
+                   05  RECEPRINTS-DATA-ID          PIC X(37).
+                   05  RECEPRINTS-PRINT-ID         PIC X(37).
+      *
                03  RECEPRINTS-ALL-NUMBER-OF-SHEETS
                                                 PIC X(5).
       *        エラー明細一覧

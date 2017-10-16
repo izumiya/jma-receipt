@@ -229,3 +229,4 @@
                07  SPA-R01-JOB-ORCA-UID    PIC X(36).
                07  SPA-R01-JOB-KARTE-UID   PIC X(36).
       *
+           05  SPA-R01-MONBLOB-ID          PIC X(37).

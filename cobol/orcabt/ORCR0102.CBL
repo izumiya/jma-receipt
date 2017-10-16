@@ -716,7 +716,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
                END-IF
                MOVE    SHELLTBL        TO  MCPDATA-REC
                IF      WRK-PARA-JOB-PARAM
-                                       =   SPACE
+                                       =   "orca"
                    MOVE    "SHELL"         TO  MCP-FUNC
                ELSE
                    MOVE    "EXCOMMAND"     TO  MCP-FUNC
@@ -806,7 +806,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    "1"                 TO  PRT-SITEKBN
       *    £È£Á£Ï£Ò£É¤Î¤È¤­¡Ö£·¡×¤òÀßÄê
-           IF      WRK-PARA-JOB-PARAM  =   SPACE
+           IF      WRK-PARA-JOB-PARAM  =   "orca"
                MOVE    WRK-PARA-PRTKBN     TO  PRT-PRTKBN
            ELSE
                MOVE    "7"                 TO  PRT-PRTKBN

@@ -721,6 +721,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0102 start = [" WRK-ARG "]"
@@ -991,6 +993,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0102 start = [" WRK-ARG "]"
@@ -1291,6 +1295,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"
@@ -1621,6 +1627,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"
@@ -2064,6 +2072,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"
@@ -2515,6 +2525,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"
@@ -2685,6 +2697,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"
@@ -2871,6 +2885,8 @@
                                 DELIMITED   BY  SIZE
                     ","         DELIMITED   BY  SIZE
                     RECEERR     DELIMITED   BY  SPACE
+                    ","         DELIMITED   BY  SIZE
+                    "orca"      DELIMITED   BY  SIZE
                                 INTO    WRK-ARG
            END-STRING
            DISPLAY "ORCR0500 start = [" WRK-ARG "]"

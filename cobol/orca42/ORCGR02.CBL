@@ -464,6 +464,8 @@
        01  SPATMP-REC.
            COPY    "CPSPA-TMP.INC".
       *
+           COPY    "MONBLOB".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -5959,7 +5961,21 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF      SPA-R01-JOB-PARAM
                                NOT =   SPACE
                MOVE    SPA-R01-JOB-PARAM   TO  SHELLTBL-ARG31
+      *
+               MOVE    "MONBLOBNEW"    TO  MCP-FUNC
+               MOVE    "key"           TO  MCP-PATHNAME
+               MOVE    "monblob"       TO  MCP-TABLE
+               CALL    "MONFUNC"       USING
+                                           MCPAREA
+                                           MONBLOB
+               MOVE    MONBLOB-ID      TO  SHELLTBL-ARG32
+                                           SPA-R01-MONBLOB-ID
+      *
+               DISPLAY "SPA-R01-MONBLOB-ID=" SPA-R01-MONBLOB-ID "#"
+           ELSE
+               MOVE    "orca"          TO  SHELLTBL-ARG31
            END-IF
+      *
       *     
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC

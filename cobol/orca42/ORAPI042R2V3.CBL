@@ -472,6 +472,11 @@
            MOVE    RECEPRINTQ-PERFORM-MONTH
                                        TO  RECEPRINTS-PERFORM-MONTH
       *
+           IF      RECEPRINTQ-REQUEST-NUMBER
+                                       =   "01"
+               MOVE    SPA-R01-MONBLOB-ID   TO  RECEPRINTS-PRINT-ID (1)
+           END-IF
+      *
            IF      APILST03-BODY   NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
            END-IF
@@ -1248,12 +1253,16 @@
                END-IF
       *
       *??
-               DISPLAY "JOB-UPDCNT=" JOB-UPDCNT 
+               DISPLAY "JOB-UPDCNT=" JOB-UPDCNT "#" JOB-ERRCD
       *??
                IF      JOB-UPDCNT      >   ZERO
                    MOVE    JOB-UPDCNT      TO  WRK-UPDCNT
                    MOVE    WRK-UPDCNT-X    TO
                                        RECEPRINTS-ALL-NUMBER-OF-SHEETS
+                   IF      JOB-ERRCD   NOT =   SPACE
+                       MOVE    "E31"           TO  WRK-ERRCD
+                       MOVE    JOB-YOBI        TO  WRK-ERRMSG
+                   END-IF
                ELSE
                    IF      JOB-ENDYMD      =   SPACE
                        MOVE    "E70"           TO  WRK-ERRCD

@@ -31,6 +31,7 @@ fi
 #        $25 HOSPNUM
 #        $26 3:汐阂 4:极清勒  5:极清勒
 #        $27 param(apiのみ)
+#        $28 MONBLOB-ID(apiのみ)
 #-------------------------------------- ----#
 
         echo "window  ${MCP_WINDOW}"
@@ -62,6 +63,8 @@ trap cleanup EXIT
         fi
         if [ $4 -eq  '1' ]; then
            echo "arg23 = [" ${23} "]" 
+           echo "arg27 = [" ${27} "]" 
+           echo "arg28 = [" ${28} "]" 
         fi
 
 ##      エラ〖ファイル猴近
@@ -92,7 +95,21 @@ trap cleanup EXIT
 	               $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$1$2,${25} 
                    else 
                        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBPREV1 -parameter ${12},${13},${14},$rennum,${16},${17},${18},${19},${20},${21},${22},$1,$2,$8,$9,${23},$5,${6},${25} 
-	               $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$1$2,${25} 
+                       if  [ -e ${MCP_TEMPDIR}/${6} ]; then
+	                  $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$1$2,${25} 
+                       else
+                          if [ ${27} == "orca" ]; then
+                              echo "no haori"
+                          else
+                              FILENM="${13}${14}.pdf"
+                              echo "filenm=[" $FILENM "]"
+                              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter ${12},${13},${14},$rennum,${16},${17},${18},${19},${20},${21},${22},$1,$2,${6},${25},$FILENM,"pdf",${28}
+                              if  [ -e ${MCP_TEMPDIR}/${6} ]; then
+                                 exit
+                              fi
+                          fi
+	                  $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$1$2,${25}
+                       fi
                    fi
            fi
         fi
