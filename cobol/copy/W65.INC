@@ -533,7 +533,7 @@
                     06  W65-JYUHENTAIKBN         PIC X(40).
                     06  W65-JYUHENTAIKBN-STATE   PIC S9(9) BINARY.
                     06  W65-JYUHENTAIKBN-COUNT   PIC S9(9) BINARY.
-                    06  W65-JYUHENTAIKBN-ITEM    PIC X(40) OCCURS 10.
+                    06  W65-JYUHENTAIKBN-ITEM    PIC X(40) OCCURS 15.
                     06  W65-JYUHENTAIKBN-ITEM-STATE
                                                  PIC S9(9) BINARY.
                   05  W65-CMB-JGNFTNKBN.

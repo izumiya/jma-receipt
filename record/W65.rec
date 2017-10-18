@@ -802,7 +802,7 @@ W65 {
             state int;
           };
           count int;
-            item varchar(40)[10];
+            item varchar(40)[15];
           state int;
         };
         CMB_JGNFTNKBN {
