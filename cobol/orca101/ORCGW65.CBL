@@ -939,7 +939,7 @@
                            11  SPA-GMN-JYUHENKBNMEIL       PIC X(78).
                    07  SPA-GMN-JYUHENTAIKBNLST-G.
                        09  SPA-GMN-JYUHENTAIKBN-MAX        PIC 9(03).
-                       09  SPA-GMN-JYUHENTAIKBNLST         OCCURS 10.
+                       09  SPA-GMN-JYUHENTAIKBNLST         OCCURS 15.
                            11  SPA-GMN-JYUHENTAIKBNL       PIC X(01).
                            11  SPA-GMN-JYUHENTAIKBNFL      PIC X(01).
                            11  SPA-GMN-JYUHENTAIKBNMEIL    PIC X(38).
@@ -3684,7 +3684,47 @@
            MOVE    "1"             TO  SPA-GMN-JYUHENTAIKBNL    (2)
            MOVE    "同一法別番号"  TO SPA-GMN-JYUHENTAIKBNMEIL  (2)
       *
-           MOVE    2               TO  SPA-GMN-JYUHENTAIKBN-MAX
+           MOVE    "A"             TO  SPA-GMN-JYUHENTAIKBNL    (3)
+           MOVE    "グループ（Ａ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (3)
+      *
+           MOVE    "B"             TO  SPA-GMN-JYUHENTAIKBNL    (4)
+           MOVE    "グループ（Ｂ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (4)
+      *
+           MOVE    "C"             TO  SPA-GMN-JYUHENTAIKBNL    (5)
+           MOVE    "グループ（Ｃ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (5)
+      *
+           MOVE    "D"             TO  SPA-GMN-JYUHENTAIKBNL    (6)
+           MOVE    "グループ（Ｄ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (6)
+      *
+           MOVE    "E"             TO  SPA-GMN-JYUHENTAIKBNL    (7)
+           MOVE    "グループ（Ｅ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (7)
+      *
+           MOVE    "F"             TO  SPA-GMN-JYUHENTAIKBNL    (8)
+           MOVE    "グループ（Ｆ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (8)
+      *
+           MOVE    "G"             TO  SPA-GMN-JYUHENTAIKBNL    (9)
+           MOVE    "グループ（Ｇ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (9)
+      *
+           MOVE    "H"             TO  SPA-GMN-JYUHENTAIKBNL    (10)
+           MOVE    "グループ（Ｈ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (10)
+      *
+           MOVE    "I"             TO  SPA-GMN-JYUHENTAIKBNL    (11)
+           MOVE    "グループ（Ｉ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (11)
+      *
+           MOVE    "J"             TO  SPA-GMN-JYUHENTAIKBNL    (12)
+           MOVE    "グループ（Ｊ）設定"
+                                   TO SPA-GMN-JYUHENTAIKBNMEIL  (12)
+      *
+           MOVE    12              TO  SPA-GMN-JYUHENTAIKBN-MAX
       *
            .
        3110-JYUHENTAIKBNLST-EXT.
