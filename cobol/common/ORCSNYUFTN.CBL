@@ -182,6 +182,7 @@
       *  04.08.05    NACL-ÌçÏÆ    17/02/21  ½é¿Ç»»Äê¾ò·ïÄÉ²Ã
       *  04.08.06    NACL-ÌçÏÆ    17/04/06  Æþ±¡´ü´Ö³°¤ÎÆþ±¡¿ÇÎÅ¹Ô°ÙÆþÎÏ
       *                                     ¥Á¥§¥Ã¥¯
+      *  04.08.07    NACL-ÌçÏÆ    17/10/12  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2016,6 +2017,10 @@
               IF  WRK-HANBETU-KOH1HKNNUM(IDX) = SPACE OR "027"
                   CONTINUE
               ELSE
+                IF   WRK-HANBETU-KOH1HKNNUM(IDX)(1:1) >= "1" AND <= "8"
+                  MOVE  990   TO  WRK-HANBETU-YUSENBAN(IDX)
+                                  WRK-HANBETU-YUSENBAN2(IDX)
+                ELSE
                   MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
                               TO  WRK-HANBETU-YUSENBAN(IDX)
                   IF    WRK-HANBETU-KOH1HKNNUM(IDX) = "972" OR "974"
@@ -2024,11 +2029,18 @@
                      MOVE  WRK-HANBETU-KOH1HKNNUM(IDX)
                               TO  WRK-HANBETU-YUSENBAN2(IDX)
                   END-IF
+                END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH2HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
+                IF   WRK-HANBETU-KOH2HKNNUM(IDX)(1:1) >= "1" AND <= "8"
+                  IF  WRK-HANBETU-KOH1HKNNUM(IDX)  =  "027"
+                     MOVE  990   TO  WRK-HANBETU-YUSENBAN(IDX)
+                                     WRK-HANBETU-YUSENBAN2(IDX)
+                  END-IF
+                ELSE
                   IF (WRK-HANBETU-YUSENBAN(IDX)
                                      > WRK-HANBETU-KOH2HKNNUM(IDX))
                   OR (WRK-HANBETU-KOH1HKNNUM(IDX)  =  "027"       )
@@ -2045,11 +2057,15 @@
                               TO  WRK-HANBETU-YUSENBAN2(IDX)
                      END-IF
                   END-IF
+                END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH3HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
+                IF   WRK-HANBETU-KOH3HKNNUM(IDX)(1:1) >= "1" AND <= "8"
+                  CONTINUE
+                ELSE
                   IF  WRK-HANBETU-YUSENBAN(IDX)
                                      > WRK-HANBETU-KOH3HKNNUM(IDX)
                      MOVE  WRK-HANBETU-KOH3HKNNUM(IDX)
@@ -2064,11 +2080,15 @@
                               TO  WRK-HANBETU-YUSENBAN2(IDX)
                      END-IF
                   END-IF
+                END-IF
               END-IF
       *
               IF  WRK-HANBETU-KOH4HKNNUM(IDX) = SPACE
                   CONTINUE
               ELSE
+                IF   WRK-HANBETU-KOH4HKNNUM(IDX)(1:1) >= "1" AND <= "8"
+                  CONTINUE
+                ELSE
                   IF  WRK-HANBETU-YUSENBAN(IDX)
                                      > WRK-HANBETU-KOH4HKNNUM(IDX)
                      MOVE  WRK-HANBETU-KOH4HKNNUM(IDX)
@@ -2083,6 +2103,7 @@
                               TO  WRK-HANBETU-YUSENBAN2(IDX)
                      END-IF
                   END-IF
+                END-IF
               END-IF
       *
               IF  WRK-HANBETU-YUSENBAN(IDX)  =   ZERO
