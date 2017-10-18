@@ -61,8 +61,8 @@
       *    カウント領域
        01  CNT-AREA.
            03  CNT-OUT             PIC 9(10).
-           03  FLG-COUNT           PIC 9(06).
-           03  FLG-XMLCOUNT        PIC 9(06).
+           03  CNT-OUT1            PIC 9(10).
+           03  CNT-XMLCOUNT        PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
@@ -84,7 +84,6 @@
            03  WRK-PARA-TERMID     PIC X(64).
            03  WRK-PARA-BASE-YMD   PIC X(08).
            03  WRK-PARA-ERRFILE    PIC X(64).
-           03  WRK-PARA-MONBLOB-ID PIC X(37).
       *
       *    一時領域
        01  WRK-AREA.
@@ -123,33 +122,52 @@
       *
       *    病名データ
        01  BYOMEILST-REC.
-           03  BYOMEILST-BYOMEICD      PIC X(07).
-           03  BYOMEILST-BYOMEI        PIC X(200).
-           03  BYOMEILST-BYOMEIMOJI    PIC 9(03).
-           03  BYOMEILST-TANBYOMEI     PIC X(200).
-           03  BYOMEILST-TANBYOMEIMOJI PIC 9(03).
-           03  BYOMEILST-BYOMEIKANA    PIC X(200).
-           03  BYOMEILST-IKOSAKICD     PIC X(07).
-           03  BYOMEILST-TOKSKNCD      PIC 9(02).
-           03  BYOMEILST-NANBYOCD      PIC 9(02).
-           03  BYOMEILST-UTAGAIFLG     PIC X(01).
-           03  BYOMEILST-TANDOKUKBN    PIC 9(02).
-           03  BYOMEILST-HKNSKYKBN     PIC 9(01).
-           03  BYOMEILST-HYOJUNCD      PIC X(08).
-           03  BYOMEILST-SAITAKUKBN    PIC X(01).
-           03  BYOMEILST-BYOMEICHGCD   PIC X(04).
-           03  BYOMEILST-ICD10-1       PIC X(05).
-           03  BYOMEILST-ICD10-2       PIC X(05).
-           03  BYOMEILST-ICD10-1-2     PIC X(05).
-           03  BYOMEILST-ICD10-2-2     PIC X(05).
-           03  BYOMEILST-SYUSAIYMD     PIC X(10).
-           03  BYOMEILST-CHGYMD        PIC X(10).
-           03  BYOMEILST-HAISIYMD      PIC X(10).
-      *****03  BYOMEILST-TERMID        PIC X(32).
-      *****03  BYOMEILST-OPID          PIC X(16).
-           03  BYOMEILST-CREYMD        PIC X(10).
-           03  BYOMEILST-UPYMD         PIC X(10).
-           03  BYOMEILST-UPHMS         PIC X(08).
+           03  BYOMEILST-OCC          OCCURS   1000.
+               05  BYOMEILST-BYOMEICD      PIC X(07).
+               05  BYOMEILST-BYOMEI        PIC X(200).
+               05  BYOMEILST-BYOMEIMOJI    PIC X(03).
+               05  BYOMEILST-BYOMEIMOJI-9
+                               REDEFINES   BYOMEILST-BYOMEIMOJI
+                                           PIC 9(03).
+               05  BYOMEILST-TANBYOMEI     PIC X(200).
+               05  BYOMEILST-TANBYOMEIMOJI PIC X(03).
+               05  BYOMEILST-TANBYOMEIMOJI-9
+                                REDEFINES  BYOMEILST-TANBYOMEIMOJI
+                                           PIC 9(03).
+               05  BYOMEILST-BYOMEIKANA    PIC X(200).
+               05  BYOMEILST-IKOSAKICD     PIC X(07).
+               05  BYOMEILST-TOKSKNCD      PIC X(02).
+               05  BYOMEILST-TOKSKNCD-9
+                               REDEFINES   BYOMEILST-TOKSKNCD
+                                           PIC 9(02).
+               05  BYOMEILST-NANBYOCD      PIC X(02).
+               05  BYOMEILST-NANBYOCD-9
+                               REDEFINES   BYOMEILST-NANBYOCD
+                                           PIC 9(02).
+               05  BYOMEILST-UTAGAIFLG     PIC X(01).
+               05  BYOMEILST-TANDOKUKBN    PIC X(02).
+               05  BYOMEILST-TANDOKUKBN-9
+                               REDEFINES   BYOMEILST-TANDOKUKBN
+                                           PIC 9(02).
+               05  BYOMEILST-HKNSKYKBN     PIC X(01).
+               05  BYOMEILST-HKNSKYKBN-9
+                               REDEFINES   BYOMEILST-HKNSKYKBN
+                                           PIC 9(01).
+               05  BYOMEILST-HYOJUNCD      PIC X(08).
+               05  BYOMEILST-SAITAKUKBN    PIC X(01).
+               05  BYOMEILST-BYOMEICHGCD   PIC X(04).
+               05  BYOMEILST-ICD10-1       PIC X(05).
+               05  BYOMEILST-ICD10-2       PIC X(05).
+               05  BYOMEILST-ICD10-1-2     PIC X(05).
+               05  BYOMEILST-ICD10-2-2     PIC X(05).
+               05  BYOMEILST-SYUSAIYMD     PIC X(10).
+               05  BYOMEILST-CHGYMD        PIC X(10).
+               05  BYOMEILST-HAISIYMD      PIC X(10).
+      *****    05  BYOMEILST-TERMID        PIC X(32).
+      *****    05  BYOMEILST-OPID          PIC X(16).
+               05  BYOMEILST-CREYMD        PIC X(10).
+               05  BYOMEILST-UPYMD         PIC X(10).
+               05  BYOMEILST-UPHMS         PIC X(08).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -253,10 +271,7 @@
                                                WRK-PARA-HOSPNUM
                                                RECEERR
                                                WRK-PARA-BASE-YMD
-                                               WRK-PARA-MONBLOB-ID
            END-UNSTRING
-      *
-           DISPLAY "MONBLOB-ID=" WRK-PARA-MONBLOB-ID
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
@@ -279,12 +294,11 @@
        100-INIT-EXT.
            EXIT.
       *
-      *
       *****************************************************************
       *    主処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
-      *      
+      *
            INITIALIZE                      BYOMEI-REC
            MOVE    WRK-PARA-BASE-YMD   TO  BYO-UPYMD
            MOVE    BYOMEI-REC          TO  MCPDATA-REC
@@ -303,11 +317,18 @@
       *
       *    病名マスタ編集処理
            PERFORM     UNTIL   FLG-BYOMEI  =   1
-               PERFORM 2001-BYOMEILST-HENSYU-SEC
+               MOVE    ZERO                TO  CNT-OUT1
       *
-               MOVE    "tbl_byomei"        TO  MCP-TABLE
-               MOVE    "key10"             TO  MCP-PATHNAME
-               PERFORM 900-BYOMEI-READ-N-SEC
+               MOVE    SPACE               TO  BYOMEILST-REC
+               INITIALIZE                      BYOMEILST-REC
+      *
+               PERFORM         UNTIL   FLG-BYOMEI  =   1
+                               OR      CNT-OUT1    >=  1000
+                   PERFORM 2001-BYOMEILST-HENSYU-SEC
+               END-PERFORM
+      *
+               ADD     1                   TO  CNT-XMLCOUNT
+               PERFORM 910-XMLEXPORT-SEC
            END-PERFORM
       *
            MOVE    "tbl_byomei"        TO  MCP-TABLE
@@ -324,56 +345,57 @@
       *****************************************************************
        2001-BYOMEILST-HENSYU-SEC          SECTION.
       *
-           MOVE    SPACE               TO  BYOMEILST-REC
-           INITIALIZE                      BYOMEILST-REC
+           ADD     1                   TO  CNT-OUT1
+                                           CNT-OUT
+           MOVE    CNT-OUT1            TO  IDX
       *
            IF      BYO-BYOMEICD (1:3)  =   "ZZZ"
-               MOVE    BYO-BYOMEICD (4:4)  TO  BYOMEILST-BYOMEICD
+               MOVE    BYO-BYOMEICD (4:4)  TO  BYOMEILST-BYOMEICD  (IDX)
            ELSE
-               MOVE    BYO-BYOMEICD        TO  BYOMEILST-BYOMEICD
+               MOVE    BYO-BYOMEICD        TO  BYOMEILST-BYOMEICD  (IDX)
            END-IF
-           MOVE    BYO-BYOMEI          TO  BYOMEILST-BYOMEI
-           MOVE    BYO-BYOMEIMOJI      TO  BYOMEILST-BYOMEIMOJI
-           MOVE    BYO-TANBYOMEI       TO  BYOMEILST-TANBYOMEI
-           MOVE    BYO-TANBYOMEIMOJI   TO  BYOMEILST-TANBYOMEIMOJI
-           MOVE    BYO-BYOMEIKANA      TO  BYOMEILST-BYOMEIKANA
-           MOVE    BYO-IKOSAKICD       TO  BYOMEILST-IKOSAKICD
-           MOVE    BYO-TOKSKNCD        TO  BYOMEILST-TOKSKNCD
-           MOVE    BYO-NANBYOCD        TO  BYOMEILST-NANBYOCD
-           MOVE    BYO-UTAGAIFLG       TO  BYOMEILST-UTAGAIFLG
-           MOVE    BYO-TANDOKUKBN      TO  BYOMEILST-TANDOKUKBN
-           MOVE    BYO-HKNSKYKBN       TO  BYOMEILST-HKNSKYKBN
-           MOVE    BYO-HYOJUNCD        TO  BYOMEILST-HYOJUNCD
-           MOVE    BYO-SAITAKUKBN      TO  BYOMEILST-SAITAKUKBN
-           MOVE    BYO-BYOMEICHGCD     TO  BYOMEILST-BYOMEICHGCD
-           MOVE    BYO-ICD10-1         TO  BYOMEILST-ICD10-1
-           MOVE    BYO-ICD10-2         TO  BYOMEILST-ICD10-2
-           MOVE    BYO-ICD10-1-2       TO  BYOMEILST-ICD10-1-2
-           MOVE    BYO-ICD10-2-2       TO  BYOMEILST-ICD10-2-2
+           MOVE    BYO-BYOMEI          TO  BYOMEILST-BYOMEI        (IDX)
+           MOVE    BYO-BYOMEIMOJI      TO  BYOMEILST-BYOMEIMOJI-9  (IDX)
+           MOVE    BYO-TANBYOMEI       TO  BYOMEILST-TANBYOMEI     (IDX)
+           MOVE    BYO-TANBYOMEIMOJI   TO  BYOMEILST-TANBYOMEIMOJI-9
+                                                                   (IDX)
+           MOVE    BYO-BYOMEIKANA      TO  BYOMEILST-BYOMEIKANA    (IDX)
+           MOVE    BYO-IKOSAKICD       TO  BYOMEILST-IKOSAKICD     (IDX)
+           MOVE    BYO-TOKSKNCD        TO  BYOMEILST-TOKSKNCD-9    (IDX)
+           MOVE    BYO-NANBYOCD        TO  BYOMEILST-NANBYOCD-9    (IDX)
+           MOVE    BYO-UTAGAIFLG       TO  BYOMEILST-UTAGAIFLG     (IDX)
+           MOVE    BYO-TANDOKUKBN      TO  BYOMEILST-TANDOKUKBN-9  (IDX)
+           MOVE    BYO-HKNSKYKBN       TO  BYOMEILST-HKNSKYKBN-9   (IDX)
+           MOVE    BYO-HYOJUNCD        TO  BYOMEILST-HYOJUNCD      (IDX)
+           MOVE    BYO-SAITAKUKBN      TO  BYOMEILST-SAITAKUKBN    (IDX)
+           MOVE    BYO-BYOMEICHGCD     TO  BYOMEILST-BYOMEICHGCD   (IDX)
+           MOVE    BYO-ICD10-1         TO  BYOMEILST-ICD10-1       (IDX)
+           MOVE    BYO-ICD10-2         TO  BYOMEILST-ICD10-2       (IDX)
+           MOVE    BYO-ICD10-1-2       TO  BYOMEILST-ICD10-1-2     (IDX)
+           MOVE    BYO-ICD10-2-2       TO  BYOMEILST-ICD10-2-2     (IDX)
            MOVE    BYO-SYUSAIYMD       TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  BYOMEILST-SYUSAIYMD
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-SYUSAIYMD     (IDX)
            MOVE    BYO-CHGYMD          TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CHGYMD
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CHGYMD        (IDX)
            MOVE    BYO-HAISIYMD        TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  BYOMEILST-HAISIYMD
-      *****MOVE    BYO-TERMID          TO  BYOMEILST-TERMID
-      *****MOVE    BYO-OPID            TO  BYOMEILST-OPID
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-HAISIYMD      (IDX)
+      *****MOVE    BYO-TERMID          TO  BYOMEILST-TERMID        (IDX)
+      *****MOVE    BYO-OPID            TO  BYOMEILST-OPID          (IDX)
            MOVE    BYO-CREYMD          TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CREYMD
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-CREYMD        (IDX)
            MOVE    BYO-UPYMD           TO  WRK-SYMD
            MOVE    BYO-UPHMS           TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  BYOMEILST-UPYMD
-           MOVE    WRK-HEN-TIME        TO  BYOMEILST-UPHMS
+           MOVE    WRK-HEN-DATE        TO  BYOMEILST-UPYMD         (IDX)
+           MOVE    WRK-HEN-TIME        TO  BYOMEILST-UPHMS         (IDX)
       *
-           ADD     1                   TO  FLG-XMLCOUNT
-           PERFORM 910-XMLEXPORT-SEC
-      *
-           ADD     1                   TO  CNT-OUT
+           MOVE    "tbl_byomei"        TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-BYOMEI-READ-N-SEC
            .
        2001-BYOMEILST-HENSYU-EXT.
            EXIT.
@@ -409,16 +431,13 @@
            INITIALIZE                  SGETTEMP-AREA
            STRING  "disease_masterlst"
                                    DELIMITED   BY  SIZE
-                   FLG-XMLCOUNT    DELIMITED   BY  SIZE
+                   CNT-XMLCOUNT    DELIMITED   BY  SIZE
                    ".xml"          DELIMITED   BY  SIZE
                                    INTO        SGETTEMP-BASENAMES  (1)
            END-STRING
            CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
            MOVE    SGETTEMP-FULLNAMES (1)
                                        TO  ORCA-BLOB-FILE
-      *??
-           display "ORCA-BLOB-FILE="  ORCA-BLOB-FILE
-      *??
            MOVE    "BLOBEXPORT"    TO  MCP-FUNC
            CALL    "MONFUNC"       USING
                                        MCPAREA
@@ -495,8 +514,9 @@
                MOVE    "disease_masterlst"
                                        TO  SAPIFILE-IN-FILENAME
                MOVE    "xml"           TO  SAPIFILE-IN-FILE-TYPE
+               move    "2"             TO  SAPIFILE-IN-KBN
                MOVE    1               TO  SAPIFILE-IN-RENNUM
-               MOVE    FLG-XMLCOUNT    TO  SAPIFILE-IN-COUNT
+               MOVE    CNT-XMLCOUNT    TO  SAPIFILE-IN-COUNT
                MOVE    SGETTEMP-TEMPDIR
                                        TO  SAPIFILE-OT-DIRNAME
                MOVE    "disease_masterlst.xml"

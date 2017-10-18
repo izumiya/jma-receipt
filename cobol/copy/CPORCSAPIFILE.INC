@@ -23,6 +23,7 @@
        01  ORCSAPIFILEAREA.
            03  SAPIFILE-IN-DIRNAME     PIC X(1024).
            03  SAPIFILE-IN-FILENAME    PIC X(1024).
+           03  SAPIFILE-IN-KBN         PIC X(01).
            03  SAPIFILE-IN-COUNT       PIC 9(06).
            03  SAPIFILE-IN-RENNUM      PIC 9(06).
            03  SAPIFILE-IN-FILE-TYPE   PIC X(04).

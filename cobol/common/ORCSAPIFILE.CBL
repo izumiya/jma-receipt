@@ -46,10 +46,10 @@
        FILE                    SECTION.
       *
        FD  XML-FILE.
-       01  XML-REC             PIC X(1000000).
+       01  XML-REC             PIC X(10000).
       *
        FD  OUT-FILE.
-       01  OUT-REC             PIC X(1000000).
+       01  OUT-REC             PIC X(10000).
       *
        WORKING-STORAGE         SECTION.
       *
@@ -89,7 +89,8 @@
            COPY    "CPTEMPFL.INC"  REPLACING  //TEMPFLPARA//
                                    BY         //WRK-ERR-FILE-NM//.
       *
-       01  WRK-XML-REC         PIC X(1000000).
+       01  WRK-XML-REC         PIC X(10000).
+       01  WRK-XML-REC1        PIC X(10000).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -101,7 +102,7 @@
       *
       *    ファイル出力可能チェックサブ
            COPY    "CPORCSACCESS.INC".
-      *     
+      *
       ******************************************************************
        LINKAGE                 SECTION.
       *
@@ -186,7 +187,6 @@
                     SAPIFILE-OT-FILENAME   DELIMITED  BY  SPACE
                                            INTO    OUTPARA
            END-STRING
-           DISPLAY "ORCSAPIFILE OUTPARA=" OUTPARA
       *
            INITIALIZE                  SACCESS-AREA
            MOVE    "W"             TO  SACCESS-MODE
@@ -238,7 +238,6 @@
                     ".xml"                 DELIMITED  BY SIZE
                                            INTO    XMLPARA
            END-STRING
-           DISPLAY "ORCSAPIFILE XMLPARA=" XMLPARA
       *
            OPEN    INPUT               XML-FILE
            IF      STS-XMLFILE         =   "00"
@@ -258,6 +257,91 @@
       *
            MOVE    ZERO                TO  CNT-IN
                                            FLG-XMLFILE
+           IF      SAPIFILE-IN-KBN     =   "2"
+               PERFORM 20011-XMLFILE-HENSYU-SEC
+           ELSE
+               PERFORM 20012-XMLFILE-HENSYU-SEC
+           END-IF
+      *
+           CLOSE   XML-FILE
+           .
+       2001-XMLFILE-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイルＷＲＩＴＥ処理
+      *****************************************************************
+       20011-XMLFILE-HENSYU-SEC         SECTION.
+      *
+           PERFORM 900-XMLFILE-READ-SEC
+           IF      FLG-XMLFILE     =   ZERO
+               ADD     1               TO  CNT-IN
+               MOVE    XML-REC         TO  WRK-XML-REC
+      *
+               PERFORM 900-XMLFILE-READ-SEC
+               PERFORM             UNTIL   FLG-XMLFILE =   1
+                   MOVE    WRK-XML-REC     TO  WRK-XML-REC1
+      *
+                   ADD     1               TO  CNT-IN
+                   MOVE    XML-REC         TO  WRK-XML-REC
+      *
+                   PERFORM 900-XMLFILE-READ-SEC
+      *
+                   MOVE    SPACE               TO  OUT-REC
+                   EVALUATE    SAPIFILE-IN-FILE-TYPE
+                       WHEN    "xml"
+                           IF      FLG-XMLFILE =   1
+      *                        最後のファイルのみ最終２行を出力
+                               IF      IDX         =   SAPIFILE-IN-COUNT
+                                   MOVE    WRK-XML-REC1    TO  OUT-REC
+                                   PERFORM 20012-WRITE-SEC
+                                   IF      SAPIFILE-RC     =   0
+                                       MOVE    WRK-XML-REC TO  OUT-REC
+                                       PERFORM 20012-WRITE-SEC
+                                   END-IF
+                               END-IF
+                           ELSE
+      *                        最初のファイルのみ先頭３行を出力
+                               IF      CNT-IN      <   5
+                                   IF      IDX         =
+                                                   SAPIFILE-IN-RENNUM
+                                       MOVE    WRK-XML-REC1
+                                                           TO  OUT-REC
+                                       PERFORM 20012-WRITE-SEC
+                                   END-IF
+                               ELSE
+                                   MOVE    WRK-XML-REC1    TO  OUT-REC
+                                   PERFORM 20012-WRITE-SEC
+                               END-IF
+                           END-IF
+                       WHEN    "json"
+                       IF    ( IDX         =   SAPIFILE-IN-RENNUM )
+                       AND   ( CNT-IN      =   1                  )
+                           MOVE    "["         TO  OUT-REC
+                           PERFORM 20012-WRITE-SEC
+                       END-IF
+                       MOVE    WRK-XML-REC     TO  OUT-REC
+                       PERFORM 20012-WRITE-SEC
+                       IF    ( IDX         =   SAPIFILE-IN-COUNT )
+                       AND   ( FLG-XMLFILE =   1                 )
+                          MOVE    "]"         TO  OUT-REC
+                          PERFORM 20012-WRITE-SEC
+                       END-IF
+                   END-EVALUATE
+      *
+                   IF      SAPIFILE-RC >   0
+                       MOVE     1          TO  FLG-XMLFILE
+                   END-IF
+               END-PERFORM
+           END-IF 
+           .
+       20011-XMLFILE-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイルＷＲＩＴＥ処理（区分＝２）
+      *****************************************************************
+       20012-XMLFILE-HENSYU-SEC         SECTION.
       *
            PERFORM 900-XMLFILE-READ-SEC
            PERFORM             UNTIL   FLG-XMLFILE =   1
@@ -276,7 +360,7 @@
                                PERFORM 20012-WRITE-SEC
                            END-IF
                        ELSE
-      *                   最初のファイルのみ先頭２行を出力
+      *                    最初のファイルのみ先頭２行を出力
                            IF      CNT-IN      <   3
                                IF      IDX         =
                                                    SAPIFILE-IN-RENNUM
@@ -299,7 +383,7 @@
                        IF    ( IDX         =   SAPIFILE-IN-COUNT )
                        AND   ( FLG-XMLFILE =   1                 )
                           MOVE    "]"         TO  OUT-REC
-                           PERFORM 20012-WRITE-SEC
+                          PERFORM 20012-WRITE-SEC
                        END-IF
                END-EVALUATE
       *
@@ -307,10 +391,8 @@
                    MOVE     1          TO  FLG-XMLFILE
                END-IF
            END-PERFORM
-      *
-           CLOSE   XML-FILE
            .
-       2001-XMLFILE-HENSYU-EXT.
+       20012-XMLFILE-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

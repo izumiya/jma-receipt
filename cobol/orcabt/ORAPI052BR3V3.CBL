@@ -74,8 +74,8 @@
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
            03  CNT-OUT                 PIC 9(10).
-           03  FLG-COUNT               PIC 9(06).
-           03  FLG-XMLCOUNT            PIC 9(06).
+           03  CNT-OUT1                PIC 9(10).
+           03  CNT-XMLCOUNT            PIC 9(06).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -89,6 +89,8 @@
            03  IDX-S                   PIC 9(04).
            03  IDX-H                   PIC 9(04).
            03  IDX-J                   PIC 9(04).
+      *
+           03  IDXX                    PIC 9(04).
       *
            03  IDX-REN                 PIC 9(02).
            03  IDX-ACT                 PIC 9(02).
@@ -110,7 +112,6 @@
            03  WRK-PARA-BASE-YMD       PIC X(08).
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
            03  WRK-PARA-ERRFILE        PIC X(64).
-           03  WRK-PARA-MONBLOB-ID     PIC X(37).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -181,30 +182,58 @@
       *    ²ó¿ô
            03  WRK-KAISU               PIC 9(03).
       *
-       01  ZAIKOUT-REC.
-      *    ÅÁÉ¼ÈÖ¹æ
-           03  ZAIKOUT-INVOICD-NUMBER      PIC  X(07).
-      *    ¿ÇÎÅÆüÉÕ
-           03  ZAIKOUT-PERFORM-DATE        PIC X(10).
-      *    ¿ÇÎÅ²Ê
-           03  ZAIKOUT-DEP-CODE            PIC X(02).
-           03  ZAIKOUT-DEP-NAME            PIC X(20).
-           03  ZAIKOUT-MEDICAL-INF         OCCURS   200.
-      *        ¿ÇÎÅ¥³¡¼¥É
-               05  ZAIKOUT-PRSCRPT-CODE          PIC X(9).
-      *        ¿ÇÎÅÌ¾¾Î
-               05  ZAIKOUT-PRSCRPT-NAME          PIC X(80).
-      *        ¿ÇÎÅ¥«¥ÊÌ¾¾Î
-               05  ZAIKOUT-PRSCRPT-KANANAME      PIC X(80).
-      *        ¿ôÎÌ
-               05  ZAIKOUT-PRSCRPT-NUMBER        PIC X(15).
-      *        Ã±²Á
-               05  ZAIKOUT-PRICD-MONEY           PIC X(9).
-      *        Ã±°Ì¥³¡¼¥É
-               05  ZAIKOUT-TANNICD               PIC X(3).
-      *        Ã±°ÌÌ¾¾Î
-               05  ZAIKOUT-TANICD-NAME           PIC X(20).
+           03  TMPFILE                 PIC X(100).
       *
+       01  ZAIKOUT-REC.
+           03  ZAIKOUT-OCC             OCCURS  68.
+      *        ÅÁÉ¼ÈÖ¹æ
+               05  ZAIKOUT-INVOICD-NUMBER      PIC X(07).
+      *        ¿ÇÎÅÆüÉÕ
+               05  ZAIKOUT-PERFORM-DATE        PIC X(10).
+      *        ¿ÇÎÅ²Ê
+               05  ZAIKOUT-DEP-CODE            PIC X(02).
+               05  ZAIKOUT-DEP-NAME            PIC X(20).
+               05  ZAIKOUT-MEDICAL-INF         OCCURS   200.
+      *            ¿ÇÎÅ¥³¡¼¥É
+                   07  ZAIKOUT-PRSCRPT-CODE    PIC X(9).
+      *            ¿ÇÎÅÌ¾¾Î
+                   07  ZAIKOUT-PRSCRPT-NAME    PIC X(80).
+      *            ¿ÇÎÅ¥«¥ÊÌ¾¾Î
+                   07  ZAIKOUT-PRSCRPT-KANANAME
+                                               PIC X(80).
+      *            ¿ôÎÌ
+                   07  ZAIKOUT-PRSCRPT-NUMBER  PIC X(15).
+      *            Ã±²Á
+                   07  ZAIKOUT-PRICD-MONEY     PIC X(9).
+      *            Ã±°Ì¥³¡¼¥É
+                   07  ZAIKOUT-TANNICD         PIC X(3).
+      *            Ã±°ÌÌ¾¾Î
+                   07  ZAIKOUT-TANICD-NAME     PIC X(20).
+      *
+       01  WRK-ZAIKOUT-REC.
+      *    ÅÁÉ¼ÈÖ¹æ
+           03  WRK-ZAIKOUT-INVOICD-NUMBER      PIC X(07).
+      *    ¿ÇÎÅÆüÉÕ
+           03  WRK-ZAIKOUT-PERFORM-DATE        PIC X(10).
+      *    ¿ÇÎÅ²Ê
+           03  WRK-ZAIKOUT-DEP-CODE            PIC X(02).
+           03  WRK-ZAIKOUT-DEP-NAME            PIC X(20).
+           03  WRK-ZAIKOUT-MEDICAL-INF         OCCURS   200.
+      *        ¿ÇÎÅ¥³¡¼¥É
+               05  WRK-ZAIKOUT-PRSCRPT-CODE    PIC X(9).
+      *        ¿ÇÎÅÌ¾¾Î
+               05  WRK-ZAIKOUT-PRSCRPT-NAME    PIC X(80).
+      *        ¿ÇÎÅ¥«¥ÊÌ¾¾Î
+               05  WRK-ZAIKOUT-PRSCRPT-KANANAME
+                                               PIC X(80).
+      *        ¿ôÎÌ
+               05  WRK-ZAIKOUT-PRSCRPT-NUMBER  PIC X(15).
+      *        Ã±²Á
+               05  WRK-ZAIKOUT-PRICD-MONEY     PIC X(9).
+      *        Ã±°Ì¥³¡¼¥É
+               05  WRK-ZAIKOUT-TANNICD         PIC X(3).
+      *        Ã±°ÌÌ¾¾Î
+               05  WRK-ZAIKOUT-TANICD-NAME     PIC X(20).
       *
       *    ¿ÇÎÅÆâÍÆ¥Æ¡¼¥Ö¥ë
        01  TBL-SRYACT-AREA.
@@ -346,11 +375,9 @@
                                                RECEERR
                                                WRK-PARA-BASE-YMD
                                                WRK-PARA-NYUGAIKBN
-                                               WRK-PARA-MONBLOB-ID
            END-UNSTRING
       *
            DISPLAY "NYUGAIKBN =" WRK-PARA-NYUGAIKBN
-           DISPLAY "MONBLOB-ID=" WRK-PARA-MONBLOB-ID
       *
       *    £Ó£Ð£ÁÀßÄê
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -431,46 +458,73 @@
                MOVE    1               TO  FLG-JYURRK
            END-IF
       *
-           MOVE    ZERO                TO  IDX
-           MOVE    ZERO                TO  IDY
-           MOVE    ZERO                TO  IDX-S
-           MOVE    JYURRK-DENPNUM      TO  WRK-KEY-DENPNUM
-           INITIALIZE                  TBL-SRYACT-AREA
-           PERFORM
-               UNTIL   (FLG-JYURRK         =   1    )
-                  OR   (FLG-ERR        NOT =   ZERO)
-               IF      JYURRK-DENPNUM      NOT =   WRK-KEY-DENPNUM
-                   IF      IDX-S               >   ZERO
-                       PERFORM 20022-STOCKRES-HEN-SEC
-                   END-IF
-                   INITIALIZE                  TBL-SRYACT-AREA
-                   MOVE    ZERO                TO  IDX-S
-               END-IF
-               MOVE    JYURRK-DENPNUM      TO  WRK-KEY-DENPNUM
-               MOVE    JYURRK-SRYYMD       TO  WRK-KEY-SRYYMD
-               MOVE    JYURRK-SRYKA        TO  WRK-KEY-SRYKA
+      *    ºß¸Ë´ÉÍýÊÔ½¸½èÍý
+           PERFORM     UNTIL   FLG-JYURRK  =   1
+               MOVE    ZERO                TO  CNT-OUT1
       *
-               IF      FLG-ERR             =   ZERO
-                   PERFORM 20021-JYURRK-SYORI-SEC
-               END-IF
+               MOVE    SPACE               TO  ZAIKOUT-REC
+               INITIALIZE                      ZAIKOUT-REC
       *
-               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-               PERFORM 970-JYURRK-READ-SEC
+               PERFORM         UNTIL   FLG-JYURRK  =   1
+                               OR      CNT-OUT1    >=  68
+                   PERFORM 2001-ZAIKO-HENSYU-SEC
+               END-PERFORM
       *
+               ADD     1                   TO  CNT-XMLCOUNT
+               PERFORM 910-XMLEXPORT-SEC
            END-PERFORM
+      *
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-      *
-           IF      IDX-S               >   ZERO
-               PERFORM 20022-STOCKRES-HEN-SEC
-           END-IF
       *
            MOVE    1                  TO  FLG-END
            .
        200-MAIN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ºß¸Ë´ÉÍýÊÔ½¸½èÍý
+      *****************************************************************
+       2001-ZAIKO-HENSYU-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  IDX
+           MOVE    ZERO                TO  IDY
+           MOVE    ZERO                TO  IDX-S
+           INITIALIZE                  TBL-SRYACT-AREA
+      *
+           PERFORM
+               UNTIL  ( FLG-JYURRK         =   1    )
+                  OR  ( FLG-ERR        NOT =   ZERO )
+               INITIALIZE                  TBL-SRYACT-AREA
+               MOVE    ZERO                TO  IDX-S
+               MOVE    JYURRK-DENPNUM      TO  WRK-KEY-DENPNUM
+               MOVE    JYURRK-SRYYMD       TO  WRK-KEY-SRYYMD
+               MOVE    JYURRK-SRYKA        TO  WRK-KEY-SRYKA
+      *
+               PERFORM
+                   UNTIL  ( FLG-JYURRK         =   1               )
+                      OR  ( FLG-ERR        NOT =   ZERO            )
+                      OR  ( JYURRK-DENPNUM NOT =   WRK-KEY-DENPNUM )
+      *
+                   IF      FLG-ERR             =   ZERO
+                       PERFORM 20021-JYURRK-SYORI-SEC
+                   END-IF
+      *
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                   PERFORM 970-JYURRK-READ-SEC
+               END-PERFORM
+      *
+               IF      IDX-S               >   ZERO
+                   PERFORM 20022-STOCKRES-HEN-SEC
+               END-IF
+           END-PERFORM
+           .
+      *
+       2001-ZAIKO-HENSYU-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ºÞÆâÍÆÊÔ½¸½èÍý
       *****************************************************************
@@ -618,7 +672,7 @@
       *
            ADD     1                   TO  IDX-S
            IF      IDX-S               >   200
-               GO      TO      20034-ZAISET-HEN-EXT
+               GO      TO      200341-MEISE-HEN-EXT
            END-IF
       *
            MOVE    SRY-SRYCD (IDXA)    TO  TBL-SRYCD (IDX-S)
@@ -628,7 +682,7 @@
            MOVE    WRK-GOK-SURYO       TO  TBL-SURYO (IDX-S)
       *
            .
-       20034-ZAISET-HEN-EXT.
+       200341-MEISE-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -636,19 +690,19 @@
       *****************************************************************
        20022-STOCKRES-HEN-SEC        SECTION.
       *
-           INITIALIZE                  ZAIKOUT-REC
+           INITIALIZE                     WRK-ZAIKOUT-REC
       *    ÅÁÉ¼ÈÖ¹æ
-           MOVE    WRK-KEY-DENPNUM     TO  ZAIKOUT-INVOICD-NUMBER
+           MOVE    WRK-KEY-DENPNUM     TO  WRK-ZAIKOUT-INVOICD-NUMBER
       *    ¿ÇÎÅÆüÉÕ
            MOVE    WRK-KEY-SRYYMD      TO  WRK-SYMD
            PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  ZAIKOUT-PERFORM-DATE
+           MOVE    WRK-HEN-DATE        TO  WRK-ZAIKOUT-PERFORM-DATE
       *
            MOVE    WRK-KEY-SRYYMD      TO  WRK-SRYYMD
       *    ¿ÇÎÅ²Ê
-           MOVE    WRK-KEY-SRYKA       TO  ZAIKOUT-DEP-CODE
+           MOVE    WRK-KEY-SRYKA       TO  WRK-ZAIKOUT-DEP-CODE
            PERFORM 20011-SRYKAMEI-HEN-SEC
-           MOVE    WRK-SRYKA-NAME      TO  ZAIKOUT-DEP-NAME
+           MOVE    WRK-SRYKA-NAME      TO  WRK-ZAIKOUT-DEP-NAME
       *
       *    ÌÀºÙ
            MOVE    ZERO                TO  IDY
@@ -663,17 +717,17 @@
                ELSE
                    ADD     1                   TO  IDY
       *
-                   MOVE    TBL-SRYCD (IDX)     TO  ZAIKOUT-PRSCRPT-CODE
-                                                           (IDY)
-                   MOVE    TNS-NAME            TO  ZAIKOUT-PRSCRPT-NAME
-                                                           (IDY)
-                   MOVE    TNS-KANANAME    TO  ZAIKOUT-PRSCRPT-KANANAME
-                                                           (IDY)
+                   MOVE    TBL-SRYCD (IDX)     TO
+                                       WRK-ZAIKOUT-PRSCRPT-CODE    (IDY)
+                   MOVE    TNS-NAME            TO
+                                       WRK-ZAIKOUT-PRSCRPT-NAME    (IDY)
+                   MOVE    TNS-KANANAME        TO
+                                       WRK-ZAIKOUT-PRSCRPT-KANANAME(IDY)
       *            ¿ôÎÌ¡ß²ó¿ô
                    MOVE    TBL-SURYO(IDX)      TO  WRK-SURYO
                    PERFORM 810-NUMHENKAN-SEC
-                   MOVE    WRK-SURYO-HX    TO  ZAIKOUT-PRSCRPT-NUMBER
-                                                           (IDY)
+                   MOVE    WRK-SURYO-HX        TO
+                                       WRK-ZAIKOUT-PRSCRPT-NUMBER  (IDY)
       *            Ã±²Á
                    IF     (TNS-TENSIKIBETU     =   "4"  )
                      AND  (TNS-TEN             >   ZERO )
@@ -683,72 +737,26 @@
                    END-IF
                    PERFORM 810-NUMHENKAN-SEC
                    MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
-                                               TO  ZAIKOUT-PRICD-MONEY
-                                                           (IDY)
+                                               TO
+                                       WRK-ZAIKOUT-PRICD-MONEY     (IDY)
       *            Ã±°Ì
-                   MOVE    TNS-TANICD          TO  ZAIKOUT-TANNICD
-                                                           (IDY)
-                   MOVE    TNS-TANINAME        TO  ZAIKOUT-TANICD-NAME
-                                                           (IDY)
+                   MOVE    TNS-TANICD          TO
+                                       WRK-ZAIKOUT-TANNICD         (IDY)
+                   MOVE    TNS-TANINAME        TO
+                                       WRK-ZAIKOUT-TANICD-NAME     (IDY)
                END-IF
            END-PERFORM
       *
            IF      IDY                 =   ZERO
-               GO      TO      20022-STOCKRES-HEN-EXT
+               INITIALIZE                  WRK-ZAIKOUT-REC
+           ELSE
+               ADD     1                   TO  CNT-OUT1
+                                               CNT-OUT
+               MOVE    CNT-OUT1            TO  IDXX
+               MOVE    WRK-ZAIKOUT-REC         TO  ZAIKOUT-OCC (IDXX)
            END-IF
-      *
-           ADD     1                   TO  FLG-XMLCOUNT
-           PERFORM 910-XMLEXPORT-SEC
-      *
-           ADD     1                   TO  CNT-OUT
            .
        20022-STOCKRES-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    EXPORT ½èÍý
-      *****************************************************************
-       910-XMLEXPORT-SEC          SECTION.
-      *
-           INITIALIZE                  XMLDATA-REC
-           MOVE   ZAIKOUT-REC      TO  XMLDATA-DATA
-      *
-           MOVE    1               TO  XMLDATA-MODE
-           MOVE    "xml_stock1"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    "XMLOPEN"       TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       XMLDATA-REC
-      *
-           MOVE    "stock1"        TO  XMLDATA-RECORDNAME
-           MOVE    "XMLWRITE"      TO  MCP-FUNC
-           CALL    "MONFUNC"           USING
-                                       MCPAREA
-                                       XMLDATA-REC
-      *
-           INITIALIZE                   ORCA-BLOB
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    "blob"          TO  MCP-TABLE
-           MOVE    XMLDATA-OBJECT  TO  ORCA-BLOB-OBJECT
-           INITIALIZE                  SGETTEMP-AREA
-           STRING  "stock1"        DELIMITED   BY  SIZE
-                   FLG-XMLCOUNT    DELIMITED   BY  SIZE
-                   ".xml"          DELIMITED   BY  SIZE
-                                   INTO        SGETTEMP-BASENAMES  (1)
-           END-STRING
-           CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
-           MOVE    SGETTEMP-FULLNAMES (1)
-                                       TO  ORCA-BLOB-FILE
-      *??
-           display "ORCA-BLOB-FILE="  ORCA-BLOB-FILE
-      *??
-           MOVE    "BLOBEXPORT"    TO  MCP-FUNC
-           CALL    "MONFUNC"       USING
-                                       MCPAREA
-                                       ORCA-BLOB
-           .
-       910-XMLEXPORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -808,6 +816,49 @@
            EXIT.
       *
       *****************************************************************
+      *    EXPORT ½èÍý
+      *****************************************************************
+       910-XMLEXPORT-SEC          SECTION.
+      *
+           INITIALIZE                  XMLDATA-REC
+           MOVE   ZAIKOUT-REC      TO  XMLDATA-DATA
+      *
+           MOVE    1               TO  XMLDATA-MODE
+           MOVE    "xml_stock1"    TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "XMLOPEN"       TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       XMLDATA-REC
+      *
+           MOVE    "stock1"        TO  XMLDATA-RECORDNAME
+           MOVE    "XMLWRITE"      TO  MCP-FUNC
+           CALL    "MONFUNC"           USING
+                                       MCPAREA
+                                       XMLDATA-REC
+      *
+           INITIALIZE                   ORCA-BLOB
+           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    "blob"          TO  MCP-TABLE
+           MOVE    XMLDATA-OBJECT  TO  ORCA-BLOB-OBJECT
+           INITIALIZE                  SGETTEMP-AREA
+           STRING  "stock1"        DELIMITED   BY  SIZE
+                   CNT-XMLCOUNT    DELIMITED   BY  SIZE
+                   ".xml"          DELIMITED   BY  SIZE
+                                   INTO        SGETTEMP-BASENAMES  (1)
+           END-STRING
+           CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                       TO  ORCA-BLOB-FILE
+           MOVE    "BLOBEXPORT"    TO  MCP-FUNC
+           CALL    "MONFUNC"       USING
+                                       MCPAREA
+                                       ORCA-BLOB
+           .
+       910-XMLEXPORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ½ªÎ»½èÍý
       *****************************************************************
        300-END-SEC                 SECTION.
@@ -823,7 +874,8 @@
                MOVE    "stock1"        TO  SAPIFILE-IN-FILENAME
                MOVE    "xml"           TO  SAPIFILE-IN-FILE-TYPE
                MOVE    1               TO  SAPIFILE-IN-RENNUM
-               MOVE    FLG-XMLCOUNT    TO  SAPIFILE-IN-COUNT
+               MOVE    CNT-XMLCOUNT    TO  SAPIFILE-IN-COUNT
+               MOVE    "2"             TO  SAPIFILE-IN-KBN
                MOVE    SGETTEMP-TEMPDIR
                                        TO  SAPIFILE-OT-DIRNAME
                MOVE    "stock1.xml"    TO  SAPIFILE-OT-FILENAME

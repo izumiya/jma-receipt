@@ -17,5 +17,5 @@ xml_stock1 {
 			Unit_Code		varchar(3);
 			Unit_Code_Name		varchar(20);
 		} [200];
-	};
+	} [68];
 };
