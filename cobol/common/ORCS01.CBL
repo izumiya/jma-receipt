@@ -489,6 +489,7 @@
       *                                     （高額療養費制度の見直し）
       *  04.08.20    NACL-門脇    17/07/14  和歌山県地方公費対応
       *  04.08.21    NACL-門脇    17/09/15  福島県地方公費対応
+      *  04.08.22    NACL-門脇    17/10/12  大阪府地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -626,7 +627,6 @@
            03  IDX14                   PIC  9(03).
            03  IDX16                   PIC  9(03).
            03  IDX17                   PIC  9(03).
-           03  IDX18                   PIC  9(03).
            03  IDX19                   PIC  9(03).
            03  Y-IDX                   PIC  9(03)  VALUE  ZERO.
            03  Y-IDX2                  PIC  9(03)  VALUE  ZERO.
@@ -1158,12 +1158,15 @@
                    07  WK-CHECK2010-JYUHENKBN           PIC X(01).
                    07  WK-CHECK2010-JYUHEN-TAIKBN       PIC X(01).
                    07  WK-CHECK2010-HBTNUM              PIC X(02).
-                   07  WK-CHECK2010-HBTNUM-NG           PIC X(01).
+                   07  WK-CHECK2010-NG                  PIC X(01).
       *
            03  WK-CHECK2010X-TBL.
                05  WK-CHECK2010X-OCC                    OCCURS   4.
                  06  WK-CHECK2010X-JYUHENKBN            PIC X(01).
-                 06  WK-CHECK2010X-HBTNUMIDX            PIC 9(01).
+                 06  WK-CHECK2010X-JYUHEN-TAIKBN        PIC X(01).
+                 06  WK-CHECK2010X-HBTNUM               PIC X(02).
+                 06  WK-CHECK2010X-NG                   PIC X(01).
+                 06  WK-CHECK2010X-TAISYOIDX            PIC 9(01).
       *
            03  WK-GNBKEIKBN-K-TBL.
                05  WK-GNBKEIKBN-K-OCC                   OCCURS   5.
@@ -18460,13 +18463,10 @@
              END-IF
            END-PERFORM
       *
-           MOVE   ZERO     TO   IDX18
            INITIALIZE           WK-CHECK2010X-TBL
            IF     LNK-SYU-SRYYMD(1:6) >= "200804"
                 PERFORM    220277-SYU-CHECK2010-SEC
-                IF   IDX18  NOT = ZERO
-                  PERFORM  220278-SYU-CHECKHBT-SEC
-                END-IF
+                PERFORM    220278-SYU-CHECKHBT-SEC
            END-IF
       *
            PERFORM   VARYING   KOHFUKA-IDX   FROM   1   BY   1
@@ -18572,16 +18572,13 @@
              WHEN        1
                IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
                    (COMB-KOH1ID     NOT =  WRK-COMB-KOH1ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  1      )
+               OR ( WK-CHECK2010X-TAISYOIDX(1)   =  1      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
                 OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
                      (COMB-KOH2ID         =  WRK-COMB-KOH1ID) AND
-                     (LNK-SYU-KOH2HKNNUM  =  "051"          ) AND
-                     (LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
-                     (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
-                     (LNK-SYU-KOH1HKNNUM  =  "051"          ))
+                     (LNK-SYU-KOH2HKNNUM  =  "051"          ))
       ***       OR  ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
       ***            (COMB-KOH2ID         =  WRK-COMB-KOH2ID) AND
       ***            (LNK-SYU-KOH2HKNNUM  =  "051"          ))
@@ -18606,7 +18603,7 @@
                END-IF
                IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM ) AND
                    (COMB-KOH2ID     NOT =  WRK-COMB-KOH1ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  2      )
+               OR ( WK-CHECK2010X-TAISYOIDX(1)   =  2      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -18637,7 +18634,7 @@
                END-IF
                IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM ) AND
                    (COMB-KOH3ID     NOT =  WRK-COMB-KOH1ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  3      )
+               OR ( WK-CHECK2010X-TAISYOIDX(1)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH1ID
@@ -18656,7 +18653,7 @@
                END-IF
                IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM ) AND
                    (COMB-KOH4ID     NOT =  WRK-COMB-KOH1ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(1)   =  4      )
+               OR ( WK-CHECK2010X-TAISYOIDX(1)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH1ID
@@ -18676,7 +18673,7 @@
              WHEN        2
                IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                    (COMB-KOH1ID     NOT =  WRK-COMB-KOH2ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  1      )
+               OR ( WK-CHECK2010X-TAISYOIDX(2)   =  1      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH1ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -18707,7 +18704,7 @@
                END-IF
                IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH2HKNNUM ) AND
                    (COMB-KOH2ID     NOT =  WRK-COMB-KOH2ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  2      )
+               OR ( WK-CHECK2010X-TAISYOIDX(2)   =  2      )
                 IF  ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH2HKNNUM ) AND
                      (COMB-KOH1ID         =  WRK-COMB-KOH2ID) AND
                      (LNK-SYU-KOH1HKNNUM  =  "051"          ))
@@ -18738,7 +18735,7 @@
                END-IF
                IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH2HKNNUM ) AND
                    (COMB-KOH3ID     NOT =  WRK-COMB-KOH2ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  3      )
+               OR ( WK-CHECK2010X-TAISYOIDX(2)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH2ID
@@ -18757,7 +18754,7 @@
                END-IF
                IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH2HKNNUM ) AND
                    (COMB-KOH4ID     NOT =  WRK-COMB-KOH2ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(2)   =  4      )
+               OR ( WK-CHECK2010X-TAISYOIDX(2)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH2ID
@@ -18777,7 +18774,7 @@
              WHEN        3
                IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH3HKNNUM ) AND
                    (COMB-KOH1ID     NOT =  WRK-COMB-KOH3ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  1      )
+               OR ( WK-CHECK2010X-TAISYOIDX(3)   =  1      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH3ID
@@ -18796,7 +18793,7 @@
                END-IF
                IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH3HKNNUM ) AND
                    (COMB-KOH2ID     NOT =  WRK-COMB-KOH3ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  2      )
+               OR ( WK-CHECK2010X-TAISYOIDX(3)   =  2      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH3ID
@@ -18815,7 +18812,7 @@
                END-IF
                IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH3HKNNUM ) AND
                    (COMB-KOH3ID     NOT =  WRK-COMB-KOH3ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  3      )
+               OR ( WK-CHECK2010X-TAISYOIDX(3)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH3ID
@@ -18834,7 +18831,7 @@
                END-IF
                IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH3HKNNUM ) AND
                    (COMB-KOH4ID     NOT =  WRK-COMB-KOH3ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(3)   =  4      )
+               OR ( WK-CHECK2010X-TAISYOIDX(3)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH3ID
@@ -18854,7 +18851,7 @@
              WHEN        4
                IF ((LNK-SYU-KOH1HKNNUM  =  SYU-KOH4HKNNUM ) AND
                    (COMB-KOH1ID     NOT =  WRK-COMB-KOH4ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  1      )
+               OR ( WK-CHECK2010X-TAISYOIDX(4)   =  1      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH1ID    TO  WRK-COMB-KOH4ID
@@ -18873,7 +18870,7 @@
                END-IF
                IF ((LNK-SYU-KOH2HKNNUM  =  SYU-KOH4HKNNUM ) AND
                    (COMB-KOH2ID     NOT =  WRK-COMB-KOH4ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  2      )
+               OR ( WK-CHECK2010X-TAISYOIDX(4)   =  2      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH2ID    TO  WRK-COMB-KOH4ID
@@ -18892,7 +18889,7 @@
                END-IF
                IF ((LNK-SYU-KOH3HKNNUM  =  SYU-KOH4HKNNUM ) AND
                    (COMB-KOH3ID     NOT =  WRK-COMB-KOH4ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  3      )
+               OR ( WK-CHECK2010X-TAISYOIDX(4)   =  3      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH3ID    TO  WRK-COMB-KOH4ID
@@ -18911,7 +18908,7 @@
                END-IF
                IF ((LNK-SYU-KOH4HKNNUM  =  SYU-KOH4HKNNUM ) AND
                    (COMB-KOH4ID     NOT =  WRK-COMB-KOH4ID))
-               OR ( WK-CHECK2010X-HBTNUMIDX(4)   =  4      )
+               OR ( WK-CHECK2010X-TAISYOIDX(4)   =  4      )
                  EVALUATE  FLG-KOHFUKA-HENSYU
                    WHEN        1
                      MOVE   COMB-KOH4ID    TO  WRK-COMB-KOH4ID
@@ -19634,7 +19631,7 @@
       *            保険者変更時
                    PERFORM   220274-KOHFUKA-HENSYU3-SEC
                  END-IF
-             WHEN      "A"
+             WHEN      "Z"
                  IF ((COMB-KOH1HKNNUM = "972" OR "974"     ) AND
                      (COMB-KOH1HKNNUM = WRK-COMB-KOH1HKNNUM) AND
                      (COMB-KOH1ID     = WRK-COMB-KOH1ID    ))
@@ -19738,20 +19735,24 @@
                       OR    (FLG-ARI                          =  1   )
              IF  SYU-HKNCOMBINUM = WK-CHECK2010-HKNCOMBINUM(IDX16)
                MOVE    1     TO    FLG-ARI
-               MOVE   IDX16  TO    IDX18
                PERFORM  VARYING  IDX17  FROM  1  BY  1
                          UNTIL  (IDX17                     >  4   )
                           OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
                  IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
                    MOVE  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
                              TO    WK-CHECK2010X-JYUHENKBN(IDX17)
+                   MOVE  WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17)
+                             TO    WK-CHECK2010X-JYUHEN-TAIKBN(IDX17)
+                   MOVE  WK-CHECK2010-HBTNUM(IDX16 IDX17)
+                             TO    WK-CHECK2010X-HBTNUM(IDX17)
+                   MOVE  WK-CHECK2010-NG(IDX16 IDX17)
+                             TO    WK-CHECK2010X-NG(IDX17)
                  END-IF
                END-PERFORM
              END-IF
            END-PERFORM
            IF    FLG-ARI  =   ZERO
            AND   IDX16   <=   100
-             MOVE     IDX16  TO    IDX18
              MOVE  SYU-HKNCOMBINUM  TO  WK-CHECK2010-HKNCOMBINUM(IDX16)
              PERFORM  VARYING  IDX17  FROM  1  BY  1
                        UNTIL  (IDX17                     >  4   )
@@ -19764,37 +19765,8 @@
              PERFORM  VARYING  IDX17  FROM  1  BY  1
                        UNTIL  (IDX17                     >  4   )
                         OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
-               IF   WK-CHECK2010-HBTNUM(IDX16 IDX17)  NOT =  SPACE
-                 EVALUATE  IDX17
-                   WHEN       1
-                     IF  WK-CHECK2010-HBTNUM(IDX16 1) =
-                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 3) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 4)
-                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 1)
-                     END-IF
-                   WHEN       2
-                     IF  WK-CHECK2010-HBTNUM(IDX16 2) =
-                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 3) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 4)
-                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 2)
-                     END-IF
-                   WHEN       3
-                     IF  WK-CHECK2010-HBTNUM(IDX16 3) =
-                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 4)
-                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 3)
-                     END-IF
-                   WHEN       4
-                     IF  WK-CHECK2010-HBTNUM(IDX16 4) =
-                                       WK-CHECK2010-HBTNUM(IDX16 1) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 2) OR
-                                       WK-CHECK2010-HBTNUM(IDX16 3)
-                       MOVE   "1"  TO  WK-CHECK2010-HBTNUM-NG(IDX16 4)
-                     END-IF
-                 END-EVALUATE
+               IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
+                 PERFORM   2202772-SYU-CHECK2010-YYY-SEC
                END-IF
              END-PERFORM
       *
@@ -19804,6 +19776,12 @@
                IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
                  MOVE  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
                              TO    WK-CHECK2010X-JYUHENKBN(IDX17)
+                 MOVE  WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17)
+                             TO    WK-CHECK2010X-JYUHEN-TAIKBN(IDX17)
+                 MOVE  WK-CHECK2010-HBTNUM(IDX16 IDX17)
+                             TO    WK-CHECK2010X-HBTNUM(IDX17)
+                 MOVE  WK-CHECK2010-NG(IDX16 IDX17)
+                             TO    WK-CHECK2010X-NG(IDX17)
                END-IF
              END-PERFORM
            END-IF
@@ -19851,7 +19829,7 @@
              OR ((COMB-KOH4HKNNUM  =  WRK-COMB-KOHHKNNUM(IDX17)) AND
                  (COMB-KOH4ID      =  WRK-COMB-KOHID(IDX17)    ) AND
                  (FLG-CHIHOU3(4)   =  "1"                      ))
-               MOVE   "A"   TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
+               MOVE   "Z"   TO  WK-CHECK2010-JYUHENKBN(IDX16 IDX17)
              END-IF
       *
              MOVE  SYS-2010-JYUHEN-TAIKBN
@@ -19897,32 +19875,221 @@
            EXIT.
       *
       ******************************************************************
-      *    収納データの法別番号チェック
+      *    収納データのシステム管理２０１０設定チェック
+      ******************************************************************
+       2202772-SYU-CHECK2010-YYY-SEC          SECTION.
+      *
+           IF  (WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17) =  "1"  )
+           AND (WK-CHECK2010-HBTNUM(IDX16 IDX17)    NOT =  SPACE)
+             EVALUATE  IDX17
+               WHEN       1
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 1) =
+                             WK-CHECK2010-HBTNUM(IDX16 2)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 1) =
+                             WK-CHECK2010-HBTNUM(IDX16 3)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 1) =
+                             WK-CHECK2010-HBTNUM(IDX16 4)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 1)
+                 END-IF
+               WHEN       2
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 2) =
+                             WK-CHECK2010-HBTNUM(IDX16 1)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 2) =
+                             WK-CHECK2010-HBTNUM(IDX16 3)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 2) =
+                             WK-CHECK2010-HBTNUM(IDX16 4)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 2)
+                 END-IF
+               WHEN       3
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 3) =
+                             WK-CHECK2010-HBTNUM(IDX16 1)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 3) =
+                             WK-CHECK2010-HBTNUM(IDX16 2)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 3) =
+                             WK-CHECK2010-HBTNUM(IDX16 4)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 3)
+                 END-IF
+               WHEN       4
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 4) =
+                             WK-CHECK2010-HBTNUM(IDX16 1)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 4) =
+                             WK-CHECK2010-HBTNUM(IDX16 2)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-HBTNUM(IDX16 4) =
+                             WK-CHECK2010-HBTNUM(IDX16 3)       ) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 4)
+                 END-IF
+             END-EVALUATE
+           END-IF
+      *
+           IF   WK-CHECK2010-JYUHEN-TAIKBN(IDX16 IDX17) =
+                        "A" OR "B" OR "C" OR "D" OR "E" OR
+                        "F" OR "G" OR "H" OR "I" OR "J"
+             EVALUATE  IDX17
+               WHEN       1
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 1) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 1)
+                 END-IF
+               WHEN       2
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 2) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 2)
+                 END-IF
+               WHEN       3
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 3) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 4)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 3)
+                 END-IF
+               WHEN       4
+                 IF ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 1)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 1)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 2)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 2)    ))
+                 OR ((WK-CHECK2010-JYUHEN-TAIKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHEN-TAIKBN(IDX16 3)) AND
+                     (WK-CHECK2010-JYUHENKBN(IDX16 4) =
+                             WK-CHECK2010-JYUHENKBN(IDX16 3)    ))
+                   MOVE   "1"  TO  WK-CHECK2010-NG(IDX16 4)
+                 END-IF
+             END-EVALUATE
+           END-IF
+      *
+           .
+      *
+       2202772-SYU-CHECK2010-YYY-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データの法別番号等のチェック
       ******************************************************************
        220278-SYU-CHECKHBT-SEC          SECTION.
       *
-           PERFORM   VARYING   IDX17   FROM   1   BY   1
-                      UNTIL    IDX17    >     4
-             IF  (WK-CHECK2010-HBTNUM(IDX18 IDX17) NOT = SPACE)
-             AND (WK-CHECK2010-HBTNUM-NG(IDX18 IDX17)  = SPACE)
+           PERFORM  VARYING  IDX17  FROM  1  BY  1
+                     UNTIL  (IDX17                     >  4   )
+                      OR    (WRK-COMB-KOHHKNNUM(IDX17) = SPACE)
+             IF   WRK-COMB-KOHHKNNUM(IDX17)(1:1) >= "1" AND <= "8"
                IF  WRK-COMB-KOHHKNNUM(IDX17) =  COMB-KOHHKNNUM(1)
                                             OR  COMB-KOHHKNNUM(2)
                                             OR  COMB-KOHHKNNUM(3)
                                             OR  COMB-KOHHKNNUM(4)
                  CONTINUE
                ELSE
-                 PERFORM  VARYING  IDX16  FROM  1  BY  1
-                           UNTIL  (IDX16                 >  4   )
-                            OR    (COMB-KOHHKNNUM(IDX16) = SPACE)
-                   IF  (WK-2010-JYUHEN-TAIKBN(IDX16)  =  "1"  )
-                   AND (WK-HBTNUM(IDX16) =
-                           WK-CHECK2010-HBTNUM(IDX18 IDX17)   )
-                   AND (WK-2010-JYUHENKBN(IDX16) =
-                           WK-CHECK2010-JYUHENKBN(IDX18 IDX17))
-                      PERFORM   2202781-SYU-CHECKHBT-XXX-SEC
-                      MOVE   4       TO   IDX16
-                   END-IF
-                 END-PERFORM
+                 IF  (WK-CHECK2010X-JYUHEN-TAIKBN(IDX17)  =  "1"  )
+                 AND (WK-CHECK2010X-HBTNUM(IDX17)     NOT =  SPACE)
+                 AND (WK-CHECK2010X-NG(IDX17)             =  SPACE)
+                   PERFORM  VARYING  IDX16  FROM  1  BY  1
+                             UNTIL  (IDX16                 >  4   )
+                              OR    (COMB-KOHHKNNUM(IDX16) = SPACE)
+                     IF  (WK-CHECK2010X-JYUHEN-TAIKBN(IDX17) =
+                                     WK-2010-JYUHEN-TAIKBN(IDX16))
+                     AND (WK-CHECK2010X-HBTNUM(IDX17) =
+                                     WK-HBTNUM(IDX16)            )
+                     AND (WK-CHECK2010X-JYUHENKBN(IDX17) =
+                                     WK-2010-JYUHENKBN(IDX16)    )
+                        PERFORM   2202781-SYU-CHECKHBT-XXX-SEC
+                        MOVE   4       TO   IDX16
+                     END-IF
+                   END-PERFORM
+                 END-IF
+      *
+                 IF  (WK-CHECK2010X-JYUHEN-TAIKBN(IDX17)  =
+                              "A" OR "B" OR "C" OR "D" OR "E" OR
+                              "F" OR "G" OR "H" OR "I" OR "J"     )
+                 AND (WK-CHECK2010X-NG(IDX17)             =  SPACE)
+                   PERFORM  VARYING  IDX16  FROM  1  BY  1
+                             UNTIL  (IDX16                 >  4   )
+                              OR    (COMB-KOHHKNNUM(IDX16) = SPACE)
+                     IF  (WK-CHECK2010X-JYUHEN-TAIKBN(IDX17) =
+                                     WK-2010-JYUHEN-TAIKBN(IDX16))
+                     AND (WK-CHECK2010X-JYUHENKBN(IDX17) =
+                                     WK-2010-JYUHENKBN(IDX16)    )
+                        PERFORM   2202782-SYU-CHECKHBT-YYY-SEC
+                        MOVE   4       TO   IDX16
+                     END-IF
+                   END-PERFORM
+                 END-IF
                END-IF
              END-IF
            END-PERFORM
@@ -19933,60 +20100,153 @@
            EXIT.
       *
       ******************************************************************
-      *    収納データの法別番号チェック
+      *    収納データの法別番号等のチェック
       ******************************************************************
        2202781-SYU-CHECKHBT-XXX-SEC          SECTION.
       *
            EVALUATE  IDX16
              WHEN      1
-               IF ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
-                   (WK-HBTNUM(2) = WK-HBTNUM(1)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
-                   (WK-HBTNUM(3) = WK-HBTNUM(1)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
-                   (WK-HBTNUM(4) = WK-HBTNUM(1)     ))
+               IF ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-HBTNUM(1)         = WK-HBTNUM(2)            ) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-HBTNUM(1)         = WK-HBTNUM(3)            ) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(3)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-HBTNUM(1)         = WK-HBTNUM(4)            ) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(4)    ))
                  CONTINUE
                ELSE
-                 MOVE    1    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+                 MOVE    1    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
                END-IF
              WHEN      2
-               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
-                   (WK-HBTNUM(1) = WK-HBTNUM(2)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
-                   (WK-HBTNUM(3) = WK-HBTNUM(2)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
-                   (WK-HBTNUM(4) = WK-HBTNUM(2)     ))
+               IF ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-HBTNUM(2)         = WK-HBTNUM(1)            ) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-HBTNUM(2)         = WK-HBTNUM(3)            ) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(3)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-HBTNUM(2)         = WK-HBTNUM(4)            ) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(4)    ))
                  CONTINUE
                ELSE
-                 MOVE    2    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+                 MOVE    2    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
                END-IF
              WHEN      3
-               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
-                   (WK-HBTNUM(1) = WK-HBTNUM(3)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
-                   (WK-HBTNUM(2) = WK-HBTNUM(3)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(4)  =  "1") AND
-                   (WK-HBTNUM(4) = WK-HBTNUM(3)     ))
+               IF ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-HBTNUM(3)         = WK-HBTNUM(1)            ) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-HBTNUM(3)         = WK-HBTNUM(2)            ) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-HBTNUM(3)         = WK-HBTNUM(4)            ) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(4)    ))
                  CONTINUE
                ELSE
-                 MOVE    3    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+                 MOVE    3    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
                END-IF
              WHEN      4
-               IF ((WK-2010-JYUHEN-TAIKBN(1)  =  "1") AND
-                   (WK-HBTNUM(1) = WK-HBTNUM(4)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(2)  =  "1") AND
-                   (WK-HBTNUM(2) = WK-HBTNUM(4)     ))
-               OR ((WK-2010-JYUHEN-TAIKBN(3)  =  "1") AND
-                   (WK-HBTNUM(3) = WK-HBTNUM(4)     ))
+               IF ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-HBTNUM(4)         = WK-HBTNUM(1)            ) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-HBTNUM(4)         = WK-HBTNUM(2)            ) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-HBTNUM(4)         = WK-HBTNUM(3)            ) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(3)    ))
                  CONTINUE
                ELSE
-                 MOVE    4    TO  WK-CHECK2010X-HBTNUMIDX(IDX17)
+                 MOVE    4    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
                END-IF
            END-EVALUATE
       *
            .
       *
        2202781-SYU-CHECKHBT-XXX-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    収納データの法別番号等のチェック
+      ******************************************************************
+       2202782-SYU-CHECKHBT-YYY-SEC          SECTION.
+      *
+           EVALUATE  IDX16
+             WHEN      1
+               IF ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(3)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(1)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-2010-JYUHENKBN(1) = WK-2010-JYUHENKBN(4)    ))
+                 CONTINUE
+               ELSE
+                 MOVE    1    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
+               END-IF
+             WHEN      2
+               IF ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(3)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(2)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-2010-JYUHENKBN(2) = WK-2010-JYUHENKBN(4)    ))
+                 CONTINUE
+               ELSE
+                 MOVE    2    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
+               END-IF
+             WHEN      3
+               IF ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(3)
+                                         = WK-2010-JYUHEN-TAIKBN(4)) AND
+                   (WK-2010-JYUHENKBN(3) = WK-2010-JYUHENKBN(4)    ))
+                 CONTINUE
+               ELSE
+                 MOVE    3    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
+               END-IF
+             WHEN      4
+               IF ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(1)) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(1)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(2)) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(2)    ))
+               OR ((WK-2010-JYUHEN-TAIKBN(4)
+                                         = WK-2010-JYUHEN-TAIKBN(3)) AND
+                   (WK-2010-JYUHENKBN(4) = WK-2010-JYUHENKBN(3)    ))
+                 CONTINUE
+               ELSE
+                 MOVE    4    TO  WK-CHECK2010X-TAISYOIDX(IDX17)
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       2202782-SYU-CHECKHBT-YYY-EXT.
            EXIT.
       *
       ******************************************************************
