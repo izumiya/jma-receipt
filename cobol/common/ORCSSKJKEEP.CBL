@@ -33,6 +33,9 @@
       *                                     コードが細分化されることから
       *                                     低所得者で難病据え置き時は
       *                                     返却する区分をクリアしない
+      *              NACL-小豆沢  17/10/19  難病判定用の保険組合せ番号
+      *                                     退避時に保険組合せ有効期間
+      *                                     を考慮するよう修正
       *****************************************************************
       *
       *
@@ -1310,9 +1313,12 @@
                      PERFORM   910-HKNCOMBI-READ-SEC
                      PERFORM    UNTIL   (FLG-HKNCOMBI   =   1)  OR
                                         (IDX-HKNCOMBI   =   10)
-                       ADD      1                TO  IDX-HKNCOMBI
-                       MOVE  COMB-HKNCOMBINUM    TO  WRK-NANBYO-HKNCOMBI
+                       IF  (COMB-TEKSTYMD(1:6) <= LNK-SKJKEEP-SANTEIYM)
+                       AND (COMB-TEKEDYMD(1:6) >= LNK-SKJKEEP-SANTEIYM)
+                           ADD      1                TO  IDX-HKNCOMBI
+                           MOVE COMB-HKNCOMBINUM TO  WRK-NANBYO-HKNCOMBI
                                                      (IDX-HKNCOMBI)
+                       END-IF
                        MOVE    "tbl_hkncombi"    TO  MCP-TABLE
                        MOVE    "key4"            TO  MCP-PATHNAME
                        PERFORM   910-HKNCOMBI-READ-SEC
