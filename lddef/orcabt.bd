@@ -310,6 +310,7 @@ bind	"ORAPI052BR1V3"	"OpenCOBOL";
 bind	"ORAPI052BR2V3"	"OpenCOBOL";
 bind    "ORCBBLOBIMPORT"    "OpenCOBOL";
 bind	"ORAPI052BR3V3"	"OpenCOBOL";
+bind	"ORCBUPMAIN"	"OpenCOBOL";
 
 db "xml2" {
  fm_payment_certificate;
