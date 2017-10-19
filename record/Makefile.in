@@ -539,6 +539,7 @@ RECORD_files = \
 	hsfindv3.rec \
 	diseasemasterlstv3.rec \
 	medicationmasterlstv3.rec \
+	subjectiveslstv2.rec \
 
 DEF_files = \
 
@@ -1022,6 +1023,8 @@ DB_files = \
 	monblob.db \
 	xml_stock1.db \
 	xml_disease_masterlst.db \
+	xml_subjectiveslstv2req.db \
+	xml_subjectiveslstv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

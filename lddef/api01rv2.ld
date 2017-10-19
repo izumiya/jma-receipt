@@ -37,6 +37,7 @@ bindapi	"imagegetv2"	"OpenCOBOL"	"ORAPI000R2V2";
 bindapi	"patientlst6v2"	"OpenCOBOL"	"ORAPI012R6V2";
 bindapi	"prescriptionv2"	"OpenCOBOL"	"ORAPI001R2V2";
 bindapi	"medicinenotebookv2"	"OpenCOBOL"	"ORAPI001R3V2";
+bindapi	"subjectiveslstv2"	"OpenCOBOL"	"ORAPI025R1V2";
 
 multiplex_group	api01rv2;
 
@@ -77,6 +78,7 @@ data	{
 		patientlst6v2;
 		prescriptionv2;
 		medicinenotebookv2;
+		subjectiveslstv2;
 	};
 };
 db "xml2" {
@@ -151,6 +153,8 @@ db "xml2" {
  fm_prescription;
  xml_medicine_notebookv2req;
  fm_medicine_notebook;
+ xml_subjectiveslstv2req;
+ xml_subjectiveslstv2res;
 };
 
 #include "orcadb.inc"
