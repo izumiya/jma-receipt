@@ -368,6 +368,9 @@
            MOVE    SPA-NAI-MOTOPG      TO  SPA-SAKIPG
            MOVE    "MJOB"              TO  SPA-MOTOPG
            MOVE    SPACE               TO  LINKAREA
+      *H29.10
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
            MOVE    "CHANGE"            TO  MCP-PUTTYPE
            MOVE    SPA-SAKIPG          TO  MCP-WINDOW
            PERFORM 900-PUT-WINDOW

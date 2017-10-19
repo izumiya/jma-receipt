@@ -511,6 +511,8 @@
            END-IF
            MOVE    "M80"               TO  SPA-MOTOPG
       *
+           MOVE    SPACE               TO  LINKAREA
+      *
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
            MOVE    "CHANGE"            TO  MCP-PUTTYPE

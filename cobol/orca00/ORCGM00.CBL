@@ -512,6 +512,9 @@
       *H25.9
                                        OR  "M97"
                                        OR  "MDAS"
+      *H29.10
+                                       OR  "MJOB"
+                                       OR  "M80"
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
                MOVE    SPA-SYSYMDW         TO  WRK-WYMD
@@ -1418,6 +1421,8 @@
       *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-SAKIPG      NOT =  SPACE
+                   MOVE    SPACE               TO  SPA-MOTOPG2
+                   MOVE    "M00"               TO  SPA-MOTOPG
                    EVALUATE    SPA-SAKIPG
                        WHEN    "M01"
                            CONTINUE

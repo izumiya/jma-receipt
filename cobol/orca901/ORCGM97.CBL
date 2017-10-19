@@ -798,6 +798,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    "M80"               TO  SPA-SAKIPG
            MOVE    "M97"               TO  SPA-MOTOPG
+      *
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPA-KYOUTU      TO  LNK-KYOUTU
+      *
            MOVE    "M80"               TO  MCP-WINDOW
            MOVE    "JOIN"              TO  MCP-PUTTYPE
       *
