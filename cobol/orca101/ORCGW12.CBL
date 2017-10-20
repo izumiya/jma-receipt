@@ -8643,7 +8643,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            IF      SPA-GMN-RECEDEN-DATAKBN =   SPACE
                IF      SPA-MW                  =   SPA-GINBEE
                    IF      SPA-200501-RECEDEN-DATAKBN
-                                                   =   "5" OR "6"
+                                                   =   "5" OR "6" OR
+                                                       SPACE
                        CONTINUE
                    ELSE
                        MOVE    SPACE       TO
@@ -8668,7 +8669,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                IF      SPA-MW                  =   SPA-GINBEE
                    MOVE    SPA-GMN-RECEDEN-DATAKBNLST (1)
                                        TO  SPA-GMN-RECEDEN-DATAKBN-G
-                   MOVE    SPACE       TO  SPA-GMN-RECEDEN-DATAKBN-G
+      ************ MOVE    SPACE       TO  SPA-GMN-RECEDEN-DATAKBN-G
                ELSE
                    MOVE    SPA-GMN-RECEDEN-DATAKBNLST (2)
                                        TO  SPA-GMN-RECEDEN-DATAKBN-G
