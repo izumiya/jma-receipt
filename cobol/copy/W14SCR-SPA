@@ -49,6 +49,7 @@
                                13  SPA-GMN-PARAKBNMEI
                                                    PIC X(12).
                            11  SPA-GMN-NAME        PIC X(128).
+                           11  SPA-GMN-NAME-BACK   PIC X(128).
        *
                    07  SPA-GMN-PARAKBNLST          OCCURS  3.
                        09  SPA-GMN-PARAKBNL        PIC X(01).

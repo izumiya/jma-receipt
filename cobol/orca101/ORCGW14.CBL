@@ -276,6 +276,8 @@
                WHEN    "WID1"
                    PERFORM 330-WID1-SET-SEC
                    GO      TO      300-SCREEN-EXT
+               WHEN    "W141"
+                   GO      TO      300-SCREEN-EXT
            END-EVALUATE
       *
            PERFORM 310-SPASET-SEC
@@ -401,6 +403,8 @@
                MOVE    SYS-3004-PRTNM      TO  SPA-GMN-PRTNM   (IDX)
                MOVE    SYS-3004-PARAKBN    TO  SPA-GMN-PARAKBN (IDX)
                MOVE    SYS-3004-NAME       TO  SPA-GMN-NAME    (IDX)
+                                               SPA-GMN-NAME-BACK
+                                                               (IDX)
                PERFORM VARYING IDZ FROM    1   BY  1
                        UNTIL   IDZ >       SPA-GMN-PARAKBN-MAX
                    IF      SPA-GMN-PARAKBN (IDX)
@@ -1098,6 +1102,9 @@
            END-IF
       *
            MOVE    SPACE           TO  SPA-MOTOPG
+      *
+           MOVE    SPA-GMN-NAME (SPA-NAI-SELCD)
+                                   TO  SPA-GMN-NAME-BACK (SPA-NAI-SELCD)
       *
            MOVE    SPA-W14FREE     TO  SPA-FREE
            MOVE    SPA-W01KYOUTU   TO  SPA-WORK

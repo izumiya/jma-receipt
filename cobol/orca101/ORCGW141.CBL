@@ -201,6 +201,8 @@
            EVALUATE    MCP-EVENT       ALSO      MCP-WIDGET
       *        戻る
                WHEN    "CLICKED"       ALSO    "B01"
+                   MOVE    SPA-GMN-NAME-BACK (SPA-NAI-SELCD)
+                                       TO  SPA-GMN-NAME (SPA-NAI-SELCD)
                    PERFORM  210-BACK
       *        削除
                WHEN    "CLICKED"       ALSO    "B04"
@@ -336,9 +338,9 @@
       *****************************************************************
        410-DELETE-SEC              SECTION.
       *
-           MOVE    SPACE           TO  W141-NAME
+           MOVE    SPACE           TO  SPA-GMN-NAME (SPA-NAI-SELCD)
       *
-           PERFORM 410-KAKUTEI-SEC
+           PERFORM 210-BACK
            .
        410-DELETE-EXT.
            EXIT.
@@ -351,60 +353,6 @@
       *    入力チェック処理
            PERFORM 410-INPUT-CHK-SEC
            IF      SPA-ERRCD   NOT =   SPACE
-               GO  TO  410-KAKUTEI-EXT
-           END-IF
-      *
-           INITIALIZE                  SYS-3004-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-3004-HOSPNUM
-           MOVE    SPA-W01-KANRICD TO  SYS-3004-KANRICD
-           MOVE    SPA-W01-STYUKYMD
-                                   TO  SYS-3004-STYUKYMD
-           MOVE    SPA-W01-STYUKYMD
-                                   TO  SYS-3004-EDYUKYMD
-           MOVE    SPA-GMN-TCD (SPA-NAI-SELCD)
-                                   TO  SYS-3004-KBNCD
-           MOVE    SYS-3004-REC    TO  MCPDATA-REC
-           PERFORM 900-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI    =   ZERO
-               MOVE   MCPDATA-REC      TO  SYS-3004-REC
-           ELSE
-               MOVE    SPACE           TO  SYS-3004-REC
-               INITIALIZE                  SYS-3004-REC
-               MOVE    SPA-HOSPNUM     TO  SYS-3004-HOSPNUM
-               MOVE    SPA-W01-KANRICD TO  SYS-3004-KANRICD
-               MOVE    SPA-GMN-TCD (SPA-NAI-SELCD)
-                                       TO  SYS-3004-KBNCD
-               MOVE    SPA-W01-STYUKYMD
-                                       TO  SYS-3004-STYUKYMD
-               MOVE    SPA-W01-EDYUKYMD
-                                       TO  SYS-3004-EDYUKYMD
-           END-IF
-           MOVE    SPA-GMN-SHORIMSG (SPA-NAI-SELCD)
-                                   TO  SYS-3004-SHORIMSG
-           MOVE    SPA-GMN-SHELLID  (SPA-NAI-SELCD)
-                                   TO  SYS-3004-SHELLID
-           MOVE    SPA-GMN-CHK      (SPA-NAI-SELCD)
-                                   TO  SYS-3004-CHK
-           MOVE    SPA-GMN-PRTNM    (SPA-NAI-SELCD)
-                                   TO  SYS-3004-PRTNM
-           MOVE    SPA-GMN-PARAKBN  (SPA-NAI-SELCD)
-                                   TO  SYS-3004-PARAKBN
-           MOVE    SPA-GMN-NAME     (SPA-NAI-SELCD)
-                                   TO  SYS-3004-NAME
-           MOVE    SYS-3004-REC    TO  MCPDATA-REC
-      *
-           IF      FLG-SYSKANRI    =   ZERO
-               MOVE    "DBUPDATE"      TO  MCP-FUNC
-           ELSE
-               MOVE    "DBINSERT"      TO  MCP-FUNC
-           END-IF
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-           IF      MCP-RC              NOT =   ZERO 
-               MOVE    "1001"                  TO  SPA-ERRCD
                GO  TO  410-KAKUTEI-EXT
            END-IF
       *
