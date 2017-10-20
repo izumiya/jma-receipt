@@ -1089,8 +1089,10 @@
                                    =   SPACE )
            OR    ( SPA-GMN-SHELLID  (SPA-NAI-SELCD) 
                                    =   SPACE )
-               MOVE    ZERO            TO  SPA-NAI-SELCD
-               GO  TO  460-DOCER-EXT
+               IF      SPA-GMN-NAME (SPA-NAI-SELCD)    =   SPACE
+                   MOVE    ZERO            TO  SPA-NAI-SELCD
+                   GO  TO  460-DOCER-EXT
+               END-IF
            END-IF
       *
       *    入力チェック処理
