@@ -451,8 +451,13 @@
       *****************************************************************
        801-DAYHEN01-SEC                SECTION.
       *
-           IF      WRK-SYMD            =   SPACE
-               MOVE    SPACE           TO  WRK-HEN-DATE
+           INITIALIZE                  WRK-HEN-DATE
+           MOVE    "-"                 TO  WRK-HEN-H1
+           MOVE    "-"                 TO  WRK-HEN-H2
+           IF      WRK-SYMD            =   SPACE   OR  "00000000"
+               MOVE    "1900"              TO  WRK-HEN-YY
+               MOVE    "01"                TO  WRK-HEN-MM
+               MOVE    "01"                TO  WRK-HEN-DD
            ELSE
                INITIALIZE                  WRK-HEN-DATE
                MOVE    WRK-SYY             TO  WRK-HEN-YY
@@ -467,14 +472,21 @@
            END-IF
       *
            INITIALIZE                  WRK-HEN-TIME
-           MOVE    WRK-THH             TO  WRK-HEN-THH
-           MOVE    WRK-TMM             TO  WRK-HEN-TMM
-           MOVE    WRK-TSS             TO  WRK-HEN-TSS
            MOVE    ":"                 TO  WRK-HEN-T1
            MOVE    ":"                 TO  WRK-HEN-T2
+           IF      WRK-THMS            =   SPACE
+               MOVE    "00"                TO  WRK-HEN-THH
+                                               WRK-HEN-TMM
+                                               WRK-HEN-TSS
+           ELSE
+               MOVE    WRK-THH             TO  WRK-HEN-THH
+               MOVE    WRK-TMM             TO  WRK-HEN-TMM
+               MOVE    WRK-TSS             TO  WRK-HEN-TSS
+           END-IF
            .
        801-DAYHEN01-EXT.
            EXIT.
+      *
       *****************************************************************
       *    日付変換編集処理
       *****************************************************************
@@ -618,23 +630,6 @@
       *
            .
        500-ERR-HENSYU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    エラー時終了処理
-      *****************************************************************
-       500-COBABORT-SEC                SECTION.
-      *
-           MOVE    SPACE               TO  WRK-ERRMSG
-           STRING  "ORAPI052BR1V3 "    DELIMITED  BY  SIZE
-                   WRK-RECEERR         DELIMITED  BY  SIZE
-                   LOW-VALUE           DELIMITED  BY  SIZE
-                                       INTO    WRK-ERRMSG
-           END-STRING
-           CALL    "cobabort"          USING   WRK-ERRMSG
-      *
-           .
-       500-COBABORT-EXT.
            EXIT.
       *
       *****************************************************************
