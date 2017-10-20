@@ -957,7 +957,9 @@
                      ( SPA-NAI-TEDYUKYMD(SPA-GMN-MAX)
                                            NOT =   "99999999" )
                    PERFORM 900-SYSKANRI-READ-SEC
-                   MOVE    SYS-1001-PREFNUM    TO  SPA-GMN-PREFNUM
+                   MOVE    SYS-1001-PREFNUM    TO  V01-PREFNUM
+                   PERFORM 4101-PREFNUM-CHK-SEC
+                   MOVE    SPACE               TO  SPA-ERRCD
                    MOVE    7                   TO  SPA-GMN-CUR
                END-IF
            END-IF 
