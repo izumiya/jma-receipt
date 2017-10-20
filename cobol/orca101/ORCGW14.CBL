@@ -277,6 +277,7 @@
                    PERFORM 330-WID1-SET-SEC
                    GO      TO      300-SCREEN-EXT
                WHEN    "W141"
+               WHEN    "W142"
                    GO      TO      300-SCREEN-EXT
            END-EVALUATE
       *
@@ -1084,6 +1085,14 @@
       *****************************************************************
        460-DOCER-SEC               SECTION.
       *
+      *    入力チェック処理
+           MOVE    ZERO            TO  FLG-TOUROKU
+           PERFORM 410-INPUT-CHK-SEC
+           IF      SPA-ERRCD   NOT =   SPACE
+               MOVE    ZERO            TO  SPA-NAI-SELCD
+               GO  TO  460-DOCER-EXT
+           END-IF
+      *
       *    シェル名等が未入力の場合は遷移しない
            IF    ( SPA-GMN-SHORIMSG (SPA-NAI-SELCD) 
                                    =   SPACE )
@@ -1093,14 +1102,6 @@
                    MOVE    ZERO            TO  SPA-NAI-SELCD
                    GO  TO  460-DOCER-EXT
                END-IF
-           END-IF
-      *
-      *    入力チェック処理
-           MOVE    ZERO            TO  FLG-TOUROKU
-           PERFORM 410-INPUT-CHK-SEC
-           IF      SPA-ERRCD   NOT =   SPACE
-               MOVE    ZERO            TO  SPA-NAI-SELCD
-               GO  TO  460-DOCER-EXT
            END-IF
       *
            MOVE    SPACE           TO  SPA-MOTOPG
