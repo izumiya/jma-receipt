@@ -204,7 +204,7 @@
                    MOVE    SPA-GMN-NAME-BACK (SPA-NAI-SELCD)
                                        TO  SPA-GMN-NAME (SPA-NAI-SELCD)
                    PERFORM  210-BACK
-      *        ºï½ü
+      *        ¥¯¥ê¥¢
                WHEN    "CLICKED"       ALSO    "B04"
                    PERFORM 410-DELETE-SEC
       *        ÅÐÏ¿
@@ -339,6 +339,8 @@
        410-DELETE-SEC              SECTION.
       *
            MOVE    SPACE           TO  SPA-GMN-NAME (SPA-NAI-SELCD)
+      *
+           MOVE    1               TO  SPA-W141-GMN-CUR
            .
        410-DELETE-EXT.
            EXIT.
