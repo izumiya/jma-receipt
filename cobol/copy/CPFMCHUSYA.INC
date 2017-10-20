@@ -27,12 +27,18 @@
               05  FMCHUSYA-FORM-ID              PIC X(30).
               05  FMCHUSYA-CUSTOM-ID            PIC X(30).
               05  FMCHUSYA-PRINTER              PIC X(20).
+      *       帳票タイトル
+              05  FMCHUSYA-TITLE-AREA.
+                  07  FMCHUSYA-TITLE-OCC        OCCURS 4.
+                      09  FMCHUSYA-TITLE        PIC X(30).
+                      09  FMCHUSYA-MAISU        PIC X(2).
+              05  FMCHUSYA-HAKKOKBN             PIC X(1).
       *       処方日
-              05  FMCHUSYA-SYSYMD               PIC X(10).
-      *       処方時刻
-              05  FMCHUSYA-SYSTIME              PIC X(5).
-      *       指示日
               05  FMCHUSYA-SRYYMD               PIC X(10).
+      *       指示日
+              05  FMCHUSYA-SYSYMD               PIC X(10).
+      *       指示日時刻
+              05  FMCHUSYA-SYSTIME              PIC X(5).
       *       診療科（日レセ）
               05  FMCHUSYA-SRYKA                PIC X(2).
               05  FMCHUSYA-SRYKANAME            PIC X(40).
@@ -47,8 +53,6 @@
                 07  FMCHUSYA-KANANAME           PIC X(50).
                 07  FMCHUSYA-BIRTHDAY           PIC X(10).
                 07  FMCHUSYA-SEX                PIC X(1).
-      *         年齢（全角）
-                07  FMCHUSYA-NENREI             PIC X(08).
       *       ドクター
               05  FMCHUSYA-DOCTOR-AREA.
                 07  FMCHUSYA-DR-CODE             PIC X(5).
@@ -56,14 +60,8 @@
                 07  FMCHUSYA-DR-KANANAME         PIC X(50).
                 07  FMCHUSYA-DR-MAYAKULICENSE    PIC X(15).
       *
-      *       帳票タイトル
-              05  FMCHUSYA-TITLE                 PIC X(30).
       *       1:麻薬を記載した指示せん
               05  FMCHUSYA-MAYAKU                PIC X(1).
-      *       回数連番（２回以上の時のみ）
-              05  FMCHUSYA-KAI-RENNUM            PIC X(2).
-      *       回数編集（Ｎ回目）
-              05  FMCHUSYA-KAI-HENSYU            PIC X(10).
       *
               05  FMCHUSYA-ZAI-AREA.
                 07  FMCHUSYA-SRYKBN              PIC X(2).
@@ -73,6 +71,8 @@
                 07  FMCHUSYA-CHUSYA-NAME         PIC X(100).
       *         手技料コード（ある場合のみ）
                 07  FMCHUSYA-CHUSYA-SRYCD        PIC X(9).
+      *         回数連番
+                07  FMCHUSYA-KAI-RENNUM          PIC X(2).
       *
                 07  FMCHUSYA-MEDICATION          OCCURS  50 TIMES.
       *           薬剤名

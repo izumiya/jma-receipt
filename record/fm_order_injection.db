@@ -8,9 +8,15 @@ fm_order_injection {
 		Form_ID				varchar(30);
 		Custom_ID			varchar(30);
 		Printer				varchar(20);
- 		Perform_Date			varchar(10);
- 		Perform_Time			varchar(5);
+#---    帳票タイトル
+		Number_Copies{
+			Title				varchar(30);
+			Copies 			varchar(2);
+		}[4];
+		Order_Class		varchar(1);
+ 		Perform_Date		varchar(10);
 		IssuedDate			varchar(10);
+ 		IssuedTime			varchar(5);
 		Department_Code			varchar(02);
 		Department_Name			varchar(40);
 		Ward_Number			varchar(02);
@@ -22,7 +28,6 @@ fm_order_injection {
 			KanaName  		varchar(50);
 			BirthDate 		varchar(10);
 			Sex			varchar(1);
-			Age			varchar(8);
 		};
 		Doctor	{
 			Code			varchar(5);
@@ -30,22 +35,19 @@ fm_order_injection {
 			KanaName 		varchar(50);
 			Drug_Permission_ID	varchar(15);
 		};
-#---    帳票タイトル
-		Title    			varchar(30);
 #---    麻薬
-		IncludingNarcotic_Flg		varchar(1);
-#---    回数連番
- 		Count				varchar(2);
- 		Count_Title			varchar(10);
+		Narcotic_Flg		varchar(1);
 		Rp	{
-#---            診療区分
-			Medical_Class_Group		varchar(02);
+#---  診療区分
+			Medical_Class			varchar(02);
 #---            診療種別区分
-			Medical_Class			varchar(03);
+			Medical_Class2			varchar(03);
 #---            注射見出し
 			Injection_Name			varchar(100);
 #---            注射コード
 			Injection_Code			varchar(9);
+#---  回数連番
+		  Count			varchar(2);
 			Medication	{
 #---                   名称
 				Name			varchar(200);
@@ -58,6 +60,6 @@ fm_order_injection {
 			}[50];
 		};
 		Memo				varchar(110)[3];
-		Operator_ID			varchar(16);
+		User_ID			varchar(16);
 	};
 };

@@ -33,6 +33,8 @@
       * 04.01.00     NACL-多々納  07/11/22  器材商品名コード対応
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.08.00     NACL-多々納  14/08/01  一時ディレクトリ対応
+      * 05.00.00     NACL-多々納  17/05/XX  API(GINBEE）対応
+      * 05.00.00     NACL-太田    17/10/11  API(GINBEE）対応
       *****************************************************************
       *
       *
@@ -102,8 +104,11 @@
            03  IDX-LINE            PIC 9(04).
       *
            03  IDXM                PIC 9(02).
+           03  IDXN                PIC 9(02).
       *
            03  KETA                PIC 9(04).
+      *API
+           03  IDX-AP              PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -186,6 +191,7 @@
            03  WRK-BTUNAME             PIC X(20).
            03  WRK-ROOMNO              PIC X(06).
            03  WRK-SYSYMD              PIC X(22).
+           03  WRK-PRINTYMD            PIC X(08).
            03  WRK-TIME-G.
                05  WRK-TIME-HH         PIC X(02).
                05  WRK-TIME-P          PIC X(01).
@@ -229,6 +235,57 @@
       *
       *    処方内容最大行
        01  WRK-IDX-MAX                 PIC 9(03)  VALUE   34.
+      *
+      *H25.5
+      *API(gingee)
+       01  WRK-API-AREA.
+      *    日付編集
+           03  WRK-HEN-DATE.
+               05  WRK-HEN-YY          PIC X(04).
+               05  WRK-HEN-H1          PIC X(01).
+               05  WRK-HEN-MM          PIC X(02).
+               05  WRK-HEN-H2          PIC X(01).
+               05  WRK-HEN-DD          PIC X(02).
+      *    時間編集
+           03  WRK-THMS.
+               05  WRK-THH             PIC X(02).
+               05  WRK-TMM             PIC X(02).
+               05  WRK-TSS             PIC X(02).
+           03  WRK-HEN-TIME.
+               05  WRK-HEN-THH         PIC X(02).
+               05  WRK-HEN-T1          PIC X(01).
+               05  WRK-HEN-TMM         PIC X(02).
+               05  WRK-HEN-T2          PIC X(01).
+               05  WRK-HEN-TSS         PIC X(02).
+      *    病棟番号
+           03  WRK-BTUNUM              PIC X(02).
+      *    日付
+           03  WRK-API-SYSYMD          PIC X(10).
+           03  WRK-API-SRYYMD          PIC X(10).
+           03  WRK-API-SYSTIME         PIC X(05).
+           03  WRK-API-CHUSYACD        PIC X(09).
+      *
+           03  WRK-API-KAISU-X.
+               05  WRK-API-KAISU-9     PIC 9(02).
+      *
+      *    処方内容
+       01  WRK-API-SYOHOU-AREA.
+           03  WRK-API-SYOHOU-G        OCCURS   50.
+               05  WRK-API-YKZNAME         PIC X(200).
+               05  WRK-API-SURYO           PIC X(12).
+               05  WRK-API-TANINAME        PIC X(12).
+               05  WRK-API-SRYCD           PIC X(09).
+      *
+      *H29.5
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-API-DATA           PIC X(01).
+           03  PARA-API-CUSTOM-ID      PIC X(30).
+      *
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(50).
+           03  WRK-PARA-MAX            PIC 9(03).
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -299,9 +356,19 @@
       *    一時ファイル名取得
            COPY    "CPORCSGETTEMP.INC".
       *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
+      *
            COPY    "MCPAREA".
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+      *H29.5
+      * API対応
+      *    注射処方せん情報構造体
+           COPY    "CPFMCHUSYA.INC".
+      *
+           COPY    "CPORCRPMAIN.INC".
+      *
       *****COPY    "CPORCMCP.INC".
       **** COPY    "ORCA-DBPATH".
       *
@@ -332,7 +399,12 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  IDX-AREA
       *
+           INITIALIZE                  WRK-API-AREA
+      *
            ACCEPT  SYS-TIME            FROM    TIME
+      *H29.5
+      *    プログラムオプション取込み
+           PERFORM 100-OPTION-SELECT-SEC
       *
       *    各ＤＢ読込
            PERFORM 100-SYORI-SEC
@@ -349,6 +421,71 @@
        000-PROC-EXT.
            EXIT    PROGRAM
            .
+      *
+      *H29.5
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC             SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+           MOVE    ZERO                TO  WRK-PARA-MAX
+      *    ＡＰＩ返却データ（1:作成する 帳票印刷なし）
+           MOVE    "API_DATA"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA(1:1)       =   "1" )
+               MOVE    WRK-PARA(1:1)       TO  PARA-API-DATA
+           END-IF
+      *
+           IF     (PARA-API-DATA       =   "1"       )
+               CONTINUE
+           ELSE
+      *        API送信なし
+               MOVE    "0"             TO  PARA-API-DATA
+           END-IF
+      *    ＡＰＩカスタムＩＤ
+           MOVE    "API_CUSTOM_ID"     TO  WRK-PARA-NAME
+           MOVE    30                  TO  WRK-PARA-MAX
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-API-CUSTOM-ID
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC             SECTION.
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCHC502"          TO  ORCSPRGOPTION-PRGID
+           MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+           MOVE    SPACE               TO  WRK-PARA
+           IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *        半角で１文字目を値とする
+               MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+               IF      WRK-PARA-MAX        >   ZERO
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                               TO  WRK-PARA
+               END-IF
+           ELSE
+               IF      WRK-PARA-MAX        >   ZERO
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    ORCSPRGOPTION-OT-PARA(1:WRK-PARA-MAX)
+                                               TO  KANACHK-MAE-INPUT
+                   MOVE    WRK-PARA-MAX        TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
+               END-IF
+           END-IF
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
+      *
+      *
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -418,6 +555,9 @@
            END-IF
       *
            MOVE    SYS-5001-BTU-NAME   TO  WRK-BTUNAME
+      *API
+      *    病棟番号
+           MOVE    PTNYUINRRK-BTUNUM   TO  WRK-BTUNUM
       *
       *    病室番号
            IF      PTNYUINRRK-BRMNUM (3:6) IS  NUMERIC
@@ -586,11 +726,21 @@
            END-IF
       *
       *    処方時間
+           MOVE    ORCHC502-PRINTYMD    TO  WRK-PRINTYMD
            MOVE    ORCHC502-PRINTHMS(1:2)
                                         TO  WRK-TIME-HH
            MOVE    ORCHC502-PRINTHMS(3:2)
                                         TO  WRK-TIME-SS
            MOVE    ":"                  TO  WRK-TIME-P
+      *
+      *H29.5
+      *API GINGEE対応
+      *    処理日
+           MOVE    ORCHC502-PRINTYMD   TO  WRK-SYMD
+           MOVE    ORCHC502-PRINTHMS   TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  WRK-API-SYSYMD
+           MOVE    WRK-HEN-TIME        TO  WRK-API-SYSTIME
       *
            .
        2001-HEAD-HENSYU-EXT.
@@ -717,6 +867,17 @@
                    PERFORM 2001-ORDERPRT-HEN-SEC
                END-IF
            END-PERFORM
+      *
+      *H29.5
+      *API GINGEE対応
+           IF      PARA-API-DATA        =   "1"
+      *        ＡＰＩ明細編集処理
+               PERFORM 700-API-SYORI-SEC
+               INITIALIZE                  LNK-ORDERPRT-AREA
+               INITIALIZE                  LNK-ORDERPRT-MAX
+               INITIALIZE                  WRK-SYOHOU-AREA
+               GO      TO      220-NAIYOU-HENSYU-EXT
+           END-IF
       *
       *    帳票のテーブルへ編集
            PERFORM 2209-PRINT-HENSYU-SEC
@@ -992,8 +1153,12 @@
                WHEN    "33"
                    EVALUATE    LNK-ORDERPRT-SRYSYUKBN(1)
                        WHEN    "330"
+      *H29.5
+                       WHEN    "331"
+                       WHEN    "332"
                            MOVE    "点滴注射"      TO  WRK-CHUSYAMEI
                        WHEN    "350"
+                       WHEN    "352"
                            MOVE    "中心静脈注射"  TO  WRK-CHUSYAMEI
                    END-EVALUATE
            END-EVALUATE
@@ -1135,7 +1300,7 @@
                MOVE    "麻"                TO  HC502-MAYAKU
            END-IF
       *    発行日
-           MOVE    ORCHC502-PRINTYMD   TO  HC502-SYSYMD
+           MOVE    WRK-PRINTYMD        TO  HC502-SYSYMD
       *    発行時間
            MOVE    WRK-TIME-G          TO  HC502-TIME
       *    診療科
@@ -1203,9 +1368,18 @@
            PERFORM 2002-DRCD-HENSYU-SEC
       *    処方日・時間はクリア
            MOVE    SPACE               TO  WRK-SYSYMD
+           MOVE    SPACE               TO  WRK-PRINTYMD
            MOVE    SPACE               TO  WRK-TIME-G
       *    年齢
            MOVE    SPACE               TO  WRK-AGE-HEN
+      *H29.5
+      *API GINGEE対応
+           IF      PARA-API-DATA       =   "1"
+               PERFORM 7005-API-HEADSYORI-SEC
+               GO      TO      200-HEAD-PRINT-EXT
+           END-IF
+      *API
+      *
       *    印刷処理
            PERFORM 3003-PRINT-SYORI-SEC
       *
@@ -1266,6 +1440,354 @@
            .
        400-PRINT-EXT.
            EXIT.
+      *
+      *H29.5
+      *API GINGEE対応
+      *****************************************************************
+      *    ＡＰＩ送信編集処理
+      *****************************************************************
+       700-API-SYORI-SEC           SECTION.
+      *
+           INITIALIZE                  WRK-API-SYOHOU-AREA
+           MOVE    ZERO                TO  IDX-AP
+      *
+           MOVE    SPACE               TO  WRK-CHUSYAMEI
+           MOVE    SPACE               TO  WRK-API-CHUSYACD
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   LNK-ORDERPRT-MAX )  OR
+                              (IDX-AP  >=  50    )
+               IF      LNK-ORDERPRT-SRYCD (IDX)(1:1)   =   "1"
+                   PERFORM 2002-CHUSYAMEI-HEN-SEC
+                   MOVE    LNK-ORDERPRT-SRYCD(IDX)
+                                               TO  WRK-API-CHUSYACD
+               ELSE
+                   MOVE    LNK-ORDERPRT-SRYCD(IDX) TO  WRK-SRYCD
+      *            ＡＰＩ明細内容編集処理
+                   PERFORM 70042-API-ORDERPRT-HEN-SEC
+               END-IF
+           END-PERFORM
+      *    注射種類
+           IF      WRK-CHUSYAMEI       =   SPACE
+               PERFORM 22093-CHUSYAMEI-SET-SEC
+           END-IF
+      *
+      *    日数分印刷する
+           MOVE    ZERO                TO  WRK-KAISU
+           MOVE    ORCHC502-SRYYMD     TO  WRK-SRYYMD
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL       IDX2    >   31
+               IF      LNK-ORDERPRT-DAY (1 IDX2)   >   ZERO
+                   MOVE    IDX2                    TO  WRK-SRYYMD(7:2)
+                   MOVE    LNK-ORDERPRT-DAY (1 IDX2)   TO  WRK-KAISU
+      *            ＡＰＩ日毎送信処理
+                   PERFORM 7002-API-DAYSYORI-SEC
+               END-IF
+           END-PERFORM
+      *
+           .
+       700-API-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ処方内容編集処理
+      *****************************************************************
+       7002-API-DAYSYORI-SEC           SECTION.
+      *
+      *    処方日
+           MOVE    WRK-SRYYMD          TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  WRK-API-SRYYMD
+      *
+           MOVE    SPACE               TO  WRK-KAISU-HENSYU
+           MOVE    SPACE               TO  WRK-API-KAISU-X
+      *
+      *    回数
+           MOVE    WRK-KAISU           TO  WRK-API-KAISU-9
+           PERFORM 3002-KAISU-HENSYU-SEC
+      *
+           PERFORM 70021-API-DAYCALL-SEC
+      *
+           .
+       7002-API-DAYSYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ処方内容編集処理
+      *****************************************************************
+       70021-API-DAYCALL-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  WRK-BIKOH-AREA
+           IF      IDX-H               =   2
+      *       麻薬編集
+              PERFORM 2003-MAYAKU-HEN-SEC
+           END-IF
+      *
+           INITIALIZE                  FMCHUSYA-REC
+      *
+      *    発行区分毎に印刷
+           MOVE    ZERO                TO  IDXN
+           PERFORM VARYING     IDX-P   FROM    1   BY  1
+                   UNTIL       IDX-P   >   4
+               IF      ORCHC502-CHKPRT (IDX-P) =   1
+                   COMPUTE IDXN    =   IDXN    +   1
+                   IF      IDX-H           =   2
+                       MOVE    WRK-SIJISEN-HEAD2(IDX-P)
+                                               TO  FMCHUSYA-TITLE (IDXN)
+                       MOVE    WRK-SIJISEN-PRT2 (IDX-P)
+                                               TO  FMCHUSYA-MAISU (IDXN)
+                   ELSE
+                       MOVE    WRK-SIJISEN-HEAD1(IDX-P)
+                                               TO  FMCHUSYA-TITLE (IDXN)
+                       MOVE    WRK-SIJISEN-PRT1 (IDX-P)
+                                               TO  FMCHUSYA-MAISU (IDXN)
+                   END-IF
+               END-IF
+            END-PERFORM
+      *
+           IF    ( IDXN    >   ZERO )
+      *        ＡＰＩ送信内容編集処理
+               PERFORM 7004-APIMEI-HENSYU-SEC
+      *        ＡＰＩ送信処理
+               PERFORM 7009-API-CALLSYORI-SEC
+           END-IF
+      *
+           .
+       70021-API-DAYCALL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ送信内容編集処理
+      *****************************************************************
+       7004-APIMEI-HENSYU-SEC      SECTION.
+      *
+           MOVE    "chushasen_n"       TO  FMCHUSYA-FORM-ID
+      *    プリンタ名
+           MOVE    SYS-1034-PRTNM(7)   TO  FMCHUSYA-PRINTER
+      *
+           IF      ORCHC502-SYORIKBN   =   "1"
+               MOVE    "2"             TO  FMCHUSYA-HAKKOKBN
+           ELSE
+               MOVE    "1"             TO  FMCHUSYA-HAKKOKBN
+           END-IF
+      *
+      *    処理日
+           MOVE    WRK-API-SYSYMD      TO  FMCHUSYA-SYSYMD
+           MOVE    WRK-API-SYSTIME     TO  FMCHUSYA-SYSTIME
+      *    指示日
+           MOVE    WRK-API-SRYYMD      TO  FMCHUSYA-SRYYMD
+      *
+      *    診療科
+           MOVE    ORCHC502-SRYKA      TO  FMCHUSYA-SRYKA
+           MOVE    SYS-1005-SRYKANAME1 TO  FMCHUSYA-SRYKANAME
+      *    ドクターコード
+           MOVE    WRK-DRCD            TO  FMCHUSYA-DR-CODE 
+      *    医師情報
+           MOVE    SYS-1010-KANANAME   TO  FMCHUSYA-DR-KANANAME
+           MOVE    SYS-1010-NAME       TO  FMCHUSYA-DR-NAME
+           MOVE    SYS-1010-MAYAKULICENSE
+                                       TO  FMCHUSYA-DR-MAYAKULICENSE
+      *
+      *    患者情報
+           MOVE    ORCHC502-PTNUM      TO  FMCHUSYA-PTNUM
+           MOVE    PTINF-NAME          TO  FMCHUSYA-NAME
+           MOVE    PTINF-KANANAME      TO  FMCHUSYA-KANANAME
+           MOVE    PTINF-SEX           TO  FMCHUSYA-SEX
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  FMCHUSYA-BIRTHDAY
+      *    年齢
+      *    MOVE    WRK-AGE-HEN         TO  FMCHUSYA-NENREI
+      *
+      *    病棟番号
+           MOVE    WRK-BTUNUM          TO  FMCHUSYA-BTUNUM
+      *    病棟名称
+           MOVE    WRK-BTUNAME         TO  FMCHUSYA-BTUNAME
+      *    病室番号
+           MOVE    WRK-ROOMNO          TO  FMCHUSYA-BRMNUM
+      *    麻薬
+           IF      IDX-H               =   2
+               MOVE    "1"             TO  FMCHUSYA-MAYAKU
+           END-IF
+      *
+      *    回数
+           MOVE    WRK-API-KAISU-X     TO  FMCHUSYA-KAI-RENNUM
+      *
+      *    注射内容
+           MOVE    WRK-CHUSYAMEI       TO  FMCHUSYA-CHUSYA-NAME
+           MOVE    WRK-API-CHUSYACD    TO  FMCHUSYA-CHUSYA-SRYCD
+      *    診療区分
+           MOVE    LNK-ORDERPRT-SRYKBN (1)
+                                       TO  FMCHUSYA-SRYKBN
+           MOVE    LNK-ORDERPRT-SRYSYUKBN (1)
+                                       TO  FMCHUSYA-SRYSYUKBN
+      *    処方内容
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   IDX-AP
+               MOVE    WRK-API-YKZNAME (IDX)
+                                       TO  FMCHUSYA-YKZNAME (IDX)
+               MOVE    WRK-API-SURYO (IDX)
+                                       TO  FMCHUSYA-SURYO (IDX)
+               MOVE    WRK-API-TANINAME (IDX)
+                                       TO  FMCHUSYA-TANINAME(IDX)
+               MOVE    WRK-API-SRYCD (IDX)
+                                       TO  FMCHUSYA-SRYCD (IDX)
+           END-PERFORM
+      *
+      *    備考欄
+           PERFORM VARYING     IDX-B   FROM    1   BY  1
+                   UNTIL       IDX-B   >   3
+               IF      WRK-BIKOH  (IDX-B)  NOT =   SPACE
+                   MOVE    WRK-BIKOH  (IDX-B)  TO  FMCHUSYA-MEMO(IDX-B)
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPA-OPID            TO  FMCHUSYA-OPID
+      *
+           .
+       7004-APIMEI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ明細内容編集処理
+      *****************************************************************
+       70042-API-ORDERPRT-HEN-SEC      SECTION.
+      *
+           ADD     1                   TO  IDX-AP
+      *
+      *    点数検索
+           MOVE    LNK-ORDERPRT-SRYCD(IDX) TO  WRK-SRYCD
+           PERFORM 910-TENSU-READ-SEC
+      *
+           IF      LNK-ORDERPRT-INPUTCOMENT(IDX)   =   SPACE
+               MOVE    TNS-NAME                TO  WRK-TNS-NAME
+           ELSE
+               MOVE    LNK-ORDERPRT-INPUTCOMENT(IDX)
+                                               TO  WRK-TNS-NAME
+           END-IF
+      *    器材商品名コード
+           IF      WRK-SRYCD (1:3)     =   "058"
+               MOVE   TNS-FORMALNAME       TO  WRK-TNS-NAME
+      *        単位名称
+               MOVE    TNS-TANINAME        TO  WRK-SYO-TANINAME
+               MOVE    SPACE               TO  TNS-TANINAME
+           END-IF
+      *!   器材商品名の器材
+           IF     (WRK-SRYCD (1:1)     =   "7"  )  AND
+                  (FLG-KIZAI           =   1    )
+               MOVE    SPACE           TO  WRK-TNS-NAME
+               STRING  "　〔"
+                       TNS-NAME        DELIMITED  BY  SPACE
+                       "〕"            DELIMITED  BY  SIZE
+                                       INTO    WRK-TNS-NAME
+               END-STRING
+      *
+      *        商品名コードの単位へ
+               IF      WRK-SYO-TANINAME    NOT =   SPACE
+                   MOVE    WRK-SYO-TANINAME    TO  TNS-TANINAME
+                   MOVE    SPACE               TO  WRK-SYO-TANINAME
+               END-IF
+           END-IF
+           IF      WRK-SRYCD (1:3)     =   "058"
+               MOVE    1               TO  FLG-KIZAI
+           ELSE
+               MOVE    ZERO            TO  FLG-KIZAI
+           END-IF
+      *
+      *    編集名
+           MOVE    WRK-TNS-NAME        TO  WRK-API-YKZNAME
+                                                      (IDX-AP)
+           MOVE    WRK-SRYCD           TO  WRK-API-SRYCD
+                                                      (IDX-AP)
+      *
+           IF     (WRK-SRYCD (1:1)   =   "6"  OR  "7" )  OR
+                  (WRK-SRYCD (1:3)   =   "059"        )
+      *        数量
+               MOVE    LNK-ORDERPRT-SRYSURYO (IDX)
+                                           TO  WRK-SURYO
+               PERFORM 20012-SURYO-HEN-SEC
+               MOVE    WRK-SURYO-X         TO  WRK-API-SURYO
+                                                      (IDX-AP)
+      *        数量単位
+               MOVE    TNS-TANINAME        TO  WRK-API-TANINAME
+                                                      (IDX-AP)
+           END-IF
+           .
+       70042-API-ORDERPRT-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ送信処理
+      *****************************************************************
+       7009-API-CALLSYORI-SEC         SECTION.
+      *
+      *    カスタムＩＤ
+           MOVE    PARA-API-CUSTOM-ID  TO  FMCHUSYA-CUSTOM-ID
+      *
+           INITIALIZE                      RPMAIN-AREA
+           MOVE    "chushasen_n"       TO  RPMAIN-ID
+           MOVE    PARA-API-CUSTOM-ID  TO  RPMAIN-CUSTOM-ID
+           MOVE    "注射処方せん"      TO  RPMAIN-TITLE
+           MOVE    "fm_order_injection"
+                                       TO  MCP-TABLE
+           MOVE    FMCHUSYA-DATA       TO  RPMAIN-DATA
+           CALL    "ORCRPMAIN"         USING
+                                       MCPAREA
+                                       RPMAIN-AREA
+                                       SPA-AREA
+      *
+           .
+       7009-API-CALLSYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ頭書き処理
+      *****************************************************************
+       7005-API-HEADSYORI-SEC         SECTION.
+      *
+           INITIALIZE                  LNK-ORDERPRT-AREA
+           INITIALIZE                  LNK-ORDERPRT-MAX
+           MOVE    SPACE               TO  WRK-KAISU-HENSYU
+           MOVE    SPACE               TO  WRK-KAISU-X
+           MOVE    1                   TO  WRK-API-KAISU-9
+           MOVE    SPACE               TO  WRK-SRYYMD
+           INITIALIZE                  WRK-API-SYOHOU-AREA
+           MOVE    ZERO                TO  IDX-AP
+           PERFORM 70021-API-DAYCALL-SEC
+           .
+       7005-API-HEADSYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理(API）
+      *****************************************************************
+       801-DAYHEN01-SEC                SECTION.
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE           TO  WRK-HEN-DATE
+           ELSE
+               INITIALIZE                  WRK-HEN-DATE
+               MOVE    WRK-SYY             TO  WRK-HEN-YY
+               MOVE    WRK-SMM             TO  WRK-HEN-MM
+               MOVE    WRK-SDD             TO  WRK-HEN-DD
+               MOVE    "-"                 TO  WRK-HEN-H1
+               MOVE    "-"                 TO  WRK-HEN-H2
+               IF      WRK-SYMD            =   "99999999"
+                   MOVE    "12"                TO  WRK-HEN-MM
+                   MOVE    "31"                TO  WRK-HEN-DD
+               END-IF
+           END-IF
+      *
+           INITIALIZE                  WRK-HEN-TIME
+           MOVE    WRK-THH             TO  WRK-HEN-THH
+           MOVE    WRK-TMM             TO  WRK-HEN-TMM
+           MOVE    WRK-TSS             TO  WRK-HEN-TSS
+           MOVE    ":"                 TO  WRK-HEN-T1
+           MOVE    ":"                 TO  WRK-HEN-T2
+           .
+       801-DAYHEN01-EXT.
+           EXIT.
+      *
+      *
       *****************************************************************
       *    ＤＢ削除処理
       *****************************************************************

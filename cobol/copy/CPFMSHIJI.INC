@@ -26,12 +26,18 @@
               05  FMSHIJI-FORM-ID              PIC X(30).
               05  FMSHIJI-CUSTOM-ID            PIC X(30).
               05  FMSHIJI-PRINTER              PIC X(20).
+      *       Ä¢É¼¥¿¥¤¥È¥ë
+              05  FMSHIJI-TITLE-AREA.
+                  07  FMSHIJI-TITLE-OCC        OCCURS 4.
+                      09  FMSHIJI-TITLE        PIC X(30).
+                      09  FMSHIJI-MAISU        PIC X(2).
+              05  FMSHIJI-HAKKOKBN             PIC X(1).
+      *       »Ø¼¨Æü
+              05  FMSHIJI-SRYYMD               PIC X(10).
       *       ½èÊýÆü
               05  FMSHIJI-SYSYMD               PIC X(10).
       *       ½èÊý»þ¹ï
               05  FMSHIJI-SYSTIME              PIC X(5).
-      *       »Ø¼¨Æü
-              05  FMSHIJI-SRYYMD               PIC X(10).
       *       ¿ÇÎÅ²Ê¡ÊÆü¥ì¥»¡Ë
               05  FMSHIJI-SRYKA                PIC X(2).
               05  FMSHIJI-SRYKANAME            PIC X(40).
@@ -46,31 +52,25 @@
                 07  FMSHIJI-KANANAME           PIC X(50).
                 07  FMSHIJI-BIRTHDAY           PIC X(10).
                 07  FMSHIJI-SEX                PIC X(1).
-      *         Ç¯Îð¡ÊÁ´³Ñ¡Ë
-                07  FMSHIJI-NENREI             PIC X(08).
       *       ¥É¥¯¥¿¡¼
               05  FMSHIJI-DOCTOR-AREA.
                 07  FMSHIJI-DR-CODE             PIC X(5).
                 07  FMSHIJI-DR-NAME             PIC X(50).
                 07  FMSHIJI-DR-KANANAME         PIC X(50).
                 07  FMSHIJI-DR-MAYAKULICENSE    PIC X(15).
-      *
-      *       Ä¢É¼¥¿¥¤¥È¥ë
-              05  FMSHIJI-TITLE                 PIC X(30).
       *       ¼Â»ÜÆü
               05  FMSHIJI-JISIYMD               PIC X(10).
-      *       ¿ÇÎÅ¶èÊ¬¡Ê£´£°¡¢£¸£°¤Î¤ß¡Ë
-              05  FMSHIJI-SRYKBN                PIC X(2).
       *
               05  FMSHIJI-ZAI-AREA              OCCURS  50 TIMES.
+      *         ¿ÇÎÅ¶èÊ¬¡Ê£´£°¡¢£¸£°¤Î¤ß¡Ë
+                07  FMSHIJI-SRYKBN              PIC X(2).
                 07  FMSHIJI-KAISU               PIC X(3).
-                07  FMSHIJI-KAISU-MEI           PIC X(6).
                 07  FMSHIJI-MEDICATION          OCCURS  50 TIMES.
       *           ¿ÇÎÅÌ¾¾Î¡ÊÌôºÞÌ¾¡Ë
                   09  FMSHIJI-YKZNAME           PIC X(200).
                   09  FMSHIJI-SURYO             PIC X(12).
                   09  FMSHIJI-TANINAME          PIC X(12).
                   09  FMSHIJI-SRYCD             PIC X(9).
-              05  FMSHIJI-MEMO                  PIC X(110)
-                                                OCCURS  3 TIMES.
+      *       05  FMSHIJI-MEMO                  PIC X(110)
+      *                                         OCCURS  3 TIMES.
               05  FMSHIJI-OPID                  PIC X(16).

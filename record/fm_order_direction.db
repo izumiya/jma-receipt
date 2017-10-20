@@ -4,14 +4,19 @@ fm_order_direction {
 	mode	int;
 	recordname	varchar(128);
 	data {
-#---    指示箋
+#---指示箋
 		Form_ID				varchar(30);
 		Custom_ID			varchar(30);
 		Printer				varchar(20);
- 		Perform_Date			varchar(10);
- 		Perform_Time			varchar(5);
-#---    指示日
+#---帳票タイトル
+		Number_Copies{
+			Title				varchar(30);
+			Copies 			varchar(2);
+		}[4];
+		Order_Class		varchar(1);
+ 		Perform_Date		varchar(10);
 		IssuedDate			varchar(10);
+ 		IssuedTime			varchar(5);
 		Department_Code			varchar(02);
 		Department_Name			varchar(40);
 		Ward_Number			varchar(02);
@@ -23,7 +28,6 @@ fm_order_direction {
 			KanaName  		varchar(50);
 			BirthDate 		varchar(10);
 			Sex			varchar(1);
-			Age			varchar(8);
 		};
 		Doctor	{
 			Code			varchar(5);
@@ -31,26 +35,21 @@ fm_order_direction {
 			KanaName 		varchar(50);
 			Drug_Permission_ID	varchar(15);
 		};
-#---    帳票タイトル
-		Title    			varchar(30);
-#---    実施日
+#---実施日
 		Medical_Date			varchar(10);
-#---    診療区分
-		Medical_Class_Group		varchar(02);
-		Rp	{
-#---                    回数
+		Rp{
+#---	診療区分
+		Medical_Class    		varchar(2);
+#---	回数
 			Count				varchar(3);
-#---                    回数名称
-			Unit_Name			varchar(6);
-			Medication	{
+			Medication{
 				Name			varchar(200);
 				Amount			varchar(12);
-#---                            単位
+#---		単位
 				Unit_Name		varchar(12);
 				Code			varchar(9);
 			}[50];
 		}[50];
-		Memo				varchar(110)[3];
-		Operator_ID			varchar(16);
+		User_ID			varchar(16);
 	};
 };
