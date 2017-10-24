@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      * 05.00.00     NACL-Â¿¡¹Ç¼  17/11/XX  Í½Ìó£É£ÄÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -674,6 +675,8 @@
            PERFORM 200212-SRYKA-NAME-SEC
            MOVE    WRK-SRYKA-NAME      TO  APLST2RES-APPOINT-DEP-NAME
                                                                  (IDX)
+      *    Í½Ìó£É£ÄÊÔ½¸
+           MOVE    YYK-YYKID           TO  APLST2RES-APPOINT-ID(IDX)
       *    Íè±¡ºÑ¤ß
            MOVE    YYK-RAIINZUMI       TO  APLST2RES-VISIT-INFO (IDX)
       *

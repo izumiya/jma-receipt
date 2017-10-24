@@ -71,6 +71,8 @@
                       07  APLST2RES-APPOINT-DR-NAME     PIC X(80).
       *               ÕË±°∫—∂Ë ¨
                       07  APLST2RES-VISIT-INFO          PIC X(1).
+      *H29.11         ÕΩÃÛID
+                      07  APLST2RES-APPOINT-ID          PIC X(2).
       *               ÕΩÃÛ•·•‚
                       07  APLST2RES-APPOINT-MEMO        PIC X(100).
       *

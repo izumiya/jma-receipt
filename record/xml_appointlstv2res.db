@@ -18,6 +18,7 @@ xml_appointlstv2res {
         	Physician_Code					varchar(5);
         	Physician_WholeName				varchar(80);
         	Visit_Information				varchar(1);
+	        Appointment_Id					varchar(2);
 		Patient_Information {
         		Patient_ID				varchar(20);
         		WholeName				varchar(100);

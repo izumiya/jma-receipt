@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 05.00.00     NACL-多々納  17/11/XX  予約ＩＤ追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -764,6 +765,8 @@
                    MOVE    99          TO  IDK
                END-IF
            END-PERFORM
+      *    予約ＩＤ編集
+           MOVE    YYK-YYKID           TO  APLSTRES-APPOINT-ID(IDX)
       *    来院済み
            MOVE    YYK-RAIINZUMI       TO  APLSTRES-VISIT-INFO (IDX)
       *

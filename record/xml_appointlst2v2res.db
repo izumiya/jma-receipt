@@ -27,6 +27,7 @@ xml_appointlst2v2res {
         	Physician_Code				varchar(5);
         	Physician_WholeName			varchar(80);
         	Visit_Information			varchar(1);
+	        Appointment_Id				varchar(2);
 		Appointment_Note			varchar(100);
         	} [50];
     	};

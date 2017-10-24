@@ -53,6 +53,8 @@
                       07  APLSTRES-APPOINT-DR-NAME     PIC X(80).
       *               ÕË±°∫—∂Ë ¨
                       07  APLSTRES-VISIT-INFO          PIC X(1).
+      *H29.11         ÕΩÃÛID
+                      07  APLSTRES-APPOINT-ID          PIC X(2).
       *               ¥µº‘æ Û
                       07  APLSTRES-PATIENT-INFOMATION.
       *                   ¥µº‘»÷πÊ
