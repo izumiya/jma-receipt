@@ -62,6 +62,9 @@
       *    画像イメージ作成パラメタ
            COPY    "CPORCSMIAREA.INC".
       *
+      *    コマンド
+       01  COMMAND                 PIC X(512).
+      *
        01  FLG-AREA.
            03  FLG-OK              PIC 9(01).
       *
@@ -319,6 +322,15 @@
                    INTO                ORCA-BLOB-FILE
            END-STRING
       *
+      *    イメージデータフォルダ作成コマンド
+           MOVE    LOW-VALUE       TO  COMMAND
+           STRING  "mkdir -p "         DELIMITED BY SIZE
+                   SPA-GMN-FOLDER      DELIMITED BY SIZE
+                               INTO    COMMAND
+           END-STRING
+      *    コマンド実行
+           CALL    "system"            USING
+                                       COMMAND
       *    画像ファイルを作成
            MOVE    "BLOBEXPORT"    TO  MCP-FUNC
            MOVE    "blob"          TO  MCP-TABLE
