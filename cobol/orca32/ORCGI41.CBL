@@ -438,6 +438,18 @@
                05  WRK-NYUINKA-ETC     PIC X(01).
                05  WRK-NYUINKAMEI      PIC X(08).
       *
+      *    ９１日超表示用
+           03  WRK-STUSAN-RRK-CNT              PIC 9(05).
+           03  WRK-STUSAN-RRK-OCC              OCCURS  50.
+               05  WRK-STUSAN-RRK-JTIKBN       PIC X(01).
+               05  WRK-STUSAN-RRK-TAINRELKBN   PIC X(01).
+               05  WRK-STUSAN-RRK-NYUINYMD     PIC X(08).
+               05  WRK-STUSAN-RRK-TAIINYMD     PIC X(08).
+               05  WRK-STUSAN-RRK-DJKBN        PIC X(01).
+      *        一般入院料で入院していた日数
+      *        （歴作成データの場合は対象日数）
+               05  WRK-STUSAN-RRK-NISSU        PIC 9(08).
+      *
       *    回数一括変更用
        01  WRK-DAY-AREA.
            03  WRK-DAY-TBL.
@@ -1612,7 +1624,6 @@
        3103-PTNYUINRRK-HEN-EXT.
            EXIT.
       *
-      *
       *****************************************************************
       *   ９１日編集処理
       *****************************************************************
@@ -1630,86 +1641,68 @@
       **     DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
       **     DISPLAY "STUSAN-RRK-CNT = " STUSAN-RRK-CNT
       *
+           MOVE    STUSAN-RRK-CNT  TO  WRK-STUSAN-RRK-CNT
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
+               MOVE  STUSAN-RRK-OCC(IDX10)  TO WRK-STUSAN-RRK-OCC(IDX10)
+           END-PERFORM
+      *
+           PERFORM VARYING IDX10   FROM    1   BY  1
+                   UNTIL ( IDX10   >   WRK-STUSAN-RRK-CNT )
       **         DISPLAY "IDX10 = " IDX10
-      **         DISPLAY "STUSAN-RRK-JTIKBN (IDX10) = "
-      **                  STUSAN-RRK-JTIKBN (IDX10)
-      **         DISPLAY "STUSAN-RRK-TAINRELKBN (IDX10) = "
-      **                  STUSAN-RRK-TAINRELKBN (IDX10)
-      **         DISPLAY "STUSAN-RRK-NYUINYMD (IDX10) = "
-      **                  STUSAN-RRK-NYUINYMD (IDX10)
-      **         DISPLAY "STUSAN-RRK-TAIINYMD (IDX10) = "
-      **                  STUSAN-RRK-TAIINYMD (IDX10)
-      **         DISPLAY "STUSAN-RRK-DJKBN (IDX10) = "
-      **                  STUSAN-RRK-DJKBN (IDX10)
-      **         DISPLAY "STUSAN-RRK-NISSU (IDX10) = "
-      **                  STUSAN-RRK-NISSU (IDX10)
-               IF    ( STUSAN-RRK-JTIKBN (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-JTIKBN (IDX10) = "
+      **                  WRK-STUSAN-RRK-JTIKBN (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-TAINRELKBN (IDX10) = "
+      **                  WRK-STUSAN-RRK-TAINRELKBN (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-NYUINYMD (IDX10) = "
+      **                  WRK-STUSAN-RRK-NYUINYMD (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-TAIINYMD (IDX10) = "
+      **                  WRK-STUSAN-RRK-TAIINYMD (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-DJKBN (IDX10) = "
+      **                  WRK-STUSAN-RRK-DJKBN (IDX10)
+      **         DISPLAY "WRK-STUSAN-RRK-NISSU (IDX10) = "
+      **                  WRK-STUSAN-RRK-NISSU (IDX10)
+               IF    ( WRK-STUSAN-RRK-JTIKBN (IDX10)
                                            NOT = "5" )
-                   IF (STUSAN-RRK-NYUINYMD (IDX10)  NOT =  SPACE)  AND
-                      (STUSAN-RRK-NISSU (IDX10)    =   ZERO)   AND
-                      (STUSAN-RRK-DJKBN (IDX10)    =   SPACE)
-                           ADD   1    TO   STUSAN-RRK-NISSU (IDX10)
-                   END-IF
-                   IF   STUSAN-RRK-NISSU (IDX10)  =   ZERO
-                        ADD   1    TO   STUSAN-RRK-NISSU (IDX10)
-                   END-IF
-      *
-                   IF   (STUSAN-RRK-TAIINYMD(IDX10)  NOT = "99999999")
-                    IF (STUSAN-RRK-NISSU (IDX10)    =   ZERO  OR  1)
-                      CONTINUE
-                    ELSE
-                     INITIALIZE                  STS-AREA-DAY
-                     INITIALIZE                  LNK-DAY5-AREA
-                     MOVE    "51"            TO  LNK-DAY5-IRAI
-                     MOVE    STUSAN-RRK-NYUINYMD (IDX10)
-                                             TO  LNK-DAY5-START
-                     MOVE    STUSAN-RRK-TAIINYMD (IDX10)
-                                             TO  LNK-DAY5-END
-                     CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                                 LNK-DAY5-AREA
-      **               DISPLAY "====  KIKAN-KEISAN ===="
-      **               DISPLAY "STUSAN-RRK-NYUINYMD (IDX10) = "
-      **                        STUSAN-RRK-NYUINYMD (IDX10)
-      **               DISPLAY "STUSAN-RRK-TAIINYMD (IDX10) = "
-      **                        STUSAN-RRK-TAIINYMD (IDX10)
-      **               DISPLAY "LNK-DAY5-NISSU2 = " LNK-DAY5-NISSU2
-                     MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX10)
-                    END-IF
+                   IF (WRK-STUSAN-RRK-NYUINYMD (IDX10)  NOT =  SPACE)
+                        INITIALIZE                  ORCSTUSANAREA
+                        MOVE    SPA-HOSPNUM     TO  STUSAN-HOSPNUM
+                        MOVE    SPA-PTID        TO  STUSAN-PTID
+                        MOVE    WRK-STUSAN-RRK-NYUINYMD (IDX10)
+                                                TO  STUSAN-KJNYMD
+                        CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
+                                                        SPA-AREA
+      **                  DISPLAY "STUSAN-RC = " STUSAN-RC
+      **                  DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
                    END-IF
       *
-      **             DISPLAY "COM-MAE WRK-TUSAN = " WRK-TUSAN
-                   COMPUTE WRK-TUSAN
-                       =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
-      **             DISPLAY "COM-ATO WRK-TUSAN = " WRK-TUSAN
-                   IF    ( WRK-TUSAN  <    91 )
+                   IF    ( STUSAN-NISSU03  <    91 )
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
                        MOVE    "61"            TO  LNK-DAY6-IRAI
-                       MOVE    STUSAN-RRK-NYUINYMD (IDX10)
+                       MOVE    WRK-STUSAN-RRK-NYUINYMD (IDX10)
                                                TO  LNK-DAY6-KIJUN
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                        IF    ( STUSAN-RRK-DJKBN (IDX10) = SPACE OR "2" )
-      **                     DISPLAY "91 - WRK-TUSAN"
+      **                     DISPLAY "92 - STUSAN-NISSU03"
                            COMPUTE LNK-DAY6-ZOGEN
-                               =   91   -          WRK-TUSAN
+                               =   92   -          STUSAN-NISSU03
                        ELSE
-      **                     DISPLAY "92 - WRK-TUSAN"
+      **                     DISPLAY "92 - STUSAN-NISSU03"
                            COMPUTE LNK-DAY6-ZOGEN
-                               =   92   -          WRK-TUSAN
+                               =   92   -          STUSAN-NISSU03
                        END-IF
       **                 DISPLAY "LNK-DAY6-KIJUN = " LNK-DAY6-KIJUN
       **                 DISPLAY "LNK-DAY6-ZOGEN = " LNK-DAY6-ZOGEN
       *AZU-ADD START
-                       IF     WRK-TUSAN   <=    ZERO
+                       IF     STUSAN-NISSU03   <=    ZERO
                             MOVE   91     TO    LNK-DAY6-ZOGEN
                        END-IF
       *AZU-ADD END
       *
       *AZU-ADD START
-                       IF    (STUSAN-RRK-CNT     =   1 )   AND
-                             (STUSAN-RRK-TAIINYMD (IDX10) = "99999999")
+                       IF (STUSAN-RRK-CNT     =   1 )   AND
+                          (WRK-STUSAN-RRK-TAIINYMD (IDX10) = "99999999")
                             MOVE   91     TO    LNK-DAY6-ZOGEN
                        END-IF
       *AZU-ADD END
@@ -1724,7 +1717,7 @@
                        END-IF
                        PERFORM 41012-SEIWA-HEN-SEC
                        MOVE    WRK-HENYMDG     TO  SPA-GMN-IJYOU91
-                       MOVE    STUSAN-RRK-CNT  TO  IDX10
+                       MOVE    WRK-STUSAN-RRK-CNT  TO  IDX10
                    END-IF
                END-IF
            END-PERFORM
