@@ -155,7 +155,8 @@
                                            MCP-WINDOW
       *
       *    排他制御解除処理
-           MOVE    2                   TO  SLOCK-MODE
+           MOVE    3                   TO  SLOCK-MODE
+           MOVE    ZERO                TO  SLOCK-PTID
            CALL    "ORCSLOCK"          USING
                                        MCPAREA
                                        SPA-AREA
