@@ -35,6 +35,7 @@
       *                                     包括対象項目追加
       * 04.08.00     NACL-多々納  15/12/14  伝票番号追加対応
       * 05.00.00     NACL-多々納  17/08/XX  CLASS=02伝票番号追加対応
+      * 05.00.00     NACL-多々納  17/11/XX  CLASS=02点数など追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -174,6 +175,8 @@
                05  WRK-END-SRYYY           PIC 9(04).
                05  WRK-END-SRYMM           PIC 9(02).
            03  WRK-SRYYMD              PIC X(08).
+      *    包括検査数
+           03  WRK-HOUKNS-CNT          PIC 9(02).
       *
       *    数値変換用
            03  WRK-SURYO               PIC S9(08)V9(05).
@@ -1890,6 +1893,8 @@
            MOVE    ZERO                TO  WRK-SUM-TENSU
            MOVE    ZERO                TO  WRK-SUM-KINGAKU
            MOVE    ZERO                TO  FLG-TENCHK
+      *H29.11
+           MOVE    ZERO                TO  WRK-HOUKNS-CNT
       *
            IF     (FLG-CHK             =   ZERO  )
                INITIALIZE                  SRYACCTPLUS-REC
@@ -2038,6 +2043,21 @@
                                                      (IDX IDY IDX-S)
            MOVE    WRK-TANINAME        TO  MDC02RES-UNIT-NAME
                                                      (IDX IDY IDX-S)
+      *H29.11
+      *    点数識別、点数
+           IF     (SRY-SRYCD (IDXA) (1:1)  =   "1"
+                                           OR  "6"
+                                           OR  "7" )
+              OR  (SRY-SRYCD (IDXA) (1:3)  =   "059"
+                                           OR  "058")
+               MOVE    TNS-TENSIKIBETU     TO  MDC02RES-TENSIKIBETU
+                                                     (IDX IDY IDX-S)
+               MOVE    TNS-TEN             TO  WRK-SURYO
+               PERFORM 810-NUMHENKAN-SEC
+               MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
+                                           TO  MDC02RES-TEN
+                                                     (IDX IDY IDX-S)
+           END-IF
       *
       *    診療コードの金額集計
            IF      SRY-SRYKBN          =   "95"
@@ -2064,6 +2084,14 @@
                    END-IF
                    ADD     TNS-TEN             TO  WRK-SUM-KINGAKU
                END-IF
+           END-IF
+      *H29.11
+      *    包括検査の判定
+           IF     (SRY-SRYCD (IDXA)(1:1)   =   "1" )  AND
+                  (SRY-SRYKBN              =   "60" ) AND
+                  (TNS-DATAKBN             =   1    ) AND
+                  (TNS-HOUKNSKBN       NOT =   ZERO )
+               ADD     1                   TO  WRK-HOUKNS-CNT
            END-IF
            .
        200341-MEISE-HEN-EXT.
@@ -2158,6 +2186,12 @@
            MOVE    WRK-SURYO-HX(1:WRK-S-MAX)
                                        TO  MDC02RES-MDC-MOENY
                                                              (IDX IDY)
+      *H29.11
+      *    包括検査の検査数
+           IF      WRK-HOUKNS-CNT      >   ZERO
+               MOVE    WRK-HOUKNS-CNT  TO  MDC02RES-HKTKNSA-CNT
+                                                             (IDX IDY)
+           END-IF
            .
        200342-KINGAKU-HEN-EXT.
            EXIT.
