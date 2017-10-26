@@ -13518,12 +13518,8 @@
            END-IF
       *    ¿©»ö¶èÊ¬
            MOVE   "099999913"   TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
-           IF     WRK-TAIHI-SHOKUJI    NOT =   ZERO
-                  MOVE   WRK-TAIHI-SHOKUJI
+           MOVE   WRK-TAIHI-SHOKUJI
                                 TO  LNK-SCNYUACCT-SHOKUJIKBN
-           ELSE
-                  MOVE   1      TO  LNK-SCNYUACCT-SHOKUJIKBN
-           END-IF
       *    ¿©Æ²²Ã»»
            PERFORM     4801-BTUSEL-SEC
            IF   FLG-SYSKANRI           =    ZERO
