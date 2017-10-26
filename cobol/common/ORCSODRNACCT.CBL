@@ -3152,7 +3152,8 @@
                    MOVE     MCPDATA-REC   TO   NYUINACCT-REC
       *
       *            ¿©»ö¤òÂàÈò
-                   IF      NACCT-ZAISKBKBN     =   "4"
+                   IF     (NACCT-ZAISKBKBN     =   "4")   AND
+                          (NACCT-SRYCDTOTAL    =   99999920)
                        MOVE    LNK-PTNYUINRRK-TAIINYMD(7:2)
                                          TO    IDX-SHOKUJIX
                        IF      NACCT-DAY(IDX-SHOKUJI9)  NOT =   ZERO
@@ -3514,12 +3515,8 @@
            END-IF
       *    ¿©»ö¶èÊ¬
            MOVE   "099999913"   TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
-           IF     WRK-TAIHI-SHOKUJI    NOT =   ZERO
-                  MOVE   WRK-TAIHI-SHOKUJI
+           MOVE   WRK-TAIHI-SHOKUJI
                                 TO  LNK-SCNYUACCT-SHOKUJIKBN
-           ELSE
-                  MOVE   1      TO  LNK-SCNYUACCT-SHOKUJIKBN
-           END-IF
       *    ¿©Æ²²Ã»»
            PERFORM     4801-BTUSEL-SEC
            IF   FLG-SYSKANRI           =    ZERO
