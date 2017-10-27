@@ -697,6 +697,9 @@
               IF      (WRK-SPA-PTNUM       =   SPACE   )  AND
                       (WRK-SPA-NAME    NOT =   SPACE   )  AND
                       (WRK-SPA-P02-UKEID   NOT =   ZERO    )
+      *H29.11
+                   MOVE    SPACE               TO  SPA-GMN-PTNUM
+                   MOVE    ZERO                TO  SPA-GMN-PTID
                    MOVE    WRK-SPA-NAME        TO  SPA-NAME
                    MOVE    WRK-SPA-P02-UKEID   TO  SPA-P02-UKEID
       *            各画面を初期編集する
