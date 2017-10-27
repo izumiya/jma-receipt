@@ -1558,14 +1558,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    患者マスタ初期編集
            MOVE    SPACE               TO  PTINF-REC
            INITIALIZE                      PTINF-REC
-           IF      SPA-NAME        NOT =   SPACE
-               MOVE    SPA-NAME            TO  PTINF-NAME
-           END-IF
+      *H29.11　削除
+      **** IF      SPA-NAME        NOT =   SPACE
+      *        MOVE    SPA-NAME            TO  PTINF-NAME
+      *    END-IF
       *
-           IF      SPA-NAME        NOT =   SPACE
-               MOVE    SPA-NAME            TO  SPA-GMN-NAMEH
-               MOVE    SPA-NAME            TO  SPA-GMN-NAME
-           END-IF
+      *    IF      SPA-NAME        NOT =   SPACE
+      *        MOVE    SPA-NAME            TO  SPA-GMN-NAMEH
+      *        MOVE    SPA-NAME            TO  SPA-GMN-NAME
+      **** END-IF
       *
       *    患者番号変換マスタ初期編集
            MOVE    SPACE               TO  PTNUM-REC
