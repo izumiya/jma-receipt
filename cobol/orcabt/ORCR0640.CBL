@@ -751,6 +751,7 @@
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *  04.08.42    NACL-ÌçÏÆ    17/09/26  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
+      *  04.08.43    NACL-ÌçÏÆ    17/11/01  ¿ÇÎÅ¶èÊ¬ÊÌÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -33546,49 +33547,17 @@
              IF   RECE62-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
                 IF   (RECE62-KOHNUM(1)   = "972" OR "974")
                 AND  (KOHFTN-IDX         >   3           )
-                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
-                                UNTIL    KOHFTN-IDX2     >   30
-                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
-                                RECE62-TENSU(KOHFTN-IDX2 1)          -
-                                RECE62-TENSU(KOHFTN-IDX2 3)
-                    END-PERFORM
-                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
-                                UNTIL    KOHFTN-IDX2     >   10
-                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
-                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
-                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 3)
-                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
-                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
-                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 3)
-                    END-PERFORM
-                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
-                          =  RECE62-NYUKHNKEI2(1)
-                          -  RECE62-NYUKHNKEI2(3)
-                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
-                          =  RECE62-NYUTOKKEI2(1)
-                          -  RECE62-NYUTOKKEI2(3)
+                  IF   RECE62-TOTALTEN(KOHFTN-IDX) = ZERO
+                    PERFORM  21144-TENSU-HENSYU3-SEC
+                  ELSE
+                    PERFORM  21143-TENSU-HENSYU2-SEC
+                  END-IF
                 ELSE
-                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
-                                UNTIL    KOHFTN-IDX2     >   30
-                       COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
-                                RECE62-TENSU(KOHFTN-IDX2 1)          -
-                                RECE62-TENSU(KOHFTN-IDX2 2)
-                    END-PERFORM
-                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
-                                UNTIL    KOHFTN-IDX2     >   10
-                       COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
-                             =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
-                             -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
-                       COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
-                             =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
-                             -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
-                    END-PERFORM
-                    COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
-                          =  RECE62-NYUKHNKEI2(1)
-                          -  RECE62-NYUKHNKEI2(2)
-                    COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
-                          =  RECE62-NYUTOKKEI2(1)
-                          -  RECE62-NYUTOKKEI2(2)
+                  IF   RECE62-TOTALTEN(KOHFTN-IDX) = ZERO
+                    PERFORM  21144-TENSU-HENSYU3-SEC
+                  ELSE
+                    PERFORM  21142-TENSU-HENSYU1-SEC
+                  END-IF
                 END-IF
              END-IF
       *
@@ -33622,6 +33591,89 @@
       *
            .
        21141-FTNKBNFLG-CLEAR-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¶èÊ¬ÊÌÅÀ¿ôÊÔ½¸
+      *****************************************************************
+       21142-TENSU-HENSYU1-SEC               SECTION.
+      *
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   30
+              COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                       RECE62-TENSU(KOHFTN-IDX2 1)          -
+                       RECE62-TENSU(KOHFTN-IDX2 2)
+           END-PERFORM
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   10
+              COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                    =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                    -  RECE62-NYUKHNKEI(KOHFTN-IDX2 2)
+              COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                    =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                    -  RECE62-NYUTOKKEI(KOHFTN-IDX2 2)
+           END-PERFORM
+           COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                 =  RECE62-NYUKHNKEI2(1)
+                 -  RECE62-NYUKHNKEI2(2)
+           COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                 =  RECE62-NYUTOKKEI2(1)
+                 -  RECE62-NYUTOKKEI2(2)
+      *
+           .
+       21142-TENSU-HENSYU1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¶èÊ¬ÊÌÅÀ¿ôÊÔ½¸
+      *****************************************************************
+       21143-TENSU-HENSYU2-SEC               SECTION.
+      *
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   30
+              COMPUTE  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
+                       RECE62-TENSU(KOHFTN-IDX2 1)          -
+                       RECE62-TENSU(KOHFTN-IDX2 3)
+           END-PERFORM
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   10
+              COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                    =  RECE62-NYUKHNKEI(KOHFTN-IDX2 1)
+                    -  RECE62-NYUKHNKEI(KOHFTN-IDX2 3)
+              COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+                    =  RECE62-NYUTOKKEI(KOHFTN-IDX2 1)
+                    -  RECE62-NYUTOKKEI(KOHFTN-IDX2 3)
+           END-PERFORM
+           COMPUTE  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+                 =  RECE62-NYUKHNKEI2(1)
+                 -  RECE62-NYUKHNKEI2(3)
+           COMPUTE  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+                 =  RECE62-NYUTOKKEI2(1)
+                 -  RECE62-NYUTOKKEI2(3)
+      *
+           .
+       21143-TENSU-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¶èÊ¬ÊÌÅÀ¿ôÊÔ½¸
+      *****************************************************************
+       21144-TENSU-HENSYU3-SEC               SECTION.
+      *
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   30
+              MOVE  ZERO  TO  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX)
+           END-PERFORM
+           PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX2     >   10
+              MOVE  ZERO  TO  RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX)
+              MOVE  ZERO  TO  RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX)
+           END-PERFORM
+           MOVE     ZERO  TO  RECE62-NYUKHNKEI2(KOHFTN-IDX)
+           MOVE     ZERO  TO  RECE62-NYUTOKKEI2(KOHFTN-IDX)
+      *
+           .
+       21144-TENSU-HENSYU3-EXT.
            EXIT.
       *
       *****************************************************************
