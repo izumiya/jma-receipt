@@ -144,6 +144,8 @@
       *                                     作成対応
       *  04.08.07    NACL-門脇    17/04/17  継続区分「３特別」選択時は、
       *                                     主保険名に（特）をつける
+      *  04.08.08    NACL-門脇    17/11/01  主保険＋052小児特定＋053児童保護の
+      *                                     保険組み合わせ作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3828,6 +3830,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                              IF  WRK-SRT-HJO-KOHNO             =
                                    "010" OR "021" OR "015" OR "016"
                                                            OR "020"
+                                PERFORM 5701413-SYUKOH-HJO-SEC
+                             END-IF
+                             IF  (WRK-KOH-HKNNUM(WRK-COMB-HJOIDX)
+                                                             = "053")
+                             AND (WRK-SRT-HJO-KOHNO          = "052")
+                             AND (WRK-KCOMB-HKNNUM(IDX2) NOT = SPACE)
                                 PERFORM 5701413-SYUKOH-HJO-SEC
                              END-IF
                           ELSE
