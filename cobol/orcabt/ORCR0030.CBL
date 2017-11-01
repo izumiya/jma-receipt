@@ -778,6 +778,7 @@
       *  04.08.48    NACL-ÌçÏÆ    17/07/14  ³ç¸ÌºÆ·Çµ­ºÜ½¤Àµ
       *  04.08.49    NACL-ÌçÏÆ    17/08/28  Ê¿À®£²£¹Ç¯£±£°·î²þÀµ
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
+      *  04.08.50    NACL-ÌçÏÆ    17/11/01  ¿ÇÎÅ¶èÊ¬ÊÌÅÀ¿ôÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -28074,19 +28075,35 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
              IF   RECE02-FUKUSHIFLG(KOHFTN-IDX)   NOT =  SPACE
                 IF   (RECE02-KOHNUM(1)   = "972" OR "974")
                 AND  (KOHFTN-IDX         >   3           )
+                  IF   RECE02-TOTALTEN(KOHFTN-IDX) = ZERO
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       MOVE  ZERO  TO
+                                RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX)
+                    END-PERFORM
+                  ELSE
                     PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
                                 UNTIL    KOHFTN-IDX2     >   50
                        COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
                                 RECE02-TENSU(KOHFTN-IDX2 1)          -
                                 RECE02-TENSU(KOHFTN-IDX2 3)
                     END-PERFORM
+                  END-IF
                 ELSE
+                  IF   RECE02-TOTALTEN(KOHFTN-IDX) = ZERO
+                    PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
+                                UNTIL    KOHFTN-IDX2     >   50
+                       MOVE  ZERO  TO
+                                RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX)
+                    END-PERFORM
+                  ELSE
                     PERFORM    VARYING   KOHFTN-IDX2   FROM   1   BY   1
                                 UNTIL    KOHFTN-IDX2     >   50
                        COMPUTE  RECE02-TENSU(KOHFTN-IDX2 KOHFTN-IDX) =
                                 RECE02-TENSU(KOHFTN-IDX2 1)          -
                                 RECE02-TENSU(KOHFTN-IDX2 2)
                     END-PERFORM
+                  END-IF
                 END-IF
              END-IF
       *
