@@ -515,10 +515,12 @@
        300-END-SEC                 SECTION.
       *
            IF      CNT-OUT         =   ZERO
-               CONTINUE 
-      ****     MOVE    "処理対象のデータがありませんでした"
-      ****                             TO  WRK-RECEERR
-      ****     PERFORM 500-ERR-HENSYU-SEC
+               MOVE    "処理対象のデータがありませんでした"
+                                       TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+      *
+      *        ＰＵＳＨ通知処理
+               PERFORM 3001-PUSH-SEC
            ELSE
                INITIALIZE                 ORCSAPIFILEAREA
                MOVE    SGETTEMP-TEMPDIR
