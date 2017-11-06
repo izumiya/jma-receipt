@@ -155,10 +155,6 @@
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
       *
-      *    ¼õ¿ÇÍúÎò
-       01  JYURRK-REC.
-           COPY    "CPJYURRK.INC".
-      *
       *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊó
        01  PTRSIINF-REC.
            COPY    "CPPTRSIINF.INC".
@@ -343,7 +339,6 @@
       *    ÊÝ¸±ÁÈ¹ç¤»ÊÔ½¸½èÍý
       *****************************************************************
        200-MAIN-SYORI-SEC            SECTION.
-      *
       *
       *    ÊÝ¸±ÁÈ¹ç¥Þ¥¹¥¿¡¼ÊÔ½¸
            MOVE    SPACE               TO  HKNCOMBI-REC
@@ -689,7 +684,7 @@
                WHEN    "1"
       *    Ï«Æ¯ÊÝ¸±ÈÖ¹æ
                    MOVE    PTRSI-KOFUNUM
-                                       TO  ORCSAPIHKN-PENSIONCERTIFICATE
+                                       TO  ORCSAPIHKN-ACCIDENT-NUMBER
                                                                 (IDXH)
                WHEN    "2"
       *    Ç¯¶â¾Ú½ñÈÖ¹æ
@@ -699,7 +694,7 @@
                WHEN    "3"
       *    ·ò¹¯´ÉÍý¼êÄ¢ÈÖ¹æ
                    MOVE    PTRSI-KOFUNUM
-                                       TO  ORCSAPIHKN-PENSIONCERTIFICATE
+                                   TO  ORCSAPIHKN-RSI-KANRITCHO-NUMBER
                                                                 (IDXH)
            END-EVALUATE
       *    ºÒ³²¶èÊ¬
