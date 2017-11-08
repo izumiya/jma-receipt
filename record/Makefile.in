@@ -540,6 +540,7 @@ RECORD_files = \
 	diseasemasterlstv3.rec \
 	medicationmasterlstv3.rec \
 	subjectiveslstv2.rec \
+	medicalmodv37.rec \
 
 DEF_files = \
 
@@ -1025,6 +1026,8 @@ DB_files = \
 	xml_disease_masterlst.db \
 	xml_subjectiveslstv2req.db \
 	xml_subjectiveslstv2res.db \
+	xml_medicalv3req7.db \
+	xml_medicalv3res7.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

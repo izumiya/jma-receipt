@@ -527,3 +527,15 @@ path  key4  {
   };
 };
 
+path	key5	{
+	DBSELECT	{
+		DECLARE tbl_lock_key5_csr CURSOR FOR
+		SELECT *
+		FROM tbl_lock
+		WHERE 	HOSPNUM	= :HOSPNUM
+		      ORDER   BY        LOCKTABLE_STARTDATE1,
+                                        LOCKTABLE_STARTTIME1
+		;
+	};
+};
+
