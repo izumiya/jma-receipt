@@ -282,7 +282,7 @@ class Jma_print
     pdf_files=Array.new
 
     @print_data.each do |data|
-      unless @show_dialog == false or @print_order == "7"
+      unless @show_dialog == true or @print_order == "7"
         unless printer == data[:lp_name]
           execute_concat(pdf_files,printer)
           pdf_files.clear
