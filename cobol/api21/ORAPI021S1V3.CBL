@@ -61,6 +61,7 @@
            03  FLG-TAHOKEN             PIC 9(01).
            03  FLG-HKN-ARI             PIC 9(01).
            03  FLG-UIDOK               PIC 9(01).
+           03  FLG-NYUINDAY            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -614,6 +615,7 @@
            END-IF
       *    編集処理
            PERFORM 20010-INPUT-HEN-SEC
+           MOVE    SPACE               TO  WRK-KEICD-G
            .
        2099-CANCEL-EXT.
            EXIT.
@@ -2290,6 +2292,7 @@
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           MOVE    ZERO                TO  FLG-NYUINDAY
            IF      FLG-PTNYUINRRK      =   ZERO
       *        入院中
                IF     (SPA-NYUGAIKBN       =   "2" )
@@ -2306,6 +2309,10 @@
                    ELSE
                        MOVE    "21"                TO  WRK-ERRCD
                    END-IF
+               END-IF
+      *        入院日
+               IF     (SPA-SRYYMD      =   PTNYUINRRK-NYUINYMD)
+                   MOVE    1               TO  FLG-NYUINDAY
                END-IF
            END-IF
            .
@@ -2627,7 +2634,9 @@
            PERFORM 200211-NYUGAIKBN-CHK-SEC
       *    入院中は自動設定なしとする
            IF     (WRK-ERRCD           =   "21" )
-              OR  (IDK                 >   ZERO )
+              OR ((IDK                 >   ZERO ) AND
+                  (WRK-KEICD (IDK)     =   "W21"))
+              OR  (FLG-NYUINDAY        =   1    )
                MOVE    "70"                TO  WRK-ERRCD
                MOVE    SPACE               TO  WRK-KEICD (IDK)
                MOVE    ZERO                TO  IDK
