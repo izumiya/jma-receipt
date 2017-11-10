@@ -2147,7 +2147,7 @@
       *****************************************************************
       *    前回の保険組合せとの判定処理
       *****************************************************************
-       1001312-MAE-HKNCOMBICHEK-SEC              SECTION.
+       1001312-MAE-HKNCOMBICHEK-SEC    SECTION.
       *
            INITIALIZE                  HKNCOMBI-REC
            MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
@@ -4118,7 +4118,6 @@
                INITIALIZE              SPA-DOUSYOSIN-AREA
                MOVE    SPACE           TO  SPA-DOUYMD
            END-IF
-      *
       *    保険組合せが使用できるかのチェック
       *****PERFORM 100131-HKNCOMBI-CHK-SEC
       *
@@ -6019,6 +6018,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    受診履歴一覧編集
            MOVE    ZERO                TO  SPA-RRK-PAGE
            PERFORM 2002-JYURRK-SET-SEC
+      *API00
+      *    受付から保険組合せ設定
+           IF      LNK-SC95-PG         =   SPACE
+               MOVE    ZERO                TO  FLG-UKETUKE-ARI
+               MOVE    SPA-SRYKA           TO  SPA-GMN-SRYKA
+               PERFORM 10014-UKETUKE-CHK-SEC
+           END-IF
+      *
       *    受診履歴より、診療科等を確定する
            PERFORM 10011-JYURRK-SEC
       *V3対応
