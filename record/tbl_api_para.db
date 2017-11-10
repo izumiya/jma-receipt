@@ -179,3 +179,14 @@ path	key7 	{
 	};
 };
 
+path	del6 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_api_para
+		WHERE 	HOSPNUM	     =   :HOSPNUM
+		        AND   TERMID       =   :TERMID
+		;
+	};
+};
+
+
