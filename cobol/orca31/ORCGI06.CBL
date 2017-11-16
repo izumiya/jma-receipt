@@ -1870,6 +1870,7 @@
                WHEN    NORDERID-FOODID
                WHEN    NORDERID-PTEVALID
                WHEN    NORDERID-BUNBENID
+               WHEN    NORDERID-CRENACCTID
                    PERFORM 41011-INPUT-AREA-HEN-SEC
                END-EVALUATE
            END-EVALUATE
@@ -2053,6 +2054,8 @@
                        PERFORM 410111-PTEVAL-HEN-SEC
                    WHEN    NORDERID-BUNBENID
                        PERFORM 410111-BUNBEN-HEN-SEC
+                   WHEN    NORDERID-CRENACCTID
+                       PERFORM 410111-OTHERS-HEN-SEC
                    END-EVALUATE
       *
                END-IF
@@ -2462,6 +2465,18 @@
        410111-BUNBEN-HEN-EXT.
            EXIT.
       *****************************************************************
+      *    その他オーダー編集処理
+      *****************************************************************
+       410111-OTHERS-HEN-SEC      SECTION.
+      *
+           COMPUTE CNT-ORDER   =  CNT-ORDER    +   1
+      *
+           PERFORM 410111-INPUT-COMMON-HEN-SEC
+      *
+           .
+       410111-OTHERS-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    共通入力項目編集処理
       *****************************************************************
        410111-INPUT-COMMON-HEN-SEC     SECTION.
@@ -2559,6 +2574,7 @@
            WHEN    NORDERID-FOODID
            WHEN    NORDERID-PTEVALID
            WHEN    NORDERID-BUNBENID
+           WHEN    NORDERID-CRENACCTID
                CONTINUE
            END-EVALUATE
       *
@@ -5374,6 +5390,7 @@
            WHEN    NORDERID-FOODID
            WHEN    NORDERID-PTEVALID
            WHEN    NORDERID-BUNBENID
+           WHEN    NORDERID-CRENACCTID
                CONTINUE
            END-EVALUATE
       *
@@ -7049,6 +7066,7 @@
                    WHEN    NORDERID-FOODID
                    WHEN    NORDERID-PTEVALID
                    WHEN    NORDERID-BUNBENID
+                   WHEN    NORDERID-CRENACCTID
                        CONTINUE
                    END-EVALUATE
       *

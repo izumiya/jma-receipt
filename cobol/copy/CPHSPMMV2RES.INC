@@ -15,23 +15,17 @@
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
       ********************************************************************
-      *    orca31¡ÊÆþÂà±¡ÅÐÏ¿¡Ë²èÌÌ
-      ******************************************************************
-           COPY    "I01.INC".
-           COPY    "I02.INC".
-           COPY    "I03.INC".
-           COPY    "I04.INC".
-           COPY    "I05.INC".
-           COPY    "I06.INC".
-           COPY    "I0ERR.INC".
-           COPY    "I0ID1.INC".
-           COPY    "I0ID2.INC".
-           COPY    "I041.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API01-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API02-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API09-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //I0API10-//.
+       01  XML-HSPMMRES.
+         02  HSPMMRES-CONTEXT                  PIC S9(9)   BINARY.
+         02  HSPMMRES-OBJECT                   PIC X(8).
+         02  HSPMMRES-MODE                     PIC S9(9)   BINARY.
+         02  HSPMMRES-RECORDNAME               PIC X(128).
+         02  HSPMMRES-AREA.
+           03  HSPMMRES-API-INFORMATION-DATE   PIC X(10).
+           03  HSPMMRES-API-INFORMATION-TIME   PIC X(8).
+           03  HSPMMRES-API-RESULT             PIC X(4).
+           03  HSPMMRES-API-RESULT-MSG         PIC X(100).
+           03  HSPMMRES-SRYYM-MAX-G.
+             04  HSPMMRES-SRYYM-MAX-OCC        OCCURS  1000.
+               05  HSPMMRES-PTNUM              PIC X(20).
+               05  HSPMMRES-SRYYM              PIC X(7).

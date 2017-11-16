@@ -8,6 +8,7 @@ xml_hsacctmodv2req {
 		Request_Number   varchar(1);
 		Patient_ID		 varchar(20);
 		Admission_Date	 varchar(10);
+		End_Month        varchar(7);
 		Perform_Date	 varchar(10);
 		End_Date         varchar(10);
 		Meal_Information	{
