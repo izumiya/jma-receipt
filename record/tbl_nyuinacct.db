@@ -1089,3 +1089,24 @@ path	key57 	{
 	};
 };
 
+
+path	key58 	{
+	DBSELECT	{
+		DECLARE tbl_nyuinacct_key58_csr CURSOR FOR
+		SELECT a.PTID, max(a.SRYYM) as SRYYM
+		FROM tbl_nyuinacct a JOIN tbl_ptnum b using (HOSPNUM, PTID)
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   ( CASE WHEN :PTID = 0 THEN TRUE ELSE (PTID = :PTID) END ) 
+			AND     ZAISKBKBN =   '5'
+			AND   ( HOSPNUM, PTID )
+				 IN ( SELECT HOSPNUM, PTID
+			        FROM   tbl_ptnyuinrrk
+		          WHERE  RRKEDANUM = 1
+		          AND  ( TAIINYMD  = '99999999' OR :UPYMD = '99999999')
+			      AND	 JTIKBN	NOT IN ('5','6')
+                  )
+		  GROUP  BY  a.PTID, b.PTNUM
+			ORDER  BY  max(a.SRYYM), b.PTNUM
+		;
+	};
+};

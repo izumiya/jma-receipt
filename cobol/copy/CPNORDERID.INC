@@ -29,6 +29,7 @@
            03  NORDERID-ORDER-ALLDELNYUIN  PIC X(02) VALUE "12".
       *
            03  NORDERID-VAL.
+      *
                05  NORDERID-NYUIN-G.
                    07  NORDERID-NYUINCL1   PIC X(02) VALUE "01".
                    07  NORDERID-NYUINCL2   PIC X(03) VALUE "001".
@@ -334,9 +335,17 @@
                                            VALUE "出産育児一時金情報".
                    07  NORDERID-BUNBENMES2 PIC X(20)
                                            VALUE "出産育児一時金情報".
+               05  NORDERID-CRENACCT-G.
+                   07  NORDERID-CRENACCTCL1    PIC X(02) VALUE "XX".
+                   07  NORDERID-CRENACCTCL2    PIC X(03) VALUE "XXX".
+                   07  NORDERID-CRENACCTID     PIC X(04) VALUE "9901".
+                   07  NORDERID-CRENACCTMES1   PIC X(30)
+                                               VALUE "入院会計作成".
+                   07  NORDERID-NACCTMES2 PIC X(20)
+                                               VALUE "入院会計作成".
       *
            03  NORDERID-R  REDEFINES       NORDERID-VAL.
-               05  NORDERID-OCC            OCCURS    38.
+               05  NORDERID-OCC            OCCURS    39.
                    07  NORDERID-CLAIMID.
                        09  NORDERID-CLAIMIDH   PIC X(02).
                        09  NORDERID-CLAIMIDT   PIC X(03).
@@ -344,4 +353,4 @@
                    07  NORDERID-ORCAMES1       PIC X(30).
                    07  NORDERID-ORCAMES2       PIC X(20).
       *
-           03  NORDERID-MAX                PIC 9(03) VALUE 38.
+           03  NORDERID-MAX                PIC 9(03) VALUE 39.

@@ -45,7 +45,9 @@
        01  FLG-AREA.
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTNYUINRRK          PIC 9(01).
+           03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
+           03  FLG-PTNUM               PIC 9(01).
            03  FLG-ORCSNUM             PIC 9(01).
       *
        01  IDX-AREA.
@@ -199,6 +201,10 @@
            COPY    "CPSK1010.INC".
            COPY    "CPSK5113.INC".
       *
+      *    患者番号
+       01  PTNUM-REC.
+           COPY    "CPPTNUM.INC".
+      *
       *    患者情報
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
@@ -206,6 +212,10 @@
       *    入院履歴
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
+      *
+      *    入院会計
+       01  NYUINACCT-REC.
+           COPY    "CPNYUINACCT.INC".
       *
       *    オーダーテーブル
        01  ORDER-REC.
@@ -345,6 +355,9 @@
            WHEN    "4"
                PERFORM 1001-SHOKUJI-SEC
                MOVE    NORDERID-FOODID     TO  REG-ORDERID
+           WHEN    "9"
+               PERFORM 1001-CRENACCT-SEC
+               MOVE    NORDERID-CRENACCTID TO  REG-ORDERID
            WHEN    OTHER
                MOVE    "8003"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
@@ -407,26 +420,54 @@
        1001-GAIHAKU-EXT.
            EXIT.
       *****************************************************************
+      *    電文項目退避処理（入院会計作成）
+      *****************************************************************
+       1001-CRENACCT-SEC            SECTION.
+      *
+           MOVE    HSACCTMREQ-SAVEREQ
+                                       TO  REG-SAVEREQ
+      *
+           PERFORM 10011-PTNUM-CHECK-SEC
+      *
+           PERFORM 10011-NYUINYMD-CHECK-SEC
+      *
+           .
+       1001-CRENACCT-EXT.
+           EXIT.
+      *****************************************************************
       *    入院日チェック処理
       *****************************************************************
        10011-NYUINYMD-CHECK-SEC       SECTION.
       *
            IF    ( HSACCTMREQ-NYUINYMD =   SPACE )
-               MOVE    "8001"           TO  WRK-ERRCD
+               MOVE    "8001"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
            ELSE
                MOVE    HSACCTMREQ-NYUINYMD
-                                      TO  WRK-DATE
+                                       TO  WRK-DATE
                PERFORM 800-SYMD-SEC
                PERFORM 800-HIZUKE-SEC
-               IF    ( WRK-EDTYMD1    =   SPACE )
-                   MOVE    "8001"     TO  WRK-ERRCD
+               IF    ( WRK-EDTYMD1     =   SPACE )
+                   MOVE    "8001"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD   TO  REG-NYUINYMD
+                   MOVE    WRK-SYMD    TO  REG-NYUINYMD
+                   IF    ( HSACCTMREQ-REQNUM   =   "9" )
+                       MOVE    WRK-SYMD    TO  REG-SRYYMD
+                   END-IF
                END-IF
       *
            END-IF
+      *
+           PERFORM 100111-NYUINYMD-CHECK-SEC
+      *
+           .
+       10011-NYUINYMD-CHECK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院日チェック処理
+      *****************************************************************
+       100111-NYUINYMD-CHECK-SEC       SECTION.
       *
            IF    ( WRK-ERRCD           =   SPACE )
                PERFORM 900-PTNYUINRRK-KEY42-SEL-SEC
@@ -455,13 +496,17 @@
                        PERFORM 990-ERROR-EDIT-SEC
                    END-IF
                ELSE
-                   MOVE    "8010"  TO  WRK-ERRCD
+                   IF    ( HSACCTMREQ-REQNUM   =   "9" )
+                       MOVE    "8005"  TO  WRK-ERRCD
+                   ELSE
+                       MOVE    "8010"  TO  WRK-ERRCD
+                   END-IF
                    PERFORM 990-ERROR-EDIT-SEC
                END-IF
            END-IF
       *
            .
-       10011-NYUINYMD-CHECK-EXT.
+       100111-NYUINYMD-CHECK-EXT.
            EXIT.
       *****************************************************************
       *    診療日チェック処理
@@ -606,6 +651,8 @@
                PERFORM 2001-GAIHAKU-SEC
            WHEN    "4"
                PERFORM 2001-SHOKUJI-SEC
+           WHEN    "9"
+               PERFORM 2001-CRENACCT-SEC
            END-EVALUATE
       *
            .
@@ -690,6 +737,38 @@
       *
            .
        2001-SHOKUJI-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院会計作成処理
+      *****************************************************************
+       2001-CRENACCT-SEC               SECTION.
+      *
+           PERFORM 2300-SODR-COMMON-SET-SEC
+      *
+           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
+           MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    ZERO                TO  IDX-ITM
+      *
+           MOVE    IDX-ITM          TO  LNK-ODRITEM-MAX
+      *
+           CALL   "ORCSODR04"      USING   SODR-AREA
+                                           LNK-ODRITEM-REC
+                                           MCPAREA
+                                           SPA-AREA
+           EVALUATE    TRUE
+           WHEN  ( SODR-RC         =   ZERO )
+            AND  ( SODR-ERRFLG     =   ZERO )
+               PERFORM 2002-RESPONSE-EDIT-SEC
+           WHEN  ( SODR-RC     NOT =   ZERO )
+               MOVE    "8051"      TO  WRK-ERRCD
+               PERFORM 990-ERROR-EDIT-SEC
+           WHEN  ( SODR-ERRFLG  NOT =   ZERO )
+               PERFORM 2400-ORDER-ERROR-EDIT-SEC
+           END-EVALUATE
+      *
+           .
+       2001-CRENACCT-EXT.
            EXIT.
       *****************************************************************
       *    食事時間区分設定処理
@@ -957,6 +1036,32 @@
        2001-RESPONSE-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    レスポンス編集処理
+      *****************************************************************
+       2002-RESPONSE-EDIT-SEC          SECTION.
+      *
+           PERFORM 900-PTNUM-KEY-SEL-SEC
+      *
+           PERFORM 900-PTINF-KEY-SEL-SEC
+      *
+           PERFORM 900-NYUINACCT-KEY58-SEL-SEC
+      *
+           MOVE    PTNUM-PTNUM         TO  HSACCTMRES-PTNUM
+           MOVE    PTINF-NAME          TO  HSACCTMRES-NAME
+           MOVE    PTINF-KANANAME      TO  HSACCTMRES-KANANAME
+           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
+           PERFORM 800-DATE-SEC
+           MOVE    WRK-DATE            TO  HSACCTMRES-BIRTHDAY
+           MOVE    PTINF-SEX           TO  HSACCTMRES-SEX
+      *
+           MOVE    NACCT-SRYYM         TO  WRK-SYMD
+           PERFORM 800-DATE-SEC
+           MOVE    WRK-DATE            TO  HSACCTMRES-SRYYM
+      *
+           .
+       2002-RESPONSE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    オーダー追加処理
       *****************************************************************
        290-ORDER-INSERT-SEC          SECTION.
@@ -1085,7 +1190,7 @@
            MOVE    WRK-YMD             TO  LNK-DAY6-KIJUN
            MOVE    WRK-ZOGENPTN        TO  LNK-DAY6-ZOGENPTN
            MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
-           CALL  "ORCSDAY"             USING   STS-AREA-DAY
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
            MOVE    LNK-DAY6-KEISAN     TO  WRK-KEISANYMD
       *
@@ -1245,6 +1350,9 @@
            WHEN    "4"
                MOVE    "食事"
                                TO  HSACCTMRES-REQNUM-NAME
+           WHEN    "9"
+               MOVE    "入院会計作成"
+                               TO  HSACCTMRES-REQNUM-NAME
            END-EVALUATE
       *
            PERFORM 9001-XML-WRITE-SEC
@@ -1368,6 +1476,35 @@
        900-SYSKANRI-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
+      *    患者番号取得処理
+      *****************************************************************
+       900-PTNUM-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNUM
+      *
+           INITIALIZE                      PTNUM-REC
+           MOVE    SPA-HOSPNUM         TO  PTNUM-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNUM-PTID
+           MOVE    PTNUM-REC           TO  MCPDATA-REC
+           MOVE    "tbl_ptnum"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNUM-REC
+           ELSE
+               MOVE    1               TO  FLG-PTNUM
+               INITIALIZE                  PTNUM-REC
+           END-IF
+      *
+           MOVE    "tbl_ptnum"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-PTNUM-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
       *    患者情報取得処理
       *****************************************************************
        900-PTINF-KEY-SEL-SEC           SECTION.
@@ -1456,6 +1593,34 @@
            .
       *
        900-PTNYUINRRK-KEY42-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院会計検索処理
+      *****************************************************************
+       900-NYUINACCT-KEY58-SEL-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NYUINACCT
+      *
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+           MOVE    NYUINACCT-REC       TO  MCPDATA-REC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key58"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  NYUINACCT-REC
+           ELSE
+               MOVE    1               TO  FLG-NYUINACCT
+               INITIALIZE                  NYUINACCT-REC
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key58"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-NYUINACCT-KEY58-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
