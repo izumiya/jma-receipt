@@ -42,6 +42,7 @@
            03  WRK-TEMPDIR             PIC X(512).
            03  WRK-TEMPDIR-ROOT        PIC X(512).
            03  WRK-TERM                PIC X(64).
+           03  WRK-RC                  PIC S9(8).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -104,11 +105,17 @@
       *
            IF    ( STEMPDIR-MODE   =   "DEL" )
                IF    ( STEMPDIR-TEMPDIR    NOT =   SPACE )
-                   CALL    "SYSTEM"        USING
-                                           FUNCTION CONCATENATE (
-                                           "rm -rf "
+                   CALL    "SYSTEM"    USING
+                                       FUNCTION CONCATENATE (
+                                         "rm -f "
+                                         FUNCTION TRIM(STEMPDIR-TEMPDIR)
+                                         "/*"
+                                       )
+      *            ディレクトリの中身が空なら削除する
+                   CALL "CBL_DELETE_DIR"   USING
                                            STEMPDIR-TEMPDIR
-                                           )
+                   RETURNING  WRK-RC
+                   END-CALL
                END-IF
            ELSE
       *
@@ -141,11 +148,21 @@
                    INTO    STEMPDIR-TEMPDIR
                    END-STRING
       *
-                   CALL    "SYSTEM"        USING
-                                           FUNCTION CONCATENATE (
-                                           "mkdir -p "
+      *
+                   CALL "CBL_CREATE_DIR"   USING
                                            STEMPDIR-TEMPDIR
-                                           )
+                   RETURNING  WRK-RC
+                   END-CALL
+      *            ディレクトリの作成に失敗した場合は例外処理を行う。
+                   IF    ( WRK-RC      NOT =   ZERO )
+                       CALL    "cobabort"  USING
+                                           FUNCTION CONCATENATE (
+                       "ORCSTEMPDIR couldn't create directory " ;
+                       FUNCTION TRIM(STEMPDIR-TEMPDIR);
+                       LOW-VALUE
+                       )
+                   END-IF
+      *
                    SET ENVIRONMENT "MCP_TEMPDIR" TO STEMPDIR-TEMPDIR
                END-IF
            END-IF

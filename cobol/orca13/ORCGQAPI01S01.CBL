@@ -193,6 +193,9 @@
       *    全角チェックパラメタ(拡張文字対応版)
            COPY    "CPORCSKANACHK2.INC".
       *
+      *    一時ディレクトリ作成サブ
+           COPY "CPORCSTEMPDIR.INC".
+      *
       *    バッチジョブ制御
            COPY    "CPORCSMONBATCH.INC".
       *
@@ -4810,26 +4813,10 @@
       *****************************************************************
        2003-SHELL-SEC                  SECTION.
       *
-           MOVE    SPACE           TO  MCP-TEMPDIR
-           ACCEPT  WRK-TEMPDIR-ROOT
-                               FROM    ENVIRONMENT  "MCP_TEMPDIR_ROOT"
-           STRING  WRK-TEMPDIR-ROOT    DELIMITED BY SPACE
-                   "/"                 DELIMITED BY SIZE
-                   SPA-TERMID          DELIMITED BY SPACE
-                   LOW-VALUE           DELIMITED BY SIZE
-           INTO    MCP-TEMPDIR
-           END-STRING
-      *
-           SET ENVIRONMENT "MCP_TEMPDIR"     TO    MCP-TEMPDIR
-      *
-           CALL "CBL_CREATE_DIR"   USING MCP-TEMPDIR
-           IF    ( RETURN-CODE     NOT =   ZERO )
-               MOVE    "4008"      TO  SPA-ERRCD
-               INITIALIZE              SYSKANRI-REC
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "abort"             TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
-           END-IF
+          INITIALIZE                   STEMPDIR-AREA
+          CALL     "ORCSTEMPDIR"       USING
+                                       STEMPDIR-AREA
+          MOVE     STEMPDIR-TEMPDIR    TO  MCP-TEMPDIR
       *
            IF    ( SPA-ERRCD       =   SPACE )
       *

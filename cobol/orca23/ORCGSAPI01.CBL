@@ -112,6 +112,9 @@
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
       *
+      *    一時ディレクトリ作成サブ
+           COPY "CPORCSTEMPDIR.INC".
+      *
       *    API XML用定義体
            COPY    "ORCA-BLOB".
            COPY    "CPAPIV3REQ.INC".
@@ -152,9 +155,9 @@
       *****************************************************************
        000-MAIN-SEC                SECTION.
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept start*"
-           DISPLAY   "***************"
+           DISPLAY   "******************"
+           DISPLAY   "* incomev3 start *"
+           DISPLAY   "******************"
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
@@ -172,9 +175,9 @@
       *    返却領域編集
            PERFORM 300-END-SEC
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept end  *"
-           DISPLAY   "***************"
+           DISPLAY   "****************"
+           DISPLAY   "* incomev3 end *"
+           DISPLAY   "****************"
       *
            .
        000-MAIN-EXIT.
@@ -265,28 +268,10 @@
           MOVE     SPACE               TO  TMP01FILE-AREA
           INITIALIZE                       TMP01FILE-AREA
       *
-          MOVE     SPACE               TO  MCP-TEMPDIR
-          ACCEPT   WRK-TEMPDIR-ROOT
-                               FROM    ENVIRONMENT  "MCP_TEMPDIR_ROOT"
-           IF    ( WRK-TEMPDIR-ROOT    =   SPACE )
-               MOVE    "/tmp/jma-tempdir"  TO  WRK-TEMPDIR-ROOT
-               CALL    "SYSTEM"        USING
-                                       FUNCTION CONCATENATE (
-                                       "mkdir -p "
-                                       WRK-TEMPDIR-ROOT
-                                       )
-           END-IF
-      *
-           STRING  WRK-TEMPDIR-ROOT    DELIMITED BY SPACE
-                   "/"                 DELIMITED BY SIZE
-                   SPA-TERMID          DELIMITED BY SPACE
-                   LOW-VALUE           DELIMITED BY SIZE
-           INTO    MCP-TEMPDIR
-           END-STRING
-      *
-           SET ENVIRONMENT "MCP_TEMPDIR"   TO    MCP-TEMPDIR
-      *
-           CALL "CBL_CREATE_DIR"   USING   MCP-TEMPDIR
+          INITIALIZE                   STEMPDIR-AREA
+          CALL     "ORCSTEMPDIR"       USING
+                                       STEMPDIR-AREA
+          MOVE     STEMPDIR-TEMPDIR    TO  MCP-TEMPDIR
       *
            MOVE    SPA-HOSPNUM         TO  TMP01FILE-HOSPNUM
            MOVE    "API02301"          TO  TMP01FILE-FILE-ID
@@ -637,7 +622,7 @@
                                        TO  SAPI01-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "appoint xml write failure "
+               DISPLAY "incomev3 xml write failure "
            END-IF
       *
            .
@@ -744,9 +729,12 @@
       *****************************************************************
        990-TERMINATE-SEC               SECTION.
       *
-            CALL "CBL_DELETE_FILE"  USING TMP01FILE
+           CALL "CBL_DELETE_FILE"  USING TMP01FILE
       *
-            CALL "CBL_DELETE_DIR"   USING MCP-TEMPDIR
+           INITIALIZE                  STEMPDIR-AREA
+           MOVE    "DEL"           TO  STEMPDIR-MODE
+           CALL    "ORCSTEMPDIR"       USING
+                                       STEMPDIR-AREA
       *
            .
        990-TERMINATE-EXT.
