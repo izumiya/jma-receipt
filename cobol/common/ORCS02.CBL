@@ -446,6 +446,7 @@
       *  04.08.18    NACL-ÌçÏÆ    17/10/02  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ
       *                                     ¿©»öÎÅÍÜ¡×¤ÎÌ¤ÀßÄê¥Á¥§¥Ã¥¯½¤Àµ
       *  04.08.19    NACL-ÌçÏÆ    17/10/12  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.21    NACL-ÌçÏÆ    17/11/17  £·£°ºÐÌ¤Ëþ¤ÎÄã£±¥Á¥§¥Ã¥¯½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -548,6 +549,7 @@
            03  FLG-PTRSIINF            PIC 9(01).
            03  FLG-KOMURSI             PIC 9(01).
            03  FLG-DAISAN-GENBUTU      PIC 9(01).
+           03  FLG-DAISAN-KOREI        PIC 9(01).
            03  FLG-ARI                 PIC 9(01).
            03  FLG-CYOKEIKBN-N         PIC 9(01).
            03  FLG-GENGAKU-HENSYU      PIC 9(01).
@@ -2143,6 +2145,7 @@
              OR (LNK-SYU-SYUHKNNUM(1:2) = "98" OR "90" OR "91")
              OR (LNK-S02-KOUREI-NYUIN-KBN = "1"               )
              OR (FLG-KOREI-TANYUIN        =  1                )
+             OR (FLG-DAISAN-KOREI         =  1                )
                CONTINUE
              ELSE
                PERFORM   VARYING   IDX24    FROM    1   BY  1
@@ -4298,6 +4301,7 @@
              END-IF
            END-IF
       *
+           MOVE     ZERO             TO  FLG-DAISAN-KOREI
            IF   LNK-S02-KOUREI-NYUIN-KBN   =  "1"
                IF  COMB-SYU-HKNKOHSBTKBN   =  "8" OR "9"
                    MOVE  SPACE       TO  LNK-S02-KOUREI-NYUIN-KBN
@@ -4309,6 +4313,7 @@
                IF  COMB-KOH1HKNNUM     =  "970"
                AND FLG-DAISAN-GENBUTU  =   ZERO
                    MOVE  SPACE       TO  LNK-S02-KOUREI-NYUIN-KBN
+                   MOVE   1          TO  FLG-DAISAN-KOREI
                END-IF
            END-IF                                               
       *
