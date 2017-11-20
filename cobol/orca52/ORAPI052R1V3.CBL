@@ -860,7 +860,9 @@
                                            INTO  WRK-ERRMSG
                        END-STRING
                    ELSE
-                       IF      JOB-ERRCD   =   SPACE
+                       IF    ( JOB-ERRCD   =   SPACE                )
+                       OR    ( JOB-YOBI    =
+                               "処理対象のデータがありませんでした" )
                            MOVE    JOB-UPDCNT      TO  WRK-UPDCNT
                            MOVE    WRK-UPDCNT-X    TO
                                                    LSTRES-OUTPUT-COUNT

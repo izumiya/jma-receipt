@@ -866,8 +866,12 @@
                                            INTO  WRK-ERRMSG
                        END-STRING
                    ELSE
-                       IF      JOB-ERRCD   =   SPACE
-                           CONTINUE
+                       IF    ( JOB-ERRCD   =   SPACE                )
+                       OR    ( JOB-YOBI    =
+                               "処理対象のデータがありませんでした" )
+                           MOVE    JOB-UPDCNT      TO  WRK-UPDCNT
+                           MOVE    WRK-UPDCNT-X    TO
+                                                   STOCKRES-OUTPUT-COUNT
                        ELSE
                            MOVE    "E30"           TO  WRK-ERRCD
                            STRING  JOB-YOBI        DELIMITED  BY  SPACE
