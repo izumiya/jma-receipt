@@ -600,7 +600,12 @@
       *
            MOVE    HSPTINFMREQ-KAIGOKBN TO REG-KAIGOKBN
       *
-           PERFORM 10011-HOKEN-CHECK-SEC
+           IF    ( HSPTINFMREQ-HKNCOMBI    NOT =   SPACE )
+               MOVE    HSPTINFMREQ-HKNCOMBI
+                                       TO  REG-HKNCOMBI
+           ELSE
+               PERFORM 10011-HOKEN-CHECK-SEC
+           END-IF
       *
            IF    ( HSPTINFMREQ-KHNCD   NOT =   SPACE )
                PERFORM 10011-KHNCD-CHECK-SEC
@@ -708,7 +713,12 @@
       *
            MOVE    HSPTINFMREQ-SRYKA    TO  REG-SRYKA
       *
-           PERFORM 10011-HOKEN-CHECK-SEC
+           IF    ( HSPTINFMREQ-HKNCOMBI    NOT =   SPACE )
+               MOVE    HSPTINFMREQ-HKNCOMBI
+                                       TO  REG-HKNCOMBI
+           ELSE
+               PERFORM 10011-HOKEN-CHECK-SEC
+           END-IF
       *
            IF    ( HSPTINFMREQ-KHNCD   NOT =   SPACE )
                PERFORM 10011-KHNCD-CHECK-SEC
