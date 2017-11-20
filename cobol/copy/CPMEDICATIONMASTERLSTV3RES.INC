@@ -51,3 +51,7 @@
                05  LSTRES-BASE-DATE        PIC X(10).
       *        ·ï¿ô
                05  LSTRES-OUTPUT-COUNT     PIC X(10).
+      *
+               05  LSTRES-DATA-ID-INFORMATION  OCCURS  10.
+                   07  LSTRES-DATA-ID      PIC X(37).
+                   07  LSTRES-PRINT-ID     PIC X(37).

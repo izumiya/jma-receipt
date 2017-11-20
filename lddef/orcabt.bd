@@ -317,6 +317,7 @@ db "xml2" {
  fm_payment_certificate;
  xml_stock1;
  xml_disease_masterlst;
+ xml_medication_masterlst;
 };
 
 #include "orcadb.inc"

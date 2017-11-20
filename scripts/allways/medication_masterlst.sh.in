@@ -17,38 +17,55 @@ fi
 #        ${14} 医療機関番号 
 #        ${15} エラーファイル名 
 #        ${16} 基準日
+#        ${17} MONBLOB-ID
 #-------------------------------------------#
 
 cleanup(){
-echo "${PARA_FILE_FULL}" >> $LOG
 ##      パラメータファイル削除
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
-##      環境変数［ORCA_UID］が設定されていた場合、一時ディレクトリを削除
         if  [ -n "${ORCA_UID}" ]; then
-            rm  -rf ${MCP_TEMPDIR}
+            $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBDELTEMPDIR
         fi
 }
-trap cleanup 1 2 3 15
+trap cleanup EXIT
 
 RENNUM=0
 
 ERR_FILE_BASE=$(basename ${15})
 ERR_FILE_FULL=${MCP_TEMPDIR}/${ERR_FILE_BASE}
 
-LOG_FILE=/var/log/jma-receipt/${14}disease_masterlst.log
+LOG_FILE=/var/log/jma-receipt/${14}medication_masterlst.log
 [ -e ${LOG_FILE} ] && rm ${LOG_FILE}
 echo $(basename ${LOG_FILE})
 
 [ -e ${ERR_FILE_FULL} ] && rm  ${ERR_FILE_FULL} 
 
 echo $#
+echo "arg17  = [" ${17} "]" 
 
 RENNUM=$(expr $RENNUM + 1) 
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORAPI052BR2V3 -parameter "$1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16}"
 if  [ -e ${ERR_FILE_FULL} ]; then
-	exit
+     exit
+else
+    cd ${MCP_TEMPDIR}/
+    FILENM="medication_masterlst.zip"
+    echo "filenm=[" $FILENM "]"
+    zip -r ${FILENM} medication_masterlst.xml
+    RC=$?
+    echo "--- zip end   ---[" $RC  "]" 
+    if  [ $RC -ne '0' ]; then
+        ERRCD='0000'$RC
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${12}${13}'  '${ERRCD:${#ERRCD}-4:4},${14} 
+        echo "--- zip err   ---" 
+        exit
+     fi
+     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"zip",${17}
+     if  [ -e ${ERR_FILE_FULL} ]; then
+         exit
+     fi
 fi
     
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBE${12}${13},${14}"
