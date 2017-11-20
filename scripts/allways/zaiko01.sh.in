@@ -26,10 +26,8 @@ cleanup(){
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
-##      環境変数［ORCA_UID］が設定されていた場合、一時ディレクトリを削除
         if  [ -n "${ORCA_UID}" ]; then
-            echo "remove!! ${MCP_TEMPDIR}"
-            rm  -rf ${MCP_TEMPDIR}
+            $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBDELTEMPDIR
         fi
 }
 trap cleanup EXIT
