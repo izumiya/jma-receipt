@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.01    NACL-小豆沢  17/11/20  (A314)認知症治療病棟入院料の
+      *                                     起算日変更
       *****************************************************************
       *
       *
@@ -2009,6 +2011,29 @@
       *    歴作成で登録した入院履歴について「特定入院−通算対象日数」の
       *    入力分日数を加算する
            PERFORM    202-RRK-TOKUTEI-NISSU-SEC
+      *
+      *    以下２つの特定入院料は初回入院日（他院分は含めない）からの
+      *    通算日数により算定を行う
+      *    (A314)認知症治療病棟入院料１
+      *    (A314)認知症治療病棟入院料２
+           IF     LNK-TOKNYUIN2-SANTEIYMD   >=   "20160401"
+              EVALUATE    LNK-TOKNYUIN2-SET-SRYCD
+                WHEN      "190151610"
+                WHEN      "190151710"
+                INITIALIZE                      ORCSTUSANAREA
+                MOVE    LNK-TOKNYUIN2-HOSPNUM   TO  STUSAN-HOSPNUM
+                MOVE    LNK-TOKNYUIN2-PTID      TO  STUSAN-PTID
+                MOVE    LNK-TOKNYUIN2-SANTEIYMD TO  STUSAN-KJNYMD
+                CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
+                                                SPA-AREA
+                COMPUTE   LNK-TOKNYUIN2-NISSU08  =  STUSAN-NISSU03 +
+                                                    STUSAN-TAINREL-NISSU
+                IF      LNK-TOKNYUIN2-NISSU08   NOT =  ZERO
+                     COMPUTE    LNK-TOKNYUIN2-NISSU08 =
+                                LNK-TOKNYUIN2-NISSU08  -  1
+                END-IF
+             END-EVALUATE
+           END-IF
       *
       *    特定入院料コードが１種類の場合
            IF    WRK-SRYCD-COUNT       =   1
