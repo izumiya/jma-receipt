@@ -67,6 +67,14 @@
            03  LNK-SCNYUACCT-SHOKUJI-SRYCD           PIC  X(09).
       *食事区分
            03  LNK-SCNYUACCT-SHOKUJIKBN              PIC  9(01).
+      *食事セット区分（空白：SHOKUJIKBNを使用　１：朝昼夜の食事区分を使用）
+           03  LNK-SCNYUACCT-SHOKUJI-SETKBN          PIC  X(01).
+      *食事区分（朝）
+           03  LNK-SCNYUACCT-SHOKUJIKBN-ASA          PIC  9(01).
+      *食事区分（昼）
+           03  LNK-SCNYUACCT-SHOKUJIKBN-HIRU         PIC  9(01).
+      *食事区分（夜）
+           03  LNK-SCNYUACCT-SHOKUJIKBN-YORU         PIC  9(01).
       *食堂加算
            03  LNK-SCNYUACCT-SHOKUDO-SRYCD           PIC  X(09).
       *食堂加算区分
