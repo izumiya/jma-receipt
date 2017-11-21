@@ -933,3 +933,47 @@ path	key50		{
 		;
 	};
 };
+
+path	key51		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key51_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     TENKIKBN   <>  ' '
+			AND     TENKIYMD   <=  :SRYYMD
+			AND     TENKIYMD   >=  :TENKIYMD
+			AND    DLTFLG      =   ' '
+			ORDER  BY  PTID,SRYYMD DESC,SEQNUM,SRYKA,RENNUM
+		;
+	};
+};
+
+path	key52		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key52_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     SRYYMD     <=  :SRYYMD
+			AND   ( TENKIKBN   =   ' '  OR
+			       (TENKIYMD   <=  :SRYYMD AND
+			        TENKIYMD   >=  :TENKIYMD ))
+			AND   DLTFLG       =   ' '
+			ORDER  BY  PTID,SRYYMD DESC,SEQNUM,SRYKA,RENNUM
+		;
+	};
+};
+
+path	key53		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key53_csr CURSOR FOR
+		SELECT MIN(TENKIYMD) AS TENKIYMD
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     TENKIYMD   <>  ''
+			AND    DLTFLG      =   ' '
+		;
+	};
+};
+

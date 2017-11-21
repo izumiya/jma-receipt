@@ -9,6 +9,9 @@ push_batch01 {
 		Perform_Month	varchar(07);
 #--->
 		Perform_Date	varchar(10);
+		Request_Mode	varchar(1);
+		Start_Date	varchar(10);
+		End_Date	varchar(10);
 #---> 処理件数
 		Output_Count	varchar(10);
 	};

@@ -28,5 +28,11 @@
                05  PUSHBA01-PERFORM-MONTH      PIC X(7).
       *        基準日
                05  PUSHBA01-PERFORM-DATE       PIC X(10).
+      *        処理区分
+               05  PUSHBA01-REQUEST-MODE       PIC X(1).
+      *        開始日
+               05  PUSHBA01-START-DATE         PIC X(10).
+      *        終了日
+               05  PUSHBA01-END-DATE           PIC X(10).
       *        処理件数
                05  PUSHBA01-OUTPUT-COUNT       PIC X(10).

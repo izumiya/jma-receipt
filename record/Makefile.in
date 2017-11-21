@@ -542,6 +542,8 @@ RECORD_files = \
 	subjectiveslstv2.rec \
 	medicalmodv37.rec \
     hspmmv2.rec \
+	patientbasisallv3.rec \
+	patientdiseaseallv3.rec \
 
 
 DEF_files = \
@@ -1033,6 +1035,12 @@ DB_files = \
     xml_hspmmv2req.db \
     xml_hspmmv2res.db \
 	xml_medication_masterlst.db \
+	xml_patient_basis_allv3req.db \
+	xml_patient_basis_allv3res.db \
+	xml_patient_basis_all.db \
+	xml_patient_disease_allv3req.db \
+	xml_patient_disease_allv3res.db \
+	xml_patient_disease_all.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
