@@ -505,5 +505,12 @@ W24 {
       count int;
         item varchar(20)[5];
     };
+    CMB_SKJ_CREATE {
+      SKJ_CREATE {
+        textdata varchar(20);
+      };
+      count int;
+        item varchar(20)[5];
+    };
   };
 };

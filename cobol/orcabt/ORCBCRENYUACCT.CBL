@@ -204,6 +204,10 @@
                                    PIC 9(04).
            03  WRK-TAIHI-SRYKA     PIC X(02).
            03  WRK-TAIHI-SHOKUJI   PIC 9(02).
+           03  WRK-SKJ-CREATEKBN   PIC X(01).
+           03  WRK-TAIHI-SHOKUJI-ASA   PIC 9(02).
+           03  WRK-TAIHI-SHOKUJI-HIRU  PIC 9(02).
+           03  WRK-TAIHI-SHOKUJI-YORU  PIC 9(02).
            03  WRK-TAIHI-SHOKUDOU  PIC 9(02).
            03  WRK-TAIHI-HKN       PIC 9(04).
            03  WRK-ZOGENPTN        PIC X(01).
@@ -610,6 +614,37 @@
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
+      *    次月会計作成時の食事区分取得
+           MOVE    SPACE               TO  WRK-SKJ-CREATEKBN
+           INITIALIZE                      SYS-5000-REC
+           MOVE    "5000"              TO  SYS-5000-KANRICD
+           MOVE    "*"                 TO  SYS-5000-KBNCD
+           MOVE    WRK-PARA-SRYYM      TO  SYS-5000-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-5000-STYUKYMD (7:2)
+           MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+           MOVE    SYS-5000-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC     =    ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM   900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYS-5000-REC
+                   IF      SYS-5000-SKJ-CREATEKBN  =  "1"
+                       MOVE   "1"          TO  WRK-SKJ-CREATEKBN
+                   ELSE
+                       MOVE   "0"          TO  WRK-SKJ-CREATEKBN
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
       *    前月分会計取得用の年月算出
            MOVE    WRK-PARA-SRYYM      TO  WRK-CHK-SRYYM
            IF      WRK-CHK-SRYMR        =   1
@@ -754,6 +789,9 @@
        2001-NYUINACCT-MAECHK-SEC          SECTION.
       *
            MOVE    ZERO                TO  WRK-TAIHI-SHOKUJI
+           MOVE    ZERO                TO  WRK-TAIHI-SHOKUJI-ASA
+           MOVE    ZERO                TO  WRK-TAIHI-SHOKUJI-HIRU
+           MOVE    ZERO                TO  WRK-TAIHI-SHOKUJI-YORU
            MOVE    ZERO                TO  WRK-TAIHI-SHOKUDOU
            MOVE    ZERO                TO  WRK-TAIHI-HKN
       *
@@ -784,6 +822,18 @@
                                                     099999920
                            MOVE  NACCT-DAY(IDX-DAY)
                                             TO  WRK-TAIHI-SHOKUJI
+                       END-IF
+                       IF    NACCT-SRYCDTOTAL   =   099999918
+                          MOVE   NACCT-DAY(IDX-DAY)
+                                            TO  WRK-TAIHI-SHOKUJI-ASA
+                       END-IF
+                       IF    NACCT-SRYCDTOTAL   =   099999919
+                          MOVE   NACCT-DAY(IDX-DAY)
+                                            TO  WRK-TAIHI-SHOKUJI-HIRU
+                       END-IF
+                       IF    NACCT-SRYCDTOTAL   =   099999920
+                          MOVE   NACCT-DAY(IDX-DAY)
+                                            TO  WRK-TAIHI-SHOKUJI-YORU
                        END-IF
                    END-IF
       *            食堂加算
@@ -1604,6 +1654,15 @@
       *    食事区分
            MOVE    "099999913"         TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
            MOVE   WRK-TAIHI-SHOKUJI    TO  LNK-SCNYUACCT-SHOKUJIKBN
+           IF     WRK-SKJ-CREATEKBN   =   "1"
+               MOVE    "1"             TO  LNK-SCNYUACCT-SHOKUJI-SETKBN
+               MOVE   WRK-TAIHI-SHOKUJI-ASA
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-ASA
+               MOVE   WRK-TAIHI-SHOKUJI-HIRU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-HIRU
+               MOVE   WRK-TAIHI-SHOKUJI-YORU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-YORU
+           END-IF
       *    食堂加算
            PERFORM 4801-BTUSEL-SEC
            IF      FLG-SYSKANRI        =    ZERO
@@ -1923,6 +1982,15 @@
       *    食事区分
            MOVE    "099999913"         TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
            MOVE    WRK-TAIHI-SHOKUJI   TO  LNK-SCNYUACCT-SHOKUJIKBN
+           IF     WRK-SKJ-CREATEKBN   =   "1"
+               MOVE    "1"             TO  LNK-SCNYUACCT-SHOKUJI-SETKBN
+               MOVE   WRK-TAIHI-SHOKUJI-ASA
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-ASA
+               MOVE   WRK-TAIHI-SHOKUJI-HIRU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-HIRU
+               MOVE   WRK-TAIHI-SHOKUJI-YORU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-YORU
+           END-IF
       *    食堂加算
            PERFORM 4801-BTUSEL-SEC
            IF      FLG-SYSKANRI           =    ZERO

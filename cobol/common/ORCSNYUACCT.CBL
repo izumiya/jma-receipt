@@ -2954,6 +2954,10 @@
            MOVE    "4"                 TO  WRK-ACT-ZAISKBKBN
            MOVE    LNK-SCNYUACCT-SHOKUJIKBN
                                        TO  WRK-ACT-DAY
+           IF      LNK-SCNYUACCT-SHOKUJI-SETKBN  =  "1"
+               MOVE    LNK-SCNYUACCT-SHOKUJIKBN-ASA
+                                       TO  WRK-ACT-DAY
+           END-IF
            MOVE    1                   TO  FLG-SYOKUJI
            PERFORM 400-NYUACT-SYORI-SEC
            MOVE    ZERO                TO  FLG-SYOKUJI
@@ -2965,6 +2969,10 @@
            MOVE    "4"                 TO  WRK-ACT-ZAISKBKBN
            MOVE    LNK-SCNYUACCT-SHOKUJIKBN
                                        TO  WRK-ACT-DAY
+           IF      LNK-SCNYUACCT-SHOKUJI-SETKBN  =  "1"
+               MOVE    LNK-SCNYUACCT-SHOKUJIKBN-HIRU
+                                       TO  WRK-ACT-DAY
+           END-IF
            MOVE    1                   TO  FLG-SYOKUJI
            PERFORM 400-NYUACT-SYORI-SEC
            MOVE    ZERO                TO  FLG-SYOKUJI
@@ -2976,6 +2984,10 @@
            MOVE    "4"                 TO  WRK-ACT-ZAISKBKBN
            MOVE    LNK-SCNYUACCT-SHOKUJIKBN
                                        TO  WRK-ACT-DAY
+           IF      LNK-SCNYUACCT-SHOKUJI-SETKBN  =  "1"
+               MOVE    LNK-SCNYUACCT-SHOKUJIKBN-YORU
+                                       TO  WRK-ACT-DAY
+           END-IF
            MOVE    1                   TO  FLG-SYOKUJI
            PERFORM 400-NYUACT-SYORI-SEC
            MOVE    ZERO                TO  FLG-SYOKUJI

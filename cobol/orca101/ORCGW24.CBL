@@ -59,6 +59,7 @@
       *                                     加算の設定追加
       *
       *  04.08.01    NACL-藤原    16.04.20  退院証明書記載区分の設定追加
+      *  04.08.02    NACL-藤原    17.11.21  次月作成時の食事の設定追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -793,6 +794,9 @@
       *    入院歴作成初期表示退院日設定コンボ
            PERFORM 310-REKI-TAIINKBNLST-SET-SEC
       *
+      *    次月作成時の食事コンボ
+           PERFORM 310-SKJ-CREATELST-SET-SEC
+      *
            .
        310-CMB-SYOKI-EXT.
            EXIT.
@@ -1452,6 +1456,25 @@
        310-REKI-TAIINKBNLST-SET-EXT.
            EXIT.
       *****************************************************************
+      *    次月作成時の食事区分コンボ
+      *****************************************************************
+       310-SKJ-CREATELST-SET-SEC    SECTION.
+      *
+           MOVE    2               TO  SPA-GMN-W24-SKJ-CREATE-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-W24-SKJ-CREATEL    (1)
+           MOVE    "最終夕食で算定"
+                                   TO  SPA-GMN-W24-SKJ-CREATEMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-W24-SKJ-CREATEL    (2)
+           MOVE    "最終日状態で算定"
+                                   TO  SPA-GMN-W24-SKJ-CREATEMEIL (2)
+      *
+      *
+           .
+       310-SKJ-CREATELST-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    入力情報編集処理
       *****************************************************************
        310-INPUT-AREA-EDIT-SEC     SECTION.
@@ -1666,6 +1689,16 @@
            ELSE
                MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (1)
                                        TO  SPA-GMN-W24-REKI-TAIINKBN-G
+           END-IF
+      *
+      *    次回作成時の食事区分区分
+           MOVE    SYS-5000-SKJ-CREATEKBN  TO  WRK-CMB-CD
+           PERFORM 4200-SKJ-CREATELST-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-SKJ-CREATE-G
+           ELSE
+               MOVE    SPA-GMN-W24-SKJ-CREATELST (1)
+                                       TO  SPA-GMN-W24-SKJ-CREATE-G
            END-IF
       *
       *    入院料加算情報
@@ -2271,6 +2304,9 @@
       *    退院時院外処方せん区分
            MOVE    W24-SHOHOUKBN       TO  SPA-GMN-W24-SHOHOUKBN-G
       *
+      *    次回作成時の食事区分
+           MOVE    W24-SKJ-CREATE       TO  SPA-GMN-W24-SKJ-CREATE-G
+      *
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -2496,6 +2532,12 @@
       *
       *    救急・在宅等支援療養病床初期加算区分チェック処理
            PERFORM 4100-KYUKYUKSN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *    次回作成時の食事区分チェック処理
+           PERFORM 4100-SKJ-CREATE-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -3070,6 +3112,10 @@
       *    入院歴作成初期表示退院日設定設定
            MOVE    SPA-GMN-W24-REKI-TAIINKBN
                                    TO  SYS-5020-REKI-TAIINKBN
+      *
+      *    次回作成時の食事区分
+           MOVE    SPA-GMN-W24-SKJ-CREATE
+                                   TO  SYS-5000-SKJ-CREATEKBN
       *
            .
       *
@@ -3956,6 +4002,25 @@
        4100-KYUKYUKSN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    次回作成時の食事区分チェック処理
+      *****************************************************************
+       4100-SKJ-CREATE-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-W24-SKJ-CREATE
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-SKJ-CREATELST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-GMN-W24-SKJ-CREATELST (1)
+                                       TO  SPA-GMN-W24-SKJ-CREATE-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-SKJ-CREATE-G
+           END-IF
+      *
+           .
+      *
+       4100-SKJ-CREATE-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    栄養管理経過措置区分チェック処理
       *****************************************************************
        4100-EIYOUKSN-CHK-SEC          SECTION.
@@ -4672,6 +4737,29 @@
        4200-KYUKYUKSNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    次回作成時の食事区分コンボチェック処理
+      *****************************************************************
+       4200-SKJ-CREATELST-CHK-SEC   SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W24-SKJ-CREATE-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W24-SKJ-CREATEL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W24-SKJ-CREATELST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-SKJ-CREATELST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    栄養管理経過措置区分コンボチェック処理
       *****************************************************************
        4200-EIYOUKSNLST-CHK-SEC   SECTION.
@@ -4899,6 +4987,8 @@
                                    TO  SPA-GMN-W24-IPPANKSN-G
            MOVE    SPA-GMN-W24-KYUKYUKSNLST (1)
                                    TO  SPA-GMN-W24-KYUKYUKSN-G
+           MOVE    SPA-GMN-W24-SKJ-CREATELST (1)
+                                   TO  SPA-GMN-W24-SKJ-CREATE-G
            MOVE    SPA-GMN-W24-EIYOUKSNLST (1)
                                    TO  SPA-GMN-W24-EIYOUKSN-G
            MOVE    SPA-GMN-W24-REKI-JITAKBNLST (2)
@@ -5598,6 +5688,21 @@
       *
            END-PERFORM
       *
+      *    次回作成時の食事区分
+           MOVE    SPA-GMN-W24-SKJ-CREATE-G
+                                       TO  W24-SKJ-CREATE
+           MOVE    SPA-GMN-W24-SKJ-CREATE-MAX
+                                       TO  W24-SKJ-CREATE-CNT
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   W24-SKJ-CREATE-CNT )
+      *
+      *
+               MOVE    SPA-GMN-W24-SKJ-CREATELST (IDX0)
+                                       TO  W24-SKJ-CREATE-ITM (IDX0)
+      *
+           END-PERFORM
+      *
       *    栄養管理経過措置区分
            MOVE    SPA-GMN-W24-EIYOUKSN-G
                                        TO  W24-EIYOUKSN
@@ -5902,6 +6007,8 @@
                MOVE    "REKI_TAIINKBN" TO MCP-WIDGET
            WHEN    067
                MOVE    "YKNCHOKA" TO MCP-WIDGET
+           WHEN    068
+               MOVE    "SKJ_CREATE"     TO MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -6054,6 +6161,8 @@
            WHEN    "IPPANKSN"
                MOVE    064             TO  SPA-GMN-W24-CUR
            WHEN    "KYUKYUKSN"
+               MOVE    068             TO  SPA-GMN-W24-CUR
+           WHEN    "SKJ_CREATE"
                MOVE    008             TO  SPA-GMN-W24-CUR
            END-EVALUATE
       *

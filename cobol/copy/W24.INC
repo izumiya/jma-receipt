@@ -276,3 +276,9 @@
                                                BINARY.
                 05  W24-REKI-TAIINKBN-ITM   PIC X(20)
                                                OCCURS  5.
+              04  W24-CMB-SKJ-CREATE.
+                05  W24-SKJ-CREATE             PIC X(20).
+                05  W24-SKJ-CREATE-CNT         PIC S9(9)
+                                               BINARY.
+                05  W24-SKJ-CREATE-ITM         PIC X(20)
+                                               OCCURS  5.

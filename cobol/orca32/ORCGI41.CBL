@@ -2248,6 +2248,9 @@
            MOVE    ZERO                TO  FLG-NYUINKHNRYO
            MOVE    ZERO                TO  SPA-TAIHI-HKN
            MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-ASA
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-HIRU
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-YORU
       *
            MOVE    ZERO                TO  IDX
            MOVE    ZERO                TO  IDG
@@ -2416,6 +2419,10 @@
       *
            MOVE    SPACE               TO  SPA-GMN-UPYMD
       *
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-ASA
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-HIRU
+           MOVE    ZERO                TO  SPA-TAIHI-SHOKUJI-YORU
+      *
            PERFORM UNTIL      (FLG-NYUINACCT     =   1)
       *
                ADD     1                   TO  IDX
@@ -2431,6 +2438,18 @@
                                                         099999920
                                MOVE   NACCT-DAY(WRK-MATSUDD)
                                                   TO  SPA-TAIHI-SHOKUJI
+                           END-IF
+                           IF    NACCT-SRYCDTOTAL   =   099999918
+                               MOVE   NACCT-DAY(WRK-MATSUDD)
+                                             TO  SPA-TAIHI-SHOKUJI-ASA
+                           END-IF
+                           IF    NACCT-SRYCDTOTAL   =   099999919
+                               MOVE   NACCT-DAY(WRK-MATSUDD)
+                                             TO  SPA-TAIHI-SHOKUJI-HIRU
+                           END-IF
+                           IF    NACCT-SRYCDTOTAL   =   099999920
+                               MOVE   NACCT-DAY(WRK-MATSUDD)
+                                             TO  SPA-TAIHI-SHOKUJI-YORU
                            END-IF
       *                    ¿©»öºÞ¤Î¹¹¿·Æü¤òÂàÈò
                            IF    NACCT-SRYCDTOTAL   =   099999918  OR
@@ -6925,6 +6944,15 @@
       *    ¿©»ö¶èÊ¬
            MOVE    "099999913"         TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
            MOVE   SPA-TAIHI-SHOKUJI    TO  LNK-SCNYUACCT-SHOKUJIKBN
+           IF     SYS-5000-SKJ-CREATEKBN   =   "1"
+               MOVE    "1"             TO  LNK-SCNYUACCT-SHOKUJI-SETKBN
+               MOVE   SPA-TAIHI-SHOKUJI-ASA
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-ASA
+               MOVE   SPA-TAIHI-SHOKUJI-HIRU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-HIRU
+               MOVE   SPA-TAIHI-SHOKUJI-YORU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-YORU
+           END-IF
       *    ¿©Æ²²Ã»»
            PERFORM 4801-BTUSEL-SEC
            IF      FLG-SYSKANRI        =    ZERO
@@ -7281,6 +7309,15 @@
       *    ¿©»ö¶èÊ¬
            MOVE    "099999913"         TO  LNK-SCNYUACCT-SHOKUJI-SRYCD
            MOVE    SPA-TAIHI-SHOKUJI   TO  LNK-SCNYUACCT-SHOKUJIKBN
+           IF     SYS-5000-SKJ-CREATEKBN   =   "1"
+               MOVE    "1"             TO  LNK-SCNYUACCT-SHOKUJI-SETKBN
+               MOVE   SPA-TAIHI-SHOKUJI-ASA
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-ASA
+               MOVE   SPA-TAIHI-SHOKUJI-HIRU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-HIRU
+               MOVE   SPA-TAIHI-SHOKUJI-YORU
+                                       TO  LNK-SCNYUACCT-SHOKUJIKBN-YORU
+           END-IF
       *    ¿©Æ²²Ã»»
            PERFORM 4801-BTUSEL-SEC
            IF      FLG-SYSKANRI           =    ZERO

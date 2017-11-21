@@ -22,6 +22,7 @@
       *  04.03.00    NACL-多々納  08/08/28  退院時院外処方せん区分追加
       *
       *  04.08.01    NACL-藤原    16.04.20  退院証明書記載区分の設定追加
+      *  04.08.02    NACL-藤原    17.11.21  次月作成時の食事の設定追加
       *****************************************************************
       *
        01  SPA-W24FREE.
@@ -126,6 +127,11 @@
                    13  SPA-GMN-W24-KYUKYUKSN           PIC X(01).
                    13  SPA-GMN-W24-KYUKYUKSNFL         PIC X(01).
                    13  SPA-GMN-W24-KYUKYUKSNMEI        PIC X(18).
+      *          次回作成時の食事区分
+                 11  SPA-GMN-W24-SKJ-CREATE-G.
+                   13  SPA-GMN-W24-SKJ-CREATE         PIC X(01).
+                   13  SPA-GMN-W24-SKJ-CREATEFL       PIC X(01).
+                   13  SPA-GMN-W24-SKJ-CREATEMEI      PIC X(18).
       *          栄養管理経過措置区分
                  11  SPA-GMN-W24-EIYOUKSN-G.
                    13  SPA-GMN-W24-EIYOUKSN            PIC X(01).
@@ -456,6 +462,14 @@
                        15  SPA-GMN-W24-KYUKYUKSNL      PIC X(01).
                        15  SPA-GMN-W24-KYUKYUKSNLFL    PIC X(01).
                        15  SPA-GMN-W24-KYUKYUKSNMEIL   PIC X(18).
+      *
+      *          次回作成時の食事区分
+                 11  SPA-GMN-W24-SKJ-CREATELST-G.
+                   13  SPA-GMN-W24-SKJ-CREATE-MAX      PIC 9(03).
+                   13  SPA-GMN-W24-SKJ-CREATELST       OCCURS  5.
+                       15  SPA-GMN-W24-SKJ-CREATEL     PIC X(01).
+                       15  SPA-GMN-W24-SKJ-CREATELFL   PIC X(01).
+                       15  SPA-GMN-W24-SKJ-CREATEMEIL  PIC X(18).
       *
       *          栄養管理経過措置区分
                  11  SPA-GMN-W24-EIYOUKSNLST-G.
