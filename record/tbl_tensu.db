@@ -1673,3 +1673,24 @@ path	key35 	{
 	};
 };
 
+path	last_update1 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_last_update1_csr CURSOR FOR
+		SELECT MAX(UPYMD||UPHMS) AS TERMID
+		FROM tbl_tensu
+		;
+	};
+};
+
+path	last_update2	{
+	DBSELECT	{
+		DECLARE tbl_tensu_last_update2_csr CURSOR FOR
+		SELECT UPYMD||TO_CHAR(COUNT(*), 'FM00000000') AS TERMID
+		FROM tbl_tensu
+        GROUP BY UPYMD
+        ORDER BY UPYMD DESC
+        LIMIT 5
+		;
+	};
+};
+
