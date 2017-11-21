@@ -49,9 +49,19 @@ $DBSTUB -dir $LDDIRECTORY -bd orcabt ORAPI052BR5V3 -parameter "$1,$2,$3,$RENNUM,
 if  [ -e ${ERR_FILE_FULL} ]; then
 	exit
 else
-     FILENM="patient_disease_all.xml"
-     echo "filenm=[" $FILENM "]"
-     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"xml",${17}
+    cd ${MCP_TEMPDIR}/
+    FILENM="patient_disease_all.zip"
+    echo "filenm=[" $FILENM "]"
+    zip -r ${FILENM} patient_disease_all.xml
+    RC=$?
+    echo "--- zip end   ---[" $RC  "]" 
+    if  [ $RC -ne '0' ]; then
+        ERRCD='0000'$RC
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${12}${13}'  '${ERRCD:${#ERRCD}-4:4},${14} 
+        echo "--- zip err   ---" 
+        exit
+     fi
+     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"zip",${17}
      if  [ -e ${ERR_FILE_FULL} ]; then
          exit
      fi
