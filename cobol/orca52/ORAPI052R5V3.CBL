@@ -562,13 +562,26 @@
                PERFORM 900-PTBYO-READ-SEC
                IF      FLG-PTBYOMEI        =   1
                    MOVE    "1989-01"           TO  LSTREQ-BASE-MONTH
+                   MOVE    "E16"               TO  WRK-KEICD
                ELSE
       *??
-                DISPLAY "PTBYO-TENKIYMD=" PTBYO-TENKIYMD
-                   MOVE    PTBYO-TENKIYMD      TO  WRK-SYMD
-                   PERFORM 801-DAYHEN01-SEC
-                   MOVE    WRK-HEN-DATE (1:7)  TO  LSTREQ-BASE-MONTH
-                   
+                   DISPLAY "PTBYO-TENKIYMD=" PTBYO-TENKIYMD
+                   MOVE    SPACE               TO  STS-AREA-DAY
+                   INITIALIZE                      STS-AREA-DAY
+                   MOVE    SPACE               TO  LNK-DAY2-AREA
+                   MOVE    "21"                TO  LNK-DAY2-IRAI
+                   MOVE    PTBYO-TENKIYMD      TO  LNK-DAY2-YMD
+                   CALL    "ORCSDAY"           USING
+                                               STS-AREA-DAY
+                                               LNK-DAY2-AREA
+                   IF      STS-DAY-RC1     NOT =   ZERO
+                       MOVE    "E16"               TO  WRK-KEICD
+                       MOVE    "1989-01"           TO  LSTREQ-BASE-MONTH
+                   ELSE
+                       MOVE    PTBYO-TENKIYMD      TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE (1:7)  TO  LSTREQ-BASE-MONTH
+                   END-IF
                END-IF
            END-IF
            MOVE   LSTREQ-BASE-MONTH    TO  LSTRES-BASE-MONTH
@@ -1043,6 +1056,10 @@
                                                TO  WRK-ERRMSG
            WHEN    "E11"
                MOVE    "基準日が暦日ではありません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "E16"
+               MOVE
+              "転帰日不正のため基準月を設定しました（１９８９−０１）。"
                                                TO  WRK-ERRMSG
            WHEN    "E20"
                MOVE    "ジョブ管理が削除できませんでした。"
