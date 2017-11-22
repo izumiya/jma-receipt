@@ -617,6 +617,9 @@
       *
            03  WRK-JYU-FLG2            PIC X(01).
       *
+           03  WRK-JYU-FLG1            PIC X(01).
+           03  WRK-JYU-FLG12           PIC X(01).
+      *
       *    検体検査迅速実施加算対象
            COPY    "CMGAIKENSATBL.INC".
       *    診療行為用共通パラメタ
@@ -3460,6 +3463,8 @@
       *****************************************************************
        20011-JYUFUKU-CHK-SEC           SECTION.
       *
+           INITIALIZE                  WRK-JYUFUKU-CHK
+      *
       *    同一検査算定有無の判定
            SET     JYU-IDX             TO  1
            SEARCH      TBL-KENSA-JYU-OCC   VARYING   JYU-IDX
@@ -3467,6 +3472,7 @@
                        MOVE    SPACE           TO  WRK-JYU-KBN
                        MOVE    ZERO            TO  WRK-JYU-KEN
                        MOVE    SPACE           TO  WRK-JYU-FLG
+                       MOVE    SPACE           TO  WRK-JYU-FLG1
                    WHEN    WRK-COM-INPUTCD (IDX-Z)
                                                =   TBL-JYU-SRYCD
                                                            (JYU-IDX)
@@ -3476,6 +3482,8 @@
                                                 TO  WRK-JYU-KEN
                        MOVE    TBL-FILLER2  (JYU-IDX)
                                                 TO  WRK-JYU-FLG
+                       MOVE    TBL-FILLER1  (JYU-IDX)
+                                                TO  WRK-JYU-FLG1
            END-SEARCH
       *
            IF      WRK-JYU-KBN         =   SPACE
@@ -3501,6 +3509,7 @@
                               (SPA-ERRCD   NOT =   SPACE  )
                MOVE    SPACE               TO  WRK-SRYCD
                MOVE    SPACE               TO  WRK-JYU-FLG2
+               MOVE    SPACE               TO  WRK-JYU-FLG12
                IF      WRK-JYU-KBN         =   "08"
       *            同じ検査
                    PERFORM 200112-JYUFUKU-KBN-CHK-SEC
@@ -3541,6 +3550,13 @@
                            IF      (WRK-JYU-KBN        =   "07" )
                              AND   (WRK-JYU-FLG        =   "1" )
                              AND   (WRK-JYU-FLG2       =   "1" )
+                               MOVE    1               TO  WRK-JYU-KEN
+                           END-IF
+      *H29.11
+      *                    どれか１つの重複対象あり
+                           IF      (WRK-JYU-KBN        =   "07" )
+                             AND   (WRK-JYU-FLG1       =   " " )
+                             AND   (WRK-JYU-FLG12      =   " " )
                                MOVE    1               TO  WRK-JYU-KEN
                            END-IF
                        END-IF
@@ -3584,6 +3600,8 @@
                MOVE    TBL-JYU-SRYCD (JYU-IDX) TO  WRK-SRYCD
       *H24.8
                MOVE    TBL-FILLER2   (JYU-IDX) TO  WRK-JYU-FLG2
+      *H29.11
+               MOVE    TBL-FILLER1   (JYU-IDX) TO  WRK-JYU-FLG12
            END-IF
            .
        200112-JYUFUKU-KBN-CHK-EXT.
