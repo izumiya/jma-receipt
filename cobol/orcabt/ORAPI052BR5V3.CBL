@@ -110,16 +110,22 @@
                05  WRK-PARAM-KARTE-UID PIC X(36).
       *
            03  WRK-PTID            PIC 9(10).
+           03  WRK-PTBYO-PTID-X.
+               05  WRK-PTBYO-PTID  PIC 9(10).
       *
            03  WRK-YM              PIC 9(06).
            03  WRK-SRYYM           PIC X(06).
            03  WRK-END-SRYYM       PIC X(06).
+      *
+           03  WRK-DISEASE-ERRCD  PIC X(03).
       *
            03  WRK-LENGTH          PIC 9(02).
       *
            03  WRK-MCP-PATHNAME    PIC X(64).
            03  WRK-MCP-PTBYO-PATHNAME
                                    PIC X(64).
+      *
+           03  WRK-BASE-MONTH      PIC X(07).
       *
            03  WRK-SYMD.
                05  WRK-SYY         PIC X(04).
@@ -422,9 +428,14 @@
            INITIALIZE                      PTBYOMEILST-REC
       *
            PERFORM         UNTIL   WRK-SRYYM   >   WRK-END-SRYYM
-      *??
+               MOVE    WRK-SRYYM           TO  WRK-SYMD (1:6)
+               MOVE    "01"                TO  WRK-SYMD (7:2)
+               MOVE    ZERO                TO  WRK-THMS
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  WRK-BASE-MONTH
+      *
                DISPLAY "SRYYM=" WRK-SRYYM
-      *??
+      *
                INITIALIZE                      PTBYOMEI-REC
                MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                MOVE    WRK-SRYYM           TO  PTBYO-SRYYMD   (1:6)
@@ -503,6 +514,8 @@
                                            CNT-OUT
            MOVE    CNT-OUT1            TO  IDX
       *
+           MOVE    SPACE               TO  WRK-DISEASE-ERRCD
+      *
            INITIALIZE                      ORCSPTIDAREA
            MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            MOVE    PTBYO-PTID          TO  SPTID-PTID
@@ -511,10 +524,15 @@
            IF      SPTID-RC            =   ZERO
                MOVE    SPTID-PTNUM     TO  PTBYOLST-PATIENTID      (IDX)
            ELSE
-               MOVE    "E16"           TO  PTBYOLST-ERRCD          (IDX)
+               MOVE    PTBYO-PTID      TO  WRK-PTBYO-PTID
+               STRING  "*"                 DELIMITED   BY  SIZE
+                       WRK-PTBYO-PTID-X    DELIMITED   BY  SIZE
+                       INTO                PTBYOLST-PATIENTID      (IDX)
+               END-STRING
+               MOVE    "E10"           TO  PTBYOLST-ERRCD          (IDX)
            END-IF
       *??
-             DISPLAY "PTNUM=" SPTID-PTNUM "#" 
+      *    DISPLAY "PTNUM=" SPTID-PTNUM "#" 
       *??
       *
            INITIALIZE                      PTINF-REC
@@ -530,14 +548,13 @@
                MOVE    WRK-HEN-DATE        TO  PTBYOLST-BIRTHDAY   (IDX)
                MOVE    PTINF-SEX           TO  PTBYOLST-SEX        (IDX)
            ELSE
-               MOVE    "E17"           TO  PTBYOLST-ERRCD          (IDX)
+               IF      PTBYOLST-ERRCD (IDX)
+                                           =   SPACE
+                   MOVE    "E12"               TO  PTBYOLST-ERRCD  (IDX)
+               END-IF
            END-IF
       *
-           MOVE    WRK-SRYYM           TO  WRK-SYMD (1:6)
-           MOVE    "01"                TO  WRK-SYMD (7:2)
-           MOVE    ZERO                TO  WRK-THMS
-           PERFORM 801-DAYHEN01-SEC
-           MOVE    WRK-HEN-DATE        TO  PTBYOLST-BASE-MONTH     (IDX)
+           MOVE    WRK-BASE-MONTH      TO  PTBYOLST-BASE-MONTH     (IDX)
       *
            MOVE    ZERO                TO  IDY
            MOVE    PTBYO-PTID          TO  WRK-PTID
@@ -557,8 +574,7 @@
                        MOVE    "O"             TO  PTBYOLST-NYUGAIKBN
                                                                (IDX IDY)
                END-EVALUATE
-               MOVE    PTBYO-SRYKA         TO  PTBYOLST-SRYKA
-                                                               (IDX IDY)
+               MOVE    PTBYO-SRYKA         TO  PTBYOLST-SRYKA  (IDX IDY)
                IF      PTBYO-HKNCOMBI   NOT =  ZERO
                    MOVE    PTBYO-HKNCOMBI      TO  PTBYOLST-HKNCOMBI
                                                                (IDX IDY)
@@ -569,54 +585,72 @@
                    MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
                    MOVE    "key"               TO  WRK-MCP-PATHNAME
                    PERFORM 900-COMB-READ-SEC
-                   IF    ( FLG-HKNCOMBI        =   1  )
-                   OR    ( COMB-DELKBN         =  "1" )
-                       MOVE    "E19"           TO
-                                       PTBYOLST-DISEASE-ERRCD  (IDX IDY)
+                   IF      FLG-HKNCOMBI        =   1
+                       MOVE    "E19"           TO  WRK-DISEASE-ERRCD
+                       PERFORM 20011-PTBYOMEILST-ERR-SEC
+                   ELSE
+                       IF      COMB-DELKBN         =  "1"
+                           MOVE    "E28"           TO  WRK-DISEASE-ERRCD
+                           PERFORM 20011-PTBYOMEILST-ERR-SEC
+                       ELSE
+                           IF      PTBYO-SRYYMD    <=  COMB-TEKEDYMD
+                               CONTINUE
+                           ELSE    
+                               MOVE    "E27"       TO  WRK-DISEASE-ERRCD
+                               PERFORM 20011-PTBYOMEILST-ERR-SEC
+                           END-IF
+                       END-IF
                    END-IF
                ELSE
                    IF      PTBYO-KOHID     >   ZERO
-                       INITIALIZE                      HKNCOMBI-REC
-                       MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
-                       MOVE    WRK-PTID            TO  COMB-PTID
-                       MOVE    PTBYO-KOHID         TO  COMB-KOHID (1)
-                       MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-                       MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-                       MOVE    "key8"              TO  MCP-PATHNAME
-                       PERFORM 900-DBSELECT-SEC
-                       IF      MCP-RC              =   ZERO
-                           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-                           MOVE    "key8"              TO  MCP-PATHNAME
-                           PERFORM 900-COMB-READ-N-SEC
+                       INITIALIZE                      PTRSIINF-REC
+                       MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+                       MOVE    WRK-PTID            TO  PTRSI-PTID
+                       MOVE    PTBYO-KOHID         TO  PTRSI-KOHID
+                       MOVE    ZERO                TO  PTRSI-HKNID
+                       MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+                       PERFORM 900-PTRSIINF-READ-SEC
+                       IF      FLG-PTRSIINF        =   1
+                           MOVE    "E25"           TO  WRK-DISEASE-ERRCD
+                           PERFORM 20011-PTBYOMEILST-ERR-SEC
                        ELSE
-                           INITIALIZE                  HKNCOMBI-REC
-                           MOVE    1               TO  FLG-HKNCOMBI
-                       END-IF
-                       PERFORM         UNTIL   FLG-HKNCOMBI        =   1
-                           IF    ( COMB-TEKSTYMD       <= PTBYO-SRYYMD )
-                           AND   ( COMB-TEKEDYMD       >= PTBYO-SRYYMD )
-                           AND   ( COMB-KOHID (1)      =  PTBYO-KOHID  )
-                               IF      COMB-DELKBN     =  "1"
-                                   MOVE    "E20"             TO
-                                       PTBYOLST-DISEASE-ERRCD  (IDX IDY)
+                           IF      PTRSI-SAKUJOKBN     =   "1"
+                               MOVE    "E29"           TO
+                                                       WRK-DISEASE-ERRCD
+                               PERFORM 20011-PTBYOMEILST-ERR-SEC
+                           ELSE
+                               IF      PTBYO-SRYYMD
+                                                   >   PTRSI-RYOEDYMD
+                                   MOVE    "E26"       TO
+                                                       WRK-DISEASE-ERRCD
+                                   PERFORM 20011-PTBYOMEILST-ERR-SEC
                                ELSE
-                                   MOVE    COMB-HKNCOMBINUM
+                                   INITIALIZE              HKNCOMBI-REC
+                                   MOVE    SPA-HOSPNUM TO  COMB-HOSPNUM
+                                   MOVE    WRK-PTID    TO  COMB-PTID
+                                   MOVE    PTBYO-KOHID TO  COMB-KOHID(1)
+                                                           COMB-KOHID(2)
+                                                           COMB-KOHID(3)
+                                                           COMB-KOHID(4)
+                                   MOVE    HKNCOMBI-REC
+                                                       TO  MCPDATA-REC
+                                   MOVE    "tbl_hkncombi"
+                                                       TO  MCP-TABLE
+                                   MOVE    "key4"      TO
+                                                       WRK-MCP-PATHNAME
+                                   PERFORM 900-COMB-READ-SEC
+                                   IF    ( FLG-HKNCOMBI    =   1   )
+                                   OR    ( COMB-DELKBN     =   "1" )
+                                       MOVE    "E30"           TO
+                                                       WRK-DISEASE-ERRCD
+                                       PERFORM 20011-PTBYOMEILST-ERR-SEC
+                                   ELSE
+                                       MOVE    COMB-HKNCOMBINUM
                                                    TO  PTBYOLST-HKNCOMBI
                                                                (IDX IDY)
+                                   END-IF
                                END-IF
                            END-IF
-                           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-                           MOVE    "key8"              TO  MCP-PATHNAME
-                           PERFORM 900-COMB-READ-N-SEC
-                       END-PERFORM
-                       MOVE    "tbl_hkncombi"      TO  MCP-TABLE
-                       MOVE    "key8"              TO  MCP-PATHNAME
-                       PERFORM 900-CLOSE-SEC
-      *
-                       IF      PTBYOLST-HKNCOMBI  (IDX IDY)
-                                                   =   SPACE
-                           MOVE    "E20"           TO
-                                       PTBYOLST-DISEASE-ERRCD  (IDX IDY)
                        END-IF
                    END-IF
                END-IF
@@ -696,18 +730,51 @@
                        MOVE    "SA"        TO  PTBYOLST-SUSPECTEDFLAG
                                                                (IDX IDY)
                END-EVALUATE
-               MOVE    PTBYO-SRYYMD        TO  WRK-SYMD
-               PERFORM 801-DAYHEN01-SEC
-               MOVE    WRK-HEN-DATE        TO  PTBYOLST-START-DATE
-                                                               (IDX IDY)
+      *
+               MOVE    SPACE               TO  STS-AREA-DAY
+               INITIALIZE                      STS-AREA-DAY
+               MOVE    SPACE               TO  LNK-DAY2-AREA
+               MOVE    "21"                TO  LNK-DAY2-IRAI
+               MOVE    PTBYO-SRYYMD        TO  LNK-DAY2-YMD
+               CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY2-AREA
+               IF      STS-DAY-RC1     NOT =   ZERO
+                   MOVE    PTBYO-SRYYMD        TO
+                                       PTBYOLST-START-DATE     (IDX IDY)
+                   MOVE    "E16"               TO  WRK-DISEASE-ERRCD
+                           PERFORM 20011-PTBYOMEILST-ERR-SEC
+               ELSE
+                   MOVE    PTBYO-SRYYMD        TO  WRK-SYMD
+                   PERFORM 801-DAYHEN01-SEC
+                   MOVE    WRK-HEN-DATE        TO
+                                       PTBYOLST-START-DATE     (IDX IDY)
+               END-IF
+      *
                IF      PTBYO-TENKIYMD      =   SPACE
                    CONTINUE
                ELSE
-                   MOVE    PTBYO-TENKIYMD      TO  WRK-SYMD
-                   PERFORM 801-DAYHEN01-SEC
-                   MOVE    WRK-HEN-DATE        TO  PTBYOLST-END-DATE
-                                                               (IDX IDY)
+                   MOVE    SPACE               TO  STS-AREA-DAY
+                   INITIALIZE                      STS-AREA-DAY
+                   MOVE    SPACE               TO  LNK-DAY2-AREA
+                   MOVE    "21"                TO  LNK-DAY2-IRAI
+                   MOVE    PTBYO-TENKIYMD      TO  LNK-DAY2-YMD
+                   CALL    "ORCSDAY"           USING
+                                               STS-AREA-DAY
+                                               LNK-DAY2-AREA
+                   IF      STS-DAY-RC1     NOT =   ZERO
+                       MOVE    PTBYO-TENKIYMD      TO
+                                       PTBYOLST-END-DATE       (IDX IDY)
+                       MOVE    "E17"               TO  WRK-DISEASE-ERRCD
+                           PERFORM 20011-PTBYOMEILST-ERR-SEC
+                   ELSE
+                       MOVE    PTBYO-TENKIYMD      TO  WRK-SYMD
+                       PERFORM 801-DAYHEN01-SEC
+                       MOVE    WRK-HEN-DATE        TO
+                                       PTBYOLST-END-DATE       (IDX IDY)
+                   END-IF
                END-IF
+      *
                EVALUATE    PTBYO-TENKIKBN
                    WHEN    "1"
                        MOVE    "F"             TO  PTBYOLST-OUTCOME
@@ -800,6 +867,27 @@
            END-IF
            .
        2001-PTBYOMEILST-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    日付編集処理
+      *****************************************************************
+       20011-PTBYOMEILST-ERR-SEC      SECTION.
+      *
+           IF      PTBYOLST-DISEASE-ERRCD  (IDX IDY)
+                                      =   SPACE
+               MOVE    WRK-DISEASE-ERRCD  TO
+                                       PTBYOLST-DISEASE-ERRCD  (IDX IDY)
+           END-IF
+      *
+           IF      PTBYOLST-ERRCD (IDX)
+                                      =   SPACE
+               MOVE    WRK-DISEASE-ERRCD  TO  PTBYOLST-ERRCD (IDX)
+           END-IF
+      *
+           MOVE    SPACE               TO  WRK-DISEASE-ERRCD
+           .
+       20011-PTBYOMEILST-ERR-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1207,7 +1295,7 @@
            EXIT.
       *
       *****************************************************************
-      *    保険組合せマスタ読込
+      *    保険組合せ読込
       *****************************************************************
        900-COMB-READ-SEC                SECTION.
       *
@@ -1247,6 +1335,37 @@
       *
            .
        900-COMB-READ-N-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者労災保険情報読込
+      *****************************************************************
+       900-PTRSIINF-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+                   MOVE    ZERO            TO  FLG-PTRSIINF
+               ELSE
+                   INITIALIZE                  PTRSIINF-REC
+                   MOVE    1               TO  FLG-PTRSIINF
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+      *
+           MOVE    "tbl_ptrsiinf"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-PTRSIINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
