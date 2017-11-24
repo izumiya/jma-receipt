@@ -1069,7 +1069,7 @@
                MOVE    "01"            TO  WRK-SYMD (7:2)
                PERFORM 801-DAYHEN01-SEC
                MOVE    WRK-HEN-DATE (1:7)
-                                       TO  PUSHBA01-PERFORM-DATE
+                                       TO  PUSHBA01-PERFORM-MONTH
                MOVE    CNT-OUT         TO  WRK-CNT
                MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
       *??
