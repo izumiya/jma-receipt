@@ -3,7 +3,7 @@ xml_patient_disease_all {
 	object		object;
 	mode		int;
 	recordname	varchar(128);
-	patient_disease_all {
+	Patient_Disease_All {
 		Patient_ID		varchar(20);
 		WholeName		varchar(100);
 		WholeName_inKana	varchar(100);

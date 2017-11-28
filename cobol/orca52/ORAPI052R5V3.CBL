@@ -1055,7 +1055,7 @@
                MOVE    "オルカＵＩＤが未設定です。"
                                                TO  WRK-ERRMSG
            WHEN    "E11"
-               MOVE    "基準日が暦日ではありません。"
+               MOVE    "基準月が暦日ではありません。"
                                                TO  WRK-ERRMSG
            WHEN    "E16"
                MOVE
