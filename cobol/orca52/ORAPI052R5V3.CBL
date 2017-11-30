@@ -430,7 +430,7 @@
       *
            MOVE   LSTREQ-KARTE-UID     TO  LSTRES-KARTE-UID
            IF      FLG-SYORI           =   1
-               IF      WRK-ERRCD           =   SPACE
+               IF      WRK-ERRCD           =   SPACE   OR  "E16"
                    MOVE   LSTREQ-ORCA-UID      TO  LSTRES-ORCA-UID
                END-IF
                MOVE    WRK-MONBLOB-ID          TO  LSTRES-DATA-ID (1)
