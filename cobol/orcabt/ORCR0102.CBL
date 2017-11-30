@@ -156,6 +156,7 @@
       *
       *  05.00.01    NACL-Æ£¸¶    17/02/07  £È£Á£Ï£Ò£ÉÂÐ±þ
       *  05.00.02    NACL-Æ£¸¶    17/07/04  £Ð£Õ£Ó£ÈÄÌÃÎÂÐ±þ
+      *  05.00.03    NACL-Æ£¸¶    17/11/29  ¥¯¥é¥¤¥¢¥ó¥È°õºþÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -389,7 +390,10 @@
       *
       *    ´µ¼ÔÈÖ¹æ¹½À®´ÉÍý¾ðÊó
            COPY  "CPSK1009.INC".
-      *     
+      *
+      *    ¿¦°÷¾ðÊó
+           COPY  "CPSK1010.INC".
+      *
       *    ¥ì¥»¥×¥È°õºþ¾ðÊó
            COPY    "CPSK2005.INC".
       *
@@ -407,6 +411,8 @@
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
+      *
+           COPY    "CPORCSCOMMON.INC".
       *
       *    monpe°õºþ¥Ç¡¼¥¿µã¤­ÊÌ¤ì½¤Àµ¥µ¥Ö
            COPY  "CPORCSFIXREDDATA.INC".
@@ -519,6 +525,19 @@
            MOVE    SGETTEMP-TEMPDIR    TO  WRK-SGETTEMP-TEMPDIR
       *
            PERFORM 100-DBOPEN-SEC
+      *
+           MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
+           MOVE    MCP-USER            TO  SPA-OPID
+      *
+      *    £Ó£Ð£Á¶¦ÄÌÀßÄê
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
       *
            CALL    "ORCSENCODING"          USING
                                            MCPAREA
@@ -713,6 +732,16 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1009-HOSPNUM
                MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
                IF      WRK-PARA-SHELLID    =   "RECEPTX"
                    MOVE    "1"         TO  SHELLTBL-ARG4
+               ELSE
+                   IF      WRK-PARA-JOB-PARAM  =   "orca"
+                       IF    ( WRK-PARA-PRTKBN     =   "2"    )
+                       AND   ( SPA-CLIENT-PRT-FLG  =   2      )
+                           MOVE    "¿ÇÎÅÊó½·ÌÀºÙ½ñ"
+                                           TO  SHELLTBL-ARG5
+                           MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG6
+                       END-IF
+                   END-IF
                END-IF
                MOVE    SHELLTBL        TO  MCPDATA-REC
                IF      WRK-PARA-JOB-PARAM
@@ -807,7 +836,12 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            MOVE    "1"                 TO  PRT-SITEKBN
       *    £È£Á£Ï£Ò£É¤Î¤È¤­¡Ö£·¡×¤òÀßÄê
            IF      WRK-PARA-JOB-PARAM  =   "orca"
-               MOVE    WRK-PARA-PRTKBN     TO  PRT-PRTKBN
+               IF    ( WRK-PARA-PRTKBN     =   "2" )
+               AND   ( SPA-CLIENT-PRT-FLG  =   2   )
+                   MOVE    "5"                 TO  PRT-PRTKBN
+               ELSE
+                   MOVE    WRK-PARA-PRTKBN     TO  PRT-PRTKBN
+               END-IF
            ELSE
                MOVE    "7"                 TO  PRT-PRTKBN
            END-IF
