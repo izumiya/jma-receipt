@@ -146,6 +146,8 @@
                05  WRK-PARA-SYORIPG        PIC X(02).
       *        確認コード
                05  WRK-SELECT-CODE         PIC X(04).
+      *        削除
+               05  WRK-DELETE-CLASS        PIC X(03).
       *        削除ＩＤ
                05  WRK-DEL-ORCA-UID        PIC X(64).
                05  WRK-DEL-KARTE-UID       PIC X(64).
@@ -959,6 +961,8 @@
                                        TO  WRK-DEL-ORCA-UID
            MOVE    MDCRES-DEL-KARTE-UID
                                        TO  WRK-DEL-KARTE-UID
+           MOVE    MDCRES-DELETE-CLASS
+                                       TO  WRK-DELETE-CLASS
       *
            MOVE    WRK-APIV3DATA-REC   TO  APIPARA-DATA-REC
       *
@@ -988,14 +992,29 @@
       *
            MOVE    MDCREQ-DEL-KARTE-UID    TO  MDCRES-DEL-KARTE-UID
            MOVE    MDCREQ-DEL-ORCA-UID     TO  MDCRES-DEL-ORCA-UID
+           MOVE    MDCREQ-DELETE-CLASS     TO  MDCRES-DELETE-CLASS
       *
       *    オルカＵＩＤ
            IF      MDCREQ-SELECT-ANSWER    =   SPACE
       *        選択確認
-               PERFORM 20021-KOUSIN-CHK-SEC
+               EVALUATE    MDCREQ-DELETE-CLASS
+               WHEN    "All"
+      *            全部
+                   PERFORM 20023-KOUSIN-ALLCHK-SEC
+               WHEN    SPACE
+      *            選択
+                   PERFORM 20021-KOUSIN-CHK-SEC
+               WHEN    OTHER
+                   MOVE    "15"            TO  WRK-ERRCD
+               END-EVALUATE
+      *
                IF      WRK-ERRCD           =   SPACE
                    MOVE    "01"            TO  MDCRES-RESPONSE-NUMBER
-                   MOVE    "0001"          TO  MDCRES-SELECT-CODE
+                   IF      MDCREQ-DELETE-CLASS     =   "All"
+                       MOVE    "0002"          TO  MDCRES-SELECT-CODE
+                   ELSE
+                       MOVE    "0001"          TO  MDCRES-SELECT-CODE
+                   END-IF
                    PERFORM 292-SELECT-HEN-SEC
       *            オルカＵＩＤ処理
                    PERFORM 20020-ORCAUID-SYORI-SEC
@@ -1064,6 +1083,33 @@
                    MOVE    SPACE               TO  MDCRES-SELECT-CODE
                    MOVE    SPACE               TO  MDCRES-DEL-ORCA-UID
                    MOVE    SPACE               TO  MDCRES-DEL-KARTE-UID
+                   MOVE    SPACE               TO  MDCRES-DELETE-CLASS
+                   MOVE    4                   TO  FLG-SYORI
+               WHEN    OTHER
+                   MOVE    "12"                TO  WRK-ERRCD
+               END-EVALUATE
+           WHEN    "0002"
+      *        全削除確認
+               EVALUATE    MDCREQ-SELECT-ANSWER
+               WHEN    "Ok"
+                   IF      (WRK-DELETE-CLASS   =   MDCREQ-DELETE-CLASS)
+                       PERFORM 20023-KOUSIN-ALLCHK-SEC
+      *                更新処理
+                       IF     (WRK-ERRCD           =   SPACE )
+                           PERFORM 20024-ALLKOUSIN-SYORI-SEC
+                           IF      WRK-ERRCD           =   SPACE
+      *                        削除処理終了
+                               MOVE    3               TO  FLG-SYORI
+                           END-IF
+                       END-IF
+                   ELSE
+                       MOVE    "11"                TO  WRK-ERRCD
+                   END-IF
+               WHEN    "No"
+                   MOVE    SPACE               TO  MDCRES-SELECT-CODE
+                   MOVE    SPACE               TO  MDCRES-DEL-ORCA-UID
+                   MOVE    SPACE               TO  MDCRES-DEL-KARTE-UID
+                   MOVE    SPACE               TO  MDCRES-DELETE-CLASS
                    MOVE    4                   TO  FLG-SYORI
                WHEN    OTHER
                    MOVE    "12"                TO  WRK-ERRCD
@@ -1183,21 +1229,40 @@
            PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-LOCK            =   ZERO
-               MOVE    TBL-LOCK            TO  MCPDATA-REC
-               MOVE    "DBDELETE"          TO  MCP-FUNC
-               MOVE    "tbl_lock"          TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               CALL    "ORCDBMAIN"         USING   MCPAREA
+      *        データ削除
+               PERFORM 200221-DELETE-SYORI-SEC
+           END-IF
+      *
+           .
+       20022-KOUSIN-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    データ削除処理
+      *****************************************************************
+       200221-DELETE-SYORI-SEC         SECTION.
+      *
+           MOVE    TBL-LOCK            TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_lock"          TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
-               IF      MCP-RC              NOT =   ZERO 
-                   MOVE    "20"                TO  WRK-ERRCD
-                   GO      TO      20022-KOUSIN-SYORI-EXT
-               END-IF
+           IF      MCP-RC              NOT =   ZERO 
+               MOVE    "20"                TO  WRK-ERRCD
+               GO      TO      200221-DELETE-SYORI-EXT
+           END-IF
+      *
+           IF     (LOCK-KARTE-UID      =   SPACE )
+            AND   (LOCK-TERMID         =   SPACE )
+               GO      TO      200221-DELETE-SYORI-EXT
            END-IF
       *
       *    端末ＩＤ(オンライン）
-           IF      LOCK-KARTE-UID      =   SPACE
+           MOVE    SPACE               TO  WRK-DEL-TERMID-Z
+           IF     (LOCK-KARTE-UID      =   SPACE )
+            AND   (WRK-DEL-TERMID  NOT =   SPACE )
                MOVE    WRK-DEL-TERMID      TO  WRK-DEL-TERMID-Z
                PERFORM VARYING IDX     FROM    64  BY  -1
                        UNTIL   IDX     <       1
@@ -1209,7 +1274,6 @@
                    END-IF
                END-PERFORM
            END-IF
-      *
       *
       *    一時データ削除
            INITIALIZE                      PARA-REC
@@ -1261,7 +1325,85 @@
            END-IF
       *
            .
-       20022-KOUSIN-SYORI-EXT.
+       200221-DELETE-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    全削除更新チェック処理
+      *****************************************************************
+       20023-KOUSIN-ALLCHK-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  TBL-LOCK
+           INITIALIZE                      TBL-LOCK
+           MOVE    SPA-HOSPNUM         TO  LOCK-HOSPNUM
+           MOVE    TBL-LOCK            TO  MCPDATA-REC
+           MOVE    "tbl_lock"          TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    "tbl_lock"          TO  MCP-TABLE
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-LOCK-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-LOCK
+           END-IF
+           MOVE    ZERO                TO  FLG-ERR
+           PERFORM UNTIL  (FLG-LOCK        =   1 )  OR
+                          (FLG-ERR         =   1 )
+               PERFORM 2311-TIME-CHK-SEC
+      *
+               MOVE    "tbl_lock"          TO  MCP-TABLE
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-LOCK-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_lock"          TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-ERR             =   1
+              MOVE    "14"             TO  WRK-ERRCD
+           END-IF
+      *
+           .
+       20023-KOUSIN-ALLCHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一括削除処理
+      *****************************************************************
+       20024-ALLKOUSIN-SYORI-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  TBL-LOCK
+           INITIALIZE                      TBL-LOCK
+           MOVE    SPA-HOSPNUM         TO  LOCK-HOSPNUM
+           MOVE    TBL-LOCK            TO  MCPDATA-REC
+           MOVE    "tbl_lock"          TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    "tbl_lock"          TO  MCP-TABLE
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-LOCK-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-LOCK
+           END-IF
+           PERFORM UNTIL  (FLG-LOCK        =   1 )
+                      OR  (WRK-ERRCD   NOT =   SPACE )
+      *        端末ＩＤ(オンライン）
+               MOVE    LOCK-TERMID     TO  WRK-DEL-TERMID
+      *        データ削除
+               PERFORM 200221-DELETE-SYORI-SEC
+      *
+               MOVE    "tbl_lock"          TO  MCP-TABLE
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-LOCK-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_lock"          TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       20024-ALLKOUSIN-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1273,6 +1415,12 @@
            EVALUATE    MDCRES-SELECT-CODE
                WHEN    "0001"
                    STRING  "選択された排他情報を削除します。"
+                           "端末が展開中でないことを確認して下さい。"
+                                           DELIMITED  BY  SIZE
+                                           INTO    MDCRES-SELECT-MSG
+                   END-STRING
+               WHEN    "0002"
+                   STRING  "排他情報をすべて削除します。"
                            "端末が展開中でないことを確認して下さい。"
                                            DELIMITED  BY  SIZE
                                            INTO    MDCRES-SELECT-MSG
@@ -1443,6 +1591,9 @@
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING
+           WHEN    "15"
+               MOVE    "削除区分が違います。"
+                                               TO  WRK-ERRMSG
            WHEN    "20"
                STRING  "削除エラーです。"
                                                DELIMITED  BY  SIZE

@@ -8,6 +8,8 @@ xml_medicalv3req7 {
 		Karte_Uid		varchar(36);
 		Orca_Uid		varchar(36);
 		Delete_Information  {
+#---    	办崇豺近
+			Delete_Class		varchar(3);
 #---    	豺近カルテＵＩＤ
 			Delete_Karte_Uid	varchar(36);
 #---    	豺近オルカＵＩＤ

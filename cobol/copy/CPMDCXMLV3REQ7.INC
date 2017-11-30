@@ -37,6 +37,8 @@
               05  MDCREQ-ORCA-UID          PIC X(36).
       *       削除情報
               05  MDCREQ-DELETE-AREA.
+      *           削除情報
+                  07  MDCREQ-DELETE-CLASS          PIC X(03).
       *           UID（電子カルテ）
                   07  MDCREQ-DEL-KARTE-UID         PIC X(36).
       *           UID（オルカ）

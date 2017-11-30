@@ -52,6 +52,8 @@
       ***      05  MDCRES-SELECT-FLAG       PIC X(05).
       *        削除情報
                05  MDCRES-DELETE-AREA.
+      *            削除情報
+                   07  MDCRES-DELETE-CLASS          PIC X(03).
       *            UID（電子カルテ）
                    07  MDCRES-DEL-KARTE-UID         PIC X(36).
       *            UID（オルカ）
