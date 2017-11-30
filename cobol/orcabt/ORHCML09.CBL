@@ -30,6 +30,7 @@
       *  04.02.01    NACL-森脇     08/03/04  疾患区分変更
       *  04.08.01    NACL-森脇     14/08/19  一時ファイルディレクトリ設定
       *  04.08.02    NACL-森脇     16/02/26  補足コメント対応
+      *  05.00.00    NACL-太田     17/11/29  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -194,6 +195,9 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
+      *    職員情報
+           COPY  "CPSK1010.INC".
+      *
       *    出力先プリンタ名割り当て情報
            COPY    "CPSK1031.INC".
       *
@@ -211,6 +215,8 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+           COPY    "CPORCSCOMMON.INC".
       *
       *   ＵＩＤ取得用エリア
        01 UIDIO-AREA.
@@ -304,6 +310,18 @@
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
+           MOVE    WRK-PARA-SYSYMD     TO  SPA-SYSYMD
+           MOVE    MCP-USER            TO  SPA-OPID
+      *
+      *    ＳＰＡ共通設定
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
       *
            CALL    "ORCSENCODING"          USING
                                            MCPAREA
@@ -488,6 +506,12 @@
                                    TO  SHELLTBL-ARG1
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
            MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+              MOVE    "自院病名一覧"
+                                   TO  SHELLTBL-ARG5
+              MOVE    SPA-CLIENT-SHOWDIALOG
+                                   TO  SHELLTBL-ARG6
+           END-IF
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
@@ -607,7 +631,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
            MOVE    SYS-1044-OFFSET-X   TO  PRT-OFFSET-X
            MOVE    SYS-1044-OFFSET-Y   TO  PRT-OFFSET-Y
            MOVE    "1"                 TO  PRT-SITEKBN
-           MOVE    "1"                 TO  PRT-PRTKBN
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+               MOVE    "5"             TO  PRT-PRTKBN
+           ELSE
+               MOVE    "1"             TO  PRT-PRTKBN
+           END-IF
            MOVE    WRK-SGETTEMP-TEMPDIR TO PRT-OUT
            MOVE    "HCML09"            TO PRT-TBL-KEY
            MOVE    1                   TO  PRT-RENNUM

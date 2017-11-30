@@ -69,13 +69,7 @@
       *
       *    印刷用データ
        FD  PRT-FILE.
-       01  PRT-REC.
-           03  PRT-PRTID               PIC X(30).
-           03  PRT-PRTNM               PIC X(20).
-           03  PRT-OFFSET-X            PIC X(05).
-           03  PRT-OFFSET-Y            PIC X(05).
-           03  PRT-SITEKBN             PIC X(01).
-           03  PRT-PRTDATA             PIC X(20000).
+           COPY    "CPPRTALL.INC".
       *
       *    ＣＳＶファイル
        FD  CSV-FILE.
@@ -180,6 +174,7 @@
            03  WRK-ENCODING            PIC X(01).
            03  WRK-ENCODING9           REDEFINES WRK-ENCODING
                                        PIC 9(01).
+           03  WRK-UUID                PIC X(36).
       * 
        01  CSV-EDIT-AREA.
            03  CSV-NO                  PIC Z(9)9.
@@ -272,6 +267,7 @@
       *    出力先プリンタ名割り当て情報
            COPY  "CPSYSKANRI.INC".
            COPY  "CPSK1001.INC".
+           COPY  "CPSK1010.INC".
            COPY  "CPSK1031.INC".
            COPY  "CPSK1044.INC".
       *
@@ -290,6 +286,17 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *   ＵＩＤ取得用エリア
+       01 UIDIO-AREA.
+           03  UIDIO-RET   PIC X(2).
+           03  UIDIO-UID   PIC X(36).
+       01  UIDIO-ST        PIC 9(2).
+      *
+           COPY    "CPORCSCOMMON.INC".
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
       *
       *   日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -376,6 +383,28 @@
            MOVE    WRK-PARA-TERMID     TO  SPA-TERMID
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
            MOVE    WRK-PARA-SYSYMD     TO  SPA-SYSYMD
+           MOVE    MCP-USER            TO  SPA-OPID
+      *
+           INITIALIZE              ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"   USING
+                                   ORCSMCNDATEAREA
+      *
+           INITIALIZE              UIDIO-AREA.
+           CALL    "orcuidset"     USING
+                                   UIDIO-ST
+                                   UIDIO-AREA
+      *
+           MOVE    UIDIO-UID           TO  WRK-UUID
+      *
+      *    ＳＰＡ共通設定
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
       *
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
@@ -386,7 +415,6 @@
            MOVE    SYSKANRI-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-1001-REC
-           DISPLAY "SYS-1001-BEDSU[" SYS-1001-BEDSU "]"
            IF    ( SYS-1001-BEDSU  >   ZERO )
                MOVE    1               TO  SPA-BEDFLG
            END-IF
@@ -557,12 +585,18 @@
                CLOSE   PRT-FILE
       *
                MOVE    SPACE           TO  SHELLTBL
-               INITIALIZE              ORCSMKPASSAREA
-               MOVE    "HCALL2.sh"     TO  SHELLTBL-NAME
+               MOVE    "HCALL_prv.sh"  TO  SHELLTBL-NAME
       *
                MOVE    ASGNPARA (ASGNPARA-ST:)
                                        TO  SHELLTBL-ARG1
-               MOVE    WRK-ENCODING    TO  SHELLTBL-ARG2
+               MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
+               MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
+               MOVE    "0"             TO  SHELLTBL-ARG4
+               IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                   MOVE    "患者照会検索結果"  TO  SHELLTBL-ARG5
+                   MOVE    SPA-CLIENT-SHOWDIALOG
+                                       TO  SHELLTBL-ARG6
+               END-IF
                MOVE    SHELLTBL        TO  MCPDATA-REC
                MOVE    "SHELL"         TO  MCP-FUNC
                MOVE    "shell"         TO  MCP-TABLE
@@ -916,11 +950,27 @@
       *
       *
            MOVE    SPACE           TO  PRT-REC
+           INITIALIZE                  PRT-REC
            MOVE    "HCM28.red"     TO  PRT-PRTID
            MOVE    WRK-PRTNM       TO  PRT-PRTNM
            MOVE    SYS-1044-OFFSET-X   TO  PRT-OFFSET-X
            MOVE    SYS-1044-OFFSET-Y   TO  PRT-OFFSET-Y
            MOVE    "1"             TO  PRT-SITEKBN
+      *
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+               MOVE    "5"         TO  PRT-PRTKBN
+           ELSE
+               MOVE    "6"         TO  PRT-PRTKBN
+           END-IF
+           MOVE    MCP-TEMPDIR     TO  PRT-OUT
+           MOVE    "ORCA0131"      TO  PRT-TBL-KEY
+           MOVE    1               TO  PRT-RENNUM
+           MOVE    SMCNDATE-YMD    TO  PRT-TBL-GROUP
+           MOVE    SMCNDATE-HMS    TO  PRT-TBL-GROUP(9:)
+           MOVE    1               TO  PRT-SHORI-RENNUM
+           MOVE    CNT-PAGE        TO  PRT-PAGE
+           MOVE    WRK-UUID        TO  PRT-UUID
+      *
            INITIALIZE                  SFIXREDDATA-AREA
            MOVE    "1"             TO  SFIXREDDATA-SITEKBN
            MOVE    PRT-PRTID       TO  SFIXREDDATA-FORMID

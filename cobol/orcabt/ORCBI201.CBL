@@ -62,13 +62,7 @@
       *
       *    印刷用データ
        FD  PRT-FILE.
-       01  PRT-REC.
-           03  PRT-PRTID               PIC X(30).
-           03  PRT-PRTNM               PIC X(20).
-           03  PRT-OFFSET-X            PIC X(05).
-           03  PRT-OFFSET-Y            PIC X(05).
-           03  PRT-SITEKBN             PIC X(01).
-           03  PRT-PRTDATA             PIC X(20000).
+           COPY    "CPPRTALL.INC".
       *
       *    ＣＳＶファイル
        FD  CSV-FILE.
@@ -172,6 +166,7 @@
                                        PIC 9(01).
            03  WRK-HKNMEI              PIC X(50).
            03  WRK-OFFSET              PIC 9(05).
+           03  WRK-UUID                PIC X(36).
       *
        01  CSV-EDIT-AREA.
            03  CSV-NO                  PIC Z(9)9.
@@ -260,6 +255,9 @@
       *    診療科目情報
            COPY    "CPSK1005.INC".
       *
+      *    職員情報
+           COPY  "CPSK1010.INC".
+      *
            COPY  "CPSK1044.INC".
       *
       *    病棟マスタ
@@ -284,6 +282,18 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *   ＵＩＤ取得用エリア
+       01 UIDIO-AREA.
+           03  UIDIO-RET   PIC X(2).
+           03  UIDIO-UID   PIC X(36).
+       01  UIDIO-ST        PIC 9(2).
+      *
+           COPY    "CPORCSCOMMON.INC".
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
+      *
       *
       *    入院患者照会サブ
            COPY    "CPI2SUB02.INC".
@@ -363,6 +373,9 @@
            MOVE    SPACE           TO  SPA-AREA
            INITIALIZE                  SPA-AREA
       *
+      *    ＤＢオープン
+           PERFORM 120-DBOPEN-SEC
+      *
            UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
                                        INTO    WRK-PARA-PAFNAME
                                                WRK-PARA-TERMID
@@ -379,9 +392,29 @@
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
            MOVE    WRK-PARA-TERMID     TO  SPA-TERMID
+           MOVE    WRK-PARA-SYSYMD     TO  SPA-SYSYMD
+           MOVE    MCP-USER            TO  SPA-OPID
       *
-      *    ＤＢオープン
-           PERFORM 120-DBOPEN-SEC
+           INITIALIZE              ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"   USING
+                                   ORCSMCNDATEAREA
+      *
+           INITIALIZE              UIDIO-AREA.
+           CALL    "orcuidset"     USING
+                                   UIDIO-ST
+                                   UIDIO-AREA
+      *
+           MOVE    UIDIO-UID           TO  WRK-UUID
+      *
+      *    ＳＰＡ共通設定
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
       *
            CALL    "ORCSENCODING"          USING
                                            MCPAREA
@@ -547,19 +580,26 @@
                CLOSE   PRT-FILE
       *
                MOVE    SPACE           TO  SHELLTBL
-               MOVE    "HCALL2.sh"     TO  SHELLTBL-NAME
+               MOVE    "HCALL_prv.sh"  TO  SHELLTBL-NAME
       *
                MOVE    ASGNPARA (ASGNPARA-ST:)
                                        TO  SHELLTBL-ARG1
-               MOVE    WRK-ENCODING    TO  SHELLTBL-ARG2
+               MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
+               MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
+               MOVE    "0"             TO  SHELLTBL-ARG4
+               IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+                   MOVE    "入院患者検索結果一覧表"
+                                       TO  SHELLTBL-ARG5
+                   MOVE    SPA-CLIENT-SHOWDIALOG
+                                       TO  SHELLTBL-ARG6
+               END-IF
                MOVE    SHELLTBL        TO  MCPDATA-REC
+               MOVE    "SHELL"         TO  MCP-FUNC
                MOVE    "shell"         TO  MCP-TABLE
                MOVE    "daily"         TO  MCP-PATHNAME
-               MOVE    "SHELL"         TO  MCP-FUNC
-               CALL    "ORCDBMAIN"         USING
-                                           MCPAREA
-                                           MCPDATA-REC
-                                           SPA-AREA
+               CALL    "ORCDBMAIN"     USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
            END-IF
       *
            IF          WKBI201-PROC-FLG    =  ZERO
@@ -968,6 +1008,7 @@
       *
       *
            MOVE    SPACE           TO  PRT-REC
+           INITIALIZE                  PRT-REC
            MOVE    CONST-FORMID   TO  PRT-PRTID
            MOVE    WRK-PRTNM       TO  PRT-PRTNM
            MOVE    "1"             TO  PRT-SITEKBN
@@ -977,6 +1018,22 @@
            MOVE    "1"             TO  SFIXREDDATA-SITEKBN
            MOVE    PRT-PRTID       TO  SFIXREDDATA-FORMID
            MOVE    HCM40           TO  SFIXREDDATA-DATA
+      *
+      *
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+               MOVE    "5"         TO  PRT-PRTKBN
+           ELSE
+               MOVE    "6"         TO  PRT-PRTKBN
+           END-IF
+           MOVE    MCP-TEMPDIR     TO  PRT-OUT
+           MOVE    "ORCA0361"      TO  PRT-TBL-KEY
+           MOVE    1               TO  PRT-RENNUM
+           MOVE    SMCNDATE-YMD    TO  PRT-TBL-GROUP
+           MOVE    SMCNDATE-HMS    TO  PRT-TBL-GROUP(9:)
+           MOVE    1               TO  PRT-SHORI-RENNUM
+           MOVE    CNT-PAGE        TO  PRT-PAGE
+           MOVE    WRK-UUID        TO  PRT-UUID
+      *
            CALL    "ORCSFIXREDDATA"    USING
                                        SFIXREDDATA-AREA
                                        SPA-AREA

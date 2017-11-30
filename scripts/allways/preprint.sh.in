@@ -20,6 +20,10 @@ fi
 #
 	echo $#
         
-        lpr -P ${16} ${15}
+    if [ "${17}" == "1" ]; then
+      ${MONUPLOAD} -t report -p ${16} ${15}
+    else
+      lpr -P ${16} ${15}
+    fi
 
         exit 

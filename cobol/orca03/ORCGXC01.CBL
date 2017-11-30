@@ -1232,12 +1232,7 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    SPA-TERMID          TO  ERRFLPARA-TERMID
       *             
            MOVE    SPACE               TO  SHELLTBL
-           MOVE    "preprint.sh"       TO  WRK-SHELL-SHELL
-      *    ファイルデイレクトリ位置指定
-           INITIALIZE                  ORCSMKPASSAREA
-           MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+           MOVE    "preprint.sh"       TO  SHELLTBL-NAME
       *     
            MOVE    SPACE               TO  LNK-PRTKANRI-AREA
            INITIALIZE                      LNK-PRTKANRI-AREA
@@ -1273,8 +1268,6 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    WRK-CONS-JOB-JOBID  TO  SHELLTBL-ARG13
            MOVE    WRK-CONS-JOB-SHELLID
                                        TO  SHELLTBL-ARG14
-           MOVE    LNK-PRTKANRI-TBL-UUID
-                                       TO  SHELLTBL-ARG18
       *    MOVE    SPA-GMN-STPAGE      TO  SHELLTBL-ARG15
       *    MOVE    SPA-GMN-EDPAGE      TO  SHELLTBL-ARG16                      
            IF      SPA-XCID1-FLG    =   "OK"
@@ -1295,16 +1288,14 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
              MOVE    SPA-NAI-PRTNM    (SPA-NAI-SELNUM)
                                        TO  SHELLTBL-ARG16                                 
            END-IF
-           IF      SPA-XCIDCD          =   "1005"
-                   MOVE    "3"         TO  SHELLTBL-ARG17                                   
-           ELSE
-                   MOVE    "1"         TO  SHELLTBL-ARG17                                   
+           IF    SPA-CLIENT-PRT-FLG  =  2
+               MOVE    "1"             TO  SHELLTBL-ARG17
            END-IF
 grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "shell"             TO  MCP-PATHNAME
+           MOVE    "allways"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
@@ -1380,7 +1371,11 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
                                        TO  SHELLTBL-ARG15
            MOVE    SPA-NAI-PAGE (SPA-NAI-SELNUM)
                                        TO  SHELLTBL-ARG16
-           MOVE    "1"                 TO  SHELLTBL-ARG17
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+               MOVE    "5"             TO  SHELLTBL-ARG17
+           ELSE
+               MOVE    "1"             TO  SHELLTBL-ARG17
+           END-IF
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC

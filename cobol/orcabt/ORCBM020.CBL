@@ -45,6 +45,7 @@
       *
       *    印刷用データ
            SELECT  PRT-FILE        ASSIGN  ASGNPARA
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
                                    FILE    STATUS  IS  STS-PARA.
       *
       *    エラーファイル
@@ -57,7 +58,7 @@
       *
       *    印刷用データ
        FD  PRT-FILE.
-           COPY    "HC26.INC".
+           COPY    "CPPRTALL.INC".
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -124,6 +125,10 @@ grpsys COPY    "COMMON-SPA".
                05  WRK-SMM           PIC 9(02).
                05  WRK-SDD           PIC 9(02).
            03  WRK-HENYMDG           PIC X(22).
+           03  WRK-ENCODING        PIC X(01).
+           03  WRK-ENCODING9       REDEFINES WRK-ENCODING
+                                   PIC 9(01).
+           03  WRK-UUID            PIC X(36).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -149,6 +154,13 @@ grpsys COPY    "COMMON-SPA".
                05  SUM-KOH-FTNMONEY        PIC 9(10).
                05  SUM-KOH-YKZFTN          PIC 9(10).
       *
+       01  CONST-AREA.
+           03  CONST-FORMID        PIC X(20)   VALUE  "HC26.red".
+      *
+           COPY    "HC26.INC".
+      *
+           COPY    "CPSHELLTBL.INC".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -167,14 +179,28 @@ grpsys COPY    "COMMON-SPA".
       *    医療機関情報情報
            COPY    "CPSK1001.INC".
       *
+      *    職員情報
+           COPY  "CPSK1010.INC".
+      *
       *    出力先プリンタ名割り当て情報
            COPY  "CPSK1031.INC".
+      *
+           COPY    "CPSK1044.INC".
       *
            COPY    "CPRCF010.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+           COPY    "CPORCSCOMMON.INC".
+      *
+      *   ＵＩＤ取得用エリア
+       01 UIDIO-AREA.
+           03  UIDIO-RET   PIC X(2).
+           03  UIDIO-UID   PIC X(36).
+       01  UIDIO-ST        PIC 9(2).
+      *
       *
       *    印刷パラメタ
            COPY    "CPORCSMKPRT.INC".
@@ -242,6 +268,30 @@ grpsys COPY    "COMMON-SPA".
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
+           MOVE    SMCNDATE-YMD        TO  SPA-SYSYMD
+           MOVE    MCP-USER            TO  SPA-OPID
+      *
+           INITIALIZE              UIDIO-AREA.
+           CALL    "orcuidset"     USING
+                                   UIDIO-ST
+                                   UIDIO-AREA
+      *
+           MOVE    UIDIO-UID           TO  WRK-UUID
+      *
+      *    ＳＰＡ共通設定
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
+      *
+           CALL    "ORCSENCODING"          USING
+                                           MCPAREA
+                                           SPA-AREA
+           MOVE    SPA-ENCODING    TO      WRK-ENCODING9
       *     
            MOVE    WRK-PARA-SKYYM      TO  WRK-SRYYMD (1:6)
            MOVE    "01"                TO  WRK-SRYYMD (7:2)
@@ -282,6 +332,25 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1031-HOSPNUM
            ELSE    
                INITIALIZE                  SYS-1031-REC
            END-IF                                     
+      *
+           PERFORM 800-OFFSET-GET-SEC
+      *
+           MOVE    "HC26"              TO  HC01PARA-FORM-ID
+           MOVE    WRK-PARA-HOSPNUM    TO  HC01PARA-HOSPNUM
+           MOVE    WRK-PARA-TERMID64   TO  HC01PARA-TERMID
+           MOVE    SMCNDATE-HMS        TO  HC01PARA-SYOHMS
+           MOVE    1                   TO  HC01PARA-CNT
+      *
+           INITIALIZE                  SGETTEMP-AREA
+           MOVE    HC01PARA-BASENAME
+                                   TO  SGETTEMP-BASENAMES (1)
+           CALL    "ORCSGETTEMP"   USING
+                                   SGETTEMP-AREA
+           MOVE    SGETTEMP-FULLNAMES (1)
+                                   TO  ASGNPARA
+           MOVE    SGETTEMP-TEMPDIR
+                                   TO  MCP-TEMPDIR
+           MOVE    SGETTEMP-ST     TO  ASGNPARA-ST
       *  
            PERFORM 900-SEIKYU-SELECT-SEC 
            .
@@ -506,7 +575,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1031-HOSPNUM
       *    印刷処理
       *****************************************************************
        310-PRINT-SEC                SECTION.
-      *     
+      *
+           OPEN    OUTPUT              PRT-FILE
+      *
       *    帳票編集<見出し>処理
            PERFORM 310-HEAD-HEN-SEC
       *     
@@ -515,6 +586,29 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1031-HOSPNUM
       *
       *    帳票印刷処理
            PERFORM 390-PRINT-OUT-SEC
+      *
+           CLOSE   PRT-FILE
+      *
+           MOVE    SPACE           TO  SHELLTBL
+           MOVE    "HCALL_prv.sh"  TO  SHELLTBL-NAME
+           MOVE    ASGNPARA (ASGNPARA-ST:)
+                                   TO  SHELLTBL-ARG1
+           MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG2
+           MOVE    WRK-ENCODING    TO  SHELLTBL-ARG3
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+              MOVE    "決定通知書"
+                                   TO  SHELLTBL-ARG5
+              MOVE    SPA-CLIENT-SHOWDIALOG
+                                   TO  SHELLTBL-ARG6
+           END-IF
+           MOVE    SHELLTBL        TO  MCPDATA-REC
+           MOVE    "SHELL"         TO  MCP-FUNC
+           MOVE    "shell"         TO  MCP-TABLE
+           MOVE    "daily"         TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"     USING   MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+      *
            .
        310-PRINT-EXT.
            EXIT.
@@ -672,32 +766,29 @@ grpsys     PERFORM 900-DBSELECT-SEC
        390-PRINT-OUT-SEC                SECTION.
       *
       *　　印刷用データ出力
+           MOVE    SPACE               TO  PRT-REC 
+           INITIALIZE                      PRT-REC 
+           MOVE    CONST-FORMID        TO  PRT-PRTID
+           MOVE    SYS-1031-PRTNM(5)   TO  PRT-PRTNM
+           MOVE    SYS-1044-OFFSET-X   TO  PRT-OFFSET-X
+           MOVE    SYS-1044-OFFSET-Y   TO  PRT-OFFSET-Y
+           MOVE    "1"                 TO  PRT-SITEKBN
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+               MOVE    "5"             TO  PRT-PRTKBN
+           ELSE
+               MOVE    "1"             TO  PRT-PRTKBN
+           END-IF
+           MOVE    MCP-TEMPDIR         TO  PRT-OUT
+           MOVE    "HC26"              TO  PRT-TBL-KEY
+           MOVE    1                   TO  PRT-RENNUM
+           MOVE    SMCNDATE-YMD        TO  PRT-TBL-GROUP (1:8)
+           MOVE    SMCNDATE-HMS        TO  PRT-TBL-GROUP (9:6)
+           MOVE    1                   TO  PRT-SHORI-RENNUM
+           MOVE    CNT-PAGE            TO  PRT-PAGE  
+           MOVE    WRK-UUID            TO  PRT-UUID
+           MOVE    HC26                TO  PRT-PRTDATA
+           WRITE   PRT-REC
       *
-           ADD     1                   TO  WRK-HC01PARA-CNT 
-           MOVE    "HC26"              TO  HC01PARA-FORM-ID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  HC01PARA-HOSPNUM
-           MOVE    WRK-PARA-TERMID64   TO  HC01PARA-TERMID
-           MOVE    SMCNDATE-HMS        TO  HC01PARA-SYOHMS
-           MOVE    WRK-HC01PARA-CNT    TO  HC01PARA-CNT
-      *
-           INITIALIZE                  SGETTEMP-AREA
-           MOVE    HC01PARA-BASENAME   TO  SGETTEMP-BASENAME
-           CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
-           MOVE    SGETTEMP-FULLNAME   TO  ASGNPARA
-      *
-           OPEN    OUTPUT  PRT-FILE
-           WRITE   HC26
-           CLOSE                       PRT-FILE
-      *
-            INITIALIZE                 ORCSMKPRTAREA
-            MOVE   "HC01.sh"           TO  MKPRT-ID
-            MOVE   "HC26.red"          TO  MKPRT-DIA
-            MOVE   SPACE               TO  MKPRT-DEF
-            MOVE   ASGNPARA            TO  MKPRT-DAT
-            MOVE   SYS-1031-PRTNM(5)   TO  MKPRT-PRTNM
-            CALL   "ORCSMKPRT"         USING
-                                       ORCSMKPRTAREA
-                                       SPA-AREA
            .
        390-PRINT-OUT-EXT.
            EXIT.
@@ -719,6 +810,52 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  HC01PARA-HOSPNUM
        31012-SEIWA-HEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    オフセット取得処理
+      *****************************************************************
+       800-OFFSET-GET-SEC              SECTION.
+      *
+           INITIALIZE                      SYS-1044-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-1044-HOSPNUM
+           MOVE    "1044"              TO  SYS-1044-KANRICD
+           MOVE    CONST-FORMID        TO  SYS-1044-FORMID
+           STRING  SYS-1031-PRTNM(5)   DELIMITED  BY  SPACE
+                   "%"                 DELIMITED  BY  SIZE
+           INTO    SYS-1044-TBL(21:)
+           END-STRING
+           MOVE    "99999999"          TO  SYS-1044-STYUKYMD
+           MOVE    "99999999"          TO  SYS-1044-EDYUKYMD
+           MOVE    SYS-1044-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE  MCPDATA-REC       TO  SYS-1044-REC
+               ELSE
+                   INITIALIZE              SYS-1044-REC
+               END-IF
+           ELSE
+               INITIALIZE                  SYS-1044-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF   (  SYS-1044-FORMID  =   CONST-FORMID  )
+            AND (  SYS-1044-PRTNM   =   SYS-1031-PRTNM(5))
+               CONTINUE
+           ELSE
+               INITIALIZE  SYS-1044-REC
+           END-IF
+      *
+           .
+       800-OFFSET-GET-EXT.
+            EXIT.
       *****************************************************************
       *    請求管理読込
       *****************************************************************

@@ -30,6 +30,7 @@
       *  00.00.01    NACL-森脇     06.08.02  労災、自賠のプリンタ追加
       *  03.05.00    NACL-多々納  07/05/02  グループ診療対応
       *  04.08.01    NACL-森脇     16/09/06  GINBEE対応
+      *  05.00.00    NACL-太田     17/11/29  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -743,8 +744,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    MKPASS-OT-01    TO  SHELLTBL-ARG15
            MOVE    WRK-PRTNUM      TO  SHELLTBL-ARG16
       *
-      *     MOVE    "1"             TO  SHELLTBL-ARG17
-      *
+           IF    SPA-CLIENT-PRT-FLG  =  2
+               MOVE    "1"         TO  SHELLTBL-ARG17
+           END-IF
 grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
