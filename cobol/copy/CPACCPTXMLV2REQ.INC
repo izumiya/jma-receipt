@@ -24,8 +24,13 @@
             02  ACCPTREQ-MODE             PIC S9(9)   BINARY.
             02  ACCPTREQ-RECORDNAME       PIC X(128).
             02  ACCPTREQ-REGIST.
+      *       リクエスト番号
+              03  ACCPTREQ-REQUEST-NUMBER  PIC X(2).
       *       患者番号
-              03  ACCPTREQ-PATIENTID    PIC X(20).
+              03  ACCPTREQ-PATIENTID       PIC X(20).
+      *       患者氏名
+              03  ACCPTREQ-NAME            PIC X(50).
+      *
       *       受付日
               03  ACCPTREQ-REGIST-DATE  PIC X(10).
       *       受付時間

@@ -4,7 +4,9 @@ xml_acceptv2req {
     mode	int;
     recordname	varchar(128);
 	acceptreq {
-		Patient_ID			varchar(20);
+		Request_Number		varchar(2);
+		Patient_ID		varchar(20);
+		WholeName		varchar(50);
 		Acceptance_Date		varchar(10);
 		Acceptance_Time		varchar(8);
 		Acceptance_Id			varchar(5);

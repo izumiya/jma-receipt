@@ -31,6 +31,7 @@
       *  04.07.00    NACL-多々納  14/06/XX  ワーニングメッセージ対応他
       *  04.08.00    NACL-多々納  15/12/01  保険組合せ番号送信追加
       *  04.08.00    NACL-多々納  17/04/XX  保険組合せ非表示区分追加
+      *  05.00.00    NACL-多々納  17/10/XX  患者未登録受付対応追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -67,6 +68,9 @@
       *    ユーザプログラム起動
            03  FLG-GYOUMU-ARI          PIC 9(01).
            03  FLG-USERPG              PIC 9(01).
+      *
+           03  FLG-ERR                 PIC 9(01).
+           03  FLG-ERR2                PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -160,7 +164,16 @@
            03  WRK-SRYNAIYO            PIC X(02).
            03  WRK-SRYNAIYO-NAME       PIC X(24).
       *
+           03  WRK-NAME                PIC X(100).
+      *
            03  WRK-REGIST-ID           PIC X(05).
+      *
+      *    半角全角変換
+       01  WRK-HENKAN-AREA.
+           03  WRK-MAE-INPUT           PIC X(100).
+           03  WRK-ATO-INPUT           PIC X(100).
+           03  WRK-MAX                 PIC 9(04).
+           03  WRK-LEN                 PIC 9(04).
       *
       *    ＣＬＡＩＭファイル名
        01  CLAIM-FILE.
@@ -191,9 +204,16 @@
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
       *
-      *    COPY    "CPORCXKANACONV.INC".
+      *    全角チェックパラメタ
+           COPY    "CPORCSKANACHK.INC".
       *
-      *    COPY    "CPORCSKANACHK.INC".
+      *    全角チェックパラメタ（拡張)
+           COPY    "CPORCSKANACHK2.INC".
+      *
+      *    拡張文字対応
+           COPY    "CPORCSSTRING.INC".
+      **** COPY    "CPORCXKANACONV.INC".
+      *
       *    日付変換サブ
            COPY     "CPORCSGDAY.INC".
       *    日付変換サブ
@@ -411,13 +431,24 @@
            MOVE    ZERO                TO  IDK
       *
            MOVE    ZERO                TO  FLG-SYORI
-           EVALUATE    APIMOD-CLASS
+      *H29.10
+      *    リクエスト番号設定
+           IF      ACCPTREQ-REQUEST-NUMBER =   SPACE
+               IF      APIMOD-CLASS        =   "01"
+                                           OR  "02"
+                   MOVE    APIMOD-CLASS    TO  ACCPTREQ-REQUEST-NUMBER
+               END-IF
+           END-IF
+           EVALUATE    ACCPTREQ-REQUEST-NUMBER
            WHEN    "01"
       *        受付登録
                MOVE    1                   TO  FLG-SYORI
            WHEN    "02"
-               MOVE    2                   TO  FLG-SYORI
       *        受付削除
+               MOVE    2                   TO  FLG-SYORI
+           WHEN    "03"
+      *        受付更新（患者番号設定）
+               MOVE    3                   TO  FLG-SYORI
            WHEN    OTHER
                MOVE    "91"                TO  WRK-ERRCD
            END-EVALUATE
@@ -434,19 +465,17 @@
                GO      TO      200-MAIN-EXT
            END-IF
       *
-           EVALUATE    APIMOD-CLASS
+      **** EVALUATE    APIMOD-CLASS
+           EVALUATE    ACCPTREQ-REQUEST-NUMBER
            WHEN    "01"
-      *TEST
-               DISPLAY "受付登録"    
-      *TEST
       *        受付登録処理
                PERFORM 2002-UKE-ADD-SEC
            WHEN    "02"
-      *TEST
-               DISPLAY "受付取消"    
-      *TEST
       *        受付取消処理
                PERFORM 2003-UKE-DELETE-SEC
+           WHEN    "03"
+      *        受付更新処理
+               PERFORM 2004-UKE-UPDATE-SEC
            END-EVALUATE
       *
            .
@@ -531,6 +560,9 @@
                                            TO  ACCPTRES-API-RESULT-MSG
                    WHEN    2
                        MOVE    "受付削除終了"
+                                           TO  ACCPTRES-API-RESULT-MSG
+                   WHEN    3
+                       MOVE    "受付更新終了"
                                            TO  ACCPTRES-API-RESULT-MSG
                END-EVALUATE
            ELSE
@@ -716,11 +748,23 @@
            END-IF
       *    受付時間チェック
            IF      WRK-ERRCD           =   SPACE
-               PERFORM 20011-REGTIME-CHK-SEC
+      *H29.10  削除は空白あり
+               IF     (WRK-REGIST-TIME     =   SPACE  )
+                 AND  (FLG-SYORI           =   2      )
+                   CONTINUE
+               ELSE
+                   PERFORM 20011-REGTIME-CHK-SEC
+               END-IF
            END-IF
       *    患者番号チェック
            IF      WRK-ERRCD           =   SPACE
-               PERFORM 20011-PTNUM-CHK-SEC
+               IF     (WRK-PTNUM           =   SPACE )
+      *            患者氏名チェック
+                   PERFORM 20011-KNJANAME-CHK-SEC
+               ELSE
+      *            患者番号チェック
+                   PERFORM 20011-PTNUM-CHK-SEC
+               END-IF
            END-IF
       *    診療科コードチェック
            IF     (WRK-SRYKA       NOT =   SPACE  )
@@ -775,6 +819,8 @@
                MOVE    "K1"                TO  WRK-KEICD (IDK)
            END-IF
            IF     (WRK-REGIST-TIME     =   SPACE  )
+      *H29.10   更新は必須
+             AND  (FLG-SYORI           =   1      )
                MOVE    SMCNDATE-HMS        TO  WRK-REGIST-TIME
                ADD     1                   TO  IDK
                MOVE    "K2"                TO  WRK-KEICD (IDK)
@@ -790,24 +836,38 @@
       *    診療内容区分
            MOVE    ACCPTREQ-REGIST-DEP-INFO
                                            TO  WRK-SRYNAIYO
+      *H29.10
+      *    患者氏名
+           MOVE    ACCPTREQ-NAME       TO  ACCPTRES-NAME
+           MOVE    ACCPTREQ-NAME       TO  WRK-NAME
       *
       *    必須入力チェック
-      *    患者番号
+      *    患者番号、氏名
            IF      WRK-PTNUM           =   SPACE
+             AND  (WRK-NAME            =   SPACE )
                MOVE    "01"                TO  WRK-ERRCD
            END-IF
       *    診療科
            IF      WRK-SRYKA           =   SPACE
-               IF     (FLG-SYORI           =   1      )
+               IF     (FLG-SYORI           =   1
+                                           OR  3      )
                  AND  (WRK-ERRCD           =   SPACE  )
                    MOVE    "02"                TO  WRK-ERRCD
                END-IF
            END-IF
       *    ドクター
            IF      WRK-DRCD            =   SPACE
-               IF     (FLG-SYORI           =   1      )
+               IF     (FLG-SYORI           =   1
+                                           OR  3      )
                  AND  (WRK-ERRCD           =   SPACE  )
                    MOVE    "03"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *    診療内容
+           IF      WRK-SRYNAIYO            =   SPACE
+               IF     (FLG-SYORI           =   3      )
+                 AND  (WRK-ERRCD           =   SPACE  )
+                   MOVE    "15"                TO  WRK-ERRCD
                END-IF
            END-IF
            .
@@ -889,6 +949,26 @@
            END-IF
            .
        20011-PTNUM-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者氏名チェック
+      *****************************************************************
+       20011-KNJANAME-CHK-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  SPA-PTID
+           INITIALIZE                      PTINF-REC
+      *    全角チェック
+           MOVE    WRK-NAME            TO  WRK-MAE-INPUT
+           MOVE    50                  TO  WRK-LEN
+           PERFORM 891-HALF-ZEN2-SEC
+           MOVE    WRK-ATO-INPUT       TO  WRK-NAME
+                                           ACCPTRES-NAME
+           IF      FLG-ERR             =   1
+               MOVE    "25"                TO  WRK-ERRCD
+           END-IF
+           .
+       20011-KNJANAME-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1009,9 +1089,15 @@
       *****************************************************************
        2002-UKE-ADD-SEC        SECTION.
       *
+      *    患者番号なしの受付
+           IF      WRK-PTNUM           =   SPACE
+               PERFORM 20020-UKE-NAME-ADD-SEC
+               GO      TO              2002-UKE-ADD-EXT
+           END-IF
+      *
       *    患者情報内容編集
            PERFORM 20021-ACCPTRES-HEN-SEC
-      * 
+      *
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
            IF      SLOCK-RETURN    NOT =   ZERO
@@ -1049,7 +1135,17 @@
            MOVE    WRK-HEN-DATE        TO  ACCPTRES-REGIST-DATE
            MOVE    WRK-HEN-TIME        TO  ACCPTRES-REGIST-TIME
       *
+           MOVE    WRK-SRYKA-NAME      TO  ACCPTRES-REGIST-DEP-NAME
+           MOVE    WRK-DRCD-NAME       TO  ACCPTRES-REGIST-DR-NAME
+      *
+           IF      SPA-PTID            =   ZERO
+               GO      TO      20021-ACCPTRES-HEN-EXT
+           END-IF
+      *
            MOVE    PTINF-NAME          TO  ACCPTRES-NAME
+      *    患者氏名
+           MOVE    PTINF-NAME          TO  WRK-NAME
+      *
            MOVE    PTINF-KANANAME      TO  ACCPTRES-KANANAME
            MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
            MOVE    ZERO                TO  WRK-THMS
@@ -1062,8 +1158,6 @@
                                        INTO    ACCPTRES-HOME-ADDRESSES
            END-STRING
       *
-           MOVE    WRK-SRYKA-NAME      TO  ACCPTRES-REGIST-DEP-NAME
-           MOVE    WRK-DRCD-NAME       TO  ACCPTRES-REGIST-DR-NAME
            .
        20021-ACCPTRES-HEN-EXT.
            EXIT.
@@ -1092,6 +1186,7 @@
       *    保険組合せ編集処理
            INITIALIZE                      ORCSAPIHKNAREA
            IF      FLG-SYORI           =   1
+                                       OR  3
       *        追加処理
                MOVE    "1"                 TO  ORCSAPIHKN-KBN
            ELSE
@@ -1190,6 +1285,7 @@
            IF      WRK-ERRCD           =   SPACE
                INITIALIZE                      ORCSAPIHKNAREA
                IF      FLG-SYORI           =   1
+                                           OR  3
       *            追加処理
                    MOVE    "1"                 TO  ORCSAPIHKN-KBN
                ELSE
@@ -1376,7 +1472,6 @@
       *****************************************************************
        20022-UKEADD-SYORI-SEC              SECTION.
       *
-      *?** ACCEPT  WRK-TIME              FROM   TIME
       *    受付２重登録疑いチェック
            PERFORM 200221-UKECHEK-SEC
            IF      FLG-UKETUKE-CHK     =   1
@@ -1386,6 +1481,36 @@
       *
       *    予約マスタの検索
            PERFORM 200222-YYKCHK-SEC
+      *
+      *    受付登録処理
+           PERFORM 200224-UKETUKE-INS-SEC
+      *
+      *    予約来院済み
+           IF      FLG-YYKHIT          =   1
+               PERFORM 20023-YYK-UPDATE-SEC
+           END-IF
+      *!!
+           DISPLAY "受付 登録 OK"
+      *!!
+      *    CLAIM送信チェック
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 4905-CLAIM-CHK-SEC
+           END-IF
+      *
+      *    ユーザ起動プログラム起動チェック
+           MOVE    1                   TO  FLG-USERPG
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 4907-USERPG-SEC
+           END-IF
+      *
+           .
+       20022-UKEADD-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    受付登録処理
+      *****************************************************************
+       200224-UKETUKE-INS-SEC            SECTION.
       *
       *    受付ＩＤ＝００検索(制御レコード)
            MOVE    SPACE               TO  UKETUKE-REC
@@ -1398,12 +1523,13 @@
                ADD     1                   TO  UKE-PTID
                IF      UKE-PTID            >   99999
                    MOVE    "50"                TO  WRK-ERRCD
-                   GO  TO  20022-UKEADD-SYORI-EXT
+                   GO  TO  200224-UKETUKE-INS-EXT
                END-IF
                MOVE    UKE-PTID            TO  WRK-UKEID
       *
                MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
                MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
+               MOVE    WRK-OPID            TO  UKE-OPID
       *
                MOVE    UKETUKE-REC         TO  MCPDATA-REC
                MOVE    "DBUPDATE"          TO  MCP-FUNC
@@ -1439,7 +1565,7 @@
                MOVE    "51"                TO  WRK-ERRCD
                DISPLAY "UKETUKE KEY INS ERR:"  MCP-RC
                        ",KEY:" UKE-KEY
-               GO  TO  20022-UKEADD-SYORI-EXT
+               GO  TO  200224-UKETUKE-INS-EXT
            END-IF
       *
       *    受付ＩＤを出力項目へ
@@ -1456,7 +1582,7 @@
            IF      FLG-UKETUKE         =   ZERO
                MOVE    "52"                TO  WRK-ERRCD
                DISPLAY "UKETUKE INS ERR KEY:"  UKE-KEY
-               GO  TO  20022-UKEADD-SYORI-EXT
+               GO  TO  200224-UKETUKE-INS-EXT
            END-IF
       *
       *    明細レコード追加
@@ -1466,7 +1592,8 @@
            MOVE    WRK-UKEID           TO  UKE-UKEID
            MOVE    WRK-REGIST-TIME     TO  UKE-UKETIME
            MOVE    SPA-PTID            TO  UKE-PTID
-           MOVE    PTINF-NAME          TO  UKE-NAME
+      **** MOVE    PTINF-NAME          TO  UKE-NAME
+           MOVE    WRK-NAME            TO  UKE-NAME
            MOVE    WRK-SRYKA           TO  UKE-SRYKA
            MOVE    WRK-DRCD            TO  UKE-DRCD
            MOVE    WRK-SRYNAIYO        TO  UKE-SRYNAIYO
@@ -1496,29 +1623,10 @@
                MOVE    "52"                TO  WRK-ERRCD
                DISPLAY "U02 UKETUKE INS ERR:"  MCP-RC
                        ",KEY:" UKE-KEY
-               GO  TO  20022-UKEADD-SYORI-EXT
+               GO  TO  200224-UKETUKE-INS-EXT
            END-IF
-      *
-      *    予約来院済み
-           IF      FLG-YYKHIT          =   1
-               PERFORM 20023-YYK-UPDATE-SEC
-           END-IF
-      *!!
-           DISPLAY "受付 登録 OK"
-      *!!
-      *    CLAIM送信チェック
-           IF      WRK-ERRCD           =   SPACE
-               PERFORM 4905-CLAIM-CHK-SEC
-           END-IF
-      *
-      *    ユーザ起動プログラム起動チェック
-           MOVE    1                   TO  FLG-USERPG
-           IF      WRK-ERRCD           =   SPACE
-               PERFORM 4907-USERPG-SEC
-           END-IF
-      *
            .
-       20022-UKEADD-SYORI-EXT.
+       200224-UKETUKE-INS-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1675,12 +1783,56 @@
            EXIT.
       *
       *****************************************************************
+      *    患者番号なしの受付処理
+      *****************************************************************
+       20020-UKE-NAME-ADD-SEC     SECTION.
+      *
+      *    予約日・予約時間編集
+           MOVE    WRK-REGIST-YMD      TO  WRK-SYMD
+           MOVE    WRK-REGIST-TIME     TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  ACCPTRES-REGIST-DATE
+           MOVE    WRK-HEN-TIME        TO  ACCPTRES-REGIST-TIME
+      *
+           MOVE    WRK-SRYKA-NAME      TO  ACCPTRES-REGIST-DEP-NAME
+           MOVE    WRK-DRCD-NAME       TO  ACCPTRES-REGIST-DR-NAME
+      *    患者氏名
+           MOVE    WRK-NAME            TO  ACCPTRES-NAME
+      *
+      *    受付登録処理
+           PERFORM 200224-UKETUKE-INS-SEC
+           .
+       20020-UKE-NAME-ADD-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    受付削除
       *****************************************************************
        2003-UKE-DELETE-SEC     SECTION.
       *
       *    患者情報内容編集
            PERFORM 20021-ACCPTRES-HEN-SEC
+      *
+      *    受付ＩＤ編集
+           IF      WRK-REGIST-ID   NOT =   SPACE
+               PERFORM 20031-UKEID-CHK-SEC
+      *        患者番号送信時、一致すること
+               IF     (WRK-PTNUM       NOT =   SPACE )
+                 AND  (UKE-PTID        NOT =   PTINF-PTID )
+                 AND  (WRK-ERRCD           =   SPACE  )
+      *            患者ＩＤ不一致
+                   MOVE    "20"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO              2003-UKE-DELETE-EXT
+           END-IF
+      *    患者番号なし
+           IF     (WRK-REGIST-ID   NOT =   SPACE )
+              AND (UKE-PTID            =   ZERO  )
+               PERFORM 20030-UKE-NAME-DEL-SEC
+               GO      TO              2003-UKE-DELETE-EXT
+           END-IF
       *
       *    排他チェック & ロック処理
            PERFORM 990-LOCK-IN-SEC
@@ -1697,23 +1849,6 @@
       *    保険組合せ編集処理
            PERFORM 20023-HKNCOMBI-HEN-SEC
       *
-      *    受付ＩＤ編集
-           IF      WRK-REGIST-ID   NOT =   SPACE
-      *        数値変換
-               INITIALIZE                      ORCSNUMAREA
-               MOVE    WRK-REGIST-ID       TO  SNUM-INX
-               CALL    "ORCSNUM"           USING
-                                           ORCSNUMAREA
-               IF     (SNUM-RC         NOT =   ZERO  )   OR
-                      (SNUM-SEISUU         >   5     )   OR
-                      (SNUM-SYOKBN         =   "1"   )   OR
-                      (SNUM-MINKBN         =   "1"   )
-                   MOVE    "19"                TO  WRK-ERRCD
-               ELSE
-                   MOVE    SNUM-OUTEDT(11:5)   TO  WRK-REGIST-ID
-               END-IF
-           END-IF
-      *
            IF      WRK-ERRCD           =   SPACE
       *    受付削除処理
                IF      WRK-REGIST-ID       =   SPACE OR  ZERO
@@ -1726,6 +1861,44 @@
            END-IF
            .
        2003-UKE-DELETE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    受付ＩＤチェック処理
+      *****************************************************************
+       20031-UKEID-CHK-SEC             SECTION.
+      *
+      *    数値変換
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    WRK-REGIST-ID       TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-SEISUU         >   5     )   OR
+                  (SNUM-SYOKBN         =   "1"   )   OR
+                  (SNUM-MINKBN         =   "1"   )
+               MOVE    "19"                TO  WRK-ERRCD
+           ELSE
+               MOVE    SNUM-OUTEDT(11:5)   TO  WRK-REGIST-ID
+           END-IF
+           IF     (WRK-ERRCD       NOT =   SPACE )
+               OR (WRK-REGIST-ID       =   ZERO )
+               GO  TO  20031-UKEID-CHK-EXT
+           END-IF
+      *
+      *    受付マスタ検索
+           INITIALIZE                      UKETUKE-REC
+           MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+           MOVE    WRK-REGIST-ID       TO  UKE-UKEID
+      *
+           PERFORM 900-UKETUKE-READ-SEC
+           IF      FLG-UKETUKE     NOT =   ZERO
+      *        受付なし
+               MOVE    "17"                TO  WRK-ERRCD
+           END-IF
+           .
+       20031-UKEID-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2089,8 +2262,17 @@
       *    診療内容
            MOVE    UKE-SRYNAIYO        TO  ACCPTRES-REGIST-DEP-INFO
       *    保険組合せ編集
-           MOVE    UKE-HKNCOMBI       TO  WRK-HKNCOMBI
-           PERFORM 20023-HKNHENSYU-SEC
+           IF      UKE-PTID            =   ZERO
+               CONTINUE
+           ELSE
+               MOVE    UKE-HKNCOMBI       TO  WRK-HKNCOMBI
+               PERFORM 20023-HKNHENSYU-SEC
+           END-IF
+      *    患者氏名
+           IF      UKE-PTID            =   ZERO
+               INITIALIZE                  ACCPTRES-PATIENT-INFOMATION
+               MOVE    UKE-NAME            TO  ACCPTRES-NAME
+           END-IF
            .
        2003211-DELETE-HEN-EXT.
            EXIT.
@@ -2102,23 +2284,26 @@
       *
            DISPLAY "受付削除(ID あり )  " WRK-REGIST-ID
       *
-      *    受付マスタ削除
-           INITIALIZE                      UKETUKE-REC
-           MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
-           MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
-           MOVE    WRK-REGIST-ID       TO  UKE-UKEID
+      *    INITIALIZE                      UKETUKE-REC
+      *    MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+      *    MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+      *    MOVE    WRK-REGIST-ID       TO  UKE-UKEID
       *
-           PERFORM 900-UKETUKE-READ-SEC
-           IF      FLG-UKETUKE         =   ZERO
-               IF      UKE-PTID            =   PTINF-PTID
+      *    PERFORM 900-UKETUKE-READ-SEC
+      *    IF      FLG-UKETUKE         =   ZERO
+      *        IF      UKE-PTID            =   PTINF-PTID
       *            受付削除
-                   PERFORM 200321-UKETUKE-DEL-SEC
-               ELSE
+      *            PERFORM 200321-UKETUKE-DEL-SEC
+      *        ELSE
       *            患者ＩＤ不一致
-                   MOVE    "20"                TO  WRK-ERRCD
-               END-IF
-           ELSE
-               MOVE    "17"                TO  WRK-ERRCD
+      *            MOVE    "20"                TO  WRK-ERRCD
+      *        END-IF
+      *    ELSE
+      ***      MOVE    "17"                TO  WRK-ERRCD
+      **** END-IF
+           IF      UKE-PTID            =   PTINF-PTID
+      *        受付削除
+               PERFORM 200321-UKETUKE-DEL-SEC
            END-IF
       *
       *    ユーザ起動プログラム起動チェック
@@ -2128,6 +2313,44 @@
            END-IF
            .
        20031-SAKUJO-ARI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者番号なし受付削除処理
+      *****************************************************************
+       20030-UKE-NAME-DEL-SEC            SECTION.
+      *
+      *    受付ＩＤ必須
+           IF      WRK-REGIST-ID       =   SPACE
+                                       OR  ZERO
+               MOVE    "26"                TO  WRK-ERRCD
+           END-IF
+      *
+           IF      WRK-ERRCD           =   SPACE
+      *        受付の患者番号がないこと
+               IF     (FLG-UKETUKE         =   ZERO )
+                 AND  (UKE-PTID            =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    "27"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *    受付時間が一致すること
+           IF      WRK-ERRCD           =   SPACE
+               IF      UKE-UKETIME     NOT =   WRK-REGIST-TIME
+                   MOVE    "29"            TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
+           INITIALIZE                      ORCSAPIHKNAREA
+      *
+           IF      WRK-ERRCD           =   SPACE
+      *        受付削除
+               PERFORM 200321-UKETUKE-DEL-SEC
+           END-IF
+      *
+           .
+       20030-UKE-NAME-DEL-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2181,6 +2404,212 @@
        200321-DEL-YYKUPD-EXT.
            EXIT.
       *****************************************************************
+      *    受付更新処理
+      *****************************************************************
+       2004-UKE-UPDATE-SEC                SECTION.
+      *
+      *    患者番号なし
+           IF     (WRK-PTNUM           =   SPACE )
+               MOVE    "01"                TO  WRK-ERRCD
+           END-IF
+           IF     (WRK-REGIST-ID       =   SPACE
+                                       OR  ZERO  )
+             AND  (WRK-ERRCD           =   SPACE )
+               MOVE    "26"                TO  WRK-ERRCD
+           END-IF
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      2004-UKE-UPDATE-EXT
+           END-IF
+      *
+      *    受付データチェック
+           PERFORM 20031-UKEID-CHK-SEC
+           IF      FLG-UKETUKE         =   ZERO
+      *        受付の患者番号がないこと
+               IF      UKE-PTID        NOT =   ZERO
+                   MOVE    "27"            TO  WRK-ERRCD
+               END-IF
+      *        受付時間が一致すること
+               IF      WRK-ERRCD           =   SPACE
+                   IF      UKE-UKETIME     NOT =   WRK-REGIST-TIME
+                       MOVE    "29"            TO  WRK-ERRCD
+                   END-IF
+               END-IF
+           ELSE
+               MOVE    "28"                TO  WRK-ERRCD
+           END-IF
+      *    患者情報内容編集
+           PERFORM 20021-ACCPTRES-HEN-SEC
+      *
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      2004-UKE-UPDATE-EXT
+           END-IF
+      *
+      *    排他チェック & ロック処理
+           PERFORM 990-LOCK-IN-SEC
+           IF      SLOCK-RETURN    NOT =   ZERO
+               MOVE    "90"            TO  WRK-ERRCD
+               GO      TO              2004-UKE-UPDATE-EXT
+           END-IF
+      * 
+           PERFORM 990-LOCK-OUT-SEC
+           IF      SLOCK-RETURN   NOT =   ZERO
+               DISPLAY "ロック解除失敗"
+           END-IF
+      *
+      *    保険組合せ編集処理
+           PERFORM 20023-HKNCOMBI-HEN-SEC
+      *
+      *    出力領域保険情報編集
+           PERFORM 20023-HKNHENSYU-SEC
+      *
+      *    受付２重登録疑いチェック
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 200221-UKECHEK-SEC
+               IF      FLG-UKETUKE-CHK     =   1
+                   MOVE    "16"                TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
+      *    受付登録処理
+           IF      WRK-ERRCD           =   SPACE
+               PERFORM 20042-UKEUPD-SYORI-SEC
+           END-IF
+           .
+       2004-UKE-UPDATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    受付更新処理
+      *****************************************************************
+       20042-UKEUPD-SYORI-SEC             SECTION.
+      *
+      *    受付検索
+           INITIALIZE                      UKETUKE-REC
+           MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
+           MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
+           MOVE    WRK-REGIST-ID       TO  UKE-UKEID
+           PERFORM 900-UKETUKE-READ-SEC
+           IF      FLG-UKETUKE     NOT =   ZERO
+               MOVE    "28"                TO  WRK-ERRCD
+               GO  TO  20042-UKEUPD-SYORI-EXT
+           END-IF
+      *    受付の患者番号がないこと
+           IF      UKE-PTID        NOT =   ZERO
+               MOVE    "27"            TO  WRK-ERRCD
+               GO  TO  20042-UKEUPD-SYORI-EXT
+           END-IF
+      *
+      *    明細レコード更新
+           MOVE    SPA-PTID            TO  UKE-PTID
+           MOVE    PTINF-NAME          TO  UKE-NAME
+           MOVE    WRK-SRYKA           TO  UKE-SRYKA
+           MOVE    WRK-DRCD            TO  UKE-DRCD
+           MOVE    WRK-SRYNAIYO        TO  UKE-SRYNAIYO
+           MOVE    WRK-HKNCOMBI        TO  UKE-HKNCOMBI
+      *
+           MOVE    SMCNDATE-YMD        TO  UKE-UPYMD
+           MOVE    SMCNDATE-HMS        TO  UKE-UPHMS
+      *
+           MOVE    WRK-OPID            TO  UKE-OPID
+      *
+      *    受付登録
+           MOVE    UKETUKE-REC         TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_uketuke"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               MOVE    "51"                TO  WRK-ERRCD
+               DISPLAY "UKETUKE UPDATE ERR:" MCP-RC
+                      ",KEY:"  UKE-KEY
+           END-IF
+      *
+           .
+       20042-UKEUPD-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    半角空白を全角空白へ変換処理（外字あり）
+      *****************************************************************
+       891-HALF-ZEN2-SEC         SECTION.
+      *
+           IF     SPA-ENCODING         =   2
+      *        拡張漢字対応
+               PERFORM 8910-HALF-ZENC2-SEC
+           ELSE
+      *        拡張漢字不可
+               PERFORM 890-HALF-ZEN-SEC
+           END-IF
+      *
+           .
+       891-HALF-ZEN2-EXT.
+           EXIT.
+      *****************************************************************
+      *    半角空白を全角空白へ変換処理（外字あり）
+      *****************************************************************
+       8910-HALF-ZENC2-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSKANACHK2AREA
+           MOVE    "1"                 TO  KANACHK2-SYORI
+           MOVE    WRK-MAE-INPUT       TO  KANACHK2-MAE-INPUT
+           MOVE    WRK-LEN             TO  KANACHK2-MAX-CNT
+           CALL    "ORCSKANACHK2"      USING
+                                       ORCSKANACHK2AREA
+           MOVE    KANACHK2-MAE-INPUT  TO  WRK-MAE-INPUT
+           IF     (KANACHK2-RC     NOT =   ZERO  )  OR
+                  (KANACHK2-SYUBETU    =   1     )
+      *ver.5.1 から　改行エラー
+      *******  OR (KANACHK2-RC5    NOT =   ZERO  ) 
+               MOVE    1                   TO  FLG-ERR
+               MOVE    KANACHK2-MAE-INPUT  TO  WRK-ATO-INPUT
+           ELSE
+               MOVE    ZERO                TO  FLG-ERR
+               MOVE    KANACHK2-OUT-INPUT  TO  WRK-ATO-INPUT
+           END-IF
+      *
+           .
+       8910-HALF-ZENC2-EXT.
+           EXIT.
+      *****************************************************************
+      *    半角空白を全角空白へ変換処理
+      *****************************************************************
+       890-HALF-ZEN-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ERR
+      ***  MOVE    ZERO                TO  FLG-ERR2
+      *    拡張漢字有無
+      *    INITIALIZE                  ORCSSTRINGAREA
+      *    MOVE    "check"             TO  ORCSSTR-COMMAND
+      *    MOVE    WRK-MAE-INPUT       TO  ORCSSTR-STRING1
+      *    CALL    "orcsstring"        USING
+      *                                ORCSSTRINGAREA
+      *    IF      ORCSSTR-NUM2    NOT =   ZERO
+      *        MOVE    1                   TO  FLG-ERR2
+      **** END-IF
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
+           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
+           IF     (KANACHK-RC      NOT =   ZERO  )  OR
+                  (KANACHK-SYUBETU     =   1     )
+      *ver.5.1 から　改行エラー
+      *******  OR (KANACHK-RC4     NOT =   ZERO  ) 
+               MOVE    1                   TO  FLG-ERR
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
+           ELSE
+               MOVE    KANACHK-OUT-INPUT   TO  WRK-ATO-INPUT
+           END-IF
+      *
+           .
+       890-HALF-ZEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    日付編集処理
       *****************************************************************
        801-DAYHEN01-SEC                SECTION.
@@ -2202,6 +2631,13 @@
            MOVE    WRK-TSS             TO  WRK-HEN-TSS
            MOVE    ":"                 TO  WRK-HEN-T1
            MOVE    ":"                 TO  WRK-HEN-T2
+      *
+           IF      WRK-SYMD            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-DATE
+           END-IF
+           IF      WRK-THMS            =   SPACE
+               MOVE    SPACE               TO  WRK-HEN-TIME
+           END-IF
            .
        801-DAYHEN01-EXT.
            EXIT.
@@ -2289,6 +2725,23 @@
            WHEN    "24"
                MOVE    "保険組合せ番号がありません"
                                                TO  WRK-ERRMSG
+      *H29.10
+           WHEN    "25"
+               MOVE    "患者氏名にエラーがあります"
+                                               TO  WRK-ERRMSG
+           WHEN    "26"
+               MOVE    "受付ＩＤが未設定です。"
+                                               TO  WRK-ERRMSG
+           WHEN    "27"
+               MOVE    "該当の受付は患者番号の設定があります。"
+                                               TO  WRK-ERRMSG
+           WHEN    "29"
+               MOVE    "該当の受付と受付時間が一致しません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "28"
+               MOVE    "更新対象の受付レコードが存在しません"
+                                               TO  WRK-ERRMSG
+      *
            WHEN    "50"
                STRING  "受付登録件数が上限以上となります。"
                        "登録できません。"
