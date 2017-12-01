@@ -310,7 +310,8 @@
            MOVE    SLDUSER-WINDOW(IDXT)
                                    TO  SPA-SAKIPG
       *
-           IF    ( SPA-SAKIPG(1:1)     =   "X" )
+           EVALUATE    TRUE
+           WHEN  ( SPA-SAKIPG(1:1)     =   "X" )
                IF    (  SPA-SAKIPG(2:1)     IS  NUMERIC )
                   OR (  SPA-SAKIPG(1:4)     =   "XERR" )
                   OR (  SPA-SAKIPG(1:3)     =   "XID" )
@@ -318,7 +319,9 @@
                ELSE
                    MOVE    "?"         TO  SPA-SAKIPG(1:1)
                END-IF
-           END-IF
+           WHEN  ( SPA-SAKIPG               =   "P97" )
+                   MOVE    "?"         TO  SPA-SAKIPG(1:1)
+           END-EVALUATE
       *
            CALL    "ORCSGYOUMUGET"     USING
                                        SPA-AREA
