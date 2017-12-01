@@ -6996,7 +6996,7 @@
       *****************************************************************
       *    ＣＬＡＩＭ接続情報取得処理
       *****************************************************************
-       49061-CLAIM-SOUSINSYOSI-SEC               SECTION.
+       49061-CLAIM-SOUSINSYOSI-SEC     SECTION.
       *
       *    フィアルデイレクトリ位置指定
            INITIALIZE                  ORCSMKPASSAREA
@@ -7269,6 +7269,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    HAPRI　処理
       *****************************************************************
        300-HAORI-SYORI-SEC                SECTION.
+      *
+            MOVE    1                   TO  FLG-END
       *
            IF      SPA-API-FLG     NOT =   1
                MOVE    "XXXX"          TO  SPA-ERRCD
