@@ -511,7 +511,7 @@
       *
            IF      WRK-ERRCD           =   "99"
       *        ユーザＩＤエラー
-               MOVE   404                  TO  APILST04-HTTPSTATUS
+               MOVE   404                  TO  APILST05-HTTPSTATUS
            ELSE
       *        返却領域編集
                PERFORM 300-APTXMLMAKE-SEC
@@ -556,6 +556,7 @@
            MOVE    WRK-HEN-TIME        TO  MDCRES-INFORMATION-TIME
       *
       *    医療機関識別番号セット 
+           MOVE    "API"               TO  SPA-MOTOPG
            CALL    "ORCSHOSPNUM"       USING
                                        MCPAREA
                                        SPA-AREA
