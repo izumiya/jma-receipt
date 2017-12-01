@@ -10892,37 +10892,9 @@
                                            SYUNOU-REC
                                            SPA-AREA
       *
-      *    ÅÁÉ¼ÈÖ¹æ»ÞÈÖ¤òµá¤á¤ë
-           MOVE    ZERO                TO  FLG-SYUMEI
-           INITIALIZE                      SYUMEI-REC
-           MOVE    SYU-HOSPNUM          TO  SMEI-HOSPNUM
-           MOVE    SYU-NYUGAIKBN       TO  SMEI-NYUGAIKBN
-           MOVE    SYU-PTID            TO  SMEI-PTID
-           MOVE    SYU-DENPNUM         TO  SMEI-DENPNUM
-           MOVE    SYUMEI-REC          TO  MCPDATA-REC
-           MOVE    "tbl_syumei"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      NOT =   ZERO )
-               MOVE    1               TO  FLG-SYUMEI
-           END-IF
+           PERFORM 900-SYUMEI-KEY14-SEL-SEC
       *
-      *
-           PERFORM VARYING  IDX13  FROM    1   BY   1
-               UNTIL ( FLG-SYUMEI  =   1)
-      *
-               MOVE    "tbl_syumei"        TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC      NOT =   ZERO )
-                   MOVE    1               TO  FLG-SYUMEI
-               END-IF
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_syumei"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+           COMPUTE IDX13 =  SMEI-DENPEDANUM + 1
       *
            MOVE    SPACE               TO  SYUMEI-REC
            INITIALIZE                      SYUMEI-REC
@@ -21069,6 +21041,37 @@
            PERFORM 910-DBCLOSECURSOR-SEC
            .
        900-PTCONF-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼ýÇ¼ÌÀºÙ¸¡º÷½èÍý
+      *****************************************************************
+       900-SYUMEI-KEY14-SEL-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUMEI
+      *
+           INITIALIZE                      SYUMEI-REC
+           MOVE    SYU-HOSPNUM          TO  SMEI-HOSPNUM
+           MOVE    SYU-NYUGAIKBN       TO  SMEI-NYUGAIKBN
+           MOVE    SYU-PTID            TO  SMEI-PTID
+           MOVE    SYU-DENPNUM         TO  SMEI-DENPNUM
+           MOVE    SYUMEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syumei"        TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUMEI-REC
+           ELSE
+               MOVE    1               TO  FLG-SYUMEI
+               INITIALIZE                  SYUMEI-REC
+           END-IF
+      *
+           MOVE    "tbl_syumei"        TO  MCP-TABLE
+           MOVE    "key14"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-SYUMEI-KEY14-SEL-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)
