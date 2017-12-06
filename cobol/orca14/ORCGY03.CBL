@@ -844,8 +844,9 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC        TO  SYS-1010-REC
       *        最後の行へ編集する
-               IF      SPA-DRCD-MAX        =   99
-                   MOVE    99              TO  SPA-DRCD-MAX
+               IF      SPA-DRCD-MAX        >=  100
+      *            MOVE    99              TO  SPA-DRCD-MAX
+                   CONTINUE
                ELSE
                    ADD     1               TO  SPA-DRCD-MAX
                END-IF
@@ -1236,6 +1237,12 @@
                    MOVE    1                   TO  FLG-CHK
                END-IF
            END-PERFORM
+      *H29.12
+      *    対象なし
+           IF      FLG-CHK             =   ZERO
+               PERFORM 2021-DRCD-CHK-SEC
+           END-IF
+      *
            IF      FLG-CHK             =   ZERO
                MOVE    "0002"              TO  SPA-ERRCD
                MOVE    2                   TO  SPA-GMN-CUR
@@ -1247,8 +1254,67 @@
                PERFORM 310-SPASET-SEC
                MOVE    3                   TO  SPA-GMN-CUR
            END-IF
-          .
+           .
        202-DRNAME-HEN-EXT.
+           EXIT.
+      *
+      *H29.12
+      *****************************************************************
+      *    ドクターチェック　処理
+      *****************************************************************
+       2021-DRCD-CHK-SEC           SECTION.
+      *
+      *
+           MOVE    SPACE               TO  SYS-1010-REC
+           INITIALIZE                  SYS-1010-REC
+           MOVE    "1010"              TO  SYS-1010-KANRICD
+           MOVE    "1"                 TO  SYS-1010-KBNCD(1:1)
+           MOVE    SPA-GMN-DRCD        TO  SYS-1010-KBNCD(2:4)
+      *
+           MOVE    SPA-NAI-SINYMD      TO  SYS-1010-STYUKYMD
+           MOVE    SPA-NAI-SINYMD      TO  SYS-1010-EDYUKYMD
+      *
+      *    システム管理検索
+           MOVE    SPA-HOSPNUM         TO  SYS-1010-HOSPNUM
+           MOVE    SYS-1010-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               INITIALIZE                  SYS-1010-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1010-REC
+      *        最後の行へ編集する
+               IF      SPA-DRCD-MAX        >=  100
+                   CONTINUE
+               ELSE
+                   ADD     1               TO  SPA-DRCD-MAX
+               END-IF
+               MOVE    SPACE               TO  SPA-GMN-DRNAMELST
+                                                      (SPA-DRCD-MAX)
+               MOVE    SYS-1010-KBNCD(2:4) TO  SPA-GMN-DRNCDL
+                                                      (SPA-DRCD-MAX)
+               MOVE    SYS-1010-NAME       TO  SPA-GMN-DRNAMEMEIL
+                                                      (SPA-DRCD-MAX)
+               MOVE    "1"                 TO  SPA-NAI-DRCDFLG
+                                                      (SPA-DRCD-MAX)
+      *
+               MOVE    SPA-GMN-DRNAMELST(SPA-DRCD-MAX)
+                                           TO  SPA-GMN-DRNAME
+      *
+               MOVE    1                   TO  FLG-CHK
+           END-IF
+           .
+       2021-DRCD-CHK-EXT.
            EXIT.
       *
       *
