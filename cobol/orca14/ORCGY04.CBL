@@ -102,6 +102,8 @@
       *    Í½Ìó´µ¼Ô°ìÍ÷£Ð£ÇÌ¾
            03  WRK-YYKICH-PG           PIC X(20).
       *
+           03  WRK-GMN-DRCD            PIC X(04).
+      *
       *    £Ó£Ï£Ò£ÔÍÑ¥ï¡¼¥¯
        01  WRK-SORT-AREA.
            03  WRK-YYKTIME                 PIC X(04).
@@ -920,10 +922,29 @@
       *****************************************************************
        41012-DRNAME-SEC            SECTION.
       *
+      *H29.12
+      *    ¥³¡¼¥ÉÊÑ´¹
+           MOVE    Y04-DRNAME(1:4)     TO  WRK-GMN-DRCD
+      *
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    WRK-GMN-DRCD        TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-SEISUU         >   4     )   OR
+                  (SNUM-SYOKBN         =   "1"   )   OR
+                  (SNUM-MINKBN         =   "1"   )
+               MOVE    "0002"              TO  SPA-ERRCD
+           ELSE
+               MOVE    SNUM-OUTEDT(12:4)   TO  WRK-GMN-DRCD
+           END-IF
+      *
            MOVE    ZERO                TO  IDY
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX            >   SPA-DRCD-MAX )
-               IF     Y04-DRNAME(1:4)
+                   UNTIL      (IDX         >   SPA-DRCD-MAX )
+                           OR (SPA-ERRCD   NOT =   SPACE )
+      ****     IF     Y04-DRNAME(1:4)
+               IF     WRK-GMN-DRCD
                                        =   SPA-GMN-DRNAMELST(IDX)(1:4)
                    MOVE    SPA-GMN-DRNAMELST(IDX)
                                            TO  Y04-DRNAME
@@ -964,7 +985,8 @@
            INITIALIZE                  SYS-1010-REC
            MOVE    "1010"              TO  SYS-1010-KANRICD
            MOVE    "1"                 TO  SYS-1010-KBNCD(1:1)
-           MOVE    Y04-DRNAME(1:4)     TO  SYS-1010-KBNCD(2:4)
+      **** MOVE    Y04-DRNAME(1:4)     TO  SYS-1010-KBNCD(2:4)
+           MOVE    WRK-GMN-DRCD        TO  SYS-1010-KBNCD(2:4)
            MOVE    SPA-NAI-YYKYMD(1)   TO  SYS-1010-STYUKYMD
            MOVE    SPA-NAI-YYKYMD(6)   TO  SYS-1010-EDYUKYMD
       *
@@ -988,8 +1010,8 @@
            IF      FLG-SYSKANRI        =   ZERO
                MOVE    SYSKANRI-REC        TO  SYS-1010-REC
       *        ºÇ¸å¤Î¹Ô¤ØÊÔ½¸¤¹¤ë
-               IF      SPA-DRCD-MAX        =   99
-                   MOVE    99              TO  SPA-DRCD-MAX
+               IF      SPA-DRCD-MAX        >=   100
+                   MOVE    100             TO  SPA-DRCD-MAX
                ELSE
                    ADD     1               TO  SPA-DRCD-MAX
                END-IF
