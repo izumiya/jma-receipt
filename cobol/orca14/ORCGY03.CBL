@@ -845,8 +845,7 @@
                MOVE    SYSKANRI-REC        TO  SYS-1010-REC
       *        最後の行へ編集する
                IF      SPA-DRCD-MAX        >=  100
-      *            MOVE    99              TO  SPA-DRCD-MAX
-                   CONTINUE
+                   MOVE    100             TO  SPA-DRCD-MAX
                ELSE
                    ADD     1               TO  SPA-DRCD-MAX
                END-IF
@@ -1225,6 +1224,21 @@
        202-DRNAME-HEN-SEC       SECTION.
       *
            MOVE    Y03-DRNAME          TO  SPA-GMN-DRNAME
+      *
+      *    コード変換
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    SPA-GMN-DRCD        TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-SEISUU         >   4     )   OR
+                  (SNUM-SYOKBN         =   "1"   )   OR
+                  (SNUM-MINKBN         =   "1"   )
+               MOVE    "0002"              TO  SPA-ERRCD
+               MOVE    02                  TO  SPA-GMN-CUR
+           ELSE
+               MOVE    SNUM-OUTEDT(12:4)   TO  SPA-GMN-DRCD
+           END-IF
       *
       *    診療内容
            MOVE    ZERO                TO  FLG-CHK
