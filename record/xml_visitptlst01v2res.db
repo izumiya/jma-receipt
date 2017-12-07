@@ -40,6 +40,8 @@ xml_visitptlst01v2res {
         	};
 		Update_Date			varchar(10);
 		Update_Time 			varchar(8);
+		Patient_Update_Date		varchar(10);
+		Patient_Update_Time 		varchar(8);
        	} [1000];
    	};
 };

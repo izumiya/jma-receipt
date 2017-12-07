@@ -52,6 +52,8 @@
                   04  PATLSTRES-CREYMD             PIC X(10).
       *           更新日付
                   04  PATLSTRES-UPYMD              PIC X(10).
+      *           更新時間
+                  04  PATLSTRES-UPTIME             PIC X(08).
       *           テスト患者番号区分
                   04  PATLSTRES-TSTPTNUMKBN        PIC X(01).
       *

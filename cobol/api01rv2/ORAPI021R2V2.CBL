@@ -28,7 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.08.00     NACL-多々納  17/04/04  最大件数を1000へ
-      *
+      * 05.00.00     NACL-多々納  19/12/07  患者情報更新日編集
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -49,6 +49,7 @@
            03  FLG-TEND                PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
+           03  FLG-PTNUM               PIC 9(01).
            03  FLG-JYURRK              PIC 9(01).
            03  FLG-HKNCOMBI            PIC 9(01).
            03  FLG-PTHKNINF            PIC 9(01).
@@ -188,6 +189,10 @@
       *    患者マスタ−
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
+      *
+      *    患者番号マスタ
+       01  PTNUM-REC.
+           COPY    "CPPTNUM.INC".
       *
       *    受診履歴
        01  JYURRK-REC.
@@ -861,6 +866,13 @@
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO  VIS01RES-UPDATE-DATE(IDX)
            MOVE    WRK-HEN-TIME        TO  VIS01RES-UPDATE-TIME(IDX)
+      *H29.12
+      *    患者登録更新日
+           MOVE    PTNUM-UPYMD         TO  WRK-SYMD
+           MOVE    PTNUM-UPHMS         TO  WRK-THMS
+           PERFORM 801-DAYHEN01-SEC
+           MOVE    WRK-HEN-DATE        TO  VIS01RES-PTNUM-UPDATE(IDX)
+           MOVE    WRK-HEN-TIME        TO  VIS01RES-PTNUM-UPTIME(IDX)
            .
        20021-JYURRK-HENSYU-EXT.
            EXIT.
@@ -871,13 +883,26 @@
        200211-PTNUM-HEN-SEC     SECTION.
       *
       *    患者番号取得
-           INITIALIZE                  ORCSPTIDAREA
-           MOVE    JYURRK-HOSPNUM      TO  SPTID-HOSPNUM
-           MOVE    JYURRK-PTID         TO  SPTID-PTID
-           CALL    "ORCSPTID"          USING   ORCSPTIDAREA
-                                               SPA-AREA
-           MOVE    SPTID-PTNUM         TO  WRK-PTNUM
-           IF      SPTID-RC        NOT =   ZERO
+      *    INITIALIZE                  ORCSPTIDAREA
+      *    MOVE    JYURRK-HOSPNUM      TO  SPTID-HOSPNUM
+      *    MOVE    JYURRK-PTID         TO  SPTID-PTID
+      *    CALL    "ORCSPTID"          USING   ORCSPTIDAREA
+      *                                        SPA-AREA
+      *    MOVE    SPTID-PTNUM         TO  WRK-PTNUM
+      *    IF      SPTID-RC        NOT =   ZERO
+      *        患者番号エラー
+      *        MOVE    ALL "*"             TO  WRK-PTNUM
+      *        MOVE    1                   TO  FLG-ERR
+      *****END-IF
+      *H29.12
+      *    患者番号検索
+           INITIALIZE                  PTNUM-REC
+           MOVE    JYURRK-HOSPNUM      TO  PTNUM-HOSPNUM
+           MOVE    JYURRK-PTID         TO  PTNUM-PTID
+           PERFORM 900-PTNUM-READ-SEC
+           IF      FLG-PTNUM           =   ZERO
+               MOVE    PTNUM-PTNUM         TO  WRK-PTNUM
+           ELSE
       *        患者番号エラー
                MOVE    ALL "*"             TO  WRK-PTNUM
                MOVE    1                   TO  FLG-ERR
@@ -1306,6 +1331,37 @@
       *
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者基本情報取得
+      *****************************************************************
+       900-PTNUM-READ-SEC              SECTION.
+      *
+           MOVE    PTNUM-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_ptnum"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTNUM-REC
+                   MOVE    ZERO                TO  FLG-PTNUM
+               ELSE
+                   MOVE    1                   TO  FLG-PTNUM
+                   INITIALIZE                  PTNUM-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTNUM
+               INITIALIZE                  PTNUM-REC
+           END-IF
+           MOVE    "tbl_ptnum"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-PTNUM-READ-EXT.
            EXIT.
       *****************************************************************
       *    受診履歴マスター読込

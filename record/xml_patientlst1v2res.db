@@ -18,6 +18,7 @@ xml_patientlst1v2res {
 		Sex			varchar(1);
 		CreateDate		varchar(10);
 		UpdateDate		varchar(10);
+		UpdateTime		varchar(8);
 		TestPatient_Flag	varchar(1);
     	} [1000];
    	};

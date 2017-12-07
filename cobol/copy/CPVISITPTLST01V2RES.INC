@@ -97,4 +97,8 @@
                   05  VIS01RES-UPDATE-DATE         PIC X(10).
       *           更新時間
                   05  VIS01RES-UPDATE-TIME         PIC X(08).
+      *           患者情報　更新日
+                  05  VIS01RES-PTNUM-UPDATE        PIC X(10).
+      *           患者情報　更新時間
+                  05  VIS01RES-PTNUM-UPTIME        PIC X(08).
       *

@@ -564,8 +564,11 @@
            MOVE    WRK-HEN-DATE        TO  PATLSTRES-CREYMD  (IDX)
       *    更新日
            MOVE    PTNUM-UPYMD         TO  WRK-SYMD
+           MOVE    PTNUM-UPHMS         TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-DATE        TO  PATLSTRES-UPYMD  (IDX)
+      *H29.12 時間
+           MOVE    WRK-HEN-TIME        TO  PATLSTRES-UPTIME (IDX)
       *    テスト患者
            MOVE    PTINF-TSTPTNUMKBN   TO  PATLSTRES-TSTPTNUMKBN(IDX)
            .
