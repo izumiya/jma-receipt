@@ -2679,7 +2679,9 @@
                    MOVE    2             TO  WRK-KENSA-MAX
                WHEN    08
       *            ∆‚…Ù»Á…È≤ŸªÓ∏≥§Œ Ò≥Á°  ›Œ±°À
-                   MOVE    1             TO  WRK-KENSA-MAX
+      ****         MOVE    1             TO  WRK-KENSA-MAX
+      *H29.12      §ﬁ§»§·«—ªﬂ
+                   MOVE    ZERO          TO  WRK-KENSA-MAX
       * ø¿Æ£±£µ«Ø£π∑Ó
                WHEN    09
       *            •¶•§•Î•ππ≥¬Œ≤¡
