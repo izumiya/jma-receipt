@@ -29,6 +29,7 @@
       *  03.05.01    NACL-森脇     07/05/30  グループ診療対応
       *  03.05.02    NACL-森脇     07/07/03  確認リスト追加
       *  04.08.01    NACL-森脇     14/08/21  一時ファイルディレクトリ設定
+      *  05.00.00    NACL-森脇     17/12/08  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -199,6 +200,11 @@
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *----(05.00.00)--ADD-START---
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *
       *****************************************************************
       *    連絡　領域
@@ -1208,9 +1214,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "3"             TO  SHELLTBL-ARG17
       *         WHEN    "NO"
       *             MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
       *----(03.05.01)--ADD-START---
 grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SPACE               TO  SHELLTBL-ARG19

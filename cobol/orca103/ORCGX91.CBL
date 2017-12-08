@@ -31,6 +31,7 @@
       *  03.04.01    NACL-¿¹ÏÆ    07/02/21  ¥Á¥§¥Ã¥¯¶èÊ¬ÄÉ²Ã
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/05/08  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.08.01    NACL-¿¹ÏÆ    16/11/29  £Ã£Ó£Ö½ÐÎÏÂÐ±þ
+      *  05.00.00    NACL-¿¹ÏÆ    17/12/08  ¥¯¥é¥¤¥¢¥ó¥È°õºþÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -311,6 +312,10 @@
            COPY    "CPORCSS013.INC"    REPLACING    //SS013-//
                                        BY           //TSS013-//.
       *
+      *----(05.00.00)--ADD-START---
+      *    ¥¯¥é¥¤¥¢¥ó¥È°õºþÀ©¸æ
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
       *****************************************************************
@@ -2116,9 +2121,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "3"             TO  SHELLTBL-ARG17
       *     WHEN    "NO"
       *         MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
            WHEN    "OK"
-               MOVE    "3"             TO  SHELLTBL-ARG17
+               IF      SPA-CLIENT-PRT-FLG  =  2
+                   MOVE    "5"         TO  SHELLTBL-ARG17
+               ELSE
+                   MOVE    "2"         TO  SHELLTBL-ARG17
+               END-IF
            END-EVALUATE
+           MOVE    SPA-CLIENT-SHOWDIALOG
+                                       TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "shell"             TO  MCP-TABLE
