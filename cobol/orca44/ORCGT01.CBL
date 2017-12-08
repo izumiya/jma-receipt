@@ -213,6 +213,7 @@
       *  04.09.02    NACL-藤原    17/02/24  レポジトリ名設定時は地方公費
       *                                     処理スクリプトの存在チェック
       *                                     を行わない
+      *  05.00.00    NACL-森脇    17/12/08  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -597,6 +598,10 @@
       *
       *    ユーザー情報取得
            COPY    "CPORCSLDUSER.INC".
+      *----(05.00.00)--ADD-START---
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    連絡領域
       *****************************************************************
@@ -2805,9 +2810,17 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                    MOVE    "3"             TO  SHELLTBL-ARG17
       **       WHEN    "NO"
       **           MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
 grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC
@@ -4638,9 +4651,17 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                    MOVE    "3"             TO  SHELLTBL-ARG17
       **       WHEN    "NO"
       **           MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
 grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC
@@ -5158,9 +5179,17 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    MOVE    "3"             TO  SHELLTBL-ARG17
       **       WHEN    "NO"
       **           MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
 grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC

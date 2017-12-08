@@ -50,6 +50,7 @@
       *  04.05.01    NACL-藤原    09/10/01  統計ＣＳＶ出力対応
       *
       *  04.08.01    NACL-藤原    14/08/28  ４．８ミドル対応
+      *  05.00.00    NACL-森脇    17/12/08  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -297,6 +298,10 @@
       *    課金チェック
            COPY    "CPORCSBILLINGCHECK.INC".
       *
+      *----(05.00.00)--ADD-START---
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -2077,9 +2082,17 @@
                    MOVE    "3"             TO  SHELLTBL-ARG17
       *         WHEN    "NO"
       *             MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
                MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC

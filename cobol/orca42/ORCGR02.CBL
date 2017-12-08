@@ -162,6 +162,7 @@
       *  04.08.06    NACL-藤原    17/08/29  一時保存テーブル削除対応
       *
       *  04.09.01    NACL-藤原    16/12/12  ＨＡＯＲＩ対応
+      *  05.00.00    NACL-森脇    17/12/08  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -491,6 +492,10 @@
       *    プリンタ名取得サブ
            COPY  "CPORCSPRTNMGET.INC".
       *
+      *----(05.00.00)--ADD-START---
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -5464,11 +5469,24 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
        440-PRINT-KENSU-GIDMSG-EXT.
            EXIT.
       *
+      *----(05.00.00)--UPD-START---
       *****************************************************************
       *    出力処理
       *****************************************************************
        440-PRINT-KENSU-SEC                SECTION.
       *
+      *    印刷制御情報取得サブ
+           CALL    "ORCSONPRTSET"  USING   SPA-AREA
+           IF    ( SPA-CLIENT-PRT-FLG  =   2 )
+             OR  ( SPA-PRTCONF         =   "1" )
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
+      *
+           MOVE    "01"                TO  SPA-PRT-FLG
       *----(03.04.01)--UPD-START---
            EVALUATE   SPA-R01-RECE07-NYUGAIKBN
                WHEN   "1"
@@ -5487,11 +5505,20 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *                                         SPA-GMN-TBL1
            END-EVALUATE
       *----(03.04.01)--UPD-END-----
+           MOVE    SPACE               TO  SPA-PRT-FLG
+      *
+           IF      (SPA-CLIENT-PRT-FLG =   1  )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"    USING   SPA-AREA
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-PRT-FLG
       *
            .
        440-PRINT-KENSU-EXT.
            EXIT.
-      *
+      *----(05.00.00)--UPD-END-----
       *****************************************************************
       *    出力前処理
       *****************************************************************
