@@ -272,6 +272,10 @@
       *    MCPAREA 保存
        01  WRK-MCPAREA             PIC X(5000).
       *
+      *    オンライン画面
+       01  WRK-SCRAREA.
+           COPY    "ORCA24SCRAREA.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -295,15 +299,15 @@
       *    保険算定チェックサブ
            COPY    "CPORCSAGECHK.INC".
       *
-      *    全角チェックパラメタ
-           COPY    "CPORCSKANACHK.INC".
+      ***  全角チェックパラメタ
+      *    COPY    "CPORCSKANACHK.INC".
       *    全角チェックパラメタ（拡張漢字）
-           COPY    "CPORCSKANACHK2.INC".
+      *    COPY    "CPORCSKANACHK2.INC".
       *
-           COPY    "CPORCXKANACONV.INC".
+      *    COPY    "CPORCXKANACONV.INC".
       *
       *    拡張文字対応
-           COPY    "CPORCSSTRING.INC".
+      ***  COPY    "CPORCSSTRING.INC".
       *
       *    日付変換サブ
            COPY     "CPORCSGDAY.INC".
@@ -464,6 +468,8 @@
            INITIALIZE                      XML-MEDICALV3RES6
            INITIALIZE                      WRK-APIV3DATA-AREA
            INITIALIZE                      SPA-J01KYOUTU
+      *
+           INITIALIZE                      WRK-SCRAREA
       *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
@@ -1970,7 +1976,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-J02
@@ -1992,7 +1998,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-J02
@@ -2245,7 +2251,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-J02
@@ -2280,7 +2286,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-J02
@@ -2333,7 +2339,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    WRK-MCPAREA     TO  MCPAREA
       *
@@ -2887,137 +2893,6 @@
            MOVE    WRK-HEN-TSS         TO  WRK-TSS
            .
        802-DAYHEN02-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理
-      *****************************************************************
-       890-HALF-ZEN-SEC         SECTION.
-      *
-           MOVE    ZERO                TO  FLG-ERR
-      *    拡張漢字有無
-           INITIALIZE                  ORCSSTRINGAREA
-           MOVE    "check"             TO  ORCSSTR-COMMAND
-           MOVE    WRK-MAE-INPUT       TO  ORCSSTR-STRING1
-           CALL    "orcsstring"        USING
-                                       ORCSSTRINGAREA
-           IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
-           END-IF
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
-           IF     (KANACHK-RC      NOT =   ZERO  )  OR
-                  (KANACHK-SYUBETU     =   1     )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    KANACHK-OUT-INPUT   TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       890-HALF-ZEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理（外字あり）
-      *****************************************************************
-       891-HALF-ZEN2-SEC         SECTION.
-      *
-           IF     SPA-ENCODING         =   2
-      *        拡張漢字対応
-               PERFORM 8910-HALF-ZENC2-SEC
-           ELSE
-      *        拡張漢字不可
-               PERFORM 890-HALF-ZEN-SEC
-           END-IF
-      *
-           .
-       891-HALF-ZEN2-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理（外字あり）
-      *****************************************************************
-       8910-HALF-ZENC2-SEC         SECTION.
-      *
-           INITIALIZE                  ORCSKANACHK2AREA
-           MOVE    "1"                 TO  KANACHK2-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK2-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK2-MAX-CNT
-           CALL    "ORCSKANACHK2"      USING
-                                       ORCSKANACHK2AREA
-           MOVE    KANACHK2-MAE-INPUT  TO  WRK-MAE-INPUT
-           IF     (KANACHK2-RC     NOT =   ZERO  )  OR
-                  (KANACHK2-SYUBETU    =   1     )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK2-MAE-INPUT  TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    ZERO                TO  FLG-ERR
-               MOVE    KANACHK2-OUT-INPUT  TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       8910-HALF-ZENC2-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角を全角へ変換処理
-      *****************************************************************
-       880-HALF-ZENCNG-SEC         SECTION.
-      *
-           MOVE    ZERO                TO  FLG-ERR
-      *    拡張漢字有無
-           INITIALIZE                  ORCSSTRINGAREA
-           MOVE    "check"             TO  ORCSSTR-COMMAND
-           MOVE    WRK-MAE-INPUT       TO  ORCSSTR-STRING1
-           CALL    "orcsstring"        USING
-                                       ORCSSTRINGAREA
-           IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
-           END-IF
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "2"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
-           IF     (KANACHK-RC      NOT =   ZERO  )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    KANACHK-OUT-INPUT   TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       880-HALF-ZEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    全角チェック処理
-      *****************************************************************
-       891-HALF-CHK-SEC         SECTION.
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           IF     (KANACHK-RC          =   ZERO  )  AND
-                  (KANACHK-SYUBETU     =   1     )
-      *        半角
-               MOVE    ZERO                TO  FLG-ERR
-           ELSE
-               MOVE    1                   TO  FLG-ERR
-           END-IF
-      *
-           .
-       891-HALF-CHK-EXT.
            EXIT.
       *
       *****************************************************************

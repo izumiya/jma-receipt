@@ -359,6 +359,9 @@
       *
       *    画面スパ領域
            COPY    "K03SCR-SPA".
+      *    オンライン画面
+       01  WRK-SCRAREA.
+           COPY    "ORCA21SCRAREA.INC".
       *
       *
       *    API XML読み込み用定義体
@@ -1910,11 +1913,12 @@
            MOVE    SPACE               TO  MCP-EVENT
            MOVE    SPACE               TO  MCP-WIDGET
       *
+           INITIALIZE                  WRK-SCRAREA
            CALL    "ORCGK03"           USING
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON          TO  SPA-AREA
            MOVE    SPA-FREE            TO  SPA-K03
@@ -2406,7 +2410,7 @@
                MOVE    "WKSRYACT"          TO  PARA-FILEMEI
                MOVE    IDW2                TO  PARA-EDANUM
                MOVE    LNK-WKSRYACT-REC(IDX)
-                                               TO  PARA-DATA-REC
+                                           TO  PARA-DATA-REC
       *
                 PERFORM 30010-PARA-DBINSERT-SEC
            END-PERFORM
@@ -2669,11 +2673,12 @@
            MOVE    SPACE               TO  MCP-EVENT
            MOVE    SPACE               TO  MCP-WIDGET
       *
+           INITIALIZE                  WRK-SCRAREA
            CALL    "ORCGK03"           USING
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON          TO  SPA-AREA
            MOVE    SPA-FREE            TO  SPA-K03
@@ -2815,11 +2820,12 @@
            MOVE    SPACE               TO  MCP-EVENT
            MOVE    SPACE               TO  MCP-WIDGET
       *
+           INITIALIZE                  WRK-SCRAREA
            CALL    "ORCGK03"           USING
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON          TO  SPA-AREA
            MOVE    SPA-FREE            TO  SPA-K03

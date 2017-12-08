@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  17/06/23  API　情報取得追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -46,6 +47,10 @@
       *
       *    画面スパ領域
            COPY    "K06SCR-SPA".
+      *
+      *    オンライン画面
+       01  WRK-SCRAREA.
+           COPY    "ORCA21SCRAREA.INC".
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -611,6 +616,14 @@
                MOVE    3                   TO  FLG-SYORI
      ***   WHEN    "05"
      ***       MOVE    5                   TO  FLG-SYORI
+      *H29.6
+      *API
+           WHEN    "00"
+               MOVE    ZERO                TO  FLG-SYORI
+               PERFORM 2010-API-SYORI-SEC
+               MOVE    "00"                TO  MDCRES-RESPONSE-NUMBER
+               GO      TO      200-MAIN-EXT
+      *API
            WHEN    "99"
       *        強制処理終了
                PERFORM 2099-CANCEL-SEC
@@ -809,6 +822,11 @@
                            MOVE    "処理終了"
                                            TO  WRK-OKMSG
                        END-IF
+      *API
+                   WHEN    0
+                       MOVE    "検索処理終了"
+                                           TO  WRK-OKMSG
+      *API
                    WHEN    9
                        MOVE    "解除処理終了"
                                            TO  WRK-OKMSG
@@ -1341,9 +1359,10 @@
       ****************************************************************
       *    リハビリ等開始日編集処理
       ****************************************************************
-       20013-RIHA-SANTEI-HENSYU-SEC           SECTION.
+       20013-RIHA-SANTEI-HENSYU-SEC     SECTION.
       *
            INITIALIZE                  SPA-K06
+           INITIALIZE                  WRK-SCRAREA
       *
            MOVE    2                   TO  SPA-K061-GMN
            MOVE    "APIV3"             TO  SPA-MOTOPG
@@ -1359,7 +1378,7 @@
                                        MCPAREA
                                        SPAAREA
                                        LINKAREA
-                                       SCRAREA
+                                       WRK-SCRAREA
       *
            MOVE    SPA-COMMON          TO  SPA-AREA
            MOVE    SPA-FREE            TO  SPA-K06
@@ -2947,6 +2966,98 @@
       *    .
       *292-SELECT-HEN-EXT.
       *    EXIT.
+      *H29.6
+      *API
+      *****************************************************************
+      *    API 処理
+      *****************************************************************
+       2010-API-SYORI-SEC            SECTION.
+      *
+      *    編集処理
+           PERFORM 20010-INPUT-HEN-SEC
+      *    患者番号チェック
+           IF      WRK-PTNUM           =   SPACE
+               MOVE    "01"                TO  WRK-ERRCD
+           ELSE
+      *        患者番号チェック
+               PERFORM 20011-PTNUM-CHK-SEC
+           END-IF
+      *
+           IF      WRK-ERRCD           =   SPACE
+      *        患者情報検索
+               INITIALIZE                      PTINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+               MOVE    SPA-PTID            TO  PTINF-PTID
+               PERFORM 900-PTINF-READ-SEC
+               IF      FLG-PTINF       NOT =   ZERO
+                   MOVE    "10"            TO  WRK-ERRCD
+               END-IF
+           END-IF
+           IF      WRK-ERRCD           =   SPACE
+      *        患者情報出力内容編集処理
+               PERFORM 20021-MDCRES-HEN-SEC
+           END-IF
+      *
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      2010-API-SYORI-EXT
+           END-IF
+      *
+      *    リハビリ等開始日編集処理
+           PERFORM 20013-RIHA-SANTEI-HENSYU-SEC
+      *    履歴算定なし一覧処理はクリア
+           INITIALIZE                  MDCRES-STARTSRYCD-INF
+      *
+           IF     (MDCREQ-PRSCRPT-CODE NOT =   SPACE )
+              AND (MDCREQ-PERFORM-YM   NOT =   SPACE )
+      *        リハビリコメント編集
+               PERFORM 20101-API-COMMNT-SEC
+           END-IF
+           .
+       2010-API-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    API リハビリコメント編集処理
+      *****************************************************************
+       20101-API-COMMNT-SEC            SECTION.
+      *
+      *    送信内容編集
+           MOVE    SPACE               TO  MDCREQ-SANTEI-MODE
+           MOVE    SPACE               TO  MDCRES-SANTEI-MODE
+           MOVE    MDCREQ-PRSCRPT-CODE TO  MDCRES-PRSCRPT-CODE
+           MOVE    MDCREQ-PRSCRPT-NAME TO  MDCRES-PRSCRPT-NAME
+           MOVE    MDCREQ-PERFORM-YM   TO  MDCRES-PERFORM-YM
+           MOVE    MDCREQ-COMBINATION-NUMBER
+                                       TO  MDCRES-COMBINATION-NUMBER
+      *
+           MOVE    ZERO                TO  IDX-ERR
+           INITIALIZE                  WRK-ERRCD-TBLG
+      *    基本チェック処理
+           PERFORM 200212-INPUT-CHK01-SEC
+      *
+           IF     IDX-ERR              =   ZERO
+      *        算定履歴登録チェック
+               MOVE    WRK-SRYYM           TO  WRK-SANTEI-SRYYM
+               MOVE    WRK-SRYCD           TO  WRK-SANTEI-SRYCD
+               MOVE    WRK-HKNCOMBI        TO  WRK-SANTEI-HKNCOMBI
+               PERFORM 910-SANTEI-KEY-READ-SEC
+               IF     (FLG-SANTEI          =   1    )
+                   ADD     1               TO  IDX-ERR
+                   MOVE    "0006"          TO  WRK-ERRCD-T (IDX-ERR)
+               END-IF
+      *        エラーコード編集処理
+               PERFORM 200212-SAN-ERRCD-SEC
+           END-IF
+           IF     IDX-ERR              =   ZERO
+               PERFORM 20022-RIHACOMMNT-HEN-SEC
+           END-IF
+           IF      IDX-ERR             >   ZERO
+              MOVE    "30"             TO  WRK-ERRCD
+           END-IF
+           .
+       20101-API-COMMNT-EXT.
+           EXIT.
+      *API
+      *
       *****************************************************************
       *    終了処理（PARA削除・排他解除）
       *****************************************************************
@@ -3199,6 +3310,8 @@
            MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
            IF     (KANACHK-RC      NOT =   ZERO  )  OR
                   (KANACHK-SYUBETU     =   1     )
+      *H29.9   改行エラー
+      ******  OR  (KANACHK-RC4     NOT =   ZERO  )
                MOVE    1                   TO  FLG-ERR
                MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
            ELSE
@@ -3207,103 +3320,6 @@
       *
            .
        890-HALF-ZEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理（外字あり）
-      *****************************************************************
-       891-HALF-ZEN2-SEC         SECTION.
-      *
-           IF     SPA-ENCODING         =   2
-      *        拡張漢字対応
-               PERFORM 8910-HALF-ZENC2-SEC
-           ELSE
-      *        拡張漢字不可
-               PERFORM 890-HALF-ZEN-SEC
-           END-IF
-      *
-           .
-       891-HALF-ZEN2-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角空白を全角空白へ変換処理（外字あり）
-      *****************************************************************
-       8910-HALF-ZENC2-SEC         SECTION.
-      *
-           INITIALIZE                  ORCSKANACHK2AREA
-           MOVE    "1"                 TO  KANACHK2-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK2-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK2-MAX-CNT
-           CALL    "ORCSKANACHK2"      USING
-                                       ORCSKANACHK2AREA
-           MOVE    KANACHK2-MAE-INPUT  TO  WRK-MAE-INPUT
-           IF     (KANACHK2-RC     NOT =   ZERO  )  OR
-                  (KANACHK2-SYUBETU    =   1     )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK2-MAE-INPUT  TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    ZERO                TO  FLG-ERR
-               MOVE    KANACHK2-OUT-INPUT  TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       8910-HALF-ZENC2-EXT.
-           EXIT.
-      *****************************************************************
-      *    半角を全角へ変換処理
-      *****************************************************************
-       880-HALF-ZENCNG-SEC         SECTION.
-      *
-           MOVE    ZERO                TO  FLG-ERR
-      *    拡張漢字有無
-           INITIALIZE                  ORCSSTRINGAREA
-           MOVE    "check"             TO  ORCSSTR-COMMAND
-           MOVE    WRK-MAE-INPUT       TO  ORCSSTR-STRING1
-           CALL    "orcsstring"        USING
-                                       ORCSSTRINGAREA
-           IF      ORCSSTR-NUM2    NOT =   ZERO
-               MOVE    1                   TO  FLG-ERR
-           END-IF
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "2"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-MAE-INPUT
-           IF     (KANACHK-RC      NOT =   ZERO  )
-               MOVE    1                   TO  FLG-ERR
-               MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           ELSE
-               MOVE    KANACHK-OUT-INPUT   TO  WRK-ATO-INPUT
-           END-IF
-      *
-           .
-       880-HALF-ZEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    全角チェック処理
-      *****************************************************************
-       891-HALF-CHK-SEC         SECTION.
-      *
-           INITIALIZE                  ORCSKANACHKAREA
-           MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
-           MOVE    WRK-LEN             TO  KANACHK-MAX-CNT
-           CALL    "ORCSKANACHK"       USING
-                                       ORCSKANACHKAREA
-           MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
-           IF     (KANACHK-RC          =   ZERO  )  AND
-                  (KANACHK-SYUBETU     =   1     )
-      *        半角
-               MOVE    ZERO                TO  FLG-ERR
-           ELSE
-               MOVE    1                   TO  FLG-ERR
-           END-IF
-      *
-           .
-       891-HALF-CHK-EXT.
            EXIT.
       *
       *****************************************************************
