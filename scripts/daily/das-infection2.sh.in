@@ -27,7 +27,7 @@ GZFILE=$CSVFILE.gz
 make_csv_file(){
   UPTARGEFILE=1
   
-  TIMESTAMP=`basename $1 |sed -e "s/${FILE_PREFIX}.csv.\(.*\).gz/\1/"`
+  TIMESTAMP=`basename $file |sed -e "s/${FILE_PREFIX}.csv.\(.*\).gz/\1/"`
   OBJECTDATE=${TIMESTAMP:8:6}
 
   zcat $file >> $CSVFILE
@@ -133,4 +133,4 @@ DAS_UPLOAD2_LOCK="/var/lock/das_upload2_${MCP_TENANT}.lock"
     get_file_count
   done
   echo 'end'
-) 9>$DAS_UPLOAD2_LOCK
+) 9>$DAS_UPLOAD2_LOCK &
