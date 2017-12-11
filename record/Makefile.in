@@ -545,6 +545,7 @@ RECORD_files = \
 	patientbasisallv3.rec \
 	patientdiseaseallv3.rec \
     masterlastupdatev3.rec \
+	system01dailyv2.rec \
 
 
 DEF_files = \
@@ -1044,6 +1045,8 @@ DB_files = \
 	xml_patient_disease_all.db \
     xml_masterlastupdatev3req.db \
     xml_masterlastupdatev3res.db \
+	xml_system01_dailyv2req.db \
+	xml_system01_dailyv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
