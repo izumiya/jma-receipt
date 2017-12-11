@@ -48,6 +48,8 @@
       *
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    14/08/26  fdd 廃止に伴う対応
+      *
+      *  05.00.01    NACL-藤原    17/11/29  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -775,6 +777,11 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
       ***          MOVE    "3"             TO  SHELLTBL-ARG17
                WHEN    "OK"
                    MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =   2
+                       MOVE    "5"             TO  SHELLTBL-ARG17
+                       MOVE    SPA-CLIENT-SHOWDIALOG
+                                               TO  SHELLTBL-ARG22
+                   END-IF
            END-EVALUATE
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            MOVE    SHELLTBL            TO  MCPDATA-REC
