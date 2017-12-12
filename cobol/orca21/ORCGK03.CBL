@@ -389,6 +389,17 @@
                05  WRK-HEN-T2          PIC X(01).
                05  WRK-HEN-TSS         PIC X(02).
       *
+      *ORCAサーベイランス一時退避
+           03  WRK-INF-AREA.
+               05  WRK-INF-HOSPNUM     PIC 9(02).
+               05  WRK-INF-HOSPID      PIC X(24).
+               05  WRK-INF-SYORIFLG    PIC 9(01).
+               05  WRK-INF-NYUGAIKBN   PIC X(01).
+               05  WRK-INF-PTID        PIC 9(10).
+               05  WRK-INF-SRYYMD      PIC X(08).
+               05  WRK-INF-SRYKA       PIC X(02).
+               05  WRK-INF-BEDFLG      PIC 9(01).
+      *
       *    剤テーブル領域
        01  WRK-TBL-ZAINUM-AREA.
            03  WRK-TBL-ZAINUM-G            OCCURS   100.
@@ -6157,6 +6168,18 @@
                PERFORM 600-PUSH-SYORI-SEC
            END-IF
       *
+      *    感染症送信一時退避（ユーザプログラムの後で起動）
+           IF      SPA-DATAINFECTIONKBN    =   1
+               INITIALIZE  WRK-INF-AREA
+               MOVE    SPA-HOSPNUM         TO  WRK-INF-HOSPNUM
+               MOVE    SPA-HOSPID          TO  WRK-INF-HOSPID
+               MOVE    SPA-SYORIFLG        TO  WRK-INF-SYORIFLG
+               MOVE    SPA-NYUGAIKBN       TO  WRK-INF-NYUGAIKBN
+               MOVE    SPA-PTID            TO  WRK-INF-PTID
+               MOVE    SPA-SRYYMD          TO  WRK-INF-SRYYMD
+               MOVE    SPA-SRYKA           TO  WRK-INF-SRYKA
+               MOVE    SPA-BEDFLG          TO  WRK-INF-BEDFLG
+           END-IF
       *!!!!
       *    ユーザプログラム起動
            IF     (SPA-ERRCD           =   SPACE ) 
@@ -6440,10 +6463,17 @@
                PERFORM 600-PUSH-SYORI-SEC
            END-IF
       *
-      *    感染症送信
+      *    感染症送信一時退避（ユーザプログラムの後で起動）
            IF      SPA-DATAINFECTIONKBN    =   1
-               MOVE    1                   TO  FLG-INFEC-DLT
-               PERFORM 4904-INFECTION-SEND-SEC
+               INITIALIZE  WRK-INF-AREA
+               MOVE    SPA-HOSPNUM         TO  WRK-INF-HOSPNUM
+               MOVE    SPA-HOSPID          TO  WRK-INF-HOSPID
+               MOVE    SPA-SYORIFLG        TO  WRK-INF-SYORIFLG
+               MOVE    SPA-NYUGAIKBN       TO  WRK-INF-NYUGAIKBN
+               MOVE    SPA-PTID            TO  WRK-INF-PTID
+               MOVE    SPA-SRYYMD          TO  WRK-INF-SRYYMD
+               MOVE    SPA-SRYKA           TO  WRK-INF-SRYKA
+               MOVE    SPA-BEDFLG          TO  WRK-INF-BEDFLG
            END-IF
       *
       *    ユーザプログラム起動
@@ -6457,6 +6487,12 @@
                    MOVE    ZERO        TO  SPA-FLG-CLAIM
                    MOVE    3           TO  SPA-USERPG-FLG
                END-IF
+           END-IF
+      *
+      *    感染症送信
+           IF      SPA-DATAINFECTIONKBN    =   1
+               MOVE    1                   TO  FLG-INFEC-DLT
+               PERFORM 4904-INFECTION-SEND-SEC
            END-IF
       *
            .
@@ -6832,18 +6868,18 @@
            MOVE    SPACE               TO  SHELLTBL
            MOVE    INFECTION-FILE      TO  SHELLTBL-NAME
            MOVE    "K03"               TO  SHELLTBL-ARG1
-           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG2
-           MOVE    SPA-HOSPID          TO  SHELLTBL-ARG3
-           MOVE    SPA-SYORIFLG        TO  SHELLTBL-ARG4
+           MOVE    WRK-INF-HOSPNUM     TO  SHELLTBL-ARG2
+           MOVE    WRK-INF-HOSPID      TO  SHELLTBL-ARG3
+           MOVE    WRK-INF-SYORIFLG    TO  SHELLTBL-ARG4
            IF      FLG-INFEC-DLT       =   1
                MOVE    "2"                 TO  SHELLTBL-ARG4
            END-IF
-           MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG5
-           MOVE    SPA-PTID            TO  WRK-PTID
+           MOVE    WRK-INF-NYUGAIKBN   TO  SHELLTBL-ARG5
+           MOVE    WRK-INF-PTID        TO  WRK-PTID
            MOVE    WRK-PTID            TO  SHELLTBL-ARG6
-           MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG7
-           MOVE    SPA-SRYKA           TO  SHELLTBL-ARG8
-           MOVE    SPA-BEDFLG          TO  SHELLTBL-ARG9
+           MOVE    WRK-INF-SRYYMD      TO  SHELLTBL-ARG7
+           MOVE    WRK-INF-SRYKA       TO  SHELLTBL-ARG8
+           MOVE    WRK-INF-BEDFLG      TO  SHELLTBL-ARG9
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
