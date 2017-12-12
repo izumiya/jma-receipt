@@ -22,6 +22,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *
       *****************************************************************
         01  XML-TMEDICALGETRES.
             02  TMDCRES-CONTEXT           PIC S9(9)   BINARY.
@@ -92,6 +93,8 @@
                       09  TMDCRES-PROVIDER-NUMBER         PIC X(08).
       *               受給者番号
                       09  TMDCRES-RECIPIENT-NUMBER        PIC X(20).
+      *           同日再入院
+                  05  TMDCRES-DOUJITSUKBN           PIC X(01).
       *
       *           ＵＩＤ
                   05  TMDCRES-MEDICAL-UID          PIC X(36).

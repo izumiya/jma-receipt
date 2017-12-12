@@ -37,6 +37,8 @@ xml_tmedicalgetv2res {
 	                	PublicInsuredPerson_Number	varchar(20);
 	            	} [4];
         	};
+#---    	“¯“úÄ“ü‰@‹æ•ª
+		Readmission_Day_In		varchar(1);
 	        Medical_Uid			varchar(36);
 	        Medical_Time			varchar(8);
 	        Medical_Mode			varchar(1);
