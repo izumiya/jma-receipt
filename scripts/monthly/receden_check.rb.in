@@ -1528,6 +1528,7 @@ class Receden_check < Receden_common
       if rece.sbt.ko_count >= 1 &&
         rece.sbt.nyugai == GAIRAI  &&
         rece.tokki.include?("96") &&
+        !(rece.ho.empty?) &&
         ["2", "3"].include?(rece.ho[0]["DCKBN"].value)
         @errors.push("30180",rece,re,"TOKKI")
       end
