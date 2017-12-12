@@ -158,8 +158,17 @@
            MOVE    "STS"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
            MOVE    "ORCBBLOBIMPORT"    TO  JOB-PGID
-           MOVE    "ÂçÍÆÎÌ£Á£Ð£ÉºîÀ®½èÍý"
-                                       TO  JOB-SHELLMSG
+           EVALUATE    WRK-PARA-FILE-TYPE
+               WHEN    "csv"
+                   MOVE    "ÂçÍÆÎÌ£Á£Ð£ÉºîÀ®½èÍý¡Ê£ã£ó£ö¡Ë"
+                                               TO  JOB-SHELLMSG
+               WHEN    "pdf"
+                   MOVE    "ÂçÍÆÎÌ£Á£Ð£ÉºîÀ®½èÍý¡Ê£ð£ä£æ¡Ë"
+                                               TO  JOB-SHELLMSG
+               WHEN    OTHER
+                   MOVE    "ÂçÍÆÎÌ£Á£Ð£ÉºîÀ®½èÍý"
+                                               TO  JOB-SHELLMSG
+           END-EVALUATE
            PERFORM 900-CALL-ORCSJOB-SEC
            .
        100-INIT-EXT.

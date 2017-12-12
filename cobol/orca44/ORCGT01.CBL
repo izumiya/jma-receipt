@@ -213,7 +213,8 @@
       *  04.09.02    NACL-Æ£¸¶    17/02/24  ¥ì¥Ý¥¸¥È¥êÌ¾ÀßÄê»þ¤ÏÃÏÊý¸øÈñ
       *                                     ½èÍý¥¹¥¯¥ê¥×¥È¤ÎÂ¸ºß¥Á¥§¥Ã¥¯
       *                                     ¤ò¹Ô¤ï¤Ê¤¤
-      *  05.00.00    NACL-¿¹ÏÆ    17/12/08  ¥¯¥é¥¤¥¢¥ó¥È°õºþÂÐ±þ
+      *  04.09.03    NACL-Æ£¸¶    17/08/01  £È£Á£Ï£Ò£ÉÂÐ±þ
+      *  05.00.00    NACL-¿¹ÏÆ    17/11/30  ¥¯¥é¥¤¥¢¥ó¥È°õºþÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -381,6 +382,11 @@
            03  WRK-STYUKYMD        PIC X(08).
            03  WRK-EDYUKYMD        PIC X(08).
       *
+           03  WRK-PARAM.
+               05  WRK-PARAM-ORCA-UID  PIC X(36).
+               05  WRK-PARAM-KARTE-UID PIC X(36).
+      *
+      *
        01  WRKPARA                 PIC X(200).
       *
       *    Ä¾ÀÜÀÁµá¤¹¤ëÊÝ¸±¼ÔÈÖ¹æ
@@ -430,8 +436,8 @@
            03  WRK-T99-MSG.
                05  WRK-T99-MSG1    PIC X(24)   VALUE
                    "½èÍý¤ÏÀµ¾ï¤Ë½ªÎ»¤·¤Þ¤·¤¿".
-               05  FILLER          PIC X(16)   VALUE
-                   "¡¡¥ì¥»¥×¥ÈÁí·ï¿ô".
+               05  FILLER          PIC X(10)   VALUE
+                   "¡¡¥ì¥»¥×¥È".
                05  WRK-T99-MSG-KENSU
                                    PIC ZZZZZ9.
                05  FILLER          PIC X(02)   VALUE   "·ï".
@@ -602,6 +608,8 @@
       *    ¥¯¥é¥¤¥¢¥ó¥È°õºþÀ©¸æ
            COPY    "CPORCSPRTCTRL.INC".
       *----(05.00.00)--ADD-END-----
+      *
+           COPY    "MONBLOB".
       *****************************************************************
       *    Ï¢ÍíÎÎ°è
       *****************************************************************
@@ -612,22 +620,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "T01.INC".
-           COPY    "T02.INC".
-           COPY    "T03.INC".
-           COPY    "T04.INC".
-           COPY    "T05.INC".
-           COPY    "T06.INC".
-           COPY    "T07.INC".
-           COPY    "T08.INC".
-           COPY    "T09.INC".
-           COPY    "T91.INC".
-           COPY    "T98.INC".
-           COPY    "T99.INC".
-           COPY    "TERR.INC".
-           COPY    "TID1.INC".
-           COPY    "TID2.INC".
-           COPY    "TID3.INC".
+           COPY    "ORCA44SCRAREA.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -3765,8 +3758,8 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                GO  TO  4109-SRYYMKBN-CHK-EXT
            END-IF
       *
-           IF      SPA-GMN-SRYYMKBN   =   SPACE
-               CONTINUE
+           IF      SPA-GMN-SRYYMKBN    =   SPACE
+               MOVE    SPACE               TO  SPA-GMN-SRYYMKBN-G
            ELSE
                MOVE    SPACE               TO  SPA-GMN-SRYYMKBNNM
                PERFORM VARYING IDX     FROM    1   BY  1
@@ -3865,14 +3858,19 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                        END-IF
                    END-IF    
                WHEN    "B17"
-                   IF      SPA-GMN-DATAKBN =   "3"
-                       MOVE    "0013"          TO  SPA-ERRCD
-                       MOVE    4               TO  SPA-GMN-CUR
-                   END-IF
-                   IF      SPA-GMN-PRTKBN  =   "6" OR  "7" OR  "8" OR
-                                               "9"
-                       MOVE    "0014"          TO  SPA-ERRCD
-                       MOVE    4               TO  SPA-GMN-CUR
+                   IF      SPA-T01-JOB-PARAM
+                                           NOT =   SPACE
+                       CONTINUE
+                   ELSE
+                       IF      SPA-GMN-DATAKBN =   "3"
+                           MOVE    "0013"          TO  SPA-ERRCD
+                           MOVE    4               TO  SPA-GMN-CUR
+                       END-IF
+                       IF      SPA-GMN-PRTKBN  =   "6" OR  "7" OR  "8"
+                                               OR  "9"
+                           MOVE    "0014"          TO  SPA-ERRCD
+                           MOVE    4               TO  SPA-GMN-CUR
+                       END-IF
                    END-IF
                WHEN    "B06"
                WHEN    "B07"
@@ -5067,6 +5065,12 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    WRK-CONS-JOB-SHELLID
                                    TO  JOB-SHELLID
            MOVE    SPA-TERMID      TO  JOB-TERMID
+           MOVE    SPA-T01-JOB-KARTE-UID
+                                   TO  WRK-PARAM-KARTE-UID
+           MOVE    SPA-T01-JOB-ORCA-UID
+                                   TO  WRK-PARAM-ORCA-UID
+           MOVE    WRK-PARAM       TO  JOB-PARAM
+      *
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
@@ -6078,7 +6082,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                    TO  SHELLTBL-ARG15         
            MOVE    ERRFLPARA-BASENAME
                                    TO  SHELLTBL-ARG16
-           MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG17
+      *    £È£Á£Ï£Ò£É¤Î¤È¤­¡Ö£¹¡×¤òÀßÄê
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    "9"             TO  SHELLTBL-ARG17
+           ELSE
+               MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG17
+           END-IF
            MOVE    SPA-GMN-NYUGAIKBN
                                    TO  SHELLTBL-ARG19
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20
@@ -6150,6 +6160,27 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20
                                        TO  SHELLTBL-ARG27
                MOVE    SPA-NAI-SRYYMKBN-ED (SPA-NAI-SRYYMKBN-SELNUM)
                                        TO  SHELLTBL-ARG28
+           END-IF
+      *
+      *    £È£Á£Ï£Ò£É¤Î¤È¤­£Í£Ï£Î£Â£Ì£Ï£Â¡Ý£É£Ä¤òÀßÄê
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SHELLTBL-ARG29
+                                               SPA-T01-MONBLOB-DATA-ID
+      *
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SPA-T01-MONBLOB-PRINT-ID
            END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
@@ -6385,7 +6416,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                    TO  SHELLTBL-ARG15         
            MOVE    ERRFLPARA-BASENAME
                                    TO  SHELLTBL-ARG16
-           MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG17
+      *    £È£Á£Ï£Ò£É¤Î¤È¤­¡Ö£¹¡×¤òÀßÄê
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    "9"             TO  SHELLTBL-ARG17
+           ELSE
+               MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG17
+           END-IF
       *ip¥¢¥É¥ì¥¹¼èÆÀ
       *****PERFORM 900-SYSTEM-GET-SEC
       *****MOVE    SLDUSER-HOST(1) TO  SHELLTBL-ARG18
@@ -6404,6 +6441,27 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20
            ELSE
                MOVE    SPA-GMN-RECEDEN-CHK
                                        TO  SHELLTBL-ARG26
+           END-IF
+      *
+      *    £È£Á£Ï£Ò£É¤Î¤È¤­£Í£Ï£Î£Â£Ì£Ï£Â¡Ý£É£Ä¤òÀßÄê
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SHELLTBL-ARG29
+                                               SPA-T01-MONBLOB-DATA-ID
+      *
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SPA-T01-MONBLOB-PRINT-ID
            END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
@@ -7912,6 +7970,9 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "9999"
                    MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
            END-EVALUATE
+      *
+           MOVE    TERR-ERRMSG          TO  SPA-ERRMSG
+      *
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T01"                TO  SPA-MOTOPG

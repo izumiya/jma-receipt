@@ -106,6 +106,7 @@ utf8_shell_sources = \
 	allways/medication_masterlst.sh.in \
 	allways/patient_basis_all.sh.in \
 	allways/patient_disease_all.sh.in \
+	monthly/recept4_monblobapi.sh.in \
 
 shell_sources = \
 	allways/master_standard_upgrade.sh.in \

@@ -30,6 +30,8 @@
       *  04.08.01    NACL-藤原    16/06/27  医療機関コード変更時のレセ電
       *                                     データ等の作成対応
       *                                      （１日からの変更のみ）
+      *
+      *  04.09.01    NACL-藤原    17/08/01  ＨＡＯＲＩ対応
       *****************************************************************
        01  SPA-T01KYOUTU.
          03  SPA-T01KYOUTU-H. 
@@ -70,7 +72,7 @@
            05  SPA-T01-JOB-JOBID           PIC 9(07).
       *
          03  SPA-T01KYOUTU-G. 
-      *直接請求する保険者番号                                             
+      *直接請求する保険者番号
            05  SPA-T01-DIRECT-HKNJANUM-AREA.
                07  SPA-T01-DIRECT-HKNJANUM-G.
                     09  SPA-T01-DIRECT-HKNJANUM
@@ -78,7 +80,7 @@
                     09  SPA-T01-DIRECT-HKNJANAME
                                            PIC X(30).
                07  SPA-T01-DIRECT-HKNJANUM-63
-                                           PIC X(08).                   
+                                           PIC X(08).
                07  SPA-T01-DIRECT-HKNJANUMLST  OCCURS  10.
                    09  SPA-T01-DIRECT-HKNJANUML
                                            PIC X(08).
@@ -110,3 +112,10 @@
                    09  SPA-T01-1001-TEDYUKYM-G
                                            PIC X(16).
                07  SPA-T01-1001-MAX        PIC 9(02).
+      *
+           05  SPA-T01-JOB-PARAM.
+               07  SPA-T01-JOB-ORCA-UID    PIC X(36).
+               07  SPA-T01-JOB-KARTE-UID   PIC X(36).
+      *
+           05  SPA-T01-MONBLOB-PRINT-ID    PIC X(37).
+           05  SPA-T01-MONBLOB-DATA-ID     PIC X(37).

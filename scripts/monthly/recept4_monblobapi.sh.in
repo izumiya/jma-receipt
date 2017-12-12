@@ -1,0 +1,52 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+#-------------------------------------------#
+#    帳票大容量ＡＰＩ作成処理
+#        $1-${11} 印刷ＤＢ用固定引数
+#        ${12} JOBID 
+#        ${13} SHELLID
+#        ${14} HOSPNUM
+#        ${15} エラーファイル名 
+#        ${16} MONBLOB-ID(print-id)
+#-------------------------------------------#
+
+
+cleanup(){
+##      パラメータファイル削除
+        if  [ -e "${PARA_FILE_FULL}" ]; then
+            rm   ${PARA_FILE_FULL}
+        fi
+
+##      一時ディレクトリを削除
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBDELTEMPDIR
+}
+trap cleanup EXIT
+
+    echo "arg2  =  [" ${2} "]"  
+    echo "arg3  =  [" ${3} "]"  
+    echo "arg12 =  [" ${12} "]"  
+    echo "arg13 =  [" ${13} "]"  
+    echo "arg14 =  [" ${14} "]"  
+    echo "arg15 =  [" ${15} "]"  
+    echo "arg16 =  [" ${16} "]"  
+
+    FILENM="${2}${3}.pdf"
+    if  [ -e "${MCP_TEMPDIR}/${FILENM}" ]; then
+        echo "printnm=[" $FILENM "]"
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter ${1},${2},${3},$rennum,${5},${6},${7},${8},${9},${10},${11},${12},${13},${14},${15},$FILENM,"pdf",${16}
+        if  [ -e ${MCP_TEMPDIR}/${6} ]; then
+             exit
+        fi
+    fi
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${12}${13},${14}
+
+    exit 
