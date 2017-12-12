@@ -6136,12 +6136,6 @@
       *    ³ÆÄ¢É¼°õºþ
            PERFORM 45009-PRINT-SEC
       *
-      *    ´¶À÷¾ÉÁ÷¿®
-           IF      SPA-DATAINFECTIONKBN    =   1
-               MOVE    ZERO                TO  FLG-INFEC-DLT
-               PERFORM 4904-INFECTION-SEND-SEC
-           END-IF
-      *
       *    £Ã£Ì£Á£É£ÍÁ÷¿®
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-FLG-CLAIM       =   1     )
@@ -6181,6 +6175,12 @@
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-NAI-CSVKBN2 NOT =   SPACE )
                PERFORM 4908-JMAMR-SEC
+           END-IF
+      *
+      *    ´¶À÷¾ÉÁ÷¿®
+           IF      SPA-DATAINFECTIONKBN    =   1
+               MOVE    ZERO                TO  FLG-INFEC-DLT
+               PERFORM 4904-INFECTION-SEND-SEC
            END-IF
            .
        450011-KOUSIN-ATO-EXT.
