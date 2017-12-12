@@ -792,6 +792,21 @@
                    END-PERFORM
                END-IF
            END-IF
+      *    情報取得時、返却情報がない場合は警告とする
+           IF      RECEDMAKEQ-REQUEST-NUMBER
+                                       =   "00"
+               IF      ( RECEDMAKES-START-MONTH-O (1)
+                                           =   SPACE )
+               AND     ( RECEDMAKES-HKNJANUM-O    (1)
+                                           =   SPACE )
+                   ADD     1                   TO  WRK-WARNING-MAX
+                   MOVE    "返却情報はありません"
+                                               TO  WRK-WARNING-MSG
+                                                       (WRK-WARNING-MAX)
+                   MOVE    "W04"               TO  WRK-WARNING
+                                                       (WRK-WARNING-MAX)
+               END-IF
+           END-IF
       *
       *    提出先
       *****IF    ( RECEDMAKEQ-REQUEST-NUMBER
