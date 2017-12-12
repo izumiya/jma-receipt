@@ -400,6 +400,15 @@
                05  WRK-INF-SRYKA       PIC X(02).
                05  WRK-INF-BEDFLG      PIC 9(01).
       *
+      *診療情報フォーマット一時退避
+           03  WRK-JMR-AREA.
+               05  WRK-JMR-HOSPNUM     PIC 9(02).
+               05  WRK-JMR-NYUGAIKBN   PIC X(01).
+               05  WRK-JMR-PTID        PIC 9(10).
+               05  WRK-JMR-SRYYMD      PIC X(08).
+               05  WRK-JMR-DRCD        PIC X(05).
+               05  WRK-JMR-OPID        PIC X(16).
+      *
       *    剤テーブル領域
        01  WRK-TBL-ZAINUM-AREA.
            03  WRK-TBL-ZAINUM-G            OCCURS   100.
@@ -6180,6 +6189,18 @@
                MOVE    SPA-SRYKA           TO  WRK-INF-SRYKA
                MOVE    SPA-BEDFLG          TO  WRK-INF-BEDFLG
            END-IF
+      *
+      *    診療情報フォーマット一時退避（ユーザプログラムの後で起動）
+           IF      SPA-NAI-CSVKBN2 NOT =   SPACE
+               INITIALIZE  WRK-JMR-AREA
+               MOVE    SPA-HOSPNUM         TO  WRK-JMR-HOSPNUM
+               MOVE    SPA-NYUGAIKBN       TO  WRK-JMR-NYUGAIKBN
+               MOVE    SPA-PTID            TO  WRK-JMR-PTID
+               MOVE    SPA-SRYYMD          TO  WRK-JMR-SRYYMD
+               MOVE    SPA-DRCD            TO  WRK-JMR-DRCD
+               MOVE    SPA-OPID            TO  WRK-JMR-OPID
+           END-IF
+      *
       *!!!!
       *    ユーザプログラム起動
            IF     (SPA-ERRCD           =   SPACE ) 
@@ -7282,14 +7303,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  SHELLTBL
            MOVE    JMAMR-FILE          TO  SHELLTBL-NAME
-           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
-           MOVE    SPA-PTID            TO  WRK-PTID
+           MOVE    WRK-JMR-HOSPNUM     TO  SHELLTBL-ARG1
+           MOVE    WRK-JMR-PTID        TO  WRK-PTID
            MOVE    WRK-PTID            TO  SHELLTBL-ARG2
-           MOVE    SPA-NYUGAIKBN       TO  SHELLTBL-ARG3
-           MOVE    SPA-SRYYMD          TO  SHELLTBL-ARG4
+           MOVE    WRK-JMR-NYUGAIKBN   TO  SHELLTBL-ARG3
+           MOVE    WRK-JMR-SRYYMD      TO  SHELLTBL-ARG4
            MOVE    SPA-NAI-CSVKBN2     TO  SHELLTBL-ARG5
-           MOVE    SPA-DRCD            TO  SHELLTBL-ARG6
-           MOVE    SPA-OPID            TO  SHELLTBL-ARG7
+           MOVE    WRK-JMR-DRCD        TO  SHELLTBL-ARG6
+           MOVE    WRK-JMR-OPID        TO  SHELLTBL-ARG7
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
