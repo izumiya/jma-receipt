@@ -133,4 +133,4 @@ DAS_UPLOAD2_LOCK="/var/lock/das_upload2_${MCP_TENANT}.lock"
     get_file_count
   done
   echo 'end'
-) 9>$DAS_UPLOAD2_LOCK &
+) 9>$DAS_UPLOAD2_LOCK
