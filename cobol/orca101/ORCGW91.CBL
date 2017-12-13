@@ -31,6 +31,7 @@
       *  04.08.00    NACL-伊藤    15/08/19  GINBEE対応
       *  05.00.00    NACL-森脇    17/02/03  傷病名称全記録追加
       *  05.00.01    NACL-森脇    17/06/01  診療行為、医薬品レコード名称記録
+      *  05.00.02    NACL-森脇    17/11/14  連携基盤当日受診分
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -89,6 +90,17 @@
       *----(05.00.01)--ADD-START---
                05  SPA-GMN-CHKNMREC            PIC X(01).
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+               05  SPA-GMN-COOPBASE2-G.
+                   07  SPA-GMN-COOPBASE2       PIC X(01).
+                   07  SPA-GMN-COOPBASE2-F1    PIC X(01).
+                   07  SPA-GMN-COOPBASE2-MEI   PIC X(18).
+               05  SPA-GMN-COOPBASE2-LST-G.
+                   07  SPA-GMN-COOPBASE2-LST   PIC X(20)
+                                               OCCURS   10.
+               05  SPA-GMN-COOPBASE2-MAX       PIC 9(02).
+      *----(05.00.02)--ADD-END-----
+      *
       *    見出し
            03  SPA-GMN-LABEL1                  PIC X(50).
            03  SPA-GMN-LABEL2                  PIC X(50).
@@ -279,6 +291,14 @@
                MOVE    "処方せん連携用ディレクトリ"
                                                TO  SPA-GMN-LABEL2
            END-IF
+      *----(05.00.02)--ADD-START---
+      *    連携基盤当日受診分
+           MOVE    "0 作成しない"      TO  SPA-GMN-COOPBASE2-LST(1)
+           MOVE    "1 作成する"        TO  SPA-GMN-COOPBASE2-LST(2)
+           MOVE    "2 作成する（全件）"
+                                       TO  SPA-GMN-COOPBASE2-LST(3)
+           MOVE    3                   TO  SPA-GMN-COOPBASE2-MAX
+      *----(05.00.02)--ADD-END-----
       *
       *    システム管理検索
            MOVE    SPACE               TO  SYSKANRI-REC
@@ -312,6 +332,10 @@
       *        診療行為、医薬品レコード名称記録
                MOVE    SYS-9101-NMREC      TO  SPA-GMN-CHKNMREC
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+      *        連携基盤用当日受診分
+               MOVE    SYS-9101-COOPBASE2  TO  SPA-GMN-COOPBASE2
+      *----(05.00.02)--ADD-END-----
            END-IF
       *    連携基盤用データ作成初期
            IF      SPA-GMN-COOPBASE    =   SPACE
@@ -342,6 +366,15 @@
                MOVE    "F"             TO  SPA-GMN-CHKNMREC
            END-IF
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+      *    連携基盤用当日受診分初期
+           IF      SPA-W01-KANRICD         =   "9101"
+               IF      SPA-GMN-COOPBASE2   =   SPACE
+                   MOVE    "0"             TO  SPA-GMN-COOPBASE2
+               END-IF
+               PERFORM 4102-COOPBASE2-CHK-SEC
+           END-IF
+      *----(05.00.02)--ADD-END-----
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    1                   TO  SPA-GMN-CUR
@@ -523,6 +556,9 @@
       *----(05.00.01)--ADD-START---
            MOVE    W91-CHKNMREC        TO  SPA-GMN-CHKNMREC
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+           MOVE    W91-COOPBASE2       TO  SPA-GMN-COOPBASE2-G
+      *----(05.00.02)--ADD-END-----
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -535,6 +571,11 @@
       *
       *    連携基盤用データ作成区分
            PERFORM 4102-COOPBASE-CHK-SEC
+      *----(05.00.02)--ADD-START---
+           IF      SPA-W01-KANRICD         =   "9101"
+               PERFORM 4102-COOPBASE2-CHK-SEC
+           END-IF
+      *----(05.00.02)--ADD-END-----
       *
       *    連携基盤ディレクトリ（PANDA環境のみ）
            IF     (SPA-MW              =   SPA-PANDA)  AND
@@ -573,6 +614,33 @@
            .
        4102-COOPBASE-CHK-EXT.
            EXIT.
+      *----(05.00.02)--ADD-START---
+      *****************************************************************
+      *    連携基盤用当日受診分区分チェック処理
+      *****************************************************************
+       4102-COOPBASE2-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-COOPBASE2-MAX
+               IF      SPA-GMN-COOPBASE2   =   SPA-GMN-COOPBASE2-LST
+                                                         (IDX)(1:1)
+                   MOVE    SPA-GMN-COOPBASE2-LST (IDX)
+                                           TO  SPA-GMN-COOPBASE2-G
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-OK              =   ZERO
+               MOVE    "0011"              TO  SPA-ERRCD
+               MOVE    8                   TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4102-COOPBASE2-CHK-EXT.
+           EXIT.
+      *----(05.00.02)--ADD-END-----
       *****************************************************************
       *    処理名チェック処理
       *****************************************************************
@@ -797,6 +865,10 @@
       *----(05.00.01)--ADD-START---
            MOVE    SPA-GMN-CHKNMREC        TO  SYS-9101-NMREC
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+      *    連携基盤用当日受診分作成
+           MOVE    SPA-GMN-COOPBASE2       TO  SYS-9101-COOPBASE2
+      *----(05.00.02)--ADD-END-----
       *
            END-IF
       *
@@ -940,6 +1012,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(05.00.01)--ADD-START---
            MOVE    SPA-GMN-CHKNMREC    TO  W91-CHKNMREC
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+           MOVE    SPA-GMN-COOPBASE2-G TO  W91-COOPBASE2
+           PERFORM VARYING IDX         FROM    1   BY  1
+                   UNTIL   IDX         >   SPA-GMN-COOPBASE2-MAX
+               MOVE    SPA-GMN-COOPBASE2-LST(IDX)
+                                      TO  W91-COOPBASE2-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-COOPBASE2-MAX   TO  W91-COOPBASE2-COUNT
+      *----(05.00.02)--ADD-END-----
            IF      SPA-W01-KANRICD         =   "9101"
                MOVE    WIDGET-NORMAL       TO  W91-CHKSYREC-STATE
                MOVE    WIDGET-NORMAL       TO  W91-CHKJIHI-STATE
@@ -950,6 +1031,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(05.00.01)--ADD-START---
                MOVE    WIDGET-NORMAL       TO  W91-CHKNMREC-STATE
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+               MOVE    WIDGET-NORMAL       TO  W91-COOPBASE2-STATE
+               MOVE    WIDGET-NORMAL       TO  W91-LABEL3-STATE
+               MOVE    WIDGET-NORMAL       TO  W91-LABEL4-STATE
+      *----(05.00.02)--ADD-END-----
            ELSE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKSYREC-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKJIHI-STATE
@@ -960,6 +1046,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(05.00.01)--ADD-START---
                MOVE    WIDGET-INSENSITIVE  TO  W91-CHKNMREC-STATE
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+               MOVE    WIDGET-INSENSITIVE  TO  W91-COOPBASE2-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W91-LABEL3-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W91-LABEL4-STATE
+      *----(05.00.02)--ADD-END-----
            END-IF
       *
            MOVE    SPA-GMN-LABEL1      TO  W91-LABEL1
@@ -1000,6 +1091,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    07
                    MOVE    "CHKNMREC"          TO  MCP-WIDGET
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+               WHEN    08
+                   MOVE    "COOPBASE2"         TO  MCP-WIDGET
+      *----(05.00.02)--ADD-END-----
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE
@@ -1015,6 +1110,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            EVALUATE    WRK-MCP-WIDGET
                WHEN    "COOPBASE"
+      *----(05.00.02)--ADD-START---
+                   IF      SPA-W01-KANRICD         =   "9101"
+                       MOVE    8               TO  SPA-GMN-CUR
+                   ELSE
+                       MOVE    2               TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "COOPBASE2"
+      *----(05.00.02)--ADD-END-----
                    MOVE    2               TO  SPA-GMN-CUR
                WHEN    "FILEDIR"
                    MOVE    3               TO  SPA-GMN-CUR
@@ -1080,7 +1183,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0010"
                    MOVE    "連携基盤用ディレクトリを入力して下さい"
                                        TO  SPA-ERRMSG
-      *
+      *----(05.00.02)--ADD-START---
+               WHEN    "0011"
+                   STRING  "連携基盤用データ作成区分（当日受診分）"
+                           "がありません"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *----(05.00.02)--ADD-END-----
                WHEN    "0301"
                    MOVE    "処方せん連携用データ作成区分がありません"
                                        TO  SPA-ERRMSG

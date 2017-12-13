@@ -102,6 +102,7 @@ utf8_shell_sources = \
 	allways/orcbi203.sh.in \
 	monthly/upload_jibai_receipt.sh.in \
 	monthly/recept43.sh.in \
+	monthly/recept4_renkei2.sh.in \
 
 shell_sources = \
 	allways/master_standard_upgrade.sh.in \
