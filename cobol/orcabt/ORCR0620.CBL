@@ -242,6 +242,8 @@
       *  04.08.06    NACL-藤原    17/03/31  同日再入院の入退院履歴のチェック
       *  04.08.07    NACL-門脇    17/09/26  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
+      *  04.08.08    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1766,7 +1768,11 @@
            END-IF              
       *
       *    低所得情報編集
-           PERFORM   2101-TEISYOTOKU-HENSYU-SEC
+           IF   RECE62-RECESYUBETU  =  "8888"  OR  "6666"
+             CONTINUE
+           ELSE
+             PERFORM   2101-TEISYOTOKU-HENSYU-SEC
+           END-IF
       *
       *    高齢者判定フラグ
            IF     (( RECE62-AGE          >=  70      )   OR
@@ -2213,6 +2219,11 @@
                      END-PERFORM
                    END-IF
                 END-IF
+                PERFORM VARYING SYOTOKU-IDX9 FROM 1 BY 1
+                         UNTIL  SYOTOKU-IDX9   > 31
+                   MOVE  LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX9)
+                            TO  RECE62-TEISYOTOKU3-SKJKBN(SYOTOKU-IDX9)
+                END-PERFORM
            END-IF
       *
            .

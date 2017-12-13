@@ -207,6 +207,8 @@
       *                                     （記録）対応
       *  04.08.09    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応修正
+      *  04.08.10    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -807,12 +809,13 @@
            03  FILLER          PIC X(09)   VALUE   "120001110".
       *    調剤料（麻・向・覚・毒）（入院）
            03  FILLER          PIC X(09)   VALUE   "120000410".
+      *    初診料算定科：
+           03  FILLER          PIC X(09)   VALUE   "830000020".
+      *
       *    実日数算定
            03  FILLER          PIC X(09)   VALUE   "099409901".
       *    初診料ダミー
            03  FILLER          PIC X(09)   VALUE   "099110001".
-      *    初診料算定科：
-           03  FILLER          PIC X(09)   VALUE   "830000020".
       *    育児栄養指導加算（ＤＵＭＭＹ）
            03  FILLER          PIC X(09)   VALUE   "099114001".
       *    実日数減算
@@ -825,13 +828,11 @@
            03  FILLER          PIC X(09)   VALUE   "099409908".
       *    短期滞在一部負担金徴収なし
            03  FILLER          PIC X(09)   VALUE   "099409909".
-      *    【レセプト】０点地域公費記載
-           03  FILLER          PIC X(09)   VALUE   "099999925".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   18.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   17.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   18.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   17.
       *
       *    固定値
        01  CONST-AREA.

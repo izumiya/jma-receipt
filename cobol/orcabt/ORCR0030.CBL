@@ -779,6 +779,8 @@
       *  04.08.49    NACL-門脇    17/08/28  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
       *  04.08.50    NACL-門脇    17/11/01  診療区分別点数編集修正
+      *  04.08.51    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11315,7 +11317,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    1     TO    FLG-HENSYU-NG
                END-IF
              END-IF
-             IF       SRY-SRYCD(IDX2)  =  "099999923" OR "099999924"
+             IF       SRY-SRYCD(IDX2)  =  "099999923" OR "099999924" OR
+                                          "099999925"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
              IF       SRY-SRYCD(IDX2)  =  "099999929"

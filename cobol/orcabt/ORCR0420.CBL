@@ -310,6 +310,8 @@
       *                                     レセ電請求が不可となる事に伴う対応
       *  04.08.17    NACL-門脇    17/03/27  請求金額０円レセプト作成対応
       *  04.08.18    NACL-門脇    17/06/01  湿布薬用法レセプト記載修正
+      *  04.08.19    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2874,7 +2876,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
       *
              IF       SRY-SRYCD(IDX2)  =  "099999909" OR "099999910" OR
-                                          "099999921"
+                                          "099999921" OR "099999925" OR
+                                          "099999929"
                   MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *
@@ -2905,10 +2908,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE   SPACE  TO    RECE41-SYOKAIFLG
                END-IF
                MOVE       1     TO    FLG-HENSYU-NG
-             END-IF
-      *
-             IF       SRY-SRYCD(IDX2)  =  "099999929"
-                  MOVE    1     TO    FLG-HENSYU-NG
              END-IF
       *
              IF       SRY-SRYCD(IDX2)(1:5)  =

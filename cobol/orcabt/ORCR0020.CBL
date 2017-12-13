@@ -278,6 +278,8 @@
       *  04.08.04    NACL-門脇    16/02/08  RECE02の予備項目使用分について、
       *                                     個々に項目を設ける事に伴う修正
       *  04.08.05    NACL-門脇    16/03/28  平成２８年４月改正対応
+      *  04.08.06    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2188,8 +2190,12 @@ grpsys             PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF   RECE01-SRYYM    >=  "200210"
-      *        低所得情報編集
+      *      低所得情報編集
+             IF   RECE02-RECESYUBETU  =  "8888"  OR  "6666"
+               CONTINUE
+             ELSE
                PERFORM   2101-TEISYOTOKU-HENSYU-SEC
+             END-IF
            END-IF
       *
       *    在総診フラグセット

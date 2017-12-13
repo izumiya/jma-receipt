@@ -108,6 +108,8 @@
       *  04.08.02    NACL-門脇    15/12/02  ０点地域公費記載対応
       *  04.08.03    NACL-門脇    17/06/13  減免時の判定修正
       *  04.08.04    NACL-門脇    17/09/15  福島県地方公費対応
+      *  04.08.05    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2120,6 +2122,10 @@
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
              IF  WRK-SEIKYU         =  ZERO
+                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
+             END-IF
+      *
+             IF  WRK-SEIKYU         =  ZERO
              AND FLG-SKJRYOYOHI-ARI =  ZERO
                 MOVE     ZERO    TO   FLG-SRYACCT-CHECK
                 PERFORM  VARYING  IDX2  FROM  1  BY  1
@@ -2160,7 +2166,6 @@
                        MOVE    1        TO  FLG-TENKEN
                      END-IF
                   END-IF
-                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                 END-IF
@@ -2796,6 +2801,10 @@
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
              IF  WRK-SEIKYU         =  ZERO
+                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
+             END-IF
+      *
+             IF  WRK-SEIKYU         =  ZERO
              AND FLG-SKJRYOYOHI-ARI =  ZERO
                 MOVE     ZERO    TO   FLG-SRYACCT-CHECK
                 PERFORM  VARYING  IDX2  FROM  1  BY  1
@@ -2836,7 +2845,6 @@
                        MOVE    1        TO  FLG-TENKEN
                      END-IF
                   END-IF
-                  MOVE        "1"       TO  LNK-FTNJGNCHK-SKYZEROFLG
                 ELSE
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                 END-IF

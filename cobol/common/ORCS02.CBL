@@ -446,6 +446,8 @@
       *  04.08.18    NACL-ÌçÏÆ    17/10/02  ¥·¥¹¥Æ¥à´ÉÍý£µ£°£°£°¡Ý¡ÖÆþ±¡»þ
       *                                     ¿©»öÎÅÍÜ¡×¤ÎÌ¤ÀßÄê¥Á¥§¥Ã¥¯½¤Àµ
       *  04.08.19    NACL-ÌçÏÆ    17/10/12  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.20    NACL-ÌçÏÆ    17/10/18  Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
+      *                                     ¤Ç¤Î¿©»ö»»ÄêÂÐ±þ
       *  04.08.21    NACL-ÌçÏÆ    17/11/17  £·£°ºÐÌ¤Ëþ¤ÎÄã£±¥Á¥§¥Ã¥¯½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
@@ -553,6 +555,7 @@
            03  FLG-ARI                 PIC 9(01).
            03  FLG-CYOKEIKBN-N         PIC 9(01).
            03  FLG-GENGAKU-HENSYU      PIC 9(01).
+           03  FLG-SET                 PIC 9(01).
       *
       *    Åº¤¨»úÎÎ°è
        01  IDX-AREA.
@@ -579,6 +582,7 @@
            03  IDX23                   PIC  9(02).
            03  IDX24                   PIC  9(02).
            03  IDX25                   PIC  9(02).
+           03  IDX26                   PIC  9(03).
            03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
            03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
            03  IDY                     PIC  9(02)  VALUE  ZERO.
@@ -1168,6 +1172,9 @@
            03  WK-IRYOKEIKBN-MAXTEN    PIC 9(08).
       *
            03  WK-SHOKUJIRYOYOCD-ERR   PIC 9(01).
+      *
+           03  WK-SKJHKN-TBL.
+               05  WK-SKJHKN-SANTEIFLG PIC X(01)  OCCURS  31.
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -2150,10 +2157,23 @@
              ELSE
                PERFORM   VARYING   IDX24    FROM    1   BY  1
                           UNTIL    IDX24     >     31
-                 IF  (LNK-SYU-DAY(IDX24)          =  "1" OR "9")
-                 OR  (LNK-S02-NYUINDAY-KBN(IDX24) =  "1"       )
-                   IF   WK-SYOTOKU-SKJKBN(IDX24)  =  "1" OR "4"
-                      MOVE   34    TO  LNK-S02-RC
+                 IF   LNK-S02-SKJHKN-HKNCOMBI(IDX24)     = SPACE
+                 AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDX24) = SPACE
+                   IF  ((LNK-SYU-DAY(IDX24)           =  "1" OR "9") OR
+                        (LNK-S02-NYUINDAY-KBN(IDX24)  =  "1"       ))
+                   AND ( LNK-S02-NYUSANTEI-KBN(IDX24) =  "1"        )
+                     IF   WK-SYOTOKU-SKJKBN(IDX24)  =  "1" OR "4"
+                        MOVE   34    TO  LNK-S02-RC
+                     END-IF
+                   END-IF
+                 ELSE
+                   IF  ((LNK-SYU-DAY(IDX24)           =  "1" OR "9") OR
+                        (LNK-S02-NYUINDAY-KBN(IDX24)  =  "1"       ) OR
+                        (WK-SKJHKN-SANTEIFLG(IDX24)   =  "1"       ))
+                   AND ( LNK-S02-NYUSANTEI-KBN(IDX24) =  "1"        )
+                     IF   WK-SYOTOKU-SKJKBN(IDX24)  =  "1" OR "4"
+                        MOVE   34    TO  LNK-S02-RC
+                     END-IF
                    END-IF
                  END-IF
                END-PERFORM
@@ -3517,16 +3537,21 @@
            MOVE    SPACE              TO  FLG-SANSHOU3
            INITIALIZE                     WK-SYOTOKU-SKJKBN-TBL
       *
-           INITIALIZE                     ORCSSYOTOKUAREA
-           MOVE  LNK-SYU-HOSPNUM      TO  LNK-SYOTOKU-HOSPNUM
-           MOVE  LNK-SYU-PTID         TO  LNK-SYOTOKU-PTID
-           MOVE  LNK-SYU-SRYYMD(1:6)  TO  LNK-SYOTOKU-SRYYM
-           MOVE  "1"                  TO  LNK-SYOTOKU-SKJCHKFLG
+           IF  (LNK-SYU-SYUHKNNUM = "971" OR "973" OR "975"
+                                 OR "068" OR "069" OR "040"  )
+           OR  (LNK-SYU-SYUHKNNUM(1:2) = "98" OR "90" OR "91")
+             CONTINUE
+           ELSE
+             INITIALIZE                     ORCSSYOTOKUAREA
+             MOVE  LNK-SYU-HOSPNUM      TO  LNK-SYOTOKU-HOSPNUM
+             MOVE  LNK-SYU-PTID         TO  LNK-SYOTOKU-PTID
+             MOVE  LNK-SYU-SRYYMD(1:6)  TO  LNK-SYOTOKU-SRYYM
+             MOVE  "1"                  TO  LNK-SYOTOKU-SKJCHKFLG
       *
-           CALL    "ORCSSYOTOKU"      USING  ORCSSYOTOKUAREA
-                                             SPA-AREA
+             CALL    "ORCSSYOTOKU"      USING  ORCSSYOTOKUAREA
+                                               SPA-AREA
       *
-           IF    LNK-SYOTOKU-RC    =   ZERO
+             IF    LNK-SYOTOKU-RC    =   ZERO
                 IF    LNK-SYU-SRYYMD(1:6)   >=  "200604"
                   MOVE   LNK-SYU-SRYYMD(7:2)  TO  SYOTOKU-IDX
                 ELSE
@@ -3543,15 +3568,10 @@
                            UNTIL    SYOTOKU-IDX     >    31
                    MOVE   LNK-SYOTOKU-SKJKBN(SYOTOKU-IDX)
                                     TO  WK-SYOTOKU-SKJKBN(SYOTOKU-IDX)
-                   IF (LNK-SYU-SYUHKNNUM = "971" OR "973" OR "975"
-                                        OR "068" OR "069" OR "040"  )
-                   OR (LNK-SYU-SYUHKNNUM(1:2) = "98" OR "90" OR "91")
-                       MOVE  SPACE  TO  WK-SYOTOKU-SKJKBN(SYOTOKU-IDX)
-                   END-IF
                 END-PERFORM
-           END-IF
+             END-IF
       *
-           EVALUATE   FLG-SANSHOU2
+             EVALUATE   FLG-SANSHOU2
                WHEN     SPACE
                     MOVE     "1"      TO  FLG-SANSHOU2
                WHEN     "2"
@@ -3560,7 +3580,8 @@
                WHEN     "1"
                WHEN     "4"
                     MOVE     "3"      TO  FLG-SANSHOU2
-           END-EVALUATE
+             END-EVALUATE
+           END-IF
       *
            .
       *
@@ -22345,7 +22366,7 @@
                PERFORM  UNTIL   FLG-SRYACCT     =    1
       *
                  IF     LNK-SYU-HKNCOMBINUM  =    ACCT-HKNCOMBI
-                         PERFORM    23043-ROSAITOKU-TAIHI-SEC
+                         PERFORM    23043-ROSAITOKU-TAIHI1-SEC
                  END-IF
       *
                  MOVE    "tbl_sryacct"   TO      MCP-TABLE
@@ -22545,6 +22566,8 @@
                   PERFORM     23048-SHOKUJI-CHECK-SEC
            END-IF
       *
+           PERFORM            23049-SKJ-SANTEIFLG-KURIA-SEC
+      *
            .
       *
        2304-SHOKUJI-KEISAN200604-EXT.
@@ -22618,47 +22641,66 @@
            EXIT.
       *
       ******************************************************************
-      *    ÆÃÊÌ¿©²Ã»»ÂàÈò                                              *
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£±                                            *
       ******************************************************************
-       23043-ROSAITOKU-TAIHI-SEC         SECTION.
+       23043-ROSAITOKU-TAIHI1-SEC         SECTION.
       *
            PERFORM    VARYING   IDY   FROM   1   BY   1
                        UNTIL    IDY    >    31
-               IF   ACCT-SRYKBN   =   "95"
-                  IF       ACCT-DAY(1 IDY)   NOT =  ZERO
-      **>             MOVE   ACCT-DAY(1 IDY)  TO   WK-ROSAITOKU95(IDY)
-                      COMPUTE  WK-ROSAITOKU95(IDY) =
-                               WK-ROSAITOKU95(IDY) +
-                               (ACCT-SURYOUTOTAL * ACCT-DAY(1 IDY))
-                  END-IF
+      *
+             IF      LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI11-SEC
+             ELSE
+               IF  ( LNK-S02-TEIKI-KBN        =   "X" )
+               OR  ((LNK-S02-TEIKI-KBN        =   "Y") AND
+                    (LNK-S02-DOJITU-DAY2(IDY) =   "1"))
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI11-SEC
+               ELSE
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   0
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI11-SEC
+                 END-IF
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   1 OR 7
+                    MOVE     2     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI11-SEC
+                 END-IF
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   8 OR 9
+                    MOVE     3     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI11-SEC
+                 END-IF
                END-IF
-               IF   ACCT-SRYKBN   =   "96"
-                  IF       ACCT-DAY(1 IDY)   NOT =  ZERO
-      **>             MOVE   ACCT-DAY(1 IDY)  TO   WK-ROSAITOKU96(IDY)
-                      COMPUTE  WK-ROSAITOKU96(IDY) =
-                               WK-ROSAITOKU96(IDY) +
-                               (ACCT-SURYOUTOTAL * ACCT-DAY(1 IDY))
-                  END-IF
-               END-IF
-               IF   ACCT-SRYKBN   =   "97"
-                  IF       ACCT-DAY(1 IDY)   NOT =  ZERO
-      **>             MOVE   ACCT-DAY(1 IDY)  TO   WK-ROSAITOKU97(IDY)
-                      IF  (ACCT-SRYCDTOTAL = 197000470 OR 197001570)
-                      AND (LNK-SYU-SRYYMD(1:6)  >=  "200604"       )
-                         COMPUTE  WK-ROSAITOKU97(IDY) =
-                                  WK-ROSAITOKU97(IDY) +
-                                  ACCT-SURYOUTOTAL
-                         IF   WK-ROSAITOKU97(IDY)  >  3
-                            MOVE    3    TO   WK-ROSAITOKU97(IDY)
-                         END-IF
-                      END-IF
-                  END-IF
-               END-IF
+             END-IF
+      *
            END-PERFORM
       *
            .
       *
-       23043-ROSAITOKU-TAIHI-EXT.
+       23043-ROSAITOKU-TAIHI1-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£±¤Î£±                                        *
+      ******************************************************************
+       230431-ROSAITOKU-TAIHI11-SEC         SECTION.
+      *
+           IF   ACCT-SRYKBN               =  "95"
+           AND  ACCT-DAY(IDX26 IDY)   NOT =  ZERO
+                  COMPUTE  WK-ROSAITOKU95(IDY) =
+                           WK-ROSAITOKU95(IDY) +
+                           (ACCT-SURYOUTOTAL * ACCT-DAY(IDX26 IDY))
+           END-IF
+           IF   ACCT-SRYKBN               =  "96"
+           AND  ACCT-DAY(IDX26 IDY)   NOT =  ZERO
+                  COMPUTE  WK-ROSAITOKU96(IDY) =
+                           WK-ROSAITOKU96(IDY) +
+                           (ACCT-SURYOUTOTAL * ACCT-DAY(IDX26 IDY))
+           END-IF
+      *
+           .
+      *
+       230431-ROSAITOKU-TAIHI11-EXT.
            EXIT.
       *
       ******************************************************************
@@ -22668,23 +22710,57 @@
       *
            PERFORM    VARYING   IDY   FROM   1   BY   1
                        UNTIL    IDY    >    31
-               IF   ACCT-SRYKBN           =  "97"
-               AND  ACCT-DAY(1 IDY)   NOT =  ZERO
-                  COMPUTE  WK-ROSAITOKU97(IDY) =
-                           WK-ROSAITOKU97(IDY) +
-                           ACCT-SURYOUTOTAL
-                  IF   WK-ROSAITOKU97(IDY)  >  3
-                     MOVE    3    TO   WK-ROSAITOKU97(IDY)
-                  END-IF
-                  IF   WK-SHOKUJIRYOYO(IDY) =  2
-                     MOVE   29    TO   LNK-S02-RC
-                  END-IF
+      *
+             IF      LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI21-SEC
+             ELSE
+               IF  ( LNK-S02-TEIKI-KBN        =   "X" )
+               OR  ((LNK-S02-TEIKI-KBN        =   "Y") AND
+                    (LNK-S02-DOJITU-DAY2(IDY) =   "1"))
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI21-SEC
+               ELSE
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   0
+                    MOVE     1     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI21-SEC
+                 END-IF
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   1 OR 7
+                    MOVE     2     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI21-SEC
+                 END-IF
+                 IF     LNK-S02-DOJITU-DAY(IDY)  =   8 OR 9
+                    MOVE     3     TO     IDX26
+                    PERFORM    230431-ROSAITOKU-TAIHI21-SEC
+                 END-IF
                END-IF
+             END-IF
+      *
            END-PERFORM
       *
            .
       *
        23043-ROSAITOKU-TAIHI2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£²¤Î£±                                        *
+      ******************************************************************
+       230431-ROSAITOKU-TAIHI21-SEC         SECTION.
+      *
+           IF   ACCT-SRYKBN               =  "97"
+           AND  ACCT-DAY(IDX26 IDY)   NOT =  ZERO
+              COMPUTE  WK-ROSAITOKU97(IDY) =
+                       WK-ROSAITOKU97(IDY) +
+                       (ACCT-SURYOUTOTAL * ACCT-DAY(IDX26 IDY))
+              IF   WK-SHOKUJIRYOYO(IDY) =  2
+                 MOVE   29    TO   LNK-S02-RC
+              END-IF
+           END-IF
+      *
+           .
+      *
+       230431-ROSAITOKU-TAIHI21-EXT.
            EXIT.
       *
       ******************************************************************
@@ -22718,68 +22794,38 @@
                MOVE     "key8"            TO   MCP-PATHNAME
                PERFORM   SRYACT-READ-SEC
                PERFORM  UNTIL   FLG-SRYACT     =    1
-                  PERFORM    VARYING   IDY   FROM   1   BY   1
-                              UNTIL    IDY    >    31
-                    IF   ACCT-SRYKBN           =  "95"
-                    AND  ACCT-DAY(1 IDY)   NOT =  ZERO
-                      IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU95(IDY) =
-                                 WK-ROSAITOKU95(IDY) +
-                                 (SRY-SRYSURYO(1) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU95(IDY) =
-                                 WK-ROSAITOKU95(IDY) +
-                                 (SRY-SRYSURYO(2) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU95(IDY) =
-                                 WK-ROSAITOKU95(IDY) +
-                                 (SRY-SRYSURYO(3) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU95(IDY) =
-                                 WK-ROSAITOKU95(IDY) +
-                                 (SRY-SRYSURYO(4) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU95(IDY) =
-                                 WK-ROSAITOKU95(IDY) +
-                                 (SRY-SRYSURYO(5) * ACCT-DAY(1 IDY))
-                      END-IF
-                    END-IF
-                    IF   ACCT-SRYKBN           =  "96"
-                    AND  ACCT-DAY(1 IDY)   NOT =  ZERO
-                      IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU96(IDY) =
-                                 WK-ROSAITOKU96(IDY) +
-                                 (SRY-SRYSURYO(1) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU96(IDY) =
-                                 WK-ROSAITOKU96(IDY) +
-                                 (SRY-SRYSURYO(2) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU96(IDY) =
-                                 WK-ROSAITOKU96(IDY) +
-                                 (SRY-SRYSURYO(3) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU96(IDY) =
-                                 WK-ROSAITOKU96(IDY) +
-                                 (SRY-SRYSURYO(4) * ACCT-DAY(1 IDY))
-                      END-IF
-                      IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
-                        COMPUTE  WK-ROSAITOKU96(IDY) =
-                                 WK-ROSAITOKU96(IDY) +
-                                 (SRY-SRYSURYO(5) * ACCT-DAY(1 IDY))
-                      END-IF
-                    END-IF
-                  END-PERFORM
-                  MOVE     "tbl_sryact"      TO   MCP-TABLE
-                  MOVE     "key8"            TO   MCP-PATHNAME
-                  PERFORM   SRYACT-READ-SEC
+                 PERFORM    VARYING   IDY   FROM   1   BY   1
+                             UNTIL    IDY    >    31
+      *
+                   IF      LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                          MOVE     1     TO     IDX26
+                          PERFORM    230431-ROSAITOKU-TAIHI31-SEC
+                   ELSE
+                     IF  ( LNK-S02-TEIKI-KBN        =   "X" )
+                     OR  ((LNK-S02-TEIKI-KBN        =   "Y") AND
+                          (LNK-S02-DOJITU-DAY2(IDY) =   "1"))
+                          MOVE     1     TO     IDX26
+                          PERFORM    230431-ROSAITOKU-TAIHI31-SEC
+                     ELSE
+                       IF     LNK-S02-DOJITU-DAY(IDY)  =   0
+                          MOVE     1     TO     IDX26
+                          PERFORM    230431-ROSAITOKU-TAIHI31-SEC
+                       END-IF
+                       IF     LNK-S02-DOJITU-DAY(IDY)  =   1 OR 7
+                          MOVE     2     TO     IDX26
+                          PERFORM    230431-ROSAITOKU-TAIHI31-SEC
+                       END-IF
+                       IF     LNK-S02-DOJITU-DAY(IDY)  =   8 OR 9
+                          MOVE     3     TO     IDX26
+                          PERFORM    230431-ROSAITOKU-TAIHI31-SEC
+                       END-IF
+                     END-IF
+                   END-IF
+      *
+                 END-PERFORM
+                 MOVE     "tbl_sryact"    TO   MCP-TABLE
+                 MOVE     "key8"          TO   MCP-PATHNAME
+                 PERFORM   SRYACT-READ-SEC
                END-PERFORM
              END-IF
              MOVE    "tbl_sryact"         TO   MCP-TABLE
@@ -22791,6 +22837,73 @@
            .
       *
        23043-ROSAITOKU-TAIHI3-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£³¤Î£±                                        *
+      ******************************************************************
+       230431-ROSAITOKU-TAIHI31-SEC         SECTION.
+      *
+           IF   ACCT-SRYKBN               =  "95"
+           AND  ACCT-DAY(IDX26 IDY)   NOT =  ZERO
+             IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU95(IDY) =
+                        WK-ROSAITOKU95(IDY) +
+                        (SRY-SRYSURYO(1) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU95(IDY) =
+                        WK-ROSAITOKU95(IDY) +
+                        (SRY-SRYSURYO(2) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU95(IDY) =
+                        WK-ROSAITOKU95(IDY) +
+                        (SRY-SRYSURYO(3) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU95(IDY) =
+                        WK-ROSAITOKU95(IDY) +
+                        (SRY-SRYSURYO(4) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU95(IDY) =
+                        WK-ROSAITOKU95(IDY) +
+                        (SRY-SRYSURYO(5) * ACCT-DAY(IDX26 IDY))
+             END-IF
+           END-IF
+           IF   ACCT-SRYKBN               =  "96"
+           AND  ACCT-DAY(IDX26 IDY)   NOT =  ZERO
+             IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU96(IDY) =
+                        WK-ROSAITOKU96(IDY) +
+                        (SRY-SRYSURYO(1) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU96(IDY) =
+                        WK-ROSAITOKU96(IDY) +
+                        (SRY-SRYSURYO(2) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU96(IDY) =
+                        WK-ROSAITOKU96(IDY) +
+                        (SRY-SRYSURYO(3) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU96(IDY) =
+                        WK-ROSAITOKU96(IDY) +
+                        (SRY-SRYSURYO(4) * ACCT-DAY(IDX26 IDY))
+             END-IF
+             IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
+               COMPUTE  WK-ROSAITOKU96(IDY) =
+                        WK-ROSAITOKU96(IDY) +
+                        (SRY-SRYSURYO(5) * ACCT-DAY(IDX26 IDY))
+             END-IF
+           END-IF
+      *
+           .
+      *
+       230431-ROSAITOKU-TAIHI31-EXT.
            EXIT.
       *
       ******************************************************************
@@ -22808,6 +22921,8 @@
       *
              IF       ( NACCT-DAY(IDY)   NOT =  ZERO        )
              AND      ( LNK-SYU-DAY(IDY)     =  "1" OR "9"  )
+             AND      ( LNK-S02-NYUSANTEI-KBN(IDY)
+                                             =  "1"         )
              AND      ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
                        (WK-GAIHAKU(IDY)     >=   4         ))
       *
@@ -23361,9 +23476,7 @@
       *
              END-IF
       *
-             IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
-      **>    AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU95(IDY)  NOT =  ZERO
       *
       *         É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                 MOVE  "197001210"    TO   WK-SRYCD
@@ -23375,9 +23488,7 @@
       *
              END-IF
       *
-             IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
-      **>    AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU96(IDY)  NOT =  ZERO
       *
       *         É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                 MOVE  "197001210"    TO   WK-SRYCD
@@ -23530,66 +23641,6 @@
       ******************************************************************
        23046-SHOKUJI-FURIWAKE-SEC                 SECTION.
       *
-           PERFORM    VARYING   IDY   FROM   1   BY   1
-                       UNTIL    IDY    >    31
-      *
-              IF  LNK-S02-DOJITU-DAY(IDY)  =  9
-                  PERFORM   230461-SHOKUJI-FURIWAKE-SEC
-              END-IF
-              IF  LNK-S02-DOJITU-DAY(IDY)  =  1
-                  PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
-              END-IF
-              IF  LNK-S02-DOJITU-DAY(IDY)  =  7 OR 8
-                  PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
-              END-IF
-      *
-           END-PERFORM
-      *
-           PERFORM    VARYING   IDY   FROM   1   BY   1
-                       UNTIL    IDY    >    31
-      *
-              EVALUATE   WK-SHOKUJI-ASA (IDY)
-                WHEN        1
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        2
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-TOKUSYO(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        3
-                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                  END-IF
-              END-EVALUATE
-              EVALUATE   WK-SHOKUJI-HIRU(IDY)
-                WHEN        1
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        2
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-TOKUSYO(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        3
-                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                  END-IF
-              END-EVALUATE
-              EVALUATE   WK-SHOKUJI-YORU(IDY)
-                WHEN        1
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        2
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                                     WK-SHOKUJI-TOKUSYO(IDY)
-                                     WK-SHOKUJI-NYUINJI2(IDY)
-                WHEN        3
-                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
-                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
-                  END-IF
-              END-EVALUATE
-      *
-           END-PERFORM
-      *
       *    Æþ±¡»þÀ¸³èÎÅÍÜÈñÉéÃ´³Û¼èÆÀ
       *    ¿©»öÉéÃ´¿ø¤¨ÃÖ¤­ÂÐ¾Ý¼èÆÀ
            IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
@@ -23677,19 +23728,25 @@
                END-PERFORM
              END-IF
       *
-             INITIALIZE                      ORCSSKJKEEP-AREA
-             MOVE    LNK-SYU-HOSPNUM     TO  LNK-SKJKEEP-HOSPNUM
-             MOVE    LNK-SYU-PTID        TO  LNK-SKJKEEP-PTID
-             MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-SKJKEEP-SANTEIYM
-             CALL    "ORCSSKJKEEP"       USING
-                                         ORCSSKJKEEP-AREA
-                                         SPA-AREA
-             IF      LNK-SKJKEEP-RC  =   ZERO
-               PERFORM  VARYING  NYULIFE-IDX  FROM  1  BY  1
-                         UNTIL   NYULIFE-IDX   >   31
-                 MOVE  LNK-SKJKEEP-KBN(NYULIFE-IDX)
-                                TO  WK-SKJKEEP-KBN(NYULIFE-IDX)
-               END-PERFORM
+             IF  (LNK-SYU-SYUHKNNUM = "971" OR "973" OR "975"
+                                   OR "068" OR "069" OR "040"  )
+             OR  (LNK-SYU-SYUHKNNUM(1:2) = "98" OR "90" OR "91")
+               CONTINUE
+             ELSE
+               INITIALIZE                      ORCSSKJKEEP-AREA
+               MOVE    LNK-SYU-HOSPNUM     TO  LNK-SKJKEEP-HOSPNUM
+               MOVE    LNK-SYU-PTID        TO  LNK-SKJKEEP-PTID
+               MOVE    LNK-SYU-SRYYMD(1:6) TO  LNK-SKJKEEP-SANTEIYM
+               CALL    "ORCSSKJKEEP"       USING
+                                           ORCSSKJKEEP-AREA
+                                           SPA-AREA
+               IF      LNK-SKJKEEP-RC  =   ZERO
+                 PERFORM  VARYING  NYULIFE-IDX  FROM  1  BY  1
+                           UNTIL   NYULIFE-IDX   >   31
+                   MOVE  LNK-SKJKEEP-KBN(NYULIFE-IDX)
+                                  TO  WK-SKJKEEP-KBN(NYULIFE-IDX)
+                 END-PERFORM
+               END-IF
              END-IF
            ELSE
              IF    LNK-SYU-SRYYMD(1:6)  >=  "200610"
@@ -23721,6 +23778,103 @@
                END-IF
              END-IF
            END-IF
+      *
+      *****
+      *
+           INITIALIZE      WK-SKJHKN-TBL
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+      *
+              PERFORM   230466-SKJ-SANTEIFLG-SET-SEC
+      *
+              IF   LNK-S02-SKJHKN-HKNCOMBI(IDY)     = SPACE
+              AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) = SPACE
+                IF  LNK-S02-DOJITU-DAY(IDY)  =  9
+                      PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                END-IF
+                IF  LNK-S02-DOJITU-DAY(IDY)  =  1
+                      PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
+                END-IF
+                IF  LNK-S02-DOJITU-DAY(IDY)  =  7 OR 8
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                END-IF
+              ELSE
+                IF  LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                   IF   LNK-S02-SKJHKN-HKNCOMBI(IDY) NOT = SPACE
+                     IF   LNK-S02-SKJHKN-HKNCOMBI(IDY)   =
+                                                LNK-SYU-HKNCOMBINUM
+                       MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                     ELSE
+                       PERFORM  230463-SHOKUJI-FURIWAKE3-SEC
+                     END-IF
+                   END-IF
+                ELSE
+                   IF  ( LNK-S02-TEIKI-KBN        =   "X" )
+                   OR  ((LNK-S02-TEIKI-KBN        =   "Y") AND
+                        (LNK-S02-DOJITU-DAY2(IDY) =   "1"))
+                      PERFORM   230464-SHOKUJI-FURIWAKE4-SEC
+                   ELSE
+                      PERFORM   230465-SHOKUJI-FURIWAKE5-SEC
+                   END-IF
+                END-IF
+      *         Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë¤ÏÆþ±¡²ñ·×¤ÎÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç»»Äê
+                IF  (LNK-S02-SKJHKN-HKNCOMBI-XXX(IDY) NOT = SPACE)
+                AND (LNK-S02-SKJHKN-HKNCOMBI-XXX(IDY)     =
+                                              LNK-SYU-HKNCOMBINUM)
+                AND (LNK-S02-DOJITU-DAY(IDY)  =  0 OR 1          )
+                   MOVE   ZERO  TO   WK-SHOKUJI-KANFLG(IDY)
+                ELSE
+                   MOVE    1    TO   WK-SHOKUJI-KANFLG(IDY)
+                END-IF
+              END-IF
+      *
+           END-PERFORM
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+      *
+              EVALUATE   WK-SHOKUJI-ASA (IDY)
+                WHEN        1
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        2
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
+              END-EVALUATE
+              EVALUATE   WK-SHOKUJI-HIRU(IDY)
+                WHEN        1
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        2
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
+              END-EVALUATE
+              EVALUATE   WK-SHOKUJI-YORU(IDY)
+                WHEN        1
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        2
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                                     WK-SHOKUJI-TOKUSYO(IDY)
+                                     WK-SHOKUJI-NYUINJI2(IDY)
+                WHEN        3
+                  IF    LNK-SYU-SRYYMD(1:6)  >=  "201604"
+                    ADD   1     TO   WK-SHOKUJI-NYUINJI(IDY)
+                  END-IF
+              END-EVALUATE
+      *
+           END-PERFORM
       *
            .
       *
@@ -23754,9 +23908,6 @@
                MOVE   ZERO   TO  WK-SHOKUJI-HIRU(IDY)
            END-EVALUATE
            MOVE        1     TO  WK-SHOKUJI-KANFLG(IDY)
-           MOVE       ZERO   TO  WK-ROSAITOKU95 (IDY)
-           MOVE       ZERO   TO  WK-ROSAITOKU96 (IDY)
-           MOVE       ZERO   TO  WK-ROSAITOKU97 (IDY)
       *
            .
       *
@@ -23804,10 +23955,268 @@
            MOVE   ZERO   TO  WK-SHOKUJI-HIRU(IDY)
            MOVE   ZERO   TO  WK-SHOKUJI-YORU(IDY)
            MOVE   ZERO   TO  WK-SHOKUDOKASAN(IDY)
+           MOVE    1     TO  WK-SHOKUJI-KANFLG(IDY)
       *
            .
       *
        230463-SHOKUJI-FURIWAKE3-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡»þ¿©»öÎÅÍÜ¤ÈÆÃÊÌ¿©²Ã»»¤ò¤ï¤±¤ë
+      ******************************************************************
+       230464-SHOKUJI-FURIWAKE4-SEC                 SECTION.
+      *
+           IF   (LNK-S02-SKJHKN-HKNCOMBI(IDY)     NOT = SPACE)
+           AND  (LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) NOT = SPACE)
+              IF      (LNK-S02-SKJHKN-HKNCOMBI(IDY)         =
+                                                LNK-SYU-HKNCOMBINUM)
+              AND     (LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)     =
+                                                LNK-SYU-HKNCOMBINUM)
+                MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+              ELSE
+                IF    (LNK-S02-SKJHKN-HKNCOMBI(IDY)         =
+                                                LNK-SYU-HKNCOMBINUM)
+                AND   (LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) NOT =
+                                                LNK-SYU-HKNCOMBINUM)
+                  PERFORM     230462-SHOKUJI-FURIWAKE2-SEC
+                  MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                ELSE
+                  IF  (LNK-S02-SKJHKN-HKNCOMBI(IDY)     NOT =
+                                                LNK-SYU-HKNCOMBINUM)
+                  AND (LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)     =
+                                                LNK-SYU-HKNCOMBINUM)
+                    PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                    MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                  ELSE
+                    PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                  END-IF
+                END-IF
+              END-IF
+           ELSE
+              IF  LNK-S02-SKJHKN-HKNCOMBI(IDY) NOT = SPACE
+                IF  LNK-S02-SKJHKN-HKNCOMBI(IDY)   =
+                                          LNK-SYU-HKNCOMBINUM
+                    IF  ( LNK-S02-DOJITU-DAY(IDY)  =  1 OR 7 OR 8 )
+                    OR  ((LNK-S02-DOJITU-DAY(IDY)  =  0 ) AND
+                         (LNK-SYU-DAY(IDY)         = "2")         )
+                      PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
+                    END-IF
+                    MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                ELSE
+                    IF  LNK-S02-DOJITU-DAY(IDY)  =  1 OR 7 OR 8
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                    END-IF
+                    IF  LNK-S02-DOJITU-DAY(IDY)  =  9 OR 0
+                      PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                    END-IF
+                END-IF
+              ELSE
+                IF  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)   =
+                                          LNK-SYU-HKNCOMBINUM
+                    IF  ( LNK-S02-DOJITU-DAY(IDY)  =  7 OR 8 OR 9 )
+                    OR  ((LNK-S02-DOJITU-DAY(IDY)  =  0 ) AND
+                         (LNK-SYU-DAY(IDY)         = "2")         )
+                      PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                    END-IF
+                    MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                ELSE
+                    IF  LNK-S02-DOJITU-DAY(IDY)  =  7 OR 8 OR 9
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                    END-IF
+                    IF  LNK-S02-DOJITU-DAY(IDY)  =  1 OR 0
+                      PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
+                    END-IF
+                END-IF
+              END-IF
+           END-IF
+      *
+           .
+      *
+       230464-SHOKUJI-FURIWAKE4-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡»þ¿©»öÎÅÍÜ¤ÈÆÃÊÌ¿©²Ã»»¤ò¤ï¤±¤ë
+      ******************************************************************
+       230465-SHOKUJI-FURIWAKE5-SEC                 SECTION.
+      *
+           IF  LNK-S02-DOJITU-DAY(IDY)  =  1 OR 7
+             IF   LNK-S02-SKJHKN-HKNCOMBI(IDY) NOT = SPACE
+                IF  LNK-S02-SKJHKN-HKNCOMBI(IDY)   =
+                                          LNK-SYU-HKNCOMBINUM
+                      PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
+                      MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                ELSE
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                END-IF
+             ELSE
+                IF    LNK-S02-DOJITU-DAY(IDY)  =  1
+                      PERFORM   230462-SHOKUJI-FURIWAKE2-SEC
+                END-IF
+                IF    LNK-S02-DOJITU-DAY(IDY)  =  7
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                END-IF
+             END-IF
+           END-IF
+      *
+           IF  LNK-S02-DOJITU-DAY(IDY)  =  8 OR 9
+             IF   LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) NOT = SPACE
+                IF  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)   =
+                                              LNK-SYU-HKNCOMBINUM
+                      PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                      MOVE   "1"   TO   WK-SKJHKN-SANTEIFLG(IDY)
+                ELSE
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                END-IF
+             ELSE
+                IF    LNK-S02-DOJITU-DAY(IDY)  =  9
+                      PERFORM   230461-SHOKUJI-FURIWAKE-SEC
+                END-IF
+                IF    LNK-S02-DOJITU-DAY(IDY)  =  8
+                      PERFORM   230463-SHOKUJI-FURIWAKE3-SEC
+                END-IF
+             END-IF
+           END-IF
+      *
+           IF  LNK-S02-DOJITU-DAY(IDY)  =  0
+                      PERFORM   230464-SHOKUJI-FURIWAKE4-SEC
+           END-IF
+      *
+           .
+      *
+       230465-SHOKUJI-FURIWAKE5-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç¤Î¿©»ö»»Äê¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ëÊÔ½¸
+      ******************************************************************
+       230466-SKJ-SANTEIFLG-SET-SEC                 SECTION.
+      *
+           IF   (LNK-S02-SKJHKN-SRYYM(1) = SPACE              )
+           OR   (LNK-SYU-SRYYMD(1:6) = LNK-S02-SKJHKN-SRYYM(1))
+             IF    LNK-S02-SKJHKN-SET(1 IDY) = SPACE
+               MOVE  LNK-SYU-SRYYMD(1:6)
+                            TO  LNK-S02-SKJHKN-SRYYM(1)
+               MOVE  "1"    TO  LNK-S02-SKJHKN-SET(1 IDY)
+               IF  LNK-S02-SKJHKN-HKNCOMBI(IDY) NOT = SPACE
+                 MOVE   "1" TO LNK-S02-SKJHKN-AAA-TAIFLG(1 IDY)
+                 PERFORM   2304661-SKJ-SANTEIFLG-SET1-SEC
+                 IF   FLG-SET  =  1
+                   MOVE "1" TO LNK-S02-SKJHKN-AAA-ARIFLG(1 IDY)
+                 END-IF
+               END-IF
+               IF  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) NOT = SPACE
+                 MOVE   "1" TO LNK-S02-SKJHKN-BBB-TAIFLG(1 IDY)
+                 PERFORM   2304662-SKJ-SANTEIFLG-SET2-SEC
+                 IF   FLG-SET  =  1
+                   MOVE "1" TO LNK-S02-SKJHKN-BBB-ARIFLG(1 IDY)
+                 END-IF
+               END-IF
+             END-IF
+           ELSE
+             IF   (LNK-S02-SKJHKN-SRYYM(2) = SPACE              )
+             OR   (LNK-SYU-SRYYMD(1:6) = LNK-S02-SKJHKN-SRYYM(2))
+               IF    LNK-S02-SKJHKN-SET(2 IDY) = SPACE
+                 MOVE  LNK-SYU-SRYYMD(1:6)
+                              TO  LNK-S02-SKJHKN-SRYYM(2)
+                 MOVE  "1"    TO  LNK-S02-SKJHKN-SET(2 IDY)
+                 IF  LNK-S02-SKJHKN-HKNCOMBI(IDY) NOT = SPACE
+                   MOVE   "1" TO LNK-S02-SKJHKN-AAA-TAIFLG(2 IDY)
+                   PERFORM   2304661-SKJ-SANTEIFLG-SET1-SEC
+                   IF   FLG-SET  =  1
+                     MOVE "1" TO LNK-S02-SKJHKN-AAA-ARIFLG(2 IDY)
+                   END-IF
+                 END-IF
+                 IF  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) NOT = SPACE
+                   MOVE   "1" TO LNK-S02-SKJHKN-BBB-TAIFLG(2 IDY)
+                   PERFORM   2304662-SKJ-SANTEIFLG-SET2-SEC
+                   IF   FLG-SET  =  1
+                     MOVE "1" TO LNK-S02-SKJHKN-BBB-ARIFLG(2 IDY)
+                   END-IF
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+      *
+           .
+      *
+       230466-SKJ-SANTEIFLG-SET-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç¤Î¿©»ö»»Äê¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ëÊÔ½¸
+      ******************************************************************
+       2304661-SKJ-SANTEIFLG-SET1-SEC                 SECTION.
+      *
+           MOVE      ZERO       TO    FLG-SET
+           IF    LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                 IF   WK-SHOKUJI-ASA (IDY)  NOT = ZERO
+                 OR   WK-SHOKUJI-HIRU(IDY)  NOT = ZERO
+                 OR   WK-SHOKUJI-YORU(IDY)  NOT = ZERO
+                   MOVE    1    TO    FLG-SET
+                 END-IF
+           ELSE
+             EVALUATE  LNK-S02-DOJITU-SKJED(IDY)
+               WHEN     "0"
+                 CONTINUE
+               WHEN     "1"
+                 IF   WK-SHOKUJI-ASA (IDY)  NOT = ZERO
+                   MOVE    1    TO    FLG-SET
+                 END-IF
+               WHEN     "2"
+                 IF   WK-SHOKUJI-ASA (IDY)  NOT = ZERO
+                 OR   WK-SHOKUJI-HIRU(IDY)  NOT = ZERO
+                   MOVE    1    TO    FLG-SET
+                 END-IF
+               WHEN     "3"
+                 IF   WK-SHOKUJI-ASA (IDY)  NOT = ZERO
+                 OR   WK-SHOKUJI-HIRU(IDY)  NOT = ZERO
+                 OR   WK-SHOKUJI-YORU(IDY)  NOT = ZERO
+                   MOVE    1    TO    FLG-SET
+                 END-IF
+             END-EVALUATE
+           END-IF
+      *    Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë¤ÏÆþ±¡²ñ·×¤ÎÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç»»Äê
+      *    ¤¹¤ë¤¿¤á¡¢¤³¤ÎÉôÊ¬¤Ï¥³¥á¥ó¥È¥¢¥¦¥È
+      ****>IF         WK-NYULIFE-KBN(IDY)   NOT = SPACE
+      ****>        MOVE    1    TO    FLG-SET
+      ****>END-IF
+      *
+           .
+      *
+       2304661-SKJ-SANTEIFLG-SET1-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç¤Î¿©»ö»»Äê¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ëÊÔ½¸
+      ******************************************************************
+       2304662-SKJ-SANTEIFLG-SET2-SEC                 SECTION.
+      *
+           MOVE      ZERO     TO    FLG-SET
+           EVALUATE  LNK-S02-DOJITU-SKJST(IDY)
+             WHEN     "0"
+               CONTINUE
+             WHEN     "1"
+               IF   WK-SHOKUJI-ASA (IDY)  NOT = ZERO
+               OR   WK-SHOKUJI-HIRU(IDY)  NOT = ZERO
+               OR   WK-SHOKUJI-YORU(IDY)  NOT = ZERO
+                 MOVE    1    TO    FLG-SET
+               END-IF
+             WHEN     "2"
+               IF   WK-SHOKUJI-HIRU(IDY)  NOT = ZERO
+               OR   WK-SHOKUJI-YORU(IDY)  NOT = ZERO
+                 MOVE    1    TO    FLG-SET
+               END-IF
+             WHEN     "3"
+               IF   WK-SHOKUJI-YORU(IDY)  NOT = ZERO
+                 MOVE    1    TO    FLG-SET
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       2304662-SKJ-SANTEIFLG-SET2-EXT.
            EXIT.
       *
       ******************************************************************
@@ -23939,30 +24348,71 @@
              MOVE     ZERO     TO      WK-SHOKUJI-JIHI
       *
              IF     WK-NYULIFE-KBN(IDY)   NOT =   SPACE
-      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
-               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
-               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDY)       >=   4         ))
-                  PERFORM   2304711-SHOKUJI-HEN201604X1-SEC
-               END-IF
-      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
-               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
-               IF       ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDY)       >=   4         ))
-               AND      ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
-                  PERFORM   2304712-SHOKUJI-HEN201604X2-SEC
+               IF   LNK-S02-SKJHKN-HKNCOMBI(IDY)     = SPACE
+               AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) = SPACE
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
+                 IF   ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                    PERFORM   2304711-SHOKUJI-HEN201604X1-SEC
+                 END-IF
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
+                 MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+                 IF   ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                 AND  ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
+                    PERFORM   2304712-SHOKUJI-HEN201604X2-SEC
+                 END-IF
+               ELSE
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
+                 IF   ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDY)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                    PERFORM   2304711-SHOKUJI-HEN201604X1-SEC
+                 END-IF
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
+                 MOVE     ZERO     TO      WK-SHOKUJI-JIHI
+                 IF   ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDY)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                 AND  ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
+                    PERFORM   2304712-SHOKUJI-HEN201604X2-SEC
+                 END-IF
                END-IF
              ELSE
-               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
-               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDY)       >=   4         ))
-                  PERFORM   2304713-SHOKUJI-HEN201604X3-SEC
+               IF   LNK-S02-SKJHKN-HKNCOMBI(IDY)     = SPACE
+               AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY) = SPACE
+                 IF   ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                    PERFORM   2304713-SHOKUJI-HEN201604X3-SEC
+                 END-IF
+               ELSE
+                 IF   ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDY)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDY)       >=   4         ))
+                    PERFORM   2304713-SHOKUJI-HEN201604X3-SEC
+                 END-IF
                END-IF
              END-IF
       *
@@ -24438,16 +24888,14 @@
        2304714-SHOKUJI-HENSINTOKU-SEC    SECTION.
       *
            IF     WK-NYULIFE-KBN(IDY)   NOT =   SPACE
-             IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU95(IDY)  NOT =  ZERO
       *        É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
                                     *  WK-ROSAITOKU95(IDY)
                ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95L
                                        WK-SHOKUJI-FTN95L
              END-IF
-             IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU96(IDY)  NOT =  ZERO
       *        É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
                  COMPUTE   WK-SKJ-ZEI   =
@@ -24463,30 +24911,35 @@
                                        WK-SHOKUJI-FTN96L
              END-IF
              MOVE     ZERO     TO      WK-SHOKUJI-JIHI
-             IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
-             AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-             AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
-                   (WK-GAIHAKU(IDY)     >=   4         ))
-             AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
-               IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
-                 MOVE  WK-SHOKUJI-NYUINJI2(IDY)
-                               TO    WK-ROSAITOKU97(IDY)
-               END-IF
-               COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI2(IDY)
-                                            - WK-SHOKUJI-TOKUSYO(IDY)
-               IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
-                 MOVE  WK-TOKUSYOKU-SURYOU
-                               TO    WK-ROSAITOKU97(IDY)
-               END-IF
-             ELSE
-               MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+             IF    LNK-S02-SKJHKN-HKNCOMBI(IDY)         = SPACE
+             AND   LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)     = SPACE
+             AND   LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                IF   WK-ROSAITOKU97(IDY)  >  3
+                  MOVE     3      TO    WK-ROSAITOKU97(IDY)
+                END-IF
+                IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
+                AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
+                AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
+                      (WK-GAIHAKU(IDY)     >=   4         ))
+                AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
+                  IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
+                    MOVE  WK-SHOKUJI-NYUINJI2(IDY)
+                                  TO    WK-ROSAITOKU97(IDY)
+                  END-IF
+                  COMPUTE  WK-TOKUSYOKU-SURYOU      =
+                           WK-SHOKUJI-NYUINJI2(IDY) -
+                           WK-SHOKUJI-TOKUSYO(IDY)
+                  IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
+                    MOVE  WK-TOKUSYOKU-SURYOU
+                                  TO    WK-ROSAITOKU97(IDY)
+                  END-IF
+                ELSE
+                  MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+                END-IF
              END-IF
-             IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
-      **>    AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-             AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
+             IF         WK-ROSAITOKU97(IDY)  NOT =  ZERO
       *         É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
-                IF    LNK-SYU-DAY(IDY)           =  "2"
-                AND   LNK-S02-KOREI-TANYUIN      =  "1"
+                IF    LNK-S02-KOREI-TANYUIN      =  "1"
                   ADD     WK-ROSAITOKU97(IDY)
                                           TO  WK-SHOKUJI-NISSU
                                               WK-SHOKUJI-NISSUL
@@ -24520,16 +24973,14 @@
                 MOVE          1     TO    FLG-SEIKATUL
              END-IF
            ELSE
-             IF       ( WK-ROSAITOKU95(IDY)  NOT =  ZERO       )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU95(IDY)  NOT =  ZERO
       *        É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                COMPUTE WK-KEISAN-XX =  WK-SHOKUJI-KINGAKU(5)
                                     *  WK-ROSAITOKU95(IDY)
                ADD     WK-KEISAN-XX TO WK-SHOKUJI-RYOYOHI95
                                        WK-SHOKUJI-FTN95
              END-IF
-             IF       ( WK-ROSAITOKU96(IDY)  NOT =  ZERO       )
-             AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
+             IF         WK-ROSAITOKU96(IDY)  NOT =  ZERO
       *        É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
                  COMPUTE   WK-SKJ-ZEI   =
@@ -24545,30 +24996,35 @@
                                        WK-SHOKUJI-FTN96
              END-IF
              MOVE     ZERO     TO      WK-SHOKUJI-JIHI
-             IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
-             AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-             AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
-                   (WK-GAIHAKU(IDY)     >=   4         ))
-             AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
-               IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
-                 MOVE  WK-SHOKUJI-NYUINJI2(IDY)
-                               TO    WK-ROSAITOKU97(IDY)
-               END-IF
-               COMPUTE  WK-TOKUSYOKU-SURYOU = WK-SHOKUJI-NYUINJI2(IDY)
-                                            - WK-SHOKUJI-TOKUSYO(IDY)
-               IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
-                 MOVE  WK-TOKUSYOKU-SURYOU
-                               TO    WK-ROSAITOKU97(IDY)
-               END-IF
-             ELSE
-               MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+             IF    LNK-S02-SKJHKN-HKNCOMBI(IDY)         = SPACE
+             AND   LNK-S02-SKJHKN-HKNCOMBI-DOU(IDY)     = SPACE
+             AND   LNK-S02-SKJHKN-HKNCOMBI-DOU-XXX(IDY) = SPACE
+                IF   WK-ROSAITOKU97(IDY)  >  3
+                  MOVE     3      TO    WK-ROSAITOKU97(IDY)
+                END-IF
+                IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
+                AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
+                AND  ((WK-GAIHAKU(IDY)      =  ZERO       ) OR
+                      (WK-GAIHAKU(IDY)     >=   4         ))
+                AND  (WK-SHOKUJI-NYUINJI2(IDY)  NOT =  ZERO)
+                  IF  WK-SHOKUJI-NYUINJI2(IDY) < WK-ROSAITOKU97(IDY)
+                    MOVE  WK-SHOKUJI-NYUINJI2(IDY)
+                                  TO    WK-ROSAITOKU97(IDY)
+                  END-IF
+                  COMPUTE  WK-TOKUSYOKU-SURYOU      =
+                           WK-SHOKUJI-NYUINJI2(IDY) -
+                           WK-SHOKUJI-TOKUSYO(IDY)
+                  IF  WK-TOKUSYOKU-SURYOU < WK-ROSAITOKU97(IDY)
+                    MOVE  WK-TOKUSYOKU-SURYOU
+                                  TO    WK-ROSAITOKU97(IDY)
+                  END-IF
+                ELSE
+                  MOVE     ZERO   TO    WK-ROSAITOKU97(IDY)
+                END-IF
              END-IF
-             IF       ( WK-ROSAITOKU97(IDY)  NOT =  ZERO       )
-      **>    AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
-             AND      ( LNK-SYU-DAY(IDY)         =  "1" OR "2" )
+             IF         WK-ROSAITOKU97(IDY)  NOT =  ZERO
       *         É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
-                IF    LNK-SYU-DAY(IDY)           =  "2"
-                AND   LNK-S02-KOREI-TANYUIN      =  "1"
+                IF    LNK-S02-KOREI-TANYUIN      =  "1"
                   ADD     WK-ROSAITOKU97(IDY)
                                           TO  WK-SHOKUJI-NISSU
                                               WK-SHOKUJI-NISSUS
@@ -24632,6 +25088,7 @@
               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+              AND      ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
                         (WK-GAIHAKU(IDY)       >=   4         ))
       *
@@ -24776,6 +25233,7 @@
               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
               IF       ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+              AND      ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
                         (WK-GAIHAKU(IDY)       >=   4         ))
               AND      ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
@@ -24875,6 +25333,7 @@
               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
+              AND      ( LNK-S02-NYUSANTEI-KBN(IDY)    =  "1"  )
               AND      ((WK-GAIHAKU(IDY)        =  ZERO       ) OR
                         (WK-GAIHAKU(IDY)       >=   4         ))
       *
@@ -25052,43 +25511,79 @@
                        UNTIL    IDX25     >    IDX-ED
       *
              IF     WK-NYULIFE-KBN(IDX25)   NOT =   SPACE
-      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
-               IF       ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
-               AND      ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDX25)       >=   4         ))
-                      MOVE    33      TO   LNK-S02-RC
-               END-IF
-      *        Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
-               IF       ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDX25)       >=   4         ))
-               AND      ( WK-SHOKUJI-KANFLG(IDX25) =  ZERO        )
-                      MOVE    33      TO   LNK-S02-RC
+               IF   LNK-S02-SKJHKN-HKNCOMBI(IDX25)     = SPACE
+               AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDX25) = SPACE
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
+                 IF   ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
+                 IF   ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                 AND  ( WK-SHOKUJI-KANFLG(IDX25) =  ZERO        )
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
+               ELSE
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê¿©»ö¡Ë
+                 IF   ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDX25)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
+      *          Æþ±¡»þÀ¸³èÎÅÍÜ¡Ê´Ä¶­¡Ë
+                 IF   ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDX25)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                 AND  ( WK-SHOKUJI-KANFLG(IDX25) =  ZERO        )
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
                END-IF
              ELSE
-               IF       ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
-               AND      ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
-                         (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
-               AND      ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
-                         (WK-GAIHAKU(IDX25)       >=   4         ))
-                      MOVE    33      TO   LNK-S02-RC
+               IF   LNK-S02-SKJHKN-HKNCOMBI(IDX25)     = SPACE
+               AND  LNK-S02-SKJHKN-HKNCOMBI-DOU(IDX25) = SPACE
+                 IF   ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
+               ELSE
+                 IF   ( WK-SHOKUJI-NYUINJI(IDX25)   NOT =  ZERO )
+                 AND  ((LNK-SYU-DAY(IDX25)       =  "1" OR "9" ) OR
+                       (LNK-S02-NYUINDAY-KBN(IDX25)     =  "1" ) OR
+                       (WK-SKJHKN-SANTEIFLG(IDX25)      =  "1" ))
+                 AND  ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+                 AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                       (WK-GAIHAKU(IDX25)       >=   4         ))
+                    MOVE    33      TO   LNK-S02-RC
+                 END-IF
                END-IF
              END-IF
       *
-             IF         ( WK-ROSAITOKU95(IDX25)  NOT =  ZERO )
-             AND        ( LNK-SYU-DAY(IDX25)         =  "2"  )
+             IF           WK-ROSAITOKU95(IDX25)  NOT =  ZERO
                       MOVE    33      TO   LNK-S02-RC
              END-IF
-             IF         ( WK-ROSAITOKU96(IDX25)  NOT =  ZERO )
-             AND        ( LNK-SYU-DAY(IDX25)         =  "2"  )
+             IF           WK-ROSAITOKU96(IDX25)  NOT =  ZERO
                       MOVE    33      TO   LNK-S02-RC
              END-IF
-             IF         ( WK-ROSAITOKU97(IDX25)  NOT =  ZERO       )
-      **>    AND        ( LNK-SYU-DAY(IDX25)         =  "2"        )
-             AND        ( LNK-SYU-DAY(IDX25)         =  "1" OR "2" )
+             IF           WK-ROSAITOKU97(IDX25)  NOT =  ZERO
                       MOVE    33      TO   LNK-S02-RC
              END-IF
       *
@@ -25097,6 +25592,41 @@
            .
       *
        23048-SHOKUJI-CHECK-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤Ç¤Î¿©»ö»»Äê¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ëÊÔ½¸
+      *    ¡Ê¥¯¥ê¥¢¡Ë
+      ******************************************************************
+       23049-SKJ-SANTEIFLG-KURIA-SEC         SECTION.
+      *
+           PERFORM    VARYING   IDX25   FROM   1   BY   1
+                       UNTIL    IDX25    >    31
+      *
+             IF   ( LNK-S02-NYUSANTEI-KBN(IDX25)    =  "1"  )
+             AND  ((WK-GAIHAKU(IDX25)        =  ZERO       ) OR
+                   (WK-GAIHAKU(IDX25)       >=   4         ))
+               CONTINUE
+             ELSE
+               IF    LNK-SYU-SRYYMD(1:6) = LNK-S02-SKJHKN-SRYYM(1)
+                 MOVE  SPACE  TO
+                        LNK-S02-SKJHKN-AAA-ARIFLG(1 IDX25)
+                 MOVE  SPACE  TO
+                        LNK-S02-SKJHKN-BBB-ARIFLG(1 IDX25)
+               END-IF
+               IF    LNK-SYU-SRYYMD(1:6) = LNK-S02-SKJHKN-SRYYM(2)
+                 MOVE  SPACE  TO
+                        LNK-S02-SKJHKN-AAA-ARIFLG(2 IDX25)
+                 MOVE  SPACE  TO
+                        LNK-S02-SKJHKN-BBB-ARIFLG(2 IDX25)
+               END-IF
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+       23049-SKJ-SANTEIFLG-KURIA-EXT.
            EXIT.
       *
       ******************************************************************
