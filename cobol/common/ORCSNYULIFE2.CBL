@@ -61,6 +61,8 @@
       *  05.00.00    NACL-小豆沢  17/08/24  特定入院料の算定要件外で算定
       *                                     する療養病棟入院基本料Ｉの
       *                                     コード判定追加
+      *  05.00.00    NACL-小豆沢  17/11/22  患者年齢６３歳以下は生活療養
+      *                                     対象外のリターンコード返却
       *****************************************************************
       *
       *
@@ -491,6 +493,20 @@
            IF      FLG-PTINF            NOT =   ZERO
                MOVE    2                TO  LNK-NYULIFE2-RC
                GO  TO  100-PRM-CHK-EXT
+           ELSE
+      *        保険年齢のチェック（入院会計マスター検索）
+               INITIALIZE                   ORCSAGECHKAREA
+               MOVE    LNK-NYULIFE2-HOSPNUM  TO  AGECHK-HOSPNUM
+               MOVE    LNK-NYULIFE2-PTID     TO  AGECHK-PTID
+               MOVE    LNK-NYULIFE2-SANTEIYM TO  AGECHK-SRYYMD(1:6)
+               MOVE    "01"                  TO  AGECHK-SRYYMD(7:2)
+               MOVE    PTINF-BIRTHDAY        TO  AGECHK-BIRTHDAY
+               CALL   "ORCSAGECHK"    USING      ORCSAGECHKAREA
+                                                 SPA-AREA
+               IF      AGECHK-NENREI         <=  63
+                   MOVE    4                TO  LNK-NYULIFE2-RC
+                   GO  TO  100-PRM-CHK-EXT
+               END-IF
            END-IF
       *
       *    入院中のチェック（入院会計マスター検索）
@@ -519,7 +535,6 @@
                     MOVE    3           TO  LNK-NYULIFE2-RC
                END-IF
            END-IF
-      *
       *    入院会計クローズ
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
