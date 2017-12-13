@@ -80,6 +80,8 @@
       *                                     （記録）対応修正
       *  04.08.10    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
+      *  04.08.11    NACL-門脇    17/12/13  包括点数の公害補償法減点分のマイナス
+      *                                     表示対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -645,6 +647,8 @@
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *    薬剤料減点（合算薬剤料上限超）
            03  CONS-GENTEN2    PIC X(09)   VALUE   "630010001".
+      *    包括点数の公害補償法減点分
+           03  CONS-GENTEN3    PIC X(09)   VALUE   "199000410".
       *    栄養管理体制減算規定該当
            03  CONS-EIYOGEN1   PIC X(09)   VALUE   "190182590".
            03  CONS-EIYOGEN2   PIC X(09)   VALUE   "190182690".
@@ -1284,6 +1288,7 @@
                        IF      RECE230-SRYCD(IDX) =   CONS-TEIGEN
                                                   OR  CONS-GENTEN
                                                   OR  CONS-GENTEN2
+                                                  OR  CONS-GENTEN3
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
                        IF     (RECE220-SRYKBN     =   "90" OR "92" )

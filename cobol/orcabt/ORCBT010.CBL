@@ -136,6 +136,8 @@
       *                                     病名があっても病名データも作成しない
       *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.05    NACL-小豆沢  16/09/16  持参薬は出力しないよう対応
+      *  04.08.06    NACL-門脇    17/12/13  包括点数の公害補償法減点分のマイナス
+      *                                     集計対応
       *  05.00.01    NACL-太田    17/11/21  入院料と異なる食事算定保険組み合わせ対応
       *****************************************************************
       *
@@ -492,6 +494,8 @@
            03  WRK-CONS-SRYCD5         PIC X(09)   VALUE   "630010006".
       *    薬剤料減点（湿布薬薬剤料上限超）
            03  WRK-CONS-SRYCD6         PIC X(09)   VALUE   "630010007".
+      *    包括点数の公害補償法減点分
+           03  WRK-CONS-SRYCD7         PIC X(09)   VALUE   "199000410".
       *
       *    疑い
            03  WRK-CONS-UTAGAI     PIC X(06)   VALUE   "の疑い".
@@ -3466,6 +3470,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            OR  WRK-CONS-SRYCD4
                                            OR  WRK-CONS-SRYCD5
                                            OR  WRK-CONS-SRYCD6
+                                           OR  WRK-CONS-SRYCD7
                    COMPUTE TOUKEI02-ZAITEN     =   TOUKEI02-ZAITEN *
                                                    (-1)
                    IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1
