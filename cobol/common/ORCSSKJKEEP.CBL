@@ -36,6 +36,9 @@
       *              NACL-小豆沢  17/10/19  難病判定用の保険組合せ番号
       *                                     退避時に保険組合せ有効期間
       *                                     を考慮するよう修正
+      *              NACL-小豆沢  17/11/29  低所得者の食事負担据え置き
+      *                                     区分のクリアを平成２９年９月
+      *                                     までとするよう対処
       *****************************************************************
       *
       *
@@ -417,32 +420,24 @@
       *    難病等の入院判定（診療行為で難病等に関わる診療が有る場合も対象）
            PERFORM    220-NANBYO-CHK-SEC
       *
-      *    サブルーチンでの患者所得情報の取得を行い、低所得者は返却値を
-      *    クリアする
-           INITIALIZE                          ORCSSYOTOKUAREA
-           MOVE    LNK-SKJKEEP-HOSPNUM     TO  LNK-SYOTOKU-HOSPNUM
-           MOVE    LNK-SKJKEEP-PTID        TO  LNK-SYOTOKU-PTID
-           MOVE    LNK-SKJKEEP-SANTEIYM    TO  LNK-SYOTOKU-SRYYM
-           MOVE    "1"                     TO  LNK-SYOTOKU-SKJCHKFLG
-           CALL   "ORCSSYOTOKU"    USING    ORCSSYOTOKUAREA
-                                            SPA-AREA
-           IF    LNK-SYOTOKU-RC    =        ZERO
-                PERFORM   VARYING   IDX   FROM   1  BY  1
-                          UNTIL     IDX   >    31
+      *    平成２９年９月まではサブルーチンでの患者所得情報の取得を行い、
+      *    低所得者は返却値をクリアする
+           IF   LNK-SKJKEEP-SANTEIYM  <=   "201709"
+               INITIALIZE                          ORCSSYOTOKUAREA
+               MOVE    LNK-SKJKEEP-HOSPNUM     TO  LNK-SYOTOKU-HOSPNUM
+               MOVE    LNK-SKJKEEP-PTID        TO  LNK-SYOTOKU-PTID
+               MOVE    LNK-SKJKEEP-SANTEIYM    TO  LNK-SYOTOKU-SRYYM
+               MOVE    "1"                     TO  LNK-SYOTOKU-SKJCHKFLG
+               CALL   "ORCSSYOTOKU"    USING    ORCSSYOTOKUAREA
+                                                SPA-AREA
+               IF    LNK-SYOTOKU-RC    =        ZERO
+                  PERFORM   VARYING   IDX   FROM   1  BY  1
+                            UNTIL     IDX   >    31
                     IF    LNK-SYOTOKU-SKJKBN(IDX)  NOT =  SPACE
-      *                ２９年１０月以降の難病据え置き時は低所得者で
-      *                あっても返却する区分をクリアしない
-                       IF   LNK-SKJKEEP-SANTEIYM  <=   "201709"
                            MOVE    SPACE   TO  LNK-SKJKEEP-KBN(IDX)
-                       ELSE
-                           IF      LNK-SKJKEEP-KBN(IDX)   =   "1"
-                               CONTINUE
-                           ELSE
-                               MOVE    SPACE   TO  LNK-SKJKEEP-KBN(IDX)
-                           END-IF
-                       END-IF
                     END-IF
-                END-PERFORM
+                  END-PERFORM
+               END-IF
            END-IF
       *
       *    精神病床の減額があるか判定し、無ければ返却する入院開始日を
