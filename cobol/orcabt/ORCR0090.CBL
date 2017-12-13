@@ -290,6 +290,8 @@
       *                                     （記録）対応修正
       *  04.08.11    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
+      *  04.08.12    NACL-門脇    17/12/13  包括点数の公害補償法減点分のマイナス
+      *                                     表示対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1077,6 +1079,8 @@
            03  CONS-TEIGEN4    PIC X(09)   VALUE   "630010007".
       *    包括点数の治験減点分
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
+      *    包括点数の公害補償法減点分
+           03  CONS-GENTEN2    PIC X(09)   VALUE   "199000410".
       *---- (01.00.05) LINE ADD START --------------------------------
       *フリーコメント
       *    電話再診（　回）
@@ -2113,6 +2117,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                                  OR  CONS-TEIGEN3
                                                  OR  CONS-TEIGEN4
                                                  OR  CONS-GENTEN
+                                                 OR  CONS-GENTEN2
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
                        IF     (RECE04-SRYKBN     =   "31" OR "32" )

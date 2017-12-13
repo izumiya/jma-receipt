@@ -146,6 +146,8 @@
       *                                     ¡Êµ­Ï¿¡ËÂÐ±þ½¤Àµ
       *  04.08.10    NACL-ÌçÏÆ    17/10/18  Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
       *                                     ¤Ç¤Î¿©»ö»»ÄêÂÐ±þ
+      *  04.08.11    NACL-ÌçÏÆ    17/12/13  Êñ³çÅÀ¿ô¤Î¸ø³²Êä½þË¡¸ºÅÀÊ¬¤Î¥Þ¥¤¥Ê¥¹
+      *                                     É½¼¨ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -675,6 +677,8 @@
            03  CONS-GENTEN     PIC X(09)   VALUE   "199000210".
       *    ÌôºÞÎÁ¸ºÅÀ¡Ê¹ç»»ÌôºÞÎÁ¾å¸ÂÄ¶¡Ë
            03  CONS-GENTEN2    PIC X(09)   VALUE   "630010001".
+      *    Êñ³çÅÀ¿ô¤Î¸ø³²Êä½þË¡¸ºÅÀÊ¬
+           03  CONS-GENTEN3    PIC X(09)   VALUE   "199000410".
       *
       *¥Õ¥ê¡¼¥³¥á¥ó¥È
       *    ¥Õ¥ê¡¼¥³¥á¥ó¥È 
@@ -1473,6 +1477,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        IF      RECE85-SRYCD(IDX) =   CONS-TEIGEN
                                                  OR  CONS-GENTEN
                                                  OR  CONS-GENTEN2
+                                                 OR  CONS-GENTEN3
                            MOVE    1             TO  FLG-TEIGEN
                        END-IF
       ***>             IF    ( RECE84-SRYKBN     =   "90" OR "92"      )
