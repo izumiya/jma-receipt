@@ -100,6 +100,7 @@
       *
       *  04.08.01    NACL-ÃÁœ∆    15/11/09  ¬æ∞Âºıø«•¡•ß•√•Øƒ…≤√
       *  04.08.02    NACL-ÃÁœ∆    16/03/08   ø¿Æ£≤£∏«Ø£¥∑Ó≤˛¿µ¬–±˛
+      *  04.08.03    NACL-ÃÁœ∆    17/12/13  ∆˛±°Œ¡≤√ªª§Œœ´∫“•ﬁ•π•ø√÷§≠¥π§®Ω§¿µ 
       *****************************************************************
       *
       *
@@ -4557,8 +4558,13 @@
                IF         WRK-201004-KSN13(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
-                    MOVE  CONS-201307-KSN1     TO  LNK-SROUNYUIN-SRYCD
+                     IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201004-KSN13 TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                     ELSE
+                       MOVE  CONS-201307-KSN1  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                     END-IF
                    ELSE
                     MOVE  CONS-201004-KSN13    TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -4676,8 +4682,13 @@
                IF         WRK-201004-KSN17(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
-                    MOVE  CONS-201307-KSN3     TO  LNK-SROUNYUIN-SRYCD
+                     IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201004-KSN17 TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                     ELSE
+                       MOVE  CONS-201307-KSN3  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                     END-IF
                    ELSE
                     MOVE  CONS-201004-KSN17    TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -4813,8 +4824,13 @@
                IF         WRK-201004-KSN15(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
                    IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
-                    MOVE  CONS-201307-KSN2     TO  LNK-SROUNYUIN-SRYCD
+                     IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201004-KSN15 TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                     ELSE
+                       MOVE  CONS-201307-KSN2  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                     END-IF
                    ELSE
                     MOVE  CONS-201004-KSN15    TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
@@ -4825,16 +4841,26 @@
       *        À˝¿≠∞›ª˝∆©¿œ¥…Õ˝≤√ªª° Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡°À(0000-0)
                IF         WRK-201404-KSN1 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201404-KSN8     TO  LNK-SROUNYUIN-SRYCD
+                   IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201404-KSN1  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                       MOVE  CONS-201404-KSN8  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª° Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡°À(0000-0)
                IF         WRK-201404-KSN2 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201404-KSN9     TO  LNK-SROUNYUIN-SRYCD
+                   IF     FLG-KENPOJYUNKYO  =  1
+                     MOVE   CONS-201404-KSN2   TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                     MOVE   CONS-201404-KSN9   TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
@@ -4842,16 +4868,26 @@
       *        ±…Õ‹¥…Õ˝¬Œ¿©∏∫ªªµ¨ƒÍ≥∫≈ˆ° ∆˛±°¥À‹Œ¡°À(0000-0)
                IF         WRK-201407-KSN1 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201407-KSN3     TO  LNK-SROUNYUIN-SRYCD
+                   IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201407-KSN1  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                       MOVE  CONS-201407-KSN3  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        ±…Õ‹¥…Õ˝¬Œ¿©∏∫ªªµ¨ƒÍ≥∫≈ˆ° ∆√ƒÍ∆˛±°Œ¡µ⁄§”√ª¥¸¬⁄∫ﬂºÍΩ—≈˘¥À‹Œ¡£≤°À(0000-0)
                IF         WRK-201407-KSN2 (IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201407-KSN4     TO  LNK-SROUNYUIN-SRYCD
+                   IF     FLG-KENPOJYUNKYO  =  1
+                       MOVE  CONS-201407-KSN2  TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                       MOVE  CONS-201407-KSN4  TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
