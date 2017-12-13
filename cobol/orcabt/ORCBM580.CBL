@@ -48,6 +48,7 @@
       *  05.00.00    NACL-森脇    17.02.09  傷病名称全記録
       *  04.08.08    NACL-藤原    17/03/24  入院のファイル名修正
       *  05.00.01    NACL-森脇    17/06/01  診療行為、医薬品レコード名称登録
+      *  05.00.02    NACL-森脇    17/11/09  当日受診のみ出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -115,6 +116,10 @@
       *----(05.00.01)--ADD-START---
            03  FLG-TENSU               PIC 9(01).
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+           03  FLG-JYURRK              PIC 9(01).
+           03  FLG-OK                  PIC 9(01).
+      *----(05.00.02)--ADD-END-----
       *
       *    カウント領域
        01  CNT-AREA.
@@ -297,6 +302,11 @@
       *    点数マスタ
            COPY    "CPTENSU.INC".
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+      *    受診履歴
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
+      *----(05.00.02)--ADD-END-----
       *
       *****************************************************************
       *    サブプロ用領域
@@ -564,6 +574,10 @@
       *
            PERFORM 900-RENKEI-TMP-SELECT-SEC
       *
+      *----(05.00.02)--ADD-START---
+           MOVE    ZERO            TO  FLG-OK
+      *----(05.00.02)--ADD-END-----
+      *
            PERFORM         UNTIL   FLG-END     =   1
                PERFORM 2001-HENSYU-SEC
            END-PERFORM
@@ -580,6 +594,10 @@
                                    =   "4"
                MOVE    "3"             TO  WRK-PARA-TEISYUTUSAKI
                PERFORM 900-RENKEI-TMP-SELECT-SEC
+      *
+      *----(05.00.02)--ADD-START---
+               MOVE    ZERO            TO  FLG-OK
+      *----(05.00.02)--ADD-END-----
       *
                PERFORM         UNTIL   FLG-END =   1
                    PERFORM 2001-HENSYU-SEC
@@ -605,6 +623,26 @@
       *    レセ電データ編集処理
       *****************************************************************
        2001-HENSYU-SEC              SECTION.
+      *
+      *----(05.00.02)--ADD-START---
+           IF      RECEDEN-RECEDATA (1:2)  =   "RE"
+      *        当日外来受診分がない場合はスキップ
+               IF      WRK-PARA-PRTKBN =   "A"
+                   IF      WRK-PARA-NYUGAIKBN  =   "1"
+                       MOVE    1               TO  FLG-OK
+                   ELSE
+                       PERFORM 900-JYURRK-READ-SEC
+                       IF    FLG-JYURRK    =   1
+                           MOVE    1               TO  FLG-OK
+                       ELSE
+                           MOVE    ZERO            TO  FLG-OK
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF      FLG-OK          =   ZERO
+      *----(05.00.02)--ADD-END-----
       *
       *    レセプト共通レコード編集処理
            IF      RECEDEN-RECEDATA (1:2)  =   "RE"
@@ -651,6 +689,10 @@
       *
            ADD     1                   TO  TABLE-MAX
            MOVE    RECEDEN-RECEDATA    TO  TBL-RECEDATA (TABLE-MAX)
+      *
+      *----(05.00.02)--ADD-START---
+           END-IF
+      *----(05.00.02)--ADD-END-----
       *
            PERFORM 900-RENKEI-TMP-READ-SEC
            .
@@ -2345,6 +2387,45 @@
        900-TENSU-READ-EXT.
            EXIT.
       *----(05.00.01)--ADD-END-----
+      *----(05.00.02)--ADD-START---
+      *****************************************************************
+      *    受診履歴読み込み
+      *****************************************************************
+       900-JYURRK-READ-SEC         SECTION.
+      *
+           INITIALIZE                      JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    RECEDEN-PTID        TO  JYURRK-PTID
+           MOVE    RECEDEN-NYUGAIKBN   TO  JYURRK-NYUGAIKBN
+           MOVE    LNK-PRTKANRI-SKYYMD TO  JYURRK-SRYYMD
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key31"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key31"             TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-JYURRK
+                   MOVE    MCPDATA-REC         TO  JYURRK-REC
+               ELSE
+                   INITIALIZE                      JYURRK-REC
+                   MOVE    1                   TO  FLG-JYURRK
+               END-IF
+           ELSE
+               INITIALIZE                      JYURRK-REC
+               MOVE    1                   TO  FLG-JYURRK
+           END-IF
+      *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key31"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-JYURRK-READ-EXT.
+           EXIT.
+      *----(05.00.02)--ADD-END-----
       *****************************************************************
       *    ＤＢＳＥＬＥＣＴ処理
       *****************************************************************

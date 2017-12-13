@@ -51,8 +51,11 @@
                05  SYS-9101-SYBYO       PIC X(01).
       *診療行為、医薬品レコードに名称記録
                05  SYS-9101-NMREC       PIC X(01).
+      *連携基盤用当日受診分
+               05  SYS-9101-COOPBASE2   PIC X(01).
       *予備
-               05  SYS-9101-YOBI        PIC X(294).
+               05  SYS-9101-YOBI        PIC X(293).
+      *         05  SYS-9101-YOBI        PIC X(294).
       *         05  SYS-9101-YOBI        PIC X(295).
       *         05  SYS-9101-YOBI        PIC X(296).
       *端末ＩＤ

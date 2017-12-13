@@ -32,3 +32,14 @@
               04  W91-CHKNMREC.
                 06  W91-CHKNMREC-VALUE   PIC X.
                 06  W91-CHKNMREC-STATE   PIC S9(9)   BINARY.
+              04  W91-COOPBASE2-COMB.
+                05  W91-COOPBASE2.
+                  07  W91-VALUE   PIC X(20).
+                05  W91-COOPBASE2-STATE  PIC S9(9)   BINARY.
+                05  W91-COOPBASE2-COUNT  PIC S9(9)   BINARY.
+                05  W91-COOPBASE2-ITEM
+                        PIC X(20)   OCCURS  10 TIMES.
+              04  W91-LABEL3.
+                05  W91-LABEL3-STATE     PIC S9(9)   BINARY.
+              04  W91-LABEL4.
+                05  W91-LABEL4-STATE     PIC S9(9)   BINARY.
