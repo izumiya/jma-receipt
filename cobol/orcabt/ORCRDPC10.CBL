@@ -181,6 +181,7 @@
       *              NACL-小豆沢  17/09/07  同日再入院日の入退院日記録修正時の
       *                                     不具合修正
       *              NACL-小豆沢  17/09/08  きざみ計算の出来高実績点数端数処理追加
+      *              NACL-小豆沢  17/12/07  同日再入院の食事記録修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1866,6 +1867,9 @@
                                                LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD
       *
+      **     DISPLAY "============== ORCRDPC10 ===================="
+      **     DISPLAY "RECE62-PTNUM = " RECE62-PTNUM
+           
       *    患者保険組み合わせ取得処理
            PERFORM 2001-HKNCOMBI-GET-SEC
       *
@@ -1876,13 +1880,15 @@
                                                    NOT =   KEY-OLD1
       *
       *        入院会計取得処理（提出先別）
-               PERFORM 2001-NYUINRYO-GET-SEC
+      ****         PERFORM 2001-NYUINRYO-GET-SEC
       *
       *        診療年月・患者ID・レセ科・提出先別処理
                MOVE    KEY-NEW         TO  KEY-OLD
                PERFORM                 UNTIL   FLG-END     =   1
                                        OR      KEY-NEW NOT =   KEY-OLD
       *
+      *            入院会計取得処理（提出先別）
+                   PERFORM 2001-NYUINRYO-GET-SEC
                    MOVE    ZERO                TO  WRK-RENNUM
                    MOVE    ZERO                TO  WRK-MEISAI-RENNUM
                    MOVE    SPACE               TO  WRK-FEDT-SRYKBN-SAVE
@@ -2166,6 +2172,22 @@
            MOVE    RECE62-HOSPNUM      TO  LNK-DPCNYUIN-HOSPNUM
            MOVE    RECE62-PTID         TO  LNK-DPCNYUIN-PTID
            MOVE    RECE62-SRYYM        TO  LNK-DPCNYUIN-SANTEIYM
+           IF      RECE62-TEISYUTUSAKI =   "6"
+               MOVE    "3"                 TO  LNK-DPCNYUIN-HKNKBN
+           ELSE
+               MOVE    RECE62-TEISYUTUSAKI TO  LNK-DPCNYUIN-HKNKBN
+           END-IF
+           PERFORM VARYING IDX FROM    1   BY  1
+             UNTIL (IDX   >    10)    OR
+                     (RECE62-HKNCOMBI (IDX)  =   ZERO)
+               MOVE    RECE62-HKNCOMBI(IDX)   TO
+                                        LNK-DPCNYUIN-SET-HKNCOMBI(IDX)
+           END-PERFORM
+      *     DISPLAY "=========   ORCSDPCNYUIN CALL ========="
+      *     DISPLAY "LNK-DPCNYUIN-SET-HKNCOMBI(1) ="
+      *              LNK-DPCNYUIN-SET-HKNCOMBI(1)
+      *     DISPLAY "LNK-DPCNYUIN-SET-HKNCOMBI(2) ="
+      *              LNK-DPCNYUIN-SET-HKNCOMBI(2)
            CALL    "ORCSDPCNYUIN"      USING   ORCSDPCNYUIN-AREA
                                                SPA-AREA
            IF      LNK-DPCNYUIN-RC     NOT =   ZERO
@@ -5166,7 +5188,7 @@
            PERFORM VARYING IDZ1    FROM    3   BY  1
                    UNTIL   IDZ1    >       5
                PERFORM VARYING IDZ2    FROM    1   BY  1
-                       UNTIL   IDZ2    >       31
+                       UNTIL   IDZ2    >       40
       *
                    MOVE    ZERO                    TO  FLG-CHK
       *
@@ -5249,12 +5271,25 @@
                                          END-IF
                                        END-IF
                                        MOVE  IDZ2  TO  WRK-FEDT-DD
+      *                                平成２９年１０月以降の食事は引数
+      *                                で返却された日付をセット
+                                       IF (LNK-DPCNYUIN-SANTEIYM >=
+                                                          "201710")  AND
+                                          (IDZ1   =   3  OR  4)      AND
+                                          (LNK-DPCNYUIN-DD
+                                                     (IDZ1 IDZ2)
+                                                     NOT =   ZERO)
+                                          MOVE  LNK-DPCNYUIN-DD
+                                                       (IDZ1 IDZ2)
+                                                        TO  WRK-FEDT-DD
+                                       END-IF
                                        PERFORM
                                          200771-NYUIN-ZAI-E-HENSYU-SEC
                                        IF  WRK-REC-LENGTH  >  ZERO
                                          PERFORM 5001-FILE-WRITE-SEC
                                        END-IF
                                     END-IF
+      *
                                     PERFORM
                                          200771-NYUIN-ZAI-F-HENSYU-SEC
                                     IF   WRK-REC-LENGTH  >  ZERO
@@ -5497,6 +5532,37 @@
            ELSE
                MOVE    "1"             TO  WRK-FEDT-BYOTOKBN
            END-IF
+      *平成２９年１０月以降の食事で同日再入院分の再セット
+           IF (LNK-DPCNYUIN-SANTEIYM >= "201710")  AND
+              (IDZ1   =   3  OR  4)   AND
+              (LNK-DPCNYUIN-SAINYUINKBN(IDZ1 IDZ2 1)  =  "1")
+      *       レセプト科区分
+               MOVE    SPACE               TO  WRK-FEDT-RECESRYKA
+               PERFORM VARYING SYSKAN-IDX2 FROM  1  BY  1
+                 UNTIL   SYSKAN-IDX2 >   TBL-SRYKA-MAX
+                   IF    LNK-DPCNYUIN-SRYKA2(IDZ1 IDZ2)
+                                       =   TBL-SRYKA (SYSKAN-IDX2)
+                      MOVE    TBL-RECESRYKA (SYSKAN-IDX2)
+                                       TO  WRK-FEDT-RECESRYKA
+                     MOVE    TBL-SRYKA-MAX   TO  SYSKAN-IDX2
+                   END-IF
+               END-PERFORM
+      *        診療科区分
+               PERFORM 200721-SRYKAKBN-HENSYU-SEC
+      *        医師コード
+               MOVE    LNK-DPCNYUIN-DRCD2 (IDZ1 IDZ2)
+                                       TO  WRK-FEDT-DRCD
+      *        病棟コード
+               MOVE    LNK-DPCNYUIN-BTUNUM2 (IDZ1 IDZ2)
+                                       TO  WRK-FEDT-BYOTOCD
+      *        病棟区分
+               IF      LNK-DPCNYUIN-BTUKBN2 (IDZ1 IDZ2)
+                                           =   "01"
+                   MOVE    "0"             TO  WRK-FEDT-BYOTOKBN
+               ELSE
+                   MOVE    "1"             TO  WRK-FEDT-BYOTOKBN
+               END-IF
+           END-IF
       *入外区分
            MOVE    RECE62-NYUGAIKBN   TO  WRK-FEDT-NYUGAIKBN
       *行為点数から施設タイプまで
@@ -5733,6 +5799,21 @@
                 (RECE641-SRYSYUKBN   NOT =  "970")       AND
                 (RECE641-KAISU(1 WRK-EDDD)   NOT =  ZERO)  AND
                 (RECE641-KAISU(1 WRK-EDDD) = RECE641-KAISU(3 WRK-EDDD))
+                  IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
+                      ADD    1     TO   IDW
+                  END-IF
+             END-IF
+      *同日再入院日の再入院時に算定した食事は次の入院履歴に変更する
+      **       DISPLAY "LNK-DPCNYUIN-SRYCD(IDZ1 IDZ2 IDXZ) = "
+      **                LNK-DPCNYUIN-SRYCD(IDZ1 IDZ2 IDXZ)
+      **       DISPLAY "LNK-DPCNYUIN-SAINYUINKBN(IDZ1 IDZ2 IDXZ) = "
+      **                LNK-DPCNYUIN-SAINYUINKBN(IDZ1 IDZ2 IDXZ)
+      **       DISPLAY "RECE641-SRYSYUKBN = " RECE641-SRYSYUKBN
+             IF (IDZ1              =    3  OR  4)        AND
+                (RECE62-PTID       =    RECE641-PTID)    AND
+                (LNK-DPCNYUIN-SANTEIYM  >=  "201710")    AND
+                (LNK-DPCNYUIN-SRYCD(IDZ1 IDZ2 IDXZ)(1:3) = "197")  AND
+                (LNK-DPCNYUIN-SAINYUINKBN(IDZ1 IDZ2 1)  =  "1")
                   IF  WRK-NYUIN-RIREKI-NYUINYMD (IDW + 1) NOT = SPACE
                       ADD    1     TO   IDW
                   END-IF
