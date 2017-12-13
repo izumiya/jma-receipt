@@ -425,6 +425,7 @@
       *                                     （入院時生活療養の見直し）
       *
       *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
+      *  05.00.02    NACL-小豆沢  17/11/07  レセ電サブ引数に保険組合せ追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2371,13 +2372,15 @@
       *
                MOVE    ZERO               TO  FLG-TOYAKUFLG
       *
-      *        入院会計取得処理（提出先別）
-               PERFORM 2001-NYURECEDEN-GET-SEC
+      ***      入院会計取得処理（提出先別）
+      ***      PERFORM 2001-NYURECEDEN-GET-SEC
       *
       *        診療年月・患者ID・レセ科・提出先別処理
                MOVE    KEY-NEW         TO  KEY-OLD
                PERFORM                 UNTIL   FLG-END     =   1
                                        OR      KEY-NEW NOT =   KEY-OLD
+      *            入院会計取得処理（提出先別）
+                   PERFORM 2001-NYURECEDEN-GET-SEC
       *
       *            県単用項目ファイル読込処理
                    PERFORM 2001-RECE67-HENSYU-SEC
@@ -2751,6 +2754,17 @@
            ELSE
                MOVE    RECE62-TEISYUTUSAKI TO  LNK-NYURECEDEN-HKNKBN
            END-IF
+           PERFORM VARYING IDX FROM    1   BY  1
+              UNTIL  (IDX   >    10)    OR
+                     (RECE62-HKNCOMBI (IDX)  =   ZERO)
+               MOVE    RECE62-HKNCOMBI(IDX)   TO
+                                      LNK-NYURECEDEN-SET-HKNCOMBI(IDX)
+           END-PERFORM
+           DISPLAY "RECE62-HKNCOMBI(1) = " RECE62-HKNCOMBI(1)
+           DISPLAY "RECE62-HKNCOMBI(2) = " RECE62-HKNCOMBI(2)
+           DISPLAY "RECE62-HKNCOMBI(3) = " RECE62-HKNCOMBI(3)
+           DISPLAY "RECE62-HKNCOMBI(4) = " RECE62-HKNCOMBI(4)
+           DISPLAY "RECE62-HKNCOMBI(5) = " RECE62-HKNCOMBI(5)
            CALL    "ORCSNYURECEDEN"    USING   ORCSNYURECEDEN-AREA
                                                SPA-AREA
            IF      LNK-NYURECEDEN-RC   NOT =   ZERO
