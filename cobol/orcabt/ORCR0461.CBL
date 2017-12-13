@@ -53,6 +53,8 @@
       *                                     （記録）対応
       *  04.08.07    NACL-門脇    16/11/07  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応修正
+      *  04.08.08    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -618,12 +620,6 @@
            03  FILLER          PIC X(09)   VALUE   "120000410".
       *    調剤料（麻・向・覚・毒）（入院外）
            03  FILLER          PIC X(09)   VALUE   "120000110".
-      *    実日数算定
-           03  FILLER          PIC X(09)   VALUE   "099409901".
-      *    初診料ダミー
-           03  FILLER          PIC X(09)   VALUE   "099110001".
-      *    再診料ダミー
-           03  FILLER          PIC X(09)   VALUE   "099120001".
       *    初診料算定科：
            03  FILLER          PIC X(09)   VALUE   "830000020".
       *    再診料算定科：
@@ -644,32 +640,18 @@
            03  FILLER          PIC X(09)   VALUE   "112008350".
       *    老人同日再診（病院）(１回目）
            03  FILLER          PIC X(09)   VALUE   "112703050".
-      *    育児栄養指導加算（ＤＵＭＭＹ）
-           03  FILLER          PIC X(09)   VALUE   "099114001".
       *    再診（乳幼児時間外）加算
            03  FILLER          PIC X(09)   VALUE   "112014770".
       *    再診（乳幼児休日）加算
            03  FILLER          PIC X(09)   VALUE   "112014870".
       *    再診（乳幼児深夜）加算
            03  FILLER          PIC X(09)   VALUE   "112014970".
-      *    実日数減算
-           03  FILLER          PIC X(09)   VALUE   "099409903".
-      *    在医総・在医総管（ＤＵＭＭＹ）
-           03  FILLER          PIC X(09)   VALUE   "099140003".
       *    処方（乳幼児）加算
            03  FILLER          PIC X(09)   VALUE   "120002170".
-      *    診察料未算定扱い
-           03  FILLER          PIC X(09)   VALUE   "099409905".
-      *    時間外受診
-           03  FILLER          PIC X(09)   VALUE   "099409907".
-      *    寝たきり老人在宅総合診療科算定終了
-           03  FILLER          PIC X(09)   VALUE   "099140001".
       *    処方料（向精神薬多剤投与）
            03  FILLER          PIC X(09)   VALUE   "120003610".
       *    処方料（紹介率が低い大病院３０日以上投薬減算）
            03  FILLER          PIC X(09)   VALUE   "120003870".
-      *    【レセプト】０点地域公費記載
-           03  FILLER          PIC X(09)   VALUE   "099999925".
       *
       *    再診（妥結率５割以下）
            03  FILLER          PIC X(09)   VALUE   "112016610".
@@ -712,10 +694,29 @@
       *    外来管理加算（３月超）（５回以内）
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   81.
+      *    実日数算定
+           03  FILLER          PIC X(09)   VALUE   "099409901".
+      *    初診料ダミー
+           03  FILLER          PIC X(09)   VALUE   "099110001".
+      *    再診料ダミー
+           03  FILLER          PIC X(09)   VALUE   "099120001".
+      *    育児栄養指導加算（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099114001".
+      *    実日数減算
+           03  FILLER          PIC X(09)   VALUE   "099409903".
+      *    在医総・在医総管（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    診察料未算定扱い
+           03  FILLER          PIC X(09)   VALUE   "099409905".
+      *    時間外受診
+           03  FILLER          PIC X(09)   VALUE   "099409907".
+      *    寝たきり老人在宅総合診療科算定終了
+           03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   81.
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   80.
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   80.
       *
       *    固定値
        01  CONST-AREA.

@@ -243,6 +243,8 @@
       *                                     （入院時生活療養の見直し）
       *  04.08.21    NACL-門脇    17/09/26  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
+      *  04.08.22    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
+      *                                     での食事算定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -7530,6 +7532,7 @@
       *
                MOVE    ZERO                  TO  FLG-KUGIRI
                IF  RECE661-ZAINUM        NOT =   WRK-R061-ZAINUM-O
+               OR  RECE661-KOHBUNRI      NOT =   WRK-R061-KOHBUNRI-O
                    MOVE    ZERO              TO  CNT-ZAIMEISAISU
                END-IF
                ADD     1                     TO  CNT-ZAIMEISAISU

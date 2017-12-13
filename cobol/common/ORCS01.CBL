@@ -490,6 +490,8 @@
       *  04.08.20    NACL-ÌçÏÆ    17/07/14  ÏÂ²Î»³¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.21    NACL-ÌçÏÆ    17/09/15  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.22    NACL-ÌçÏÆ    17/10/12  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.23    NACL-ÌçÏÆ    17/10/18  Æþ±¡ÎÁ¤È°Û¤Ê¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
+      *                                     ¤Ç¤Î¿©»ö»»ÄêÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3454,16 +3456,21 @@
               MOVE     "1"            TO  FLG-SANSHOU
            END-IF
       *
-           INITIALIZE                     ORCSSYOTOKUAREA
-           MOVE  LNK-SYU-HOSPNUM      TO  LNK-SYOTOKU-HOSPNUM
-           MOVE  LNK-SYU-PTID         TO  LNK-SYOTOKU-PTID
-           MOVE  LNK-SYU-SRYYMD(1:6)  TO  LNK-SYOTOKU-SRYYM
-           MOVE  SPACE                TO  LNK-SYOTOKU-SKJCHKFLG
+           IF  (LNK-SYU-SYUHKNNUM = "971" OR "973" OR "975"
+                                 OR "068" OR "069" OR "040"  )
+           OR  (LNK-SYU-SYUHKNNUM(1:2) = "98" OR "90" OR "91")
+             CONTINUE
+           ELSE
+             INITIALIZE                     ORCSSYOTOKUAREA
+             MOVE  LNK-SYU-HOSPNUM      TO  LNK-SYOTOKU-HOSPNUM
+             MOVE  LNK-SYU-PTID         TO  LNK-SYOTOKU-PTID
+             MOVE  LNK-SYU-SRYYMD(1:6)  TO  LNK-SYOTOKU-SRYYM
+             MOVE  SPACE                TO  LNK-SYOTOKU-SKJCHKFLG
       *
-           CALL    "ORCSSYOTOKU"      USING  ORCSSYOTOKUAREA
-                                             SPA-AREA
+             CALL    "ORCSSYOTOKU"      USING  ORCSSYOTOKUAREA
+                                               SPA-AREA
       *
-           IF    LNK-SYOTOKU-RC    =   ZERO
+             IF    LNK-SYOTOKU-RC    =   ZERO
                 IF    LNK-SYU-SRYYMD(1:6)   >=  "200604"
                   MOVE   LNK-SYU-SRYYMD(7:2)  TO  SYOTOKU-IDX
                 ELSE
@@ -3475,9 +3482,9 @@
       *       ¡ÊÃÏÊý¸øÈñ¡Ë
                 MOVE   LNK-SYOTOKU-CHIKBN(SYOTOKU-IDX)
                                               TO  FLG-SANSHOU2
-           END-IF
+             END-IF
       *
-           EVALUATE   FLG-SANSHOU2
+             EVALUATE   FLG-SANSHOU2
                WHEN     SPACE
                     MOVE     "1"      TO  FLG-SANSHOU2
                WHEN     "2"
@@ -3485,7 +3492,8 @@
                WHEN     "1"
                WHEN     "4"
                     MOVE     "3"      TO  FLG-SANSHOU2
-           END-EVALUATE
+             END-EVALUATE
+           END-IF
       *
            .
       *
