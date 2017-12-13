@@ -170,9 +170,6 @@
                                    REPLACING   //NACCT//
                                    BY          //LNKNACCT//.
       *
-      *    Æþ±¡²ñ·×ÊÔ½¸¥µ¥Ö
-           COPY    "CPORCHCM34S01.INC".
-      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".

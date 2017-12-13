@@ -75,6 +75,9 @@
            03  FLG-NYUINDAY-G.
                05  FLG-NYUINDAY                PIC 9(01)
                                                OCCURS  31.
+           03  FLG-SKJDAY-G.
+               05  FLG-SKJDAY                  PIC 9(01)
+                                               OCCURS  31.
            03  FLG-NYUINRYODAY-G.
                05  FLG-NYUINRYODAY             PIC 9(01)
                                                OCCURS  31.
@@ -266,7 +269,11 @@
            03  WRK-RATE3                       PIC 999V99.
            03  WRK-RATE4                       PIC 999V99.
            03  WRK-HASU                        PIC 9V99999.
-           03  WRK-ZAITEN                      PIC  9(08).
+           03  WRK-ZAITEN                      PIC 9(08).
+           03  WRK-HKNCOMBI-FST-G.
+               05  WRK-HKNCOMBI-FST            PIC 9(04).
+           03  WRK-HKNCOMBI-SND-G.
+               05  WRK-HKNCOMBI-SND            PIC 9(04).
       *
       *    入院料
        01  WNYUINRYO-AREA.
@@ -464,6 +471,7 @@
       *    コンスタント値
        01  CONST-AREA.
            03  CONST-H9999                 PIC X(08)   VALUE "999999".
+           03  CONST-H2910                 PIC X(08)   VALUE "201710".
            03  CONST-H2804                 PIC X(08)   VALUE "201604".
            03  CONST-H2604                 PIC X(08)   VALUE "201404".
            03  CONST-H2404                 PIC X(06)   VALUE "201204".
@@ -652,6 +660,9 @@
       *
       *    患者所得情報編集サブ
            COPY    "CPORCSSYOTOKU.INC".
+      *
+      *    入院料と異なる食事算定保険組み合わせ取得サブ
+           COPY    "CPORCSSKJHKN.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -905,6 +916,7 @@
                                            ORCSNYULIFE2-AREA
                                            ORCSSYOTOKUAREA
                                            ORCSSKJKEEP-AREA
+                                           ORCSSKJHKN-AREA
       *
       *    医療機関情報取得処理
            PERFORM 1501-SYS1001-GET-SEC
@@ -1027,20 +1039,30 @@
                      AND ( LNK-NYUINDAY-DOUJITSU-T-HKNCOMBI(IDXD)
                                            NOT =  HCM34S01-HKNCOMBI )
                        MOVE    2           TO  FLG-NYUINDAY(IDXD)
-                       MOVE    LNK-NYUINDAY-DOUJITSU-SKJKBN(IDXD)
-                                           TO  WRK-DOJITUST (IDXD)
-                   END-IF
-      *
-                   IF    ( LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDXD)
-                                           NOT =  HCM34S01-HKNCOMBI )
-                     AND ( LNK-NYUINDAY-DOUJITSU-T-HKNCOMBI(IDXD)
-                                               =  HCM34S01-HKNCOMBI )
-                       MOVE    LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDXD)
-                                           TO  WRK-DOJITUED (IDXD)
                    END-IF
                END-IF
       *
            END-PERFORM
+      *
+           IF    ( HCM34S01-SANTEIYM  >= CONST-H2910 )
+               INITIALIZE              ORCSSKJHKN-AREA
+               MOVE    HCM34S01-HOSPNUM
+                                       TO  LNK-SKJHKN-HOSPNUM
+               MOVE    HCM34S01-PTID   TO  LNK-SKJHKN-PTID
+               MOVE    HCM34S01-SANTEIYM
+                                       TO  LNK-SKJHKN-SANTEIYM
+               CALL    "ORCSSKJHKN"    USING
+                                       ORCSSKJHKN-AREA
+                                       ORCSNYUINDAY-AREA
+                                       SPA-AREA
+               IF    ( LNK-SKJHKN-RC   =   ZERO )
+                   CONTINUE
+               ELSE
+                   INITIALIZE          ORCSSKJHKN-AREA
+               END-IF
+           END-IF
+      *
+           PERFORM 1501-SHOKUJI-HOKEN-SEC
       *
            .
        150-INIT-EXT.
@@ -1201,6 +1223,98 @@
       *
            .
        1501-SYS5000-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    食事保険設定処理
+      *****************************************************************
+       1501-SHOKUJI-HOKEN-SEC          SECTION.
+      *
+           PERFORM VARYING     IDXD    FROM    WRK-SKYSTDD BY  1
+                   UNTIL     ( IDXD    >       WRK-SKYEDDD )
+      *
+               IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDXD 1)
+                                       NOT =   SPACE )
+                   MOVE    LNK-SKJHKN-HKNCOMBINUM  (IDXD 1)
+                                       TO  WRK-HKNCOMBI-FST-G
+                   IF    ( WRK-HKNCOMBI-FST =  HCM34S01-HKNCOMBI )
+                       MOVE    1       TO  FLG-SKJDAY (IDXD)
+                   ELSE
+                       MOVE    ZERO    TO  FLG-SKJDAY (IDXD)
+                   END-IF
+               ELSE
+                   MOVE    FLG-NYUINDAY (IDXD)
+                                       TO  FLG-SKJDAY (IDXD)
+               END-IF
+      *
+               IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDXD) = "1" )
+                   MOVE    LNK-NYUINDAY-DOUJITSU-T-HKNCOMBI(IDXD)
+                                           TO  WRK-HKNCOMBI-FST
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDXD)
+                                           TO  WRK-HKNCOMBI-SND
+                   IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDXD 1)
+                                   NOT =   SPACE )
+                       MOVE    LNK-SKJHKN-HKNCOMBINUM  (IDXD 1)
+                                           TO  WRK-HKNCOMBI-FST-G
+                   END-IF
+                   IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDXD 2)
+                                   NOT =   SPACE )
+                       MOVE    LNK-SKJHKN-HKNCOMBINUM  (IDXD 2)
+                                           TO  WRK-HKNCOMBI-SND-G
+                   END-IF
+      *
+                   EVALUATE    TRUE
+                   WHEN  ( WRK-HKNCOMBI-SND        =  HCM34S01-HKNCOMBI)
+                     AND ( WRK-HKNCOMBI-FST    NOT =  HCM34S01-HKNCOMBI)
+                       MOVE    2           TO  FLG-SKJDAY(IDXD)
+                       MOVE    LNK-NYUINDAY-DOUJITSU-SKJKBN(IDXD)
+                                           TO  WRK-DOJITUST (IDXD)
+                   WHEN  ( WRK-HKNCOMBI-SND    NOT =  HCM34S01-HKNCOMBI)
+                     AND ( WRK-HKNCOMBI-FST        =  HCM34S01-HKNCOMBI)
+                       MOVE    LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDXD)
+                                           TO  WRK-DOJITUED (IDXD)
+                   WHEN  ( WRK-HKNCOMBI-SND    NOT =  HCM34S01-HKNCOMBI)
+                     AND ( WRK-HKNCOMBI-FST    NOT =  HCM34S01-HKNCOMBI)
+                       MOVE    ZERO        TO  FLG-SKJDAY (IDXD)
+                   END-EVALUATE
+      *
+               END-IF
+      *
+           END-PERFORM
+           DISPLAY "HKNCOMBI," HCM34S01-HKNCOMBI ","
+                   FLG-SKJDAY (01) ","
+                   FLG-SKJDAY (02) ","
+                   FLG-SKJDAY (03) ","
+                   FLG-SKJDAY (04) ","
+                   FLG-SKJDAY (05) ","
+                   FLG-SKJDAY (06) ","
+                   FLG-SKJDAY (07) ","
+                   FLG-SKJDAY (08) ","
+                   FLG-SKJDAY (09) ","
+                   FLG-SKJDAY (10) ","
+                   FLG-SKJDAY (11) ","
+                   FLG-SKJDAY (12) ","
+                   FLG-SKJDAY (13) ","
+                   FLG-SKJDAY (14) ","
+                   FLG-SKJDAY (15) ","
+                   FLG-SKJDAY (16) ","
+                   FLG-SKJDAY (17) ","
+                   FLG-SKJDAY (18) ","
+                   FLG-SKJDAY (19) ","
+                   FLG-SKJDAY (20) ","
+                   FLG-SKJDAY (21) ","
+                   FLG-SKJDAY (22) ","
+                   FLG-SKJDAY (23) ","
+                   FLG-SKJDAY (24) ","
+                   FLG-SKJDAY (25) ","
+                   FLG-SKJDAY (26) ","
+                   FLG-SKJDAY (27) ","
+                   FLG-SKJDAY (28) ","
+                   FLG-SKJDAY (29) ","
+                   FLG-SKJDAY (30) ","
+                   FLG-SKJDAY (31) ","
+      *
+           .
+       1501-SHOKUJI-HOKEN-EXT.
            EXIT.
       *****************************************************************
       *    主処理
@@ -3440,7 +3554,7 @@
                    UNTIL ( IDXD    >   31 )
       *
              IF    ( HCM34S01-HKNNUM(1:2)  NOT =   "98" )
-               IF    ( FLG-NYUINDAY (IDXD)     =   1 OR 2 )
+               IF    ( FLG-SKJDAY (IDXD)     =   1 OR 2 )
                 OR   ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
       *
                    EVALUATE    LNK-SYOTOKU-SKJKBN(IDXD)
@@ -3600,7 +3714,7 @@
       *
                MOVE    ZERO                TO  FLG-SANTEI
                IF    ( NACCT-DAY    (IDXD)     >   ZERO )
-                AND  ( FLG-NYUINDAY (IDXD)     =   1 )
+                AND  ( FLG-SKJDAY   (IDXD)     =   1 )
                 AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4  )
                     IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                      OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
@@ -4604,7 +4718,7 @@
       *
                    MOVE    ZERO                TO  FLG-SANTEI
                    IF    ( NACCT-DAY    (IDXD)     >   ZERO )
-                    AND  ( FLG-NYUINDAY (IDXD)     =   1 OR 2 )
+                    AND  ( FLG-SKJDAY   (IDXD)     =   1 OR 2 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4  )
                         IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                          OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )

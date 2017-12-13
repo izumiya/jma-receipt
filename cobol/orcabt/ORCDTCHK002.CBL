@@ -561,7 +561,8 @@
            03  WRK-NYUGAIKBN                           PIC X(01).
            03  WRK-HKNID                               PIC 9(10).
            03  WRK-KOHID                               PIC 9(10).
-           03  WRK-ERRCD                               PIC X(06).
+           03  WRK-ERRCD.
+               05  WRK-ERRCD-NUM                       PIC 9(06).
            03  WRK-ERRMES                              PIC X(200).
            03  WRK-ERRMES-PLUS                         PIC X(200).
            03  WRK-PTBYOMES-PLUS                       PIC X(200).
@@ -1266,6 +1267,8 @@
        01  LNK-SYUDAY-REC-T.
          02 LNK-SYUDAY-REC     OCCURS 10.
            COPY  "CPSYUDAY.INC"  REPLACING  //SDAY-// BY //LNK-SDAY-//.
+      *
+           COPY    "CPORCS02MSG.INC".
       *
       *    文字列操作サブ
            COPY    "CPORCSSTRING.INC".
@@ -11269,50 +11272,19 @@
       *
                PERFORM 900-DBCOMMIT-SEC
                PERFORM 900-DBSTART-SEC
-               EVALUATE    LNK-S02-RC
-               WHEN    13
-                   MOVE    "990012"    TO  WRK-ERRCD
-               WHEN    14
-                   MOVE    "990002"    TO  WRK-ERRCD
-               WHEN    15
-                   MOVE    "990008"    TO  WRK-ERRCD
-               WHEN    16
-                   MOVE    "990007"    TO  WRK-ERRCD
-               WHEN    17
-                   MOVE    "990013"    TO  WRK-ERRCD
-               WHEN    19
-                   MOVE    "990014"    TO  WRK-ERRCD
-               WHEN    20
-                   MOVE    "990015"    TO  WRK-ERRCD
-               WHEN    21
-                   MOVE    "990016"    TO  WRK-ERRCD
-               WHEN    22
-                   MOVE    "990017"    TO  WRK-ERRCD
-               WHEN    23
-                   MOVE    "990020"    TO  WRK-ERRCD
-               WHEN    24
-                   MOVE    "990021"    TO  WRK-ERRCD
-               WHEN    25
-                   MOVE    "990022"    TO  WRK-ERRCD
-               WHEN    26
-                   MOVE    "990026"    TO  WRK-ERRCD
-               WHEN    27
-                   MOVE    "990027"    TO  WRK-ERRCD
-               WHEN    29
-                   MOVE    "990033"    TO  WRK-ERRCD
-               WHEN    30
-                   MOVE    "990035"    TO  WRK-ERRCD
-               WHEN    31
-                   MOVE    "990036"    TO  WRK-ERRCD
-               WHEN    33
-                   MOVE    "990038"    TO  WRK-ERRCD
-               WHEN    34
-                   MOVE    "990039"    TO  WRK-ERRCD
-               WHEN    101
-                   MOVE    "990034"    TO  WRK-ERRCD
-               WHEN    OTHER
-                   MOVE    "990018"    TO  WRK-ERRCD
-               END-EVALUATE
+      *
+               INITIALIZE              S02MSG-AREA
+               MOVE    LNK-S02-RC  TO  S02MSG-S02-RC
+               CALL    "ORCS02MSG"     USING
+                                       S02MSG-AREA
+                                       SPA-AREA
+               IF    ( S02MSG-MSG (1)  =   SPACE )
+                   MOVE    "990500"    TO  WRK-ERRCD
+               ELSE
+                   COMPUTE WRK-ERRCD-NUM = 990500 + LNK-S02-RC
+                   MOVE    WRK-ERRCD   TO  WRK-ERRCD
+               END-IF
+      *
                INITIALIZE              TERRINF-AREA
                PERFORM 210-ERRMES-HEN-SEC
            END-IF

@@ -62,11 +62,14 @@
            03  IDX6                        PIC 9(05).
            03  IDX7                        PIC 9(05).
            03  IDX8                        PIC 9(05).
+           03  IDX9                        PIC 9(05).
            03  IDX-DAY                     PIC 9(02).
       *
        01  WRK-AREA.
            03  WRK-COMB-HKNCOMBINUM        PIC 9(04).
-           03  WRK-HKNCOMBINUM             PIC 9(04).
+           03  WRK-HKNCOMBINUM-G.
+               05  WRK-HKNCOMBINUM         PIC 9(04).
+               05  WRK-HKNCOMBINUM-SKJHKN  PIC X(01).
            03  WRK-HBTSRYKA-G.
                05  WRK-HBTSRYKA-HBTKA      PIC X(02)   OCCURS  31.
                05  WRK-HBTSRYKA-MAX        PIC 9(05).
@@ -96,6 +99,7 @@
       *
       *    固定値領域
        01  CONST-AREA.
+           03  CONST-H2910                 PIC X(06) VALUE "201710".
            03  CONST-H180401               PIC X(08) VALUE "20060401".
            03  CONST-ZAINUM-MAX            PIC 9(05) VALUE  200.
            03  CONST-TNRRK-MAX             PIC 9(05) VALUE  100.
@@ -131,6 +135,9 @@
       *
       *    入院会計編集サブ
            COPY    "CPORCHCM34S01.INC".
+      *
+      *    入院料と異なる食事算定保険組み合わせ取得サブ
+           COPY    "CPORCSSKJHKN.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -294,6 +301,7 @@
                    UNTIL ( IDX1    >   31 )
       *
                IF    ( NACCT-DAY (IDX1)    >   ZERO )
+                   INITIALIZE                      WRK-HKNCOMBINUM-G
                    MOVE    NACCT-DAY (IDX1)    TO  WRK-HKNCOMBINUM
                    PERFORM 20011-TCOMBI-HEN-SEC
                END-IF
@@ -315,12 +323,40 @@
                    UNTIL ( IDX1   >       31 )
       *
                IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDX1) = "1" )
+                   INITIALIZE              WRK-HKNCOMBINUM-G
                    MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-HKNCOMBINUM
                    PERFORM 20011-TCOMBI-HEN-SEC
                END-IF
       *
            END-PERFORM
+      *
+           IF    ( NACCT-SRYYM         >= CONST-H2910 )
+               INITIALIZE              ORCSSKJHKN-AREA
+               MOVE    NACCT-HOSPNUM   TO  LNK-SKJHKN-HOSPNUM
+               MOVE    NACCT-PTID      TO  LNK-SKJHKN-PTID
+               MOVE    NACCT-SRYYM     TO  LNK-SKJHKN-SANTEIYM
+               CALL    "ORCSSKJHKN"    USING
+                                       ORCSSKJHKN-AREA
+                                       ORCSNYUINDAY-AREA
+                                       SPA-AREA
+               IF    ( LNK-SKJHKN-RC   =   ZERO )
+                   PERFORM VARYING IDX1   FROM    1   BY  1
+                           UNTIL ( IDX1   >       31 )
+                       PERFORM VARYING IDX9    FROM    1   BY  1
+                               UNTIL ( IDX9    >   2 )
+                           IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDX1 IDX9)
+                                       NOT =   SPACE )
+                               MOVE LNK-SKJHKN-HKNCOMBINUM (IDX1 IDX9)
+                                       TO  WRK-HKNCOMBINUM-G
+                               MOVE "1"
+                                       TO  WRK-HKNCOMBINUM-SKJHKN
+                               PERFORM 20011-TCOMBI-HEN-SEC
+                           END-IF
+                       END-PERFORM
+                   END-PERFORM
+               END-IF
+           END-IF
       *
            .
        2001-TCOMBI-HEN-EXT.
@@ -356,7 +392,9 @@
                    COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
                        =   TCOMBI-HKNCOMBI-CNT (IDX2)
                        +   1
-                   MOVE    1   TO  TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
+                   IF    ( WRK-HKNCOMBINUM-SKJHKN =   SPACE )
+                       MOVE    1   TO  TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
+                   END-IF
                END-IF
            END-IF
       *

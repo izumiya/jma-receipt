@@ -136,6 +136,7 @@
       *                                     病名があっても病名データも作成しない
       *  04.08.04    NACL-門脇    16/03/28  平成２８年４月改正対応
       *  04.08.05    NACL-小豆沢  16/09/16  持参薬は出力しないよう対応
+      *  05.00.01    NACL-太田    17/11/21  入院料と異なる食事算定保険組み合わせ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -267,6 +268,8 @@
            03  IDZ                             PIC 9(03).
            03  IDXX                            PIC 9(03).
            03  IDYY                            PIC 9(03).
+           03  IDZZ                            PIC 9(03).
+           03  IDXD                            PIC 9(03).
       **** 03  SYSKAN-IDX                      PIC 9(03).
       *
        01  KEY-AREA                            VALUE   LOW-VALUE.
@@ -347,6 +350,10 @@
            03  WRK-MOJISU          PIC 9(03).
       *
            03  WRK-YM              PIC 9(06).
+      *
+           03  WRK-HKNCOMBINUM-G.
+               05  WRK-HKNCOMBINUM PIC 9(04).
+      *
       *    レセプト種別判定用領域
        01  WK-RECESYUBETU-AREA.
            03  WK-KOKUHO                               PIC X(01).
@@ -624,6 +631,9 @@
            COPY    "CPORCSNYUINDAY.INC".
       *
            COPY    "CPORCSGETTEMP.INC".
+      *
+      *    入院料と異なる食事算定保険組み合わせ取得サブ
+           COPY    "CPORCSSKJHKN.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -970,6 +980,11 @@ grpsys             PERFORM 900-DBSELECT-SEC
       *        同日再入院のチェック
                PERFORM 500-ORCSNYUINDAY-CHECK-SEC
       *
+      *        入院料と異なる食事算定保険組み合わせのチェック
+               IF    ( WRK-PARA-SRYYM          >=  "201710" )
+                   PERFORM 500-ORCSSKJHKN-CHECK-SEC
+               END-IF
+      *
       *        入院会計の保険組合せをまとめる
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
@@ -977,6 +992,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                          ( LNK-NYUINDAY-KBN (IDX)
                                                =   "1"  )    )  AND
                        (   WRK-DAY (2 IDX)     >   ZERO      )
+                       MOVE    WRK-DAY (2 IDX) TO  WRK-HKNCOMBINUM
+                       MOVE    IDX             TO  IDXD
                        PERFORM 20011-NYUINACCT-HENSYU-SEC
                    END-IF
                END-PERFORM        
@@ -1050,7 +1067,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    MOVE    WRK-PARA-HOSPNUM
                                            TO  COMB-HOSPNUM
                    MOVE    PTINF-PTID      TO  COMB-PTID
-                   MOVE    WRK-DAY (2 IDX) TO
+                   MOVE    WRK-HKNCOMBINUM TO
                                            COMB-HKNCOMBINUM 
                    MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
                    PERFORM 910-HKNCOMBI-INV-SEC
@@ -1063,20 +1080,20 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                            WRK-COMB-HOSPNUM     (IDX1)
                        MOVE    PTINF-PTID      TO
                                            WRK-COMB-PTID        (IDX1)
-                       MOVE    WRK-DAY (2 IDX) TO
+                       MOVE    WRK-HKNCOMBINUM TO
                                            WRK-COMB-HKNCOMBINUM (IDX1)
                        MOVE    "1"     TO  WRK-HKNCOMBI-SYOKBN  (IDX1)
                    END-IF
                END-IF
       *
       *        適用範囲かチェック（範囲外のとき２をセット）
-               IF      WRK-DAY (2 IDX)     =
+               IF      WRK-HKNCOMBINUM     =
                                        WRK-COMB-HKNCOMBINUM (IDX1)
                    IF      WRK-HKNCOMBI-SYOKBN (IDX1)   NOT =   SPACE
                        CONTINUE                    
                    ELSE     
                        MOVE    WRK-STYMD       TO  WRK-YMD
-                       MOVE    IDX             TO  WRK-DD
+                       MOVE    IDXD            TO  WRK-DD
                        IF      WRK-COMB-TEKSTYMD (IDX1)
                                                <=  WRK-YMD
                        AND     WRK-COMB-TEKEDYMD (IDX1)
@@ -3782,63 +3799,44 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    UNTIL   IDXX    >       31
                IF      LNK-NYUINDAY-DOUJITSU-KBN (IDXX)
                                                =   "1"
-                   PERFORM VARYING IDX1    FROM    1   BY  1
-                           UNTIL   IDX1    >   10
-      *                保険組合せ追加
-                       IF      WRK-COMB-HKNCOMBINUM (IDX1)
-                                                   =   ZERO
-                           INITIALIZE                      HKNCOMBI-REC
-                           MOVE    WRK-PARA-HOSPNUM    TO  COMB-HOSPNUM
-                           MOVE    PTINF-PTID          TO  COMB-PTID
-                           MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
-                                                       TO
-                                                       COMB-HKNCOMBINUM 
-                           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
-                           PERFORM 910-HKNCOMBI-INV-SEC
-      *                    （対象外の組合せは１をセット）
-                           IF      FLG-HKNCOMBI    =   ZERO
-                               MOVE    HKNCOMBI-REC    TO
-                                               WRK-HKNCOMBI-REC(IDX1)
-                           ELSE
-                               MOVE    WRK-PARA-HOSPNUM
-                                                       TO
-                                           WRK-COMB-HOSPNUM     (IDX1)
-                               MOVE    PTINF-PTID      TO
-                                           WRK-COMB-PTID        (IDX1)
-                               MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI
-                                                                (IDXX)
-                                                       TO
-                                           WRK-COMB-HKNCOMBINUM (IDX1)
-                               MOVE    "1"             TO
-                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
-                           END-IF
-                       END-IF
-      *
-      *                適用範囲かチェック（範囲外のとき２をセット）
-                       IF      LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
-                                               =
-                                           WRK-COMB-HKNCOMBINUM (IDX1)
-                           IF      WRK-HKNCOMBI-SYOKBN (IDX1)
-                                               NOT =   SPACE
-                               CONTINUE                    
-                           ELSE     
-                               MOVE    WRK-STYMD       TO  WRK-YMD
-                               MOVE    IDXX            TO  WRK-DD
-                               IF      WRK-COMB-TEKSTYMD (IDX1)
-                                                       <=  WRK-YMD
-                               AND     WRK-COMB-TEKEDYMD (IDX1)
-                                                       >=  WRK-YMD
-                                   CONTINUE
-                               ELSE   
-                                   MOVE    "2"         TO
-                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
-                               END-IF
-                           END-IF
-                           MOVE    10              TO  IDX1
-                       END-IF            
-                   END-PERFORM
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                       TO  WRK-HKNCOMBINUM
+                   MOVE    IDXX        TO  IDXD
+                   PERFORM 20011-NYUINACCT-HENSYU-SEC
                END-IF
            END-PERFORM
+      *
+           .
+       500-ORCSNYUINDAY-CHECK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料と異なる食事算定保険組み合わせチェック処理
+      *****************************************************************
+       500-ORCSSKJHKN-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                  ORCSSKJHKN-AREA
+           MOVE    SPA-HOSPNUM     TO  LNK-SKJHKN-HOSPNUM
+           MOVE    PTINF-PTID      TO  LNK-SKJHKN-PTID
+           MOVE    WRK-PARA-SRYYM  TO  LNK-SKJHKN-SANTEIYM
+           CALL    "ORCSSKJHKN"    USING
+                                       ORCSSKJHKN-AREA
+                                       ORCSNYUINDAY-AREA
+                                       SPA-AREA
+           IF    ( LNK-SKJHKN-RC   =   ZERO )
+               PERFORM VARYING IDXX   FROM    1   BY  1
+                       UNTIL ( IDXX   >       31 )
+                   PERFORM VARYING IDZZ    FROM    1   BY  1
+                           UNTIL ( IDZZ    >   2 )
+                       IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDXX IDZZ)
+                                   NOT =   SPACE )
+                           MOVE    LNK-SKJHKN-HKNCOMBINUM  (IDXX IDZZ)
+                                       TO  WRK-HKNCOMBINUM-G
+                           MOVE    IDXX    TO  IDXD
+                           PERFORM 20011-NYUINACCT-HENSYU-SEC
+                       END-IF
+                   END-PERFORM
+               END-PERFORM
+           END-IF
       *
            .
        500-ORCSNYUINDAY-CHECK-EXT.

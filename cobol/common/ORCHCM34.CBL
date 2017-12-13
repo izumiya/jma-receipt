@@ -282,6 +282,7 @@
            03  IDXR                                PIC 9(05).
            03  IDXS                                PIC 9(05).
            03  IDXT                                PIC 9(05).
+           03  IDXW                                PIC 9(05).
            03  IDXZ                                PIC 9(05).
            03  IDX-RRK                             PIC 9(05).
            03  IDX-RJ                              PIC 9(05).
@@ -404,7 +405,8 @@
            03  WRK-GAIHAKU-ED-Z9                   PIC Z9.
            03  WRK-HKNCOMBI-KEY-MAE                PIC X(04).
            03  WRK-HKNCOMBI-KEY                    PIC X(04).
-           03  WRK-HKNCOMBINUM                     PIC 9(04).
+           03  WRK-HKNCOMBINUM-G.
+               05  WRK-HKNCOMBINUM                 PIC 9(04).
            03  WRK-HKNNUM                          PIC X(03).
            03  WRK-KOHNUM                          PIC X(03).
            03  WRK-SHONUM-G.
@@ -650,7 +652,8 @@
            03  KEY-ACCT-HKNCOMBI                   PIC 9(4).
       *
        01  CONST-AREA.
-           03  CONST-H2710             PIC X(08)   VALUE "999999".
+           03  CONST-H9999             PIC X(08)   VALUE "999999".
+           03  CONST-H2910             PIC X(08)   VALUE "201710".
            03  CONST-H2612             PIC X(08)   VALUE "201412".
            03  CONST-H2604             PIC X(08)   VALUE "201404".
            03  CONST-H190401           PIC X(08)   VALUE "20070401".
@@ -1023,6 +1026,9 @@
       *    °åÎÅ¶èÊ¬¡¦£Á£Ä£ÌÅÀ¿ô¼èÆÀ¥µ¥Ö
            COPY    "CPORCHCN68S01.INC".
       *
+      *    Æþ±¡ÎÁ¤È°Û¤Ê¤ë¿©»ö»»ÄêÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSSKJHKN.INC".
+      *
       *    £Ä£Â¸¡º÷
            COPY    "MCPAREA".
       *
@@ -1152,7 +1158,7 @@
            COMPUTE WRK-MAXZAINUM   =   PTINF-MAXZAINUM     +   1000
       *
            EVALUATE    TRUE
-           WHEN  ( ORCHCM34-SRYYM      >=  CONST-H2710 )
+           WHEN  ( ORCHCM34-SRYYM      >=  CONST-H9999 )
                MOVE    0.10            TO  WRK-RATE1
            WHEN  ( ORCHCM34-SRYYM      >=  CONST-H2604 )
                MOVE    0.08            TO  WRK-RATE1
@@ -5806,6 +5812,33 @@
                END-IF
       *
            END-PERFORM
+      *
+           IF    ( ORCHCM34-SRYYM      >= CONST-H2910 )
+               INITIALIZE              ORCSSKJHKN-AREA
+               MOVE    SPA-HOSPNUM
+                                       TO  LNK-SKJHKN-HOSPNUM
+               MOVE    SPA-PTID        TO  LNK-SKJHKN-PTID
+               MOVE    ORCHCM34-SRYYM  TO  LNK-SKJHKN-SANTEIYM
+               CALL    "ORCSSKJHKN"    USING
+                                       ORCSSKJHKN-AREA
+                                       ORCSNYUINDAY-AREA
+                                       SPA-AREA
+               IF    ( LNK-SKJHKN-RC   =   ZERO )
+                   PERFORM VARYING IDX25   FROM    ORCHCM34-STDAY BY 1
+                           UNTIL ( IDX25   >       ORCHCM34-EDDAY )
+                       PERFORM VARYING IDXW    FROM    1   BY  1
+                               UNTIL ( IDXW    >   2 )
+                           IF    ( LNK-SKJHKN-HKNCOMBINUM  (IDX25 IDXW)
+                                       NOT =   SPACE )
+                               MOVE LNK-SKJHKN-HKNCOMBINUM  (IDX25 IDXW)
+                                       TO  WRK-HKNCOMBINUM-G
+                               PERFORM 200211-TCOMBI-HEN-SEC
+                           END-IF
+                       END-PERFORM
+                   END-PERFORM
+               END-IF
+           END-IF
+           
       *
            .
        20021-TCOMBI-HEN-EXT.

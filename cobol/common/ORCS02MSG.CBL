@@ -177,6 +177,16 @@
                                            DELIMITED   BY  SIZE
                INTO    WRK-MSG (1)
                END-STRING
+           WHEN    35
+               STRING  "同一日に食事保険指定コードの入力が"
+                       "２件以上あります"  DELIMITED   BY  SIZE
+               INTO    WRK-MSG (1)
+               END-STRING
+           WHEN    36
+               STRING  "食事保険指定コードの入力日に食事の算定"
+                       "がありません"      DELIMITED   BY  SIZE
+               INTO    WRK-MSG (1)
+               END-STRING
            WHEN    101
                STRING  "包括入院期間に算定できない入院料加算"
                                            DELIMITED   BY  SIZE
