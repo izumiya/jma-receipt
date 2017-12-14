@@ -5253,6 +5253,11 @@
                    IF      SPA-COM-KZMERR (IDX-T)  =   2  OR  3
                        MOVE    "0021"          TO  SPA-ERRCD
                    END-IF
+      *H29.12
+      *            数量ゼロはエラーなし
+                   IF      (WRK-SURYO          =   ZERO )
+                       MOVE    SPACE           TO  SPA-ERRCD
+                   END-IF
       *
       *            下限値＜データ≦上限値
                WHEN     (SPA-COM-KZMKGN (IDX-T)    <   WRK-SURYO )   AND
