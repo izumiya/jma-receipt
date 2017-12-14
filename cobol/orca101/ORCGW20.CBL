@@ -6671,7 +6671,7 @@ UPDATE*    ´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
            MOVE    ZERO        TO  SPA-GMN-W20-CUR
            MOVE    W20-KJNYMD  TO  WRK-YMD
            PERFORM 800-SEIWA-HEN-SEC
-           IF  ( SPA-ERRCD         =   SPACE )
+           IF  ( FLG-HIZUKE-ERR    =   ZERO )
       *
                INITIALIZE              SPA-W20-AREA
       *

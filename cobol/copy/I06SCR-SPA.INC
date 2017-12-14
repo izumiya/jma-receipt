@@ -187,7 +187,7 @@
                            11  SPA-GMN-BTUNAMEMEIL PIC X(20).
                    07  SPA-GMN-SAGAKULST-G.
                        09  SPA-GMN-SAGAKU-MAX      PIC 9(05).
-                       09  SPA-GMN-SAGAKULST       OCCURS  20.
+                       09  SPA-GMN-SAGAKULST       OCCURS  99.
                            11  SPA-GMN-SAGAKUL     PIC X(02).
                            11  SPA-GMN-SAGAKUFLL   PIC X(01).
                            11  SPA-GMN-SAGAKUMEIL  PIC X(20).

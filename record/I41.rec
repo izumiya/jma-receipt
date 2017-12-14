@@ -431,8 +431,8 @@ I41 {
           item {
             column1 varchar(4);
             column2 varchar(22);
-          }[30];
-          selectdata bool[30];
+          }[99];
+          selectdata bool[99];
       };
     };
     TSUSANNISSU {

@@ -70,7 +70,7 @@ W21 {
         state int;
       };
       count int;
-        item varchar(12)[30];
+        item varchar(12)[99];
       state int;
     };
     CMB_BRM_SEX {

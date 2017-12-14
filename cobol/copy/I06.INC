@@ -60,7 +60,7 @@
                 04  I06-SAGAKU                 PIC X(23).
                 04  I06-SAGAKU-STATE           PIC S9(9)   BINARY.
                 04  I06-SAGAKU-COUNT           PIC S9(9)   BINARY.
-                04  I06-SAGAKU-ITEM            PIC X(23)   OCCURS  20.
+                04  I06-SAGAKU-ITEM            PIC X(23)   OCCURS  99.
                 04  I06-SAGAKU-ITEM-STATE      PIC S9(9)   BINARY.
               03  I06-CMB-SENTEIKBN.
                 04  I06-SENTEIKBN              PIC X(24).

@@ -97,7 +97,7 @@
       *    ººŒ¡∫π≥€æ Û
            03  SPA-GMN-SAGAKUTBL-41.
                05  SPA-GMN-SAGAKU-TITLE-41               PIC X(22).
-               05  SPA-GMN-SAGAKULIST-41                 OCCURS  30.
+               05  SPA-GMN-SAGAKULIST-41                 OCCURS  99.
                    07  SPA-GMN-SAGAKUNO-41               PIC X(04).
                    07  SPA-GMN-SAGAKU-41                 PIC X(22).
                05  SPA-SAGAKU-MAX-41                     PIC 9(03).

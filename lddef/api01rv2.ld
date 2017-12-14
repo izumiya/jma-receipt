@@ -39,6 +39,7 @@ bindapi	"prescriptionv2"	"OpenCOBOL"	"ORAPI001R2V2";
 bindapi	"medicinenotebookv2"	"OpenCOBOL"	"ORAPI001R3V2";
 bindapi	"subjectiveslstv2"	"OpenCOBOL"	"ORAPI025R1V2";
 bindapi	"system01dailyv2"	"OpenCOBOL"	"ORAPI101R2V2";
+bindapi	"hsconfroomchargev2"	"OpenCOBOL"	"ORAPI031RC3V2";
 
 multiplex_group	api01rv2;
 
@@ -81,6 +82,7 @@ data	{
 		medicinenotebookv2;
 		subjectiveslstv2;
 		system01dailyv2;
+        hsconfroomchargev2;
 	};
 };
 db "xml2" {
@@ -159,6 +161,8 @@ db "xml2" {
  xml_subjectiveslstv2res;
  xml_system01_dailyv2req;
  xml_system01_dailyv2res;
+ xml_hsconfroomchargev2req;
+ xml_hsconfroomchargev2res;
 };
 
 #include "orcadb.inc"

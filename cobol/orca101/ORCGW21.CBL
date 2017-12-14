@@ -867,7 +867,7 @@
            MOVE    SYSKANRI-REC    TO  SYS-5113-REC
       *
            PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
-                    OR   ( SPA-GMN-W21-SAGAKU-MAX  >=  30 )
+                    OR   ( SPA-GMN-W21-SAGAKU-MAX  >=  99 )
       *
                COMPUTE SPA-GMN-W21-SAGAKU-MAX
                    =   SPA-GMN-W21-SAGAKU-MAX  +   1
@@ -3501,6 +3501,10 @@
        4100-KJNYMD-CHK-SEC             SECTION.
       *
            MOVE    ZERO        TO  SPA-GMN-W21-CUR
+           IF    ( W21-KJNYMD  =   SPACE )
+               MOVE    SPA-NAI-W21-KJNYMD
+                               TO  W21-KJNYMD
+           END-IF
            MOVE    W21-KJNYMD  TO  WRK-YMD
            PERFORM 800-HIZUKE-CHK-SEC
            IF  ( SPA-ERRCD         =   SPACE )

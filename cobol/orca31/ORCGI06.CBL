@@ -210,7 +210,7 @@
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
            03  CONST-ERRCD9001             PIC X(04)   VALUE "9001".
            03  CONST-BTUNAME-MAX           PIC 9(05)   VALUE 50.
-           03  CONST-SAGAKU-MAX            PIC 9(05)   VALUE 20.
+           03  CONST-SAGAKU-MAX            PIC 9(05)   VALUE 99.
            03  CONST-NYUINKA-MAX           PIC 9(05)   VALUE 99.
            03  CONST-TAIINCD-MAX           PIC 9(05)   VALUE 50.
            03  CONST-DR-MAX                PIC 9(05)   VALUE 99.

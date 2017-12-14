@@ -1652,7 +1652,7 @@
            MOVE    SYSKANRI-REC    TO  SYS-5113-REC
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
-               UNTIL     ( IDX1            >   30 )
+               UNTIL     ( IDX1            >   99 )
                    OR    ( FLG-SYSKANRI    NOT =   ZERO )
       *
                MOVE    IDX1    TO  SPA-GMN-I01-SAGAKU-CNT

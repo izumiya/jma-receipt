@@ -1,0 +1,18 @@
+xml_hsconfroomchargev2req {
+    context                  int;
+    object                   object;
+    mode                     int;
+    recordname               varchar(128);
+    hsconfroomchargev2req {
+      Request_Number         varchar(02);
+      Base_Date	             varchar(10);
+      Room_Charge_Information{ 
+        Room_Charge_Code     varchar(02);
+        Room_Charge          varchar(7);
+        StartDate            varchar(10);
+        EndDate              varchar(10);
+        Force_Update         varchar(5);
+    }[99];
+  };
+};
+

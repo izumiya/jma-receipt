@@ -520,3 +520,20 @@ path	del3	{
 		;
 	};
 };
+
+path	upd3	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_syskanri 
+				SET	EDYUKYMD     =   :EDYUKYMD,
+					OPID         =   :OPID,
+					UPYMD        =   :UPYMD,
+					UPHMS        =   :UPHMS
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   KANRICD      =      :KANRICD
+			AND   KBNCD        =      :KBNCD
+			AND		STYUKYMD     <=   :STYUKYMD
+			AND		EDYUKYMD     >=   :EDYUKYMD
+		;
+	};
+};
+

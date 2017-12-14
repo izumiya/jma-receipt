@@ -87,10 +87,10 @@
               05  I41-SAGAKULIST-COUNT PIC S9(9)   BINARY.
               05  I41-SAGAKULIST-ROW     PIC S9(9)   BINARY.
               05  I41-SAGAKULIST-ROWATTR PIC S9(9)   BINARY.
-              05  I41-SAGAKU-ITEM      OCCURS  30 TIMES.
+              05  I41-SAGAKU-ITEM      OCCURS  99 TIMES.
                 06  I41-SAGAKUNO       PIC X(4).
                 06  I41-SAGAKU         PIC X(22).
-              05  I41-SAGAKULIST-SELECT  PIC X      OCCURS  30 TIMES.
+              05  I41-SAGAKULIST-SELECT  PIC X      OCCURS  99 TIMES.
           03  I41-TSUSANNISSU     PIC S9(6).
           03  I41-SYUBETSU1-G.
             04  I41-SYUBETSU1-STYLE.

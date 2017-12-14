@@ -161,7 +161,7 @@
                05  WRK-LIFE-TEN-KANKYO2        PIC 9(08).
            03  WRK-SYS-5113.
                05  WRK-SYS-5113-MAX            PIC 9(03).
-               05  WRK-SYS-5113-OCC            OCCURS  30.
+               05  WRK-SYS-5113-OCC            OCCURS  99.
                    07  WRK-SYS-5113-STYUKYMD   PIC X(08).
                    07  WRK-SYS-5113-EDYUKYMD   PIC X(08).
                    07  WRK-SYS-5113-KBNCD      PIC 9(02).
@@ -1633,7 +1633,7 @@
            END-IF
       *
            PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
-                    OR   ( WRK-SYS-5113-MAX   >=   30 )
+                    OR   ( WRK-SYS-5113-MAX   >=   99 )
       *
                IF    ( SYS-5113-STYUKYMD (1:6)
                                        <=  HCM34S01-SANTEIYM )

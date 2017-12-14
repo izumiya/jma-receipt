@@ -345,7 +345,7 @@
       *          ººŒ¡∫π≥€•≥•Û•‹
                  11  SPA-GMN-I01-CMB-SAGAKU.
                    13  SPA-GMN-I01-SAGAKU-CNT      PIC 9(5).
-                   13  SPA-GMN-I01-SAGAKU-ITM      OCCURS  30.
+                   13  SPA-GMN-I01-SAGAKU-ITM      OCCURS  99.
                        15  SPA-GMN-I01-SAGAKUL     PIC X(02).
                        15  SPA-GMN-I01-SAGAKUFLL   PIC X(01).
                        15  SPA-GMN-I01-SAGAKUMEIL  PIC X(20).

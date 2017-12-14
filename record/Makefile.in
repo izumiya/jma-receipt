@@ -547,6 +547,7 @@ RECORD_files = \
     masterlastupdatev3.rec \
 	system01dailyv2.rec \
 	receiptdatamakev3.rec \
+    hsconfroomchargev2.rec \
 
 
 DEF_files = \
@@ -1050,6 +1051,8 @@ DB_files = \
 	xml_system01_dailyv2res.db \
         xml_receiptdata_makev3req.db \
         xml_receiptdata_makev3res.db \
+    xml_hsconfroomchargev2req.db \
+    xml_hsconfroomchargev2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

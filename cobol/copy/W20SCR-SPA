@@ -1192,7 +1192,7 @@
       *          ººŒ¡∫π≥€•≥•Û•‹π‡Ã‹øÙ
                  11  SPA-GMN-W21-SAGAKU-MAX        PIC 9(5).
       *          ººŒ¡∫π≥€•≥•Û•‹π‡Ã‹
-                 11  SPA-GMN-W21-SAGAKULST         OCCURS  30.
+                 11  SPA-GMN-W21-SAGAKULST         OCCURS  99.
                    13  SPA-GMN-W21-SAGAKUL         PIC X(02).
                    13  SPA-GMN-W21-SAGAKUFL        PIC X(01).
                    13  SPA-GMN-W21-SAGAKUMEIL      PIC X(09).

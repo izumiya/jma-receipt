@@ -17,24 +17,21 @@
       ********************************************************************
         02  W22.
             03  W22-FIXED6.
-              04  W22-KANRICD.
-                05  W22-VALUE                PIC X(31).
-              04  W22-KBNCD.
-                05  W22-VALUE                PIC X(02).
-              04  W22-MEISYOU.
-                05  W22-VALUE                PIC X(6).
-              04  W22-STYUKYMD.
-                05  W22-VALUE                PIC X(10).
-              04  W22-EDYUKYMD.
-                05  W22-VALUE                PIC X(10).
-              04  W22-MEISYOUWINDOW.
-                05  W22-MEISYOULIST.
-                  06  W22-MEISYOU-COUNT      PIC S9(9)   BINARY.
-                  06  W22-MEISYOU-ROW        PIC S9(9)   BINARY.
-                  06  W22-MEISYOU-ROWATTR    PIC S9(9)   BINARY.
-                  06  W22-MEISYOU-ITEM           OCCURS  30 TIMES.
-                    07  W22-VALUE1           PIC X(16).
-                    07  W22-VALUE2           PIC X(60).
-                    07  W22-VALUE3           PIC X(19).
-                    07  W22-VALUE4           PIC X(19).
-                  06  W22-MEISYOU-SELECT     PIC X OCCURS  30 TIMES.
+              04  W22-SELNUM                 PIC S9(2).
+              04  W22-KJNYMD                 PIC X(10).
+              04  W22-KBNCD                  PIC X(02).
+              04  W22-KBNCD-STATE            PIC S9(9)   BINARY.
+              04  W22-SAGAKU                 PIC X(6).
+              04  W22-STYUKYMD               PIC X(10).
+              04  W22-EDYUKYMD               PIC X(10).
+              04  W22-SAGAKULST.
+                05  W22-SAGAKULST-COUNT      PIC S9(9)   BINARY.
+                05  W22-SAGAKULST-ROW        PIC S9(9)   BINARY.
+                05  W22-SAGAKULST-ROWATTR    PIC S9(9)   BINARY.
+                05  W22-SAGAKULST-OCC        OCCURS  100 TIMES.
+                  06  W22-TNUM               PIC X(2).
+                  06  W22-TKBNCD             PIC X(2).
+                  06  W22-TSAGAKU            PIC X(7).
+                  06  W22-TSTYUKYMD          PIC X(10).
+                  06  W22-TEDYUKYMD          PIC X(10).
+                05  W22-SAGAKULST-SELECT     PIC X OCCURS  100 TIMES.

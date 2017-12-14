@@ -55,7 +55,7 @@
                 05  I01-SAGAKU-STT                 PIC S9(9)   BINARY.
                 05  I01-SAGAKU-CNT                 PIC S9(9)   BINARY.
                 05  I01-SAGAKU-ITM                 PIC X(23)
-                                                   OCCURS  30.
+                                                   OCCURS  99.
                 05  I01-SAGAKU-ITM-STT             PIC S9(9)   BINARY.
               04  I01-CMB-SKJKBN.
                 05  I01-SKJKBN                     PIC X(24).
