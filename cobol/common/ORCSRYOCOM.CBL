@@ -325,6 +325,7 @@
       *
       *    医療区分コメント並び替え用
            03  WRK-IDX                     PIC 9(04).
+           03  WRK-RYOCOM-IRYO-SORT-COM    PIC X(04).
            03  WRK-RYOCOM-IRYO-SRYCD       PIC X(09).
            03  WRK-RYOCOM-IRYO-ZAINUM      PIC 9(08).
       *
@@ -1732,11 +1733,19 @@
                          IF   LNK-RYOCOM-IRYO-SORT-COM(SIDX1 SIDX2)
                                 >  LNK-RYOCOM-IRYO-SORT-COM(SIDX1 SIDX3)
       *                       SIDX2からワークへの退避
+                              MOVE  LNK-RYOCOM-IRYO-SORT-COM
+                                                         (SIDX1 SIDX2)
+                                            TO  WRK-RYOCOM-IRYO-SORT-COM
                               MOVE  LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX2)
                                             TO  WRK-RYOCOM-IRYO-SRYCD
                               MOVE  LNK-RYOCOM-IRYO-ZAINUM(SIDX1 SIDX2)
                                             TO  WRK-RYOCOM-IRYO-ZAINUM
       *                       SIDX3からSIDX2への移入
+                              MOVE  LNK-RYOCOM-IRYO-SORT-COM
+                                                      (SIDX1 SIDX3)
+                                            TO
+                                    LNK-RYOCOM-IRYO-SORT-COM
+                                                      (SIDX1 SIDX2)
                               MOVE  LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX3)
                                             TO
                                     LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX2)
@@ -1744,6 +1753,10 @@
                                             TO
                                     LNK-RYOCOM-IRYO-ZAINUM(SIDX1 SIDX2)
       *                       ワークからSIDX3への移入
+                              MOVE  WRK-RYOCOM-IRYO-SORT-COM
+                                            TO
+                                    LNK-RYOCOM-IRYO-SORT-COM
+                                                     (SIDX1 SIDX3)
                               MOVE  WRK-RYOCOM-IRYO-SRYCD
                                             TO
                                     LNK-RYOCOM-IRYO-SRYCD(SIDX1 SIDX3)
