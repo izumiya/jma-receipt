@@ -3357,7 +3357,23 @@
            INTO    SPA-GMN-IRYOKEIKBNMEIL (3)
            END-STRING
       *
-           MOVE    3               TO  SPA-GMN-IRYOKEIKBN-MAX
+           MOVE    "3"             TO  SPA-GMN-IRYOKEIKBNL    (4)
+           STRING  "¡ãÌ¤Ëþ¡äÄÌ¾ï·×»»¡ã°Ê¾å¡ä´µ¼ÔÉéÃ´¤¢¤ê¡ÊÁ´³Û¡Ë"
+                                       DELIMITED BY SIZE
+                   "¡ÚÀßÄê³Û 21,000±ß¡Û"
+                                       DELIMITED BY SIZE
+           INTO    SPA-GMN-IRYOKEIKBNMEIL (4)
+           END-STRING
+      *
+           MOVE    "4"             TO  SPA-GMN-IRYOKEIKBNL    (5)
+           STRING  "¡ãÌ¤Ëþ¡äÄÌ¾ï·×»»¡ã°Ê¾å¡ä´µ¼ÔÉéÃ´¤¢¤ê¡ÊÁ´³Û¡Ë"
+                                       DELIMITED BY SIZE
+                   "¡ÚÀßÄê³Û 20,000±ß¡Û"
+                                       DELIMITED BY SIZE
+           INTO    SPA-GMN-IRYOKEIKBNMEIL (5)
+           END-STRING
+      *
+           MOVE    5               TO  SPA-GMN-IRYOKEIKBN-MAX
       *
            .
        3110-IRYOKEIKBNLST-EXT.
@@ -14793,12 +14809,6 @@
                WHEN    CONST-SHIMANE
       *            MOVE    SPA-GMN-SYUKEIKBNLST (3)
                    MOVE    SPA-GMN-SYUKEIKBNLST (5)
-                                   TO  WRK-CMB-ITM
-                   MOVE    "1"     TO  WRK-CMB-ITM2
-               WHEN    CONST-EHIME
-      *        WHEN    CONST-WAKAYAMA
-      *            MOVE    SPA-GMN-SYUKEIKBNLST (2)
-                   MOVE    SPA-GMN-SYUKEIKBNLST (4)
                                    TO  WRK-CMB-ITM
                    MOVE    "1"     TO  WRK-CMB-ITM2
                WHEN    CONST-GUNMA

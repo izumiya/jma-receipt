@@ -110,6 +110,7 @@
       *  04.08.04    NACL-門脇    17/09/15  福島県地方公費対応
       *  04.08.05    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
+      *  04.08.06    NACL-門脇    17/12/07  熊本県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -900,6 +901,24 @@
                     MOVE  "2"  TO WRK-IRYOKEIKBN-G
                   END-IF
                END-EVALUATE
+             WHEN      "3"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-G
+                 WHEN        "0"
+                    MOVE  "3"  TO WRK-IRYOKEIKBN-G
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "3"  TO WRK-IRYOKEIKBN-G
+                  END-IF
+               END-EVALUATE
+             WHEN      "4"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-G
+                 WHEN        "0"
+                    MOVE  "4"  TO WRK-IRYOKEIKBN-G
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "4"  TO WRK-IRYOKEIKBN-G
+                  END-IF
+               END-EVALUATE
            END-EVALUATE
       *
            EVALUATE  SYS-2010-IRYOKEIKBN-N
@@ -921,6 +940,24 @@
                  WHEN        "1"
                   IF   WRK-TEISYOTOKU2  NOT =  SPACE
                     MOVE  "2"  TO WRK-IRYOKEIKBN-N
+                  END-IF
+               END-EVALUATE
+             WHEN      "3"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-N
+                 WHEN        "0"
+                    MOVE  "3"  TO WRK-IRYOKEIKBN-N
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "3"  TO WRK-IRYOKEIKBN-N
+                  END-IF
+               END-EVALUATE
+             WHEN      "4"
+               EVALUATE  SYS-2010-IRYOKEI-TAIKBN-N
+                 WHEN        "0"
+                    MOVE  "4"  TO WRK-IRYOKEIKBN-N
+                 WHEN        "1"
+                  IF   WRK-TEISYOTOKU2  NOT =  SPACE
+                    MOVE  "4"  TO WRK-IRYOKEIKBN-N
                   END-IF
                END-EVALUATE
            END-EVALUATE
@@ -2422,10 +2459,10 @@
       *****************************************************************
        2004114-FTNJGNCHK-HENSYU-SEC            SECTION.
       *
-           IF ((LNK-FTNJGNCHK-NYUGAIKBN = "2"   ) AND
-               (WRK-IRYOKEIKBN-G    NOT =  SPACE))
-           OR ((LNK-FTNJGNCHK-NYUGAIKBN = "1"   ) AND
-               (WRK-IRYOKEIKBN-N    NOT =  SPACE))
+           IF ((LNK-FTNJGNCHK-NYUGAIKBN = "2"       ) AND
+               (WRK-IRYOKEIKBN-G        = "1" OR "2"))
+           OR ((LNK-FTNJGNCHK-NYUGAIKBN = "1"       ) AND
+               (WRK-IRYOKEIKBN-N        = "1" OR "2"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF

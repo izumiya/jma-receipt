@@ -133,6 +133,8 @@
       *  04.08.07    NACL-ÌçÏÆ    16/11/12  ÆÁÅç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.08    NACL-ÌçÏÆ    17/02/23  °ñ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¥·¥¹¥Æ¥à´ÉÍý
       *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
+      *  04.08.09    NACL-ÌçÏÆ    17/12/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¥·¥¹¥Æ¥à´ÉÍý
+      *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
       *****************************************************************
       *
       *
@@ -4717,21 +4719,16 @@
                       WHEN     "32"
                       WHEN     "13"
                       WHEN     "26"
-      ***                 MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "30"
                       WHEN     "38"
-      ***                 MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "36"
-      ***                 MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-      ***                 MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                       WHEN     "10"
-      ***                 MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                           MOVE "4" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                     END-EVALUATE
@@ -4773,37 +4770,31 @@
                  EVALUATE   WRK-PREFNUM
                    WHEN     "32"
                    WHEN     "13"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "36"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
-      ***              MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "0" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "10"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                    WHEN     "38"
-      ***              MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
+                     IF  RECE62-SRYYM  <=  "201711"
                        MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "08"
                      IF  RECE62-SRYYM  <=  "201002"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
                      IF  RECE62-SRYYM  <=  "201003"
-      ***              MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
@@ -4814,21 +4805,23 @@
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE62-SYUKEI-TAIKBN(IDX11 2)
                  EVALUATE   WRK-PREFNUM
+                   WHEN     "38"
+                     IF  RECE62-SRYYM  <=  "201711"
+                       MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
+                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+                     END-IF
                    WHEN     "08"
                      IF  RECE62-SRYYM  <=  "201002"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "26"
                      IF  RECE62-SRYYM  <=  "201103"
-      ***              MOVE "2" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
                    WHEN     "30"
                      IF  RECE62-SRYYM  <=  "201003"
-      ***              MOVE "1" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
                      END-IF
