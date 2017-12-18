@@ -669,6 +669,8 @@
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
       *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+      *
            MOVE    ZERO                TO  IDX-ITM
       *
            PERFORM 2300-GAIHAKUKBN-SET-SEC
@@ -704,6 +706,8 @@
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -747,6 +751,8 @@
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
