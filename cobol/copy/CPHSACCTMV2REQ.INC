@@ -38,3 +38,4 @@
                        09  HSACCTMREQ-SKJTYPE    PIC X(1).
                        09  HSACCTMREQ-NISSU      PIC X(50).
                05  HSACCTMREQ-GAIHAKUKBN        PIC X(2).
+               05  HSACCTMREQ-SAGAKU            PIC X(7).

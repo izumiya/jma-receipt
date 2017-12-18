@@ -105,6 +105,8 @@
            03  REG-SAVEREQ             PIC X(01).
            03  REG-NYUINYMD            PIC X(08).
            03  REG-ORDERID             PIC X(04).
+           03  REG-SAGAKU              PIC X(07).
+           03  REG-SAGAKUCD            PIC X(02).
            03  REG-SRYYMD              PIC X(08).
            03  REG-ENDYMD              PIC X(08).
            03  REG-GAIHAKUKBN          PIC X(02).
@@ -352,6 +354,9 @@
            WHEN    "2"
                PERFORM 1001-GAIHAKU-SEC
                MOVE    NORDERID-GPTSTID    TO  REG-ORDERID
+           WHEN    "3"
+               PERFORM 1001-SAGAKU-SEC
+               MOVE    NORDERID-SAGAKUID   TO  REG-ORDERID
            WHEN    "4"
                PERFORM 1001-SHOKUJI-SEC
                MOVE    NORDERID-FOODID     TO  REG-ORDERID
@@ -404,6 +409,20 @@
       *
            .
        1001-SHOKUJI-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÅÅÊ¸¹àÌÜÂàÈò½èÍý¡Ê¼¼ÎÁº¹³Û¡Ë
+      *****************************************************************
+       1001-SAGAKU-SEC                 SECTION.
+      *
+           PERFORM 1001-INIT-CHECK-SEC
+      *
+           PERFORM 10011-SAGAKU-CHECK-SEC
+      *
+           PERFORM 10011-ENDYMD-CHECK-SEC
+      *
+           .
+       1001-SAGAKU-EXT.
            EXIT.
       *****************************************************************
       *    ÅÅÊ¸¹àÌÜÂàÈò½èÍý¡Ê³°Çñ¡Ë
@@ -610,6 +629,71 @@
        10011-GAIHAKUKBN-CHECK-EXT.
            EXIT.
       *****************************************************************
+      *    ¼¼ÎÁº¹³Û¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       10011-SAGAKU-CHECK-SEC          SECTION.
+      *
+           MOVE    SPACE           TO  REG-SAGAKUCD
+           MOVE    HSACCTMREQ-SAGAKU
+                                   TO  REG-SAGAKU
+      *
+           IF    ( HSACCTMREQ-SAGAKU   =   SPACE )
+               MOVE    "0024"      TO  WRK-ERRCD
+           ELSE
+               MOVE    HSACCTMREQ-SAGAKU
+                                   TO  WRK-SNUM-INX
+               PERFORM 800-ORCSNUM-SEC
+               IF    ( FLG-ORCSNUM =   ZERO )
+                   IF    ( WRK-SNUM-OUTNUM =   ZERO )
+                       MOVE    "00"    TO  REG-SAGAKUCD
+                   END-IF
+               ELSE
+                   MOVE    "0024"      TO  WRK-ERRCD
+               END-IF
+      *
+               IF    ( WRK-ERRCD       =   SPACE )
+                AND  ( REG-SAGAKUCD    =   SPACE )
+                   INITIALIZE              SYSKANRI-REC
+                   MOVE    "5113"      TO  SYS-KANRICD
+                   MOVE    REG-SRYYMD  TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+                   PERFORM 900-SYSKANRI-KEY2-SEL-SEC
+                   MOVE    SYSKANRI-REC TO SYS-5113-REC
+                   PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
+                            OR   ( REG-SAGAKUCD    NOT =   SPACE )
+                       IF    ( WRK-SNUM-OUTNUM
+                                   =   SYS-5113-BRM-SAGAKU-NM )
+                           MOVE    SYS-5113-KBNCD
+                                       TO  REG-SAGAKUCD
+                       END-IF
+      *
+                       PERFORM 900-SYSKANRI-KEY2-FET-SEC
+                       MOVE    SYSKANRI-REC
+                                       TO  SYS-5113-REC
+                   END-PERFORM
+      *
+                   MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( WRK-ERRCD       =   SPACE )
+               IF    ( REG-SAGAKUCD    =   SPACE )
+                   MOVE     "8047" TO  WRK-ERRCD
+               END-IF
+           END-IF
+      *
+          IF    (  WRK-ERRCD       =   SPACE )
+              CONTINUE
+          ELSE
+               PERFORM 990-ERROR-EDIT-SEC
+          END-IF
+      *
+           .
+       10011-SAGAKU-CHECK-EXT.
+           EXIT.
+      *****************************************************************
       *    ´ü´Ö½ªÎ»Æü¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        10011-ENDYMD-CHECK-SEC          SECTION.
@@ -649,6 +733,8 @@
            EVALUATE    HSACCTMREQ-REQNUM
            WHEN    "2"
                PERFORM 2001-GAIHAKU-SEC
+           WHEN    "3"
+               PERFORM 2001-SAGAKU-SEC
            WHEN    "4"
                PERFORM 2001-SHOKUJI-SEC
            WHEN    "9"
@@ -668,6 +754,8 @@
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -696,6 +784,44 @@
        2001-GAIHAKU-EXT.
            EXIT.
       *****************************************************************
+      *    ¼¼ÎÁº¹³Û½èÍý
+      *****************************************************************
+       2001-SAGAKU-SEC                 SECTION.
+      *
+           PERFORM 2300-SODR-COMMON-SET-SEC
+      *
+           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
+           MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+      *
+           MOVE    ZERO                TO  IDX-ITM
+      *
+           PERFORM 2300-SAGAKU-SET-SEC
+      *
+           PERFORM 2300-ENDYMD-SET-SEC
+      *
+           MOVE   IDX-ITM          TO  LNK-ODRITEM-MAX
+      *
+           CALL   "ORCSODR04"      USING   SODR-AREA
+                                           LNK-ODRITEM-REC
+                                           MCPAREA
+                                           SPA-AREA
+           EVALUATE    TRUE
+           WHEN  ( SODR-RC         =   ZERO )
+            AND  ( SODR-ERRFLG     =   ZERO )
+               PERFORM 2001-RESPONSE-EDIT-SEC
+           WHEN  ( SODR-RC     NOT =   ZERO )
+               MOVE    "8051"      TO  WRK-ERRCD
+               PERFORM 990-ERROR-EDIT-SEC
+           WHEN  ( SODR-ERRFLG  NOT =   ZERO )
+               PERFORM 2400-ORDER-ERROR-EDIT-SEC
+           END-EVALUATE
+      *
+           .
+       2001-SAGAKU-EXT.
+           EXIT.
+      *****************************************************************
       *    ¿©»ö½èÍý
       *****************************************************************
        2001-SHOKUJI-SEC                SECTION.
@@ -704,6 +830,8 @@
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -747,6 +875,8 @@
       *
            MOVE    REG-SRYYMD          TO  SODR-SRYYMD
            MOVE    REG-ORDERID         TO  SODR-ORDERID
+      *
+           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -834,6 +964,20 @@
       *
            .
        2300-ENDYMD-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼¼ÎÁº¹³ÛÀßÄê½èÍý
+      *****************************************************************
+       2300-SAGAKU-SET-SEC             SECTION.
+      *
+           PERFORM 2300-ODRITEM-COMMON-SET-SEC
+      *
+           MOVE    NCLAIMID-SAGAKUJMA  TO  LNK-ODRITEM-ITEMID (IDX-ITM)
+           MOVE    REG-SAGAKUCD        TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    REG-SAGAKU          TO  LNK-ODRITEM-MEMO (IDX-ITM)
+      *
+           .
+       2300-SAGAKU-SET-EXT.
            EXIT.
       *****************************************************************
       *    ¶¦ÄÌ¹àÌÜÀßÄê½èÍý
@@ -1346,6 +1490,9 @@
            EVALUATE    HSACCTMREQ-REQNUM
            WHEN    "2"
                MOVE    "³°Çñ"
+                               TO  HSACCTMRES-REQNUM-NAME
+           WHEN    "3"
+               MOVE    "¼¼ÎÁº¹³Û"
                                TO  HSACCTMRES-REQNUM-NAME
            WHEN    "4"
                MOVE    "¿©»ö"

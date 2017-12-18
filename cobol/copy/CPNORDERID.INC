@@ -335,6 +335,24 @@
                                            VALUE "½Ð»º°é»ù°ì»þ¶â¾ðÊó".
                    07  NORDERID-BUNBENMES2 PIC X(20)
                                            VALUE "½Ð»º°é»ù°ì»þ¶â¾ðÊó".
+      *
+               05  NORDERID-SAGAKU-G.
+                   07  NORDERID-SAGAKUCL1  PIC X(02) VALUE "XX".
+                   07  NORDERID-SAGAKUCL2  PIC X(03) VALUE "XXX".
+                   07  NORDERID-SAGAKUID   PIC X(04) VALUE "0601".
+                   07  NORDERID-SAGAKUMES1 PIC X(30)
+                                           VALUE "¼¼ÎÁº¹³Û".
+                   07  NORDERID-SAGAKUMES2 PIC X(20)
+                                           VALUE "¼¼ÎÁº¹³Û".
+               05  NORDERID-SAGAKUCANCEL-G.
+                   07  NORDERID-SAGAKUCANCELCL1  PIC X(02) VALUE "XX".
+                   07  NORDERID-SAGAKUCANCELCL2  PIC X(03) VALUE "XXX".
+                   07  NORDERID-SAGAKUCANCELID   PIC X(04) VALUE "0602".
+                   07  NORDERID-SAGAKUCANCELMES1 PIC X(30)
+                                           VALUE "¼¼ÎÁº¹³Û".
+                   07  NORDERID-SAGAKUCANCELMES2 PIC X(20)
+                                           VALUE "¼¼ÎÁº¹³Û".
+      *
                05  NORDERID-CRENACCT-G.
                    07  NORDERID-CRENACCTCL1    PIC X(02) VALUE "XX".
                    07  NORDERID-CRENACCTCL2    PIC X(03) VALUE "XXX".
@@ -345,7 +363,7 @@
                                                VALUE "Æþ±¡²ñ·×ºîÀ®".
       *
            03  NORDERID-R  REDEFINES       NORDERID-VAL.
-               05  NORDERID-OCC            OCCURS    39.
+               05  NORDERID-OCC            OCCURS    40.
                    07  NORDERID-CLAIMID.
                        09  NORDERID-CLAIMIDH   PIC X(02).
                        09  NORDERID-CLAIMIDT   PIC X(03).
@@ -353,4 +371,4 @@
                    07  NORDERID-ORCAMES1       PIC X(30).
                    07  NORDERID-ORCAMES2       PIC X(20).
       *
-           03  NORDERID-MAX                PIC 9(03) VALUE 39.
+           03  NORDERID-MAX                PIC 9(03) VALUE 40.

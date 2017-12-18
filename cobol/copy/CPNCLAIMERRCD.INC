@@ -981,6 +981,12 @@
                05                      PIC X(80)   VALUE
                    "異常分娩は２５日請求できません".
       *-----------------------------------------------------------
+               05                      PIC X(04)   VALUE   "8047".
+               05                      PIC X(40)   VALUE
+                   "室料差額がシステム管理（５００５）に設定".
+               05                      PIC X(40)   VALUE
+                   "されていません".
+      *-----------------------------------------------------------
                05                      PIC X(04)   VALUE   "8051".
                05                      PIC X(80)   VALUE
                    "更新処理に失敗しました".
@@ -1038,7 +1044,7 @@
                    "処理終了".
       *
            03  NCLAIMERRCD-R   REDEFINES   NCLAIMERRCD-VAL.
-               05  NCLAIMERRCD-OCC     OCCURS  252.
+               05  NCLAIMERRCD-OCC     OCCURS  253.
                    07  NCLAIMERRCDL    PIC X(04).
                    07  NCLAIMERRCDLMEI PIC X(80).
-           03  NCLAIMERRCD-MAX         PIC 9(05)   VALUE   252.
+           03  NCLAIMERRCD-MAX         PIC 9(05)   VALUE   253.

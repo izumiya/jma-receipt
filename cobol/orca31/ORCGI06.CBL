@@ -1871,6 +1871,7 @@
                WHEN    NORDERID-PTEVALID
                WHEN    NORDERID-BUNBENID
                WHEN    NORDERID-CRENACCTID
+               WHEN    NORDERID-SAGAKUID
                    PERFORM 41011-INPUT-AREA-HEN-SEC
                END-EVALUATE
            END-EVALUATE
@@ -2055,6 +2056,7 @@
                    WHEN    NORDERID-BUNBENID
                        PERFORM 410111-BUNBEN-HEN-SEC
                    WHEN    NORDERID-CRENACCTID
+                   WHEN    NORDERID-SAGAKUID
                        PERFORM 410111-OTHERS-HEN-SEC
                    END-EVALUATE
       *
@@ -2575,6 +2577,7 @@
            WHEN    NORDERID-PTEVALID
            WHEN    NORDERID-BUNBENID
            WHEN    NORDERID-CRENACCTID
+           WHEN    NORDERID-SAGAKUID
                CONTINUE
            END-EVALUATE
       *
@@ -5391,6 +5394,7 @@
            WHEN    NORDERID-PTEVALID
            WHEN    NORDERID-BUNBENID
            WHEN    NORDERID-CRENACCTID
+           WHEN    NORDERID-SAGAKUID
                CONTINUE
            END-EVALUATE
       *
@@ -7067,6 +7071,7 @@
                    WHEN    NORDERID-PTEVALID
                    WHEN    NORDERID-BUNBENID
                    WHEN    NORDERID-CRENACCTID
+                   WHEN    NORDERID-SAGAKUID
                        CONTINUE
                    END-EVALUATE
       *
