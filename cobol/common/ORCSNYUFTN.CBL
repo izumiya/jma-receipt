@@ -2689,19 +2689,20 @@
                        END-EVALUATE
                      END-IF
                   END-IF
-                  MOVE  WRK-NYUINDAY-TAIHI-DOU-SKJKBN(IDX7 IDY)
-                                TO   WRK-DOJITUSKJST-FLG(IDX IDY)
-                  EVALUATE  WRK-NYUINDAY-TAIHI-DOU-SKJKBN(IDX7 IDY)
-                    WHEN     "0"
-                      MOVE "3"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
-                    WHEN     "1"
-                      MOVE "0"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
-                    WHEN     "2"
-                      MOVE "1"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
-                    WHEN     "3"
-                      MOVE "2"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
-                  END-EVALUATE
                 END-IF
+      *
+                MOVE  WRK-NYUINDAY-TAIHI-DOU-SKJKBN(IDX7 IDY)
+                              TO   WRK-DOJITUSKJST-FLG(IDX IDY)
+                EVALUATE  WRK-NYUINDAY-TAIHI-DOU-SKJKBN(IDX7 IDY)
+                  WHEN     "0"
+                    MOVE "3"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
+                  WHEN     "1"
+                    MOVE "0"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
+                  WHEN     "2"
+                    MOVE "1"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
+                  WHEN     "3"
+                    MOVE "2"  TO   WRK-DOJITUSKJED-FLG(IDX IDY)
+                END-EVALUATE
       *
                 MOVE  WRK-SKJHKN-TAIHI-HKNCOMBI(IDX7 IDY)
                           TO   WRK-SKJHKN-HKNCOMBI(IDX IDY)
