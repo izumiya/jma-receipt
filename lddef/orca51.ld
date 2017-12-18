@@ -31,6 +31,7 @@ bindapi	"stock1v2"		"OpenCOBOL"	"ORAPI052R3V3";
 bindapi	"patientbasisallv3"	"OpenCOBOL"	"ORAPI052R4V3";
 bindapi	"patientdiseaseallv3"	"OpenCOBOL"	"ORAPI052R5V3";
 bindapi	"masterlastupdatev3"	"OpenCOBOL"	"ORAPI052R6V3";
+bindapi	"patientmedicalallv3"	"OpenCOBOL"	"ORAPI052R7V3";
 
 multiplex_group	orca51;
 
@@ -65,6 +66,7 @@ data	{
 		patientbasisallv3;
 		patientdiseaseallv3;
 		masterlastupdatev3;
+		patientmedicalallv3;
 	};
 };
 
@@ -82,6 +84,8 @@ db "xml2" {
  xml_patient_disease_allv3res;
  xml_masterlastupdatev3req;
  xml_masterlastupdatev3res;
+ xml_patient_medical_allv3req;
+ xml_patient_medical_allv3res;
 };
 
 #db "monblob" {
