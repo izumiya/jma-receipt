@@ -7,9 +7,14 @@ fm_karte_no3 {
     Form_ID                          varchar(30);
     Custom_ID                        varchar(30);
     Printer                          varchar(20);
+    Printer_Overlay                  varchar(20);
     Order_Class                      varchar(1);
     Last_Page_Number                 varchar(3);
     Last_Row_Number                  varchar(2);
+    Perform_Month                    varchar(7);
+    Department_Code                  varchar(02);
+    Department_Name                  varchar(10);
+    Insurance_Name                   varchar(120);
     Patient{
       ID                             varchar(20);
       Name                           varchar(50);
@@ -17,20 +22,20 @@ fm_karte_no3 {
       BirthDate                      varchar(10);
       Sex                            varchar(1);
     };
-    Department_Code                  varchar(02);
-    Department_Name                  varchar(10);
-    Insurance_Name                   varchar(124);
-    Account_Information{
-       Insurance_Combination_Number  varchar(04);
-       InsuranceProvider_Class       varchar(03);
+    Account_List{
        Perform_Date                  varchar(10);
-       Point_Information{
-         Medical_Class               varchar(2);
-         Point                       varchar(8);
-         Money                       varchar(8);
-         Count                       varchar(3);
-       }[400];
-       Ai_Money                      varchar(8);
-    }[300];
+       Consultation                  varchar(8);
+       Medication                    varchar(8);
+       Injection                     varchar(8);
+       Treatment_Operation           varchar(8);
+       Examination                   varchar(8);
+       Diagnostic_Imaging            varchar(8);
+       Other                         varchar(8);
+       Total_Point                   varchar(8);
+       Total_Copayment               varchar(8);
+       Own_Expence                   varchar(8);
+       Memo                          varchar(8);
+    }[400];
   };
 };
+

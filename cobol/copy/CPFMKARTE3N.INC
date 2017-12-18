@@ -16,48 +16,37 @@
       * 113-8621, Japan.
       ********************************************************************
         01  FMKARTE3N-REC.
-            03  FMKARTE3N-PCONTEXT             PIC S9(9)   BINARY.
-            03  FMKARTE3N-OBJECT               PIC X(8).
-            03  FMKARTE3N-MODE                 PIC S9(9)   BINARY.
-            03  FMKARTE3N-RECORDNAME           PIC X(128).
+            03  FMKARTE3N-CONTEXT               PIC S9(9)   BINARY.
+            03  FMKARTE3N-OBJECT                PIC X(8).
+            03  FMKARTE3N-MODE                  PIC S9(9)   BINARY.
+            03  FMKARTE3N-RECORDNAME            PIC X(128).
             03  FMKARTE3N-DATA.
-              05  FMKARTE3N-FORM-ID            PIC X(30).
-              05  FMKARTE3N-CUSTOM-ID          PIC X(30).
-              05  FMKARTE3N-PRINTER            PIC X(20).
+              05  FMKARTE3N-FORM-ID             PIC X(30).
+              05  FMKARTE3N-CUSTOM-ID           PIC X(30).
+              05  FMKARTE3N-PRINTER             PIC X(20).
+              05  FMKARTE3N-PRINTER-ZOKUSHI     PIC X(20).
       *       1:ì™èëàÛç¸/1à»äO:í èÌàÛç¸
-              05  FMKARTE3N-HAKKOKBN           PIC X(1).
+              05  FMKARTE3N-HAKKOKBN            PIC X(1).
       *       ç≈èIàÛç¸ï≈
-              05  FMKARTE3N-LAST-PAGE          PIC X(3).
+              05  FMKARTE3N-ENDPAGE             PIC X(3).
       *       ç≈èIàÛç¸çs
-              05  FMKARTE3N-LAST-LINENO        PIC X(2).
-              05  FMKARTE3N-PTINF-AREA.
-                07  FMKARTE3N-PTNUM            PIC X(20).
-                07  FMKARTE3N-NAME             PIC X(50).
-                07  FMKARTE3N-KANANAME         PIC X(50).
-                07  FMKARTE3N-BIRTHDAY         PIC X(10).
-                07  FMKARTE3N-SEX              PIC X(1).
+              05  FMKARTE3N-ENDLINE             PIC X(2).
+      *       êfó√îNåé
+              05  FMKARTE3N-SRYYM               PIC X(7).
       *       êfó√â»
-              05  FMKARTE3N-SRYKA              PIC X(2).
+              05  FMKARTE3N-SRYKA               PIC X(2).
       *       êfó√â»ñº
-              05  FMKARTE3N-SRYKANAME          PIC X(10).
+              05  FMKARTE3N-SRYKANAME           PIC X(10).
       *       ï€åØÇÃñºèÃ
-              05  FMKARTE3N-HKNSYUBETU         PIC X(124).
-              05  FMKARTE3N-ACT-AREA.
-                  07  FMKARTE3N-ACT-OCC        OCCURS  300.
-      *             ï€åØëgçáÇπ
-                    09  FMKARTE3N-HKNCOMBI     PIC X(04).
-      *             ï€åØî‘çÜ
-                    09  FMKARTE3N-HKNNUM       PIC X(03).
-      *             êfó√ì˙
-                    09  FMKARTE3N-SRYYMD       PIC X(10).
-                    09  FMKARTE3N-ACT-ZAI-OCC  OCCURS  400.
-      *                 êfó√ãÊï™
-                        11 FMKARTE3N-SRYKBN    PIC X(02).
-      *                 ì_êî
-                        11 FMKARTE3N-TEN       PIC X(7).
-      *                 ïâíSã‡äz
-                        11 FMKARTE3N-MONEY     PIC X(7).
-      *                 âÒêîÅiãLç⁄ÇµÇ»Ç¢èÍçáÇÕãÛîíÅj
-                        11 FMKARTE3N-COUNT     PIC X(3).
-      *             ïâíSã‡äz
-                    09  FMKARTE3N-HKNTEKMONEY  PIC X(7).
+              05  FMKARTE3N-HKNSYUBETU          PIC X(120).
+              05  FMKARTE3N-PTINF-AREA.
+                07  FMKARTE3N-PTNUM             PIC X(20).
+                07  FMKARTE3N-NAME              PIC X(50).
+                07  FMKARTE3N-KANANAME          PIC X(50).
+                07  FMKARTE3N-BIRTHDAY          PIC X(10).
+                07  FMKARTE3N-SEX               PIC X(1).
+              05  FMKARTE3N-BODY-AREA.
+                07  FMKARTE3N-BODY-OCC         OCCURS 400.
+                  09  FMKARTE3N-SRYYMD         PIC X(10).
+                  09  FMKARTE3N-NAIYO          PIC X(8)  OCCURS 11.
+                  09  FMKARTE3N-BIKOU          PIC X(8).
