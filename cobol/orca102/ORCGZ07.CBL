@@ -32,6 +32,7 @@
       *                                     薬情マスタ更新処理追加
       *  04.05.00    NACL-太田    09/11/24  経過措置医薬品置換えマスタ一覧
       *                                     印刷機能追加
+      *  05.00.00    NACL-森脇    17/12/18  クライアント印刷対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -345,6 +346,10 @@
            COPY    "MCPDATA.INC".
       *****COPY    "CPORCMCP.INC".
       *
+      *----(05.00.00)--ADD-START---
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
+      *----(05.00.00)--ADD-END-----
       *****************************************************************
       *    連絡領域
       *****************************************************************
@@ -1993,9 +1998,17 @@
                EVALUATE    SPA-ZID1-FLG
                WHEN    "PV"
                    MOVE    "3"             TO  SHELLTBL-ARG17
+      *----(05.00.00)--ADD-START---
                WHEN    "OK"
-                   MOVE    "2"             TO  SHELLTBL-ARG17
+                   IF      SPA-CLIENT-PRT-FLG  =  2
+                       MOVE    "5"         TO  SHELLTBL-ARG17
+                   ELSE
+                       MOVE    "2"         TO  SHELLTBL-ARG17
+                   END-IF
                END-EVALUATE
+               MOVE    SPA-CLIENT-SHOWDIALOG
+                                           TO  SHELLTBL-ARG22
+      *----(05.00.00)--ADD-END-----
                MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SPACE               TO  SHELLTBL-ARG19
                MOVE    SPACE               TO  SHELLTBL-ARG20
