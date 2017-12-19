@@ -1389,6 +1389,11 @@ grpsys             MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
                    MOVE    "1"             TO  LNK-NYURECEDEN-HKNKBN
                END-IF
            END-IF
+           PERFORM  VARYING   IDZ1    FROM   1   BY  1
+             UNTIL  IDZ1    >    10
+               MOVE   COLDAT01-HKNCOMBI(IDZ1)
+                                  TO  LNK-NYURECEDEN-SET-HKNCOMBI(IDZ1)
+           END-PERFORM
            CALL    "ORCSNYURECEDEN"    USING   ORCSNYURECEDEN-AREA
                                                SPA-AREA
            IF      LNK-NYURECEDEN-RC   NOT =   ZERO
