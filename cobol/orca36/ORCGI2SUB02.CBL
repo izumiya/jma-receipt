@@ -40,6 +40,7 @@
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
            03  FLG-PTNYUINRRK      PIC 9(01).
+           03  FLG-TEIKIRRK        PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -66,6 +67,8 @@
                05  WRK-STBIRTHDAY                  PIC 9(08).
            03  WRK-EDBIRTHDAY-G.
                05  WRK-EDBIRTHDAY                  PIC 9(08).
+           03  WRK-SRYYM                           PIC X(06).
+           03  WRK-KBT                             PIC X(01).
            03  WRK-ADRS                            PIC X(150).
            03  WRK-ORDER-TEXT                      PIC X(200).
            03  WRK-ORDER-PNT                       PIC 9(05).
@@ -98,6 +101,10 @@
       *    £Á£Ð£É¥Ñ¥é¥á¥¿
        01  APIPARA-REC.
            COPY    "CPAPIPARA.INC".
+      *
+      *    ´µ¼ÔÄê´üÀÁµáÍúÎò
+       01  TEIKIRRK-REC.
+           COPY    "CPTEIKIRRK.INC".
       *
       *    ´µ¼Ô¾ðÊó¾È²ñ¥Æ¡¼¥Ö¥ë
        01  PTSRH-REC.
@@ -183,6 +190,12 @@
                MOVE    SPA-TERMID      TO  WRK-TERMID
            ELSE
                MOVE    I2SUB02-ORCA-UID TO WRK-TERMID
+           END-IF
+      *
+           IF    ( I2SUB02-SEIKYUJOTAI =   "2" )
+               PERFORM 900-TEIKIRRK-KEY2-SEL-SEC
+               MOVE    TEIKIRRK-SRYYM  TO  I2SUB02-LAST-TEIKIYM
+               MOVE    TEIKIRRK-KBT    TO  I2SUB02-LAST-KBT
            END-IF
       *
            IF    ( I2SUB02-MODE        =   "O" )
@@ -558,6 +571,24 @@
                END-STRING
            END-EVALUATE
       *
+      *    ÀÁµá¾õÂÖ
+           EVALUATE    I2SUB02-SEIKYUJOTAI
+           WHEN    "1"
+               PERFORM 2001-SQL-SYUNOU-SEC
+           WHEN    "2"
+               MOVE    TEIKIRRK-SRYYM  TO  WRK-SRYYM
+               MOVE    TEIKIRRK-KBT    TO  WRK-KBT
+               PERFORM 2001-SQL-PTTEIKIRRK-SEC
+           END-EVALUATE
+      *
+           IF    ( I2SUB02-TEIKIYM     =   SPACE )
+               CONTINUE
+           ELSE
+               MOVE    I2SUB02-TEIKIYM TO  WRK-SRYYM
+               MOVE    I2SUB02-KBT     TO  WRK-KBT
+               PERFORM 2001-SQL-PTTEIKIRRK-SEC
+           END-IF
+      *
       *    Âà±¡»öÍ³
            IF    ( I2SUB02-TAIINCD     =   SPACE )
                CONTINUE
@@ -633,6 +664,63 @@
       *
            .
        200-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼ýÇ¼¸¡º÷¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       2001-SQL-SYUNOU-SEC             SECTION.
+      *
+           STRING    " AND (HOSPNUM,'1',PTID,RRKNUM) IN ("
+                                           DELIMITED BY SIZE
+               "SELECT a.HOSPNUM,a.NYUGAIKBN,a.PTID,b.NYUIN_RRKNUM"
+                                           DELIMITED BY SIZE
+               " FROM TBL_SYUNOU_MAIN AS a JOIN TBL_SYUNOU_NYUIN"
+                                           DELIMITED BY SIZE
+               " AS b USING(HOSPNUM, NYUGAIKBN, PTID,DENPNUM)"
+                                           DELIMITED BY SIZE
+               " WHERE a.CREATEKBN='1' AND a.DENPJTIKBN  <>  '3')"
+                                           DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       2001-SQL-SYUNOU-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÄê´üÀÁµáÍúÎò¸¡º÷¾ò·ïÊÔ½¸½èÍý
+      *****************************************************************
+       2001-SQL-PTTEIKIRRK-SEC         SECTION.
+      *
+           STRING    " AND (HOSPNUM,PTID,RRKNUM) IN ("
+                                           DELIMITED BY SIZE
+               "SELECT HOSPNUM,PTID,RRKNUM"
+                                           DELIMITED BY SIZE
+               " FROM TBL_PTTEIKIRRK WHERE "
+                                           DELIMITED BY SIZE
+               " SRYYM = '"                DELIMITED BY SIZE
+               WRK-SRYYM                   DELIMITED BY SIZE
+               "'"                         DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           IF    ( WRK-KBT         NOT =   SPACE )
+               STRING    " AND KBT ='"     DELIMITED BY SIZE
+                   WRK-KBT                 DELIMITED BY SIZE
+                   "'"                     DELIMITED BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+           END-IF
+      *
+           STRING  " AND DELFLG=0)"        DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           .
+       2001-SQL-PTTEIKIRRK-EXT.
            EXIT.
       *****************************************************************
       *    »áÌ¾¸¡º÷¾ò·ïÊÔ½¸½èÍý
@@ -863,6 +951,33 @@
        900-PTSRH-DEL4-EXT.
            EXIT.
       *****************************************************************
+      *    Äê´üÀÁµáÍúÎò¸¡º÷¡ÊKEY2¡Ë
+      *****************************************************************
+       900-TEIKIRRK-KEY2-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TEIKIRRK
+           INITIALIZE                      TEIKIRRK-REC
+      *
+           MOVE    SPA-HOSPNUM         TO  TEIKIRRK-HOSPNUM
+           MOVE    TEIKIRRK-REC        TO  MCPDATA-REC
+           MOVE    "tbl_teikirrk"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  TEIKIRRK-REC
+           ELSE
+               MOVE    1               TO  FLG-TEIKIRRK
+               INITIALIZE                  TEIKIRRK-REC
+           END-IF
+      *
+           MOVE    "tbl_teikirrk"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-TEIKIRRK-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
       *    £Á£Ð£É¥Ñ¥é¥á¥¿ºï½ü½èÍý
       *****************************************************************
        900-APIPARA-DEL5-SEC              SECTION.
@@ -878,6 +993,54 @@
       *
            .
        900-APIPARA-DEL5-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¸¡º÷½èÍý
+      *****************************************************************
+       910-DBSELECT-SEC               SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 910-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£ÂÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBFETCH-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¥¯¥í¡¼¥º½èÍý
+      *****************************************************************
+       910-DBCLOSECURSOR-SEC           SECTION.
+      *
+           MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+      *
+       910-DBCLOSECURSOR-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â£Ä£Å£Ì£Å£Ô£Å½èÍý

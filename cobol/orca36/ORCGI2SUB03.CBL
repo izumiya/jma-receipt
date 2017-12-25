@@ -131,6 +131,9 @@
       *    状態コンボボックス初期処理
            PERFORM 2001-JOTAILST-SEC
       *
+      *    請求状態コンボボックス初期処理
+           PERFORM 2001-SEIKYUJOTAILST-SEC
+      *
       *    死亡区分コンボボックス初期処理
            PERFORM 2001-DEATHKBNLST-SEC
       *
@@ -243,6 +246,22 @@
       *
            .
        2001-JOTAILST-EXT.
+           EXIT.
+      *****************************************************************
+      *    請求状態コンボボックス初期処理
+      *****************************************************************
+       2001-SEIKYUJOTAILST-SEC             SECTION.
+      *
+           MOVE    2                   TO  I2SUB03-SEIKYUJOTAILST-MAX
+      *
+           MOVE    "1"                 TO  I2SUB03-SEIKYUJOTAIL (1)
+           MOVE    "退院請求済"        TO  I2SUB03-SEIKYUJOTAIMEIL (1)
+      *
+           MOVE    "2"                 TO  I2SUB03-SEIKYUJOTAIL (2)
+           MOVE    "直近の定期請求済"  TO  I2SUB03-SEIKYUJOTAIMEIL (2)
+      *
+           .
+       2001-SEIKYUJOTAILST-EXT.
            EXIT.
       *****************************************************************
       *    死亡コンボ初期処理

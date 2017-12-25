@@ -13,6 +13,8 @@ xml_hsfindv3res{
       First                        varchar(7);
       Last                         varchar(7);
     };
+    Last_Reccurning_Billing_Month  varchar(7);
+    Last_Reccurning_Billing_Period varchar(1);
     Result{
       Number                       varchar(7);
       Patient_ID                   varchar(20);

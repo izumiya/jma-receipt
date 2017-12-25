@@ -114,6 +114,8 @@
            03  WRK-CMB-ITM-G.
                07  WRK-CMB-ITM         PIC X(200).
            03  WRK-BRMNUM-Z            PIC ZZZZZ9.
+           03  WRK-LAST-TEIKIYM        PIC X(06).
+           03  WRK-LAST-KBT            PIC X(01).
       *
        01  REQ-AREA.
            03  REQ-BASEYMD             PIC X(10).
@@ -399,6 +401,22 @@
       *    状態
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 2001-JOTAI-CHK-SEC
+           END-IF
+      *    退院請求状態
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 2001-JOTAI-CHK-SEC
+           END-IF
+      *    請求状態
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 2001-SEIKYUJOTAI-CHK-SEC
+           END-IF
+      *    定期請求年月
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 2001-TEIKIYM-CHK-SEC
+           END-IF
+      *    定期請求期別
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 2001-KBT-CHK-SEC
            END-IF
       *    退院事由
            IF    ( SPA-ERRCD       =   SPACE )
@@ -827,6 +845,82 @@
        2001-JOTAI-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    請求状態入力処理
+      *****************************************************************
+       2001-SEIKYUJOTAI-CHK-SEC              SECTION.
+      *
+           IF    ( HSFINDREQ-SEIKYUJOTAI   =   SPACE )
+               CONTINUE
+           ELSE
+      *
+               MOVE    1               TO  FLG-REQUESTED
+      *
+               MOVE    HSFINDREQ-SEIKYUJOTAI
+                                       TO  WRK-CMB-CD
+               PERFORM 4200-SEIKYUJOTAILST-CHK-SEC
+               IF    ( WRK-CMB-ITM     =   SPACE )
+                   MOVE    "0026"      TO  SPA-ERRCD
+               ELSE
+                   MOVE    HSFINDREQ-SEIKYUJOTAI
+                                       TO  I2SUB02-SEIKYUJOTAI
+               END-IF
+           END-IF
+      *
+           .
+       2001-SEIKYUJOTAI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    定期請求年月入力処理
+      *****************************************************************
+       2001-TEIKIYM-CHK-SEC                SECTION.
+      *
+           IF    ( HSFINDREQ-TEIKIYM   =   SPACE )
+               CONTINUE
+           ELSE
+      *
+               MOVE    1               TO  FLG-REQUESTED
+      *
+               MOVE    HSFINDREQ-TEIKIYM
+                                       TO  WRK-DATE
+               MOVE    "-01"           TO  WRK-DATE(8:)
+               PERFORM 800-SYMD-SEC
+               PERFORM 800-HIZUKE-SEC
+               IF    ( WRK-EDTYMD1     =   SPACE )
+                   MOVE    "0027"      TO  SPA-ERRCD
+               ELSE
+                   MOVE    WRK-SYMD(1:6)
+                                       TO  I2SUB02-TEIKIYM
+               END-IF
+      *
+           END-IF
+      *
+           .
+       2001-TEIKIYM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    定期請求期別入力処理
+      *****************************************************************
+       2001-KBT-CHK-SEC                SECTION.
+      *
+           IF    ( HSFINDREQ-KBT       =   SPACE )
+            OR   ( HSFINDREQ-TEIKIYM   =   SPACE )
+               CONTINUE
+           ELSE
+      *
+               MOVE    1               TO  FLG-REQUESTED
+      *
+               IF    ( HSFINDREQ-KBT   =   "1" OR "2" OR "3" )
+                   MOVE    HSFINDREQ-KBT
+                                       TO  I2SUB02-KBT
+               ELSE
+                   MOVE    "0028"      TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       2001-TEIKIKBT-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    テスト患者入力処理
       *****************************************************************
        2001-TSTPT-CHK-SEC              SECTION.
@@ -1089,6 +1183,18 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR         TO  I2SUB02-JOTAI
       *
+           MOVE    I2SUB02-SEIKYUJOTAI TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR         TO  I2SUB02-SEIKYUJOTAI
+      *
+           MOVE    I2SUB02-TEIKIYM     TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR         TO  I2SUB02-TEIKIYM
+      *
+           MOVE    I2SUB02-KBT         TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR         TO  I2SUB02-KBT
+      *
            MOVE    I2SUB02-TSTPT   TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR         TO  I2SUB02-TSTPT
@@ -1117,6 +1223,11 @@
                                        SPA-AREA
            IF    ( I2SUB02-RC      NOT =   ZERO ) 
                MOVE    "0105"          TO  SPA-ERRCD
+           ELSE
+               MOVE    I2SUB02-LAST-TEIKIYM
+                                       TO  WRK-LAST-TEIKIYM
+               MOVE    I2SUB02-LAST-KBT
+                                       TO  WRK-LAST-KBT
            END-IF
       *
            .
@@ -1132,6 +1243,15 @@
            MOVE    RES-COUNT       TO  WRK-NUMZ
            MOVE    FUNCTION TRIM (WRK-NUMZ)
                                    TO  HSFINDRES-COUNT
+      *
+           IF    ( HSFINDREQ-SEIKYUJOTAI   =   "2" )
+               MOVE    WRK-LAST-TEIKIYM
+                                       TO  WRK-SYMD
+               MOVE    "01"            TO  WRK-SYMD(7:2)
+               PERFORM 800-DATE-SEC
+               MOVE    WRK-DATE(1:7)   TO  HSFINDRES-LAST-TEIKIYM
+               MOVE    WRK-LAST-KBT    TO  HSFINDRES-LAST-KBT
+           END-IF
       *
            IF    ( PTSRH-PTID      =   ZERO )
                MOVE    "0106"      TO  SPA-ERRCD
@@ -1416,6 +1536,28 @@
        4200-JOTAILST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    請求状態リストチェック処理
+      *****************************************************************
+       4200-SEIKYUJOTAILST-CHK-SEC           SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDXC     FROM    1   BY  1
+                   UNTIL ( IDXC     >   I2SUB03-SEIKYUJOTAILST-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( I2SUB03-SEIKYUJOTAIL (IDXC)
+                                       =   WRK-CMB-CD )
+                   MOVE    I2SUB03-SEIKYUJOTAIMEIL (IDXC)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-SEIKYUJOTAILST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    テスト患者リストチェック処理
       *****************************************************************
        4200-TSTPTLST-CHK-SEC           SECTION.
@@ -1678,7 +1820,6 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "hsfindv3res"       TO  HSFINDRES-RECORDNAME
            MOVE    "XMLWRITE"          TO  MCP-FUNC
-           DISPLAY "ST WRITE"
            CALL    "MONFUNC"               USING
                                            MCPAREA
                                            XML-HSFINDRES
@@ -1687,7 +1828,6 @@
            ELSE
                DISPLAY "XMLWRITE failure = " MCP-RC
            END-IF
-           DISPLAY "ED WRITE"
       *
            MOVE    "xml_hsfindv3res"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME

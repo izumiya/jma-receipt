@@ -33,6 +33,9 @@
            03  I2SUB02-EDBIRTHDAY  PIC X(08).
            03  I2SUB02-BTUNUM      PIC X(02).
            03  I2SUB02-JOTAI       PIC X(01).
+           03  I2SUB02-SEIKYUJOTAI PIC X(01).
+           03  I2SUB02-TEIKIYM     PIC X(06).
+           03  I2SUB02-KBT         PIC X(01).
            03  I2SUB02-TSTPT       PIC X(1).
            03  I2SUB02-TAIINCD     PIC X(02).
            03  I2SUB02-DEATHKBN    PIC X(01).
@@ -45,6 +48,10 @@
                05  I2SUB02-SORT-ORDER
                                    PIC X(01).
            03  I2SUB02-MEMO        PIC X(2000).
+           03  I2SUB02-LAST-TEIKIYM
+                                   PIC X(06).
+           03  I2SUB02-LAST-KBT
+                                   PIC X(01).
            03  I2SUB02-SELYMD      PIC X(08).
            03  I2SUB02-SELHMS      PIC X(08).
            03  I2SUB02-ORCA-UID    PIC X(64).

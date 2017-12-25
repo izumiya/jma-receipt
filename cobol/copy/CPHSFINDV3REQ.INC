@@ -38,6 +38,9 @@
              04  HSFINDREQ-SRYKA               PIC X(2).
              04  HSFINDREQ-BTUNUM              PIC X(2).
              04  HSFINDREQ-JOTAI               PIC X(1).
+             04  HSFINDREQ-SEIKYUJOTAI         PIC X(1).
+             04  HSFINDREQ-TEIKIYM             PIC X(7).
+             04  HSFINDREQ-KBT                 PIC X(1).
              04  HSFINDREQ-TAIINCD             PIC X(2).
              04  HSFINDREQ-DEATHKBN            PIC X(1).
              04  HSFINDREQ-TSTPT               PIC X(1).

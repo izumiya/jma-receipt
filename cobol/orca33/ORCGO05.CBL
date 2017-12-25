@@ -451,8 +451,10 @@
                MOVE    SPA-NAI-KBT         TO  WRK-NUMX
                MOVE    KKN-KIKAN    (WRK-NUM9)
                                            TO  SPA-GMN-KIKAN
-               MOVE    KKN-SKYSTYMD (IDX1) TO  SPA-NAI-SKYSTYMD
-               MOVE    KKN-SKYEDYMD (IDX1) TO  SPA-NAI-SKYEDYMD
+               MOVE    KKN-SKYSTYMD (WRK-NUM9)
+                                           TO  SPA-NAI-SKYSTYMD
+               MOVE    KKN-SKYEDYMD (WRK-NUM9)
+                                           TO  SPA-NAI-SKYEDYMD
                MOVE    KKN-GETUMATU (WRK-NUM9)
                                            TO  SPA-NAI-GETUMATU
            END-IF

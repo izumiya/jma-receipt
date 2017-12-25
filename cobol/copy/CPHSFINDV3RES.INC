@@ -28,6 +28,8 @@
              03  HSFINDRES-COUNT               PIC X(7).
              03  HSFINDRES-RANGE-FROM          PIC X(7).
              03  HSFINDRES-RANGE-TO            PIC X(7).
+             03  HSFINDRES-LAST-TEIKIYM        PIC X(7).
+             03  HSFINDRES-LAST-KBT            PIC X(1).
              03  HSFINDRES-RESULTS-INFO        OCCURS 200.
                  05  HSFINDRES-SEQNUM          PIC X(7).
                  05  HSFINDRES-PTNUM           PIC X(20).

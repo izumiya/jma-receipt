@@ -36,6 +36,12 @@
                        09  I2SUB03-JOTAIL                  PIC X(01).
                        09  I2SUB03-JOTAIFLL                PIC X(01).
                        09  I2SUB03-JOTAIMEIL               PIC X(10).
+               05  I2SUB03-SEIKYUJOTAILST-G.
+                   07  I2SUB03-SEIKYUJOTAILST-MAX          PIC 9(05).
+                   07  I2SUB03-SEIKYUJOTAILST              OCCURS  2.
+                       09  I2SUB03-SEIKYUJOTAIL            PIC X(01).
+                       09  I2SUB03-SEIKYUJOTAIFLL          PIC X(01).
+                       09  I2SUB03-SEIKYUJOTAIMEIL         PIC X(20).
                05  I2SUB03-DEATHKBNLST-G.
                    07  I2SUB03-DEATHKBNLST-MAX             PIC 9(05).
                    07  I2SUB03-DEATHKBNLST                 OCCURS  2.

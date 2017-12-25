@@ -131,6 +131,15 @@
            WHEN    "0025"
                MOVE    "基準日の入力に誤りがあります。"
                                                    TO  SPA-ERRMSG
+           WHEN    "0026"
+               MOVE    "請求状態の入力に誤りがあります。"
+                                                   TO  SPA-ERRMSG
+           WHEN    "0027"
+               MOVE    "定期請求年月の入力に誤りがあります。"
+                                                   TO  SPA-ERRMSG
+           WHEN    "0028"
+               MOVE    "定期請求期別の入力に誤りがあります。"
+                                                   TO  SPA-ERRMSG
            WHEN    "0100"
                MOVE    "検索条件が入力されていません。"
                                                    TO  SPA-ERRMSG
