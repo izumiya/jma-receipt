@@ -1480,12 +1480,19 @@
            PERFORM VARYING    IDX      FROM   1   BY  1
                    UNTIL     (IDX      >   SPA-GMN28-CRHKN-MAX)
                IF     (SPA-GMN28-CRHSELNUM =   IDX )
-                   MOVE    SPA-GMN28-CR-HKNLST-OCC (IDX + 1)
+      *H29.12
+                   IF      IDX                 =   10
+                       INITIALIZE              SPA-GMN28-CR-HKNLST-OCC
+                                                              (IDX)
+                   ELSE
+                       MOVE    SPA-GMN28-CR-HKNLST-OCC (IDX + 1)
                                        TO  SPA-GMN28-CR-HKNLST-OCC(IDX)
-                   INITIALIZE              SPA-GMN28-CR-HKNLST-OCC
+                       INITIALIZE              SPA-GMN28-CR-HKNLST-OCC
                                                               (IDX + 1)
+                   END-IF
                ELSE
-                   IF      SPA-GMN28-TCHNUM (IDX)  =   ZERO
+                   IF     (SPA-GMN28-TCHNUM (IDX)  =   ZERO )
+                      AND (IDX                 <   10   )
                        MOVE    SPA-GMN28-CR-HKNLST-OCC (IDX + 1)
                                        TO  SPA-GMN28-CR-HKNLST-OCC(IDX)
                        INITIALIZE          SPA-GMN28-CR-HKNLST-OCC
@@ -2194,12 +2201,19 @@
            PERFORM VARYING    IDX      FROM   1   BY  1
                    UNTIL     (IDX      >   SPA-GMN28-CRNIN-MAX)
                IF     (SPA-GMN28-CRSELNUM  =   IDX )
-                   MOVE    SPA-GMN28-CR-NINLST-OCC (IDX + 1)
+      *H29.12
+                   IF      IDX             =   50
+                       INITIALIZE          SPA-GMN28-CR-NINLST-OCC
+                                                              (IDX)
+                   ELSE
+                       MOVE    SPA-GMN28-CR-NINLST-OCC (IDX + 1)
                                        TO  SPA-GMN28-CR-NINLST-OCC(IDX)
-                   INITIALIZE              SPA-GMN28-CR-NINLST-OCC
+                       INITIALIZE              SPA-GMN28-CR-NINLST-OCC
                                                               (IDX + 1)
+                   END-IF
                ELSE
-                   IF      SPA-GMN28-TCRNUM (IDX)  =   ZERO
+                   IF     (SPA-GMN28-TCRNUM (IDX)  =   ZERO )
+                      AND (IDX                     <   50   )
                        MOVE    SPA-GMN28-CR-NINLST-OCC (IDX + 1)
                                        TO  SPA-GMN28-CR-NINLST-OCC(IDX)
                        INITIALIZE          SPA-GMN28-CR-NINLST-OCC
@@ -2375,12 +2389,19 @@
            PERFORM VARYING    IDX      FROM   1   BY  1
                    UNTIL     (IDX      >   SPA-GMN28-MYID-MAX)
                IF     (SPA-GMN28-MYSELNUM  =   IDX )
-                   MOVE    SPA-GMN28-MYLIST-OCC (IDX + 1)
+      *H29.12
+                   IF      IDX             =   20
+                       INITIALIZE              SPA-GMN28-MYLIST-OCC
+                                                            (IDX)
+                   ELSE
+                       MOVE    SPA-GMN28-MYLIST-OCC (IDX + 1)
                                        TO  SPA-GMN28-MYLIST-OCC(IDX)
-                   INITIALIZE              SPA-GMN28-MYLIST-OCC
+                       INITIALIZE              SPA-GMN28-MYLIST-OCC
                                                             (IDX + 1)
+                   END-IF
                ELSE
-                   IF      SPA-GMN28-TMYNUM (IDX)  =   ZERO
+                   IF     (SPA-GMN28-TMYNUM (IDX)  =   ZERO )
+                      AND (IDX                     <   20   )
                        MOVE    SPA-GMN28-MYLIST-OCC (IDX + 1)
                                        TO  SPA-GMN28-MYLIST-OCC(IDX)
                        INITIALIZE          SPA-GMN28-MYLIST-OCC
