@@ -1835,7 +1835,8 @@
                IF      SPA-J98-GMN-SYORI3      =   "U6"
                    IF      TNS-SRYCD           >=  "099999911"
                        IF     (TNS-SRYCD           >=  "099999921"
-                                               AND <=  "099999929" )
+      *H29.12                                  AND <=  "099999929" )
+                                               AND <=  "099999949" )
                            CONTINUE
                        ELSE
                            MOVE    1               TO  FLG-CHK
