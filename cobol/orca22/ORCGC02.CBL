@@ -346,6 +346,8 @@
       *
       *  05.00.01    NACL-藤原    17/10/05  開始日の未来日入力の警告表示
       *                                     の修正
+      *  05.00.02    NACL-藤原    18/01/05  登録時の補足コメント半角入力
+      *                                     のチェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4287,7 +4289,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
                        END-IF
                    END-IF
       *
-                   MOVE    WRK-GMN-C02-CUR     TO  SPA-GMN-C02-CUR
+                   IF      SPA-ERRCD           =   SPACE
+                       MOVE    WRK-GMN-C02-CUR     TO  SPA-GMN-C02-CUR
+                   END-IF
            END-EVALUATE
       *
            IF    ( SPA-ERRCD       NOT =   SPACE )
@@ -10794,6 +10798,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    補足コメントのチェック
            IF      SPA-GMN-C02-HOSOKU-COMMENT
                                    NOT =   SPACE 
+               PERFORM 41025-HOSOKU-COMMENT-CHK-SEC
+               IF      SPA-ERRCD       NOT =   SPACE
+                   GO  TO  4501-KEIKOKU-CHK-EXT
+               END-IF
+      *
                PERFORM VARYING IDZ FROM    1   BY  2
                        UNTIL   IDZ >       39
                        OR      SPA-GMN-C02-HOSOKU-COMMENT  (IDZ:2)
