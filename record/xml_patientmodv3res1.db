@@ -3,7 +3,7 @@ xml_patientmodv3res1 {
 	object		object;
 	mode		int;
 	recordname	varchar(128);
-	patientmodres {
+	patientmodv3res1 {
 	Request_Number		varchar(02);
 	Response_Number		varchar(02);
 	Karte_Uid		varchar(36);

@@ -615,7 +615,7 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST03-BODY       TO  APIREQ-OBJECT
            MOVE    ZERO                TO  APIREQ-MODE
-           MOVE    "patientmodreq"     TO  APIREQ-RECORDNAME
+           MOVE    "patientmodv3req1"  TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-APIREQ
@@ -633,7 +633,7 @@
            MOVE    "xml_patientmodv3req1"  TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    ORCA-BLOB-OBJECT    TO  APIREQ-OBJECT
-           MOVE    "patientmodreq"     TO  APIREQ-RECORDNAME
+           MOVE    "patientmodv3req1"  TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-APIREQ
@@ -753,7 +753,7 @@
            MOVE    "xml_patientmodv3res1"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    1                   TO  PTMODRES-MODE
-           MOVE    "patientmodres"     TO  PTMODRES-RECORDNAME
+           MOVE    "patientmodv3res1"  TO  PTMODRES-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-PATIENTMODRES
@@ -767,7 +767,7 @@
            MOVE    "XMLWRITE"           TO  MCP-FUNC
            MOVE    "xml_patientmodv3res1"   TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    "patientmodres"     TO  PTMODRES-RECORDNAME
+           MOVE    "patientmodv3res1"  TO  PTMODRES-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-PATIENTMODRES

@@ -680,7 +680,7 @@
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    APILST04-BODY       TO  APIREQ-OBJECT
            MOVE    ZERO                TO  APIREQ-MODE
-           MOVE    "patientmodreq"     TO  APIREQ-RECORDNAME
+           MOVE    "patientmodv3req2"  TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-APIREQ
@@ -698,7 +698,7 @@
            MOVE    "xml_patientmodv3req2"  TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            MOVE    ORCA-BLOB-OBJECT    TO  APIREQ-OBJECT
-           MOVE    "patientmodreq"     TO  APIREQ-RECORDNAME
+           MOVE    "patientmodv3req2"  TO  APIREQ-RECORDNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        XML-APIREQ
