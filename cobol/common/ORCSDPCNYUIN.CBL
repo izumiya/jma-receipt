@@ -6162,7 +6162,8 @@
                    ADD   1             TO  WRK-SKJ7-SKJFTN-SU(SET-IDX1)
                END-IF
       *        ø©∆≤≤√ªª
-               IF    WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE
+               IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
+                     (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
                                        TO  WRK-SKJ7-SHOKUDOU(SET-IDX1)
       *            ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò§Œ√÷¥π§®
@@ -6267,7 +6268,8 @@
                    ADD   1             TO  WRK-SKJ7-SKJFTN-SU(SET-IDX1)
                END-IF
       *        ø©∆≤≤√ªª
-               IF    WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE
+               IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
+                     (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
                                        TO  WRK-SKJ7-SHOKUDOU(SET-IDX1)
       *            ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò§Œ√÷¥π§®
@@ -6378,7 +6380,8 @@
       **             MOVE      1         TO   WRK-SKJ7-KAISU(IDX1)
       **         END-IF
       *        ø©∆≤≤√ªª
-               IF    WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE
+               IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
+                     (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
                                        TO  WRK-SKJ7-SHOKUDOU(SET-IDX1)
       *            ∆˛±°ª˛¿∏≥ËŒ≈Õ‹»Ò§Œ√÷¥π§®
