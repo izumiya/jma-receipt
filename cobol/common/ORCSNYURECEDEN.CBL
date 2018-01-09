@@ -666,6 +666,9 @@
       *        ¼çÊÝ¸±¤¬Ìµ¤¤¾ì¹ç¤ÏºÒ³²¸ºÌÈ¤ÎÂÐ¾Ý³°¤È¤¹¤ëÈ½ÄêÍÑ
                07  WRK-SAIGAI-SYUHKN           PIC X(01)  OCCURS  31.
       *
+      *    Æþ±¡ÎÁ»»Äê¤ÎÈ½ÄêÍÑÎÎ°è
+           03  WRK-NACCT-DAY-TBL.
+               05  WRK-NACCT-DAY               PIC  9(03)  OCCURS 31.
       *
       *    ÆüÉÕÁ´³ÑÊÑ´¹ÎÎ°è
        01  TBL-DAY-AREA.
@@ -4602,6 +4605,8 @@
       *
       *Æþ±¡ÎÁ¤Î¼èÆÀ
            MOVE    ZERO                    TO  FLG-OK
+           MOVE    SPACE                   TO  WRK-NACCT-DAY-TBL
+           INITIALIZE                          WRK-NACCT-DAY-TBL
            INITIALIZE                          NYUINACCT-REC
            MOVE    LNK-NYURECEDEN-HOSPNUM  TO  NACCT-HOSPNUM
            MOVE    LNK-NYURECEDEN-PTID     TO  NACCT-PTID
@@ -4627,6 +4632,8 @@
       *                Æþ±¡´ðËÜÎÁ¤È½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
+                           MOVE   NACCT-DAY(IDX1)  TO   WRK-NACCT-DAY
+                                                                (IDX1)
                            IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
                            AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                              MOVE    NSRY-SRYCD(1)   TO  
@@ -4757,7 +4764,9 @@
       *    Æþ±¡ÎÁ¤Î»»Äê¤¬Ìµ¤¤Æü¤Ï¿©»öÊÝ¸±¤ò¥¯¥ê¥¢
            PERFORM    VARYING  IDX1   FROM  1  BY  1
              UNTIL    IDX1     >   31
-              IF   WRK-NYUINKHN(IDX1)    =    SPACE
+              IF  (WRK-NYUINKHN(IDX1)    =    SPACE)    AND
+                  (LNK-NYUINDAY-KBN(IDX1)  =  SPACE)    AND
+                  (WRK-NACCT-DAY(IDX1)     =  ZERO)
                    MOVE  ZERO          TO  WRK-SKJ-HKNCOMBI-ASA(IDX1)
                                            WRK-SKJ-HKNCOMBI-HIRU(IDX1)
                                            WRK-SKJ-HKNCOMBI-YORU(IDX1)
