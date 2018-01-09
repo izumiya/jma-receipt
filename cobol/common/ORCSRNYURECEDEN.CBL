@@ -1045,6 +1045,16 @@
            MOVE    "key17"                 TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
+      *    入院料の算定が無い日は食事保険をクリア
+           PERFORM    VARYING  IDX1   FROM  1  BY  1
+             UNTIL    IDX1     >   31
+              IF   WRK-NYUINKHN(IDX1)    =    SPACE
+                   MOVE  ZERO          TO  WRK-SKJ-HKNCOMBI-ASA(IDX1)
+                                           WRK-SKJ-HKNCOMBI-HIRU(IDX1)
+                                           WRK-SKJ-HKNCOMBI-YORU(IDX1)
+              END-IF
+           END-PERFORM
+      *
       *
       *入院時の外泊取得
            INITIALIZE                          NYUINACCT-REC
