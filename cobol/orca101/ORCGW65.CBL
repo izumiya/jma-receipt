@@ -2161,7 +2161,15 @@
            MOVE    "負担上限未満記載あり"
                                    TO  SPA-GMN-RECEKSIKBNMEIL (3)
       *
-           MOVE    3               TO  SPA-GMN-RECEKSIKBN-MAX
+           MOVE    "3"             TO  SPA-GMN-RECEKSIKBNL    (4)
+           STRING    "設定額以上記載なし（設定額未満・以上で異なる"
+                                       DELIMITED BY SIZE
+                     "負担金計算）"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-RECEKSIKBNMEIL (4)
+           END-STRING
+      *
+           MOVE    4               TO  SPA-GMN-RECEKSIKBN-MAX
       *
            .
        3110-RECEKSIKBNLST-EXT.
