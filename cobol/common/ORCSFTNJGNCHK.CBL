@@ -111,6 +111,7 @@
       *  04.08.05    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
       *  04.08.06    NACL-門脇    17/12/07  熊本県地方公費対応
+      *  04.08.07    NACL-門脇    18/01/09  熊本県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -170,8 +171,7 @@
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
            03  WRK-HKNMST-JGNGAK2 PIC 9(06).
-           03  WRK-HKNMST-JGNGAK-N
-                                  PIC 9(06).
+           03  WRK-HKNMST-JGNGAK3 PIC 9(06).
            03  WRK-TAIHI-JGNGAK   PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-KOHFTN-EN      PIC 9(10)V9(01).
@@ -184,6 +184,8 @@
            03  WRK-KOHFTN-RITU    PIC 9(03).
            03  WRK-KOHFTN-HKNFTNMONEY
                                   PIC 9(10).
+           03  WRK-KOHFTN-JYO-HKNFTNMONEY
+                                  PIC 9(10).
            03  WRK-SEIKYU         PIC 9(10).
            03  WRK-SEIKYU-TOTAL   PIC 9(10).
            03  WRK-KYUFUGAITEN    PIC 9(10).
@@ -194,6 +196,7 @@
            03  WRK-TEISYOTOKU     PIC X(01).
            03  WRK-TEISYOTOKU2    PIC X(01).
            03  WRK-RECEJGNDSPKBN  PIC X(01).
+           03  WRK-RECEJGNDSPKBN2 PIC X(01).
       *
            03  WRK-HKNCOMBINUM-TBL.
                05  WRK-HKNCOMBINUM-OCC      OCCURS 50.
@@ -405,6 +408,7 @@
            MOVE        SPACE     TO     WRK-TEISYOTOKU
            MOVE        SPACE     TO     WRK-TEISYOTOKU2
            MOVE        SPACE     TO     WRK-RECEJGNDSPKBN
+           MOVE        SPACE     TO     WRK-RECEJGNDSPKBN2
            MOVE        ZERO      TO     WRK-KOHFTN-RITU
            MOVE        ZERO      TO     FLG-ZENKI-TOKUREI
            MOVE        ZERO      TO     FLG-KOREI-HIGAITO
@@ -436,6 +440,23 @@
       *
       *      システム管理２０１０編集
              PERFORM      2002-SYS2010-HENSYU-SEC
+      *
+      *      設定額以上記載なし（設定額未満・以上で異なる負担金計算）
+      *      対象チェック
+             IF   (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+             AND  (HKN-RECEJGNDSPKBN          = "0"           )
+               IF    LNK-FTNJGNCHK-NYUGAIKBN  = "1"
+                 IF   (WRK-IRYOKEIKBN-N   NOT =  SPACE)
+                 AND  (WRK-RECEKSIFLG-N       =  "3"  )
+                   MOVE   WRK-IRYOKEIKBN-N   TO   WRK-RECEJGNDSPKBN2
+                 END-IF
+               ELSE
+                 IF   (WRK-IRYOKEIKBN-G   NOT =  SPACE)
+                 AND  (WRK-RECEKSIFLG-G       =  "3"  )
+                   MOVE   WRK-IRYOKEIKBN-G   TO   WRK-RECEJGNDSPKBN2
+                 END-IF
+               END-IF
+             END-IF
       *
              IF   (HKN-RECEJGNDSPKBN    =   "1"           )
              OR   (HKN-HKNNUM           =   "972" OR "974")
@@ -514,7 +535,7 @@
              IF    LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8"
                 CONTINUE
              ELSE
-                MOVE   SPACE   TO   HKN-RECEJGNDSPKBN
+                MOVE    "0"      TO    HKN-RECEJGNDSPKBN
              END-IF
            END-IF
       *
@@ -683,6 +704,27 @@
                     MOVE  "2"  TO WRK-RECEKSIFLG-G
                   END-IF
                END-EVALUATE
+             WHEN      "3"
+               EVALUATE  SYS-2010-RECEKSI-TAIKBN-G
+                 WHEN        "0"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-G
+                 WHEN        "1"
+                  IF   PTHKN-HKNNUM  = "060" OR "067" OR "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-G
+                  END-IF
+                 WHEN        "2"
+                  IF   PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-G
+                  END-IF
+                 WHEN        "3"
+                  IF   PTHKN-HKNNUM  = "060" OR "067"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-G
+                  END-IF
+                 WHEN        "4"
+                  IF   PTHKN-HKNNUM  = "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-G
+                  END-IF
+               END-EVALUATE
            END-EVALUATE
       *
            EVALUATE  SYS-2010-RECEKSIKBN-N
@@ -745,6 +787,27 @@
                  WHEN        "4"
                   IF   PTHKN-HKNNUM  = "039"
                     MOVE  "2"  TO WRK-RECEKSIFLG-N
+                  END-IF
+               END-EVALUATE
+             WHEN      "3"
+               EVALUATE  SYS-2010-RECEKSI-TAIKBN-N
+                 WHEN        "0"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-N
+                 WHEN        "1"
+                  IF   PTHKN-HKNNUM  = "060" OR "067" OR "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-N
+                  END-IF
+                 WHEN        "2"
+                  IF   PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-N
+                  END-IF
+                 WHEN        "3"
+                  IF   PTHKN-HKNNUM  = "060" OR "067"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-N
+                  END-IF
+                 WHEN        "4"
+                  IF   PTHKN-HKNNUM  = "039"
+                    MOVE  "3"  TO WRK-RECEKSIFLG-N
                   END-IF
                END-EVALUATE
            END-EVALUATE
@@ -1351,7 +1414,7 @@
                EVALUATE   WRK-TEISYOTOKU
                  WHEN     SPACE
                    IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                      MOVE HKN-HON-GAIMGAIJGNGAK TO  WRK-HKNMST-JGNGAK
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
@@ -1366,24 +1429,24 @@
                    END-EVALUATE
       *****        院内用
                    IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                      MOVE HKN-HON-GAIMNAIJGNGAK TO  WRK-HKNMST-JGNGAK3
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
                     WHEN      "1"
                       IF  HKN-HON-GAIDJGNGAK  NOT = ZERO
-                        MOVE  HKN-HON-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-HON-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                     WHEN      "2"
                       IF  HKN-HON-GAIKJGNGAK  NOT = ZERO
-                        MOVE  HKN-HON-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-HON-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                    END-EVALUATE
-                   MOVE    HKN-HON-GAIKFTNRATE   TO WRK-KOHFTN-RITU
+                   MOVE    HKN-HON-GAIKFTNRATE   TO  WRK-KOHFTN-RITU
                  WHEN     "1"
                  WHEN     "4"
                    IF    HKN-TNK-GAIMGAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TNK-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                      MOVE HKN-TNK-GAIMGAIJGNGAK TO  WRK-HKNMST-JGNGAK
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
@@ -1398,23 +1461,23 @@
                    END-EVALUATE
       *****        院内用
                    IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                      MOVE HKN-TNK-GAIMNAIJGNGAK TO  WRK-HKNMST-JGNGAK3
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
                     WHEN      "1"
                       IF  HKN-TNK-GAIDJGNGAK  NOT = ZERO
-                        MOVE  HKN-TNK-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-TNK-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                     WHEN      "2"
                       IF  HKN-TNK-GAIKJGNGAK  NOT = ZERO
-                        MOVE  HKN-TNK-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-TNK-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                    END-EVALUATE
-                   MOVE    HKN-TNK-GAIKFTNRATE   TO WRK-KOHFTN-RITU
+                   MOVE    HKN-TNK-GAIKFTNRATE   TO  WRK-KOHFTN-RITU
                  WHEN     "2"
                    IF    HKN-TSY-GAIMGAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TSY-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                      MOVE HKN-TSY-GAIMGAIJGNGAK TO  WRK-HKNMST-JGNGAK
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
@@ -1429,20 +1492,20 @@
                    END-EVALUATE
       *****        院内用
                    IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                      MOVE HKN-TSY-GAIMNAIJGNGAK TO  WRK-HKNMST-JGNGAK3
                    END-IF
       *            チェック対象上限額判定
                    EVALUATE  WRK-CHKJGNFLG-G
                     WHEN      "1"
                       IF  HKN-TSY-GAIDJGNGAK  NOT = ZERO
-                        MOVE  HKN-TSY-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-TSY-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                     WHEN      "2"
                       IF  HKN-TSY-GAIKJGNGAK  NOT = ZERO
-                        MOVE  HKN-TSY-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                        MOVE  HKN-TSY-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK3
                       END-IF
                    END-EVALUATE
-                   MOVE    HKN-TSY-GAIKFTNRATE   TO WRK-KOHFTN-RITU
+                   MOVE    HKN-TSY-GAIKFTNRATE   TO  WRK-KOHFTN-RITU
                END-EVALUATE
            END-IF
       *
@@ -1651,6 +1714,37 @@
       *****************************************************************
        20041-SYUKEI-SEC            SECTION.
       *
+           MOVE   ZERO   TO   FLG-GENMEN
+           MOVE   ZERO   TO   FLG-TOKU75
+           MOVE   ZERO   TO   FLG-SKJRYOYOHI-ARI
+           MOVE   ZERO   TO   FLG-ARI2
+           MOVE   ZERO   TO   FLG-SAIGAI-ARI
+           MOVE   ZERO   TO   FLG-SAIGAI-ARI2
+           MOVE   ZERO   TO   FLG-SEIHO-CHECK
+           MOVE   ZERO   TO   FLG-INGAI
+           MOVE   ZERO   TO   FLG-INNAI
+           MOVE   ZERO   TO   FLG-HKNCOMBI-CHECK
+           MOVE   ZERO   TO   FLG-SKJ-CHECK
+           MOVE   ZERO   TO   FLG-GENMEN-ARI
+           MOVE   ZERO   TO   FLG-GENMEN-NASI
+      *
+           MOVE   ZERO   TO   WRK-KOHFTN
+           MOVE   ZERO   TO   WRK-KOHFTN-EN
+           MOVE   ZERO   TO   WRK-KOHFTN-H
+           MOVE   ZERO   TO   WRK-KOHFTN9-H
+           MOVE   ZERO   TO   WRK-KOHFTN9-X
+           MOVE   ZERO   TO   WRK-KOHFTN-X
+           MOVE   ZERO   TO   WRK-KOHFTN-SKJ
+           MOVE   ZERO   TO   WRK-KOHFTN-TOKU75
+           MOVE   ZERO   TO   WRK-KOHFTN-HKNFTNMONEY
+           MOVE   ZERO   TO   WRK-KOHFTN-JYO-HKNFTNMONEY
+           MOVE   ZERO   TO   WRK-SEIKYU
+           MOVE   ZERO   TO   WRK-SEIKYU-TOTAL
+           MOVE   ZERO   TO   WRK-KYUFUGAITEN
+           MOVE   ZERO   TO   WRK-SKJ-FTN
+           MOVE   ZERO   TO   WRK-SYUSKJ-FTN
+           MOVE   ZERO   TO   WRK-SKYMONEY-SKJ
+      *
            INITIALIZE                          SYUNOU-REC
            MOVE    LNK-FTNJGNCHK-HOSPNUM   TO  SYU-HOSPNUM
            MOVE    LNK-FTNJGNCHK-PTID      TO  SYU-PTID
@@ -1682,10 +1776,11 @@
                END-IF
                PERFORM 910-SYUNOU-READ-SEC
                IF   FLG-SYUNOU             =   ZERO
-                 IF   (HKN-RECEJGNDSPKBN    =   "1"           )
-                 OR   (HKN-HKNNUM           =   "972" OR "974"
-                                                      OR "012")
-                 OR   (WRK-RECEJGNDSPKBN    =   "1"           )
+                 IF   (HKN-RECEJGNDSPKBN       =  "1"           )
+                 OR   (HKN-HKNNUM              =  "972" OR "974"
+                                                        OR "012")
+                 OR   (WRK-RECEJGNDSPKBN       =  "1"           )
+                 OR   (WRK-RECEJGNDSPKBN2  NOT =  SPACE         )
                      PERFORM 200411-SYUKEI-HENSYU1-SEC
                  ELSE
                      PERFORM 200412-SYUKEI-HENSYU2-SEC
@@ -1825,34 +1920,6 @@
        200411-SYUKEI-HENSYU1-SEC            SECTION.
       *
       *    患者負担金の集計
-           MOVE      ZERO          TO      WRK-KOHFTN
-           MOVE      ZERO          TO      WRK-KOHFTN-EN
-           MOVE      ZERO          TO      WRK-KOHFTN-H
-           MOVE      ZERO          TO      WRK-KOHFTN9-H
-           MOVE      ZERO          TO      WRK-KOHFTN9-X
-           MOVE      ZERO          TO      WRK-KOHFTN-X
-           MOVE      ZERO          TO      WRK-KOHFTN-SKJ
-           MOVE      ZERO          TO      WRK-KOHFTN-TOKU75
-           MOVE      ZERO          TO      WRK-KOHFTN-HKNFTNMONEY
-           MOVE      ZERO          TO      WRK-SEIKYU
-           MOVE      ZERO          TO      WRK-SEIKYU-TOTAL
-           MOVE      ZERO          TO      WRK-KYUFUGAITEN
-           MOVE      ZERO          TO      FLG-GENMEN
-           MOVE      ZERO          TO      WRK-SKJ-FTN
-           MOVE      ZERO          TO      FLG-TOKU75
-           MOVE      ZERO          TO      FLG-SKJRYOYOHI-ARI
-           MOVE      ZERO          TO      FLG-ARI2
-           MOVE      ZERO          TO      FLG-SAIGAI-ARI
-           MOVE      ZERO          TO      FLG-SAIGAI-ARI2
-           MOVE      ZERO          TO      WRK-SYUSKJ-FTN
-           MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
-           MOVE      ZERO          TO      FLG-SEIHO-CHECK
-           MOVE      ZERO          TO      FLG-INGAI
-           MOVE      ZERO          TO      FLG-INNAI
-           MOVE      ZERO          TO      FLG-HKNCOMBI-CHECK
-           MOVE      ZERO          TO      FLG-SKJ-CHECK
-           MOVE      ZERO          TO      FLG-GENMEN-ARI
-           MOVE      ZERO          TO      FLG-GENMEN-NASI
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1879,6 +1946,8 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(1)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
+                       ADD  SYU-JYO-HKNFTNMONEY
+                                       TO  WRK-KOHFTN-JYO-HKNFTNMONEY
                        ADD  SYU-KOH-HKNFTNMONEY(1) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
@@ -1920,6 +1989,8 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(2)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
+                       ADD  SYU-JYO-HKNFTNMONEY
+                                       TO  WRK-KOHFTN-JYO-HKNFTNMONEY
                        ADD  SYU-KOH-HKNFTNMONEY(2) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
@@ -1961,6 +2032,8 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(3)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
+                       ADD  SYU-JYO-HKNFTNMONEY
+                                       TO  WRK-KOHFTN-JYO-HKNFTNMONEY
                        ADD  SYU-KOH-HKNFTNMONEY(3) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
@@ -2002,6 +2075,8 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(4)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
+                       ADD  SYU-JYO-HKNFTNMONEY
+                                       TO  WRK-KOHFTN-JYO-HKNFTNMONEY
                        ADD  SYU-KOH-HKNFTNMONEY(4) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(4) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
@@ -2119,7 +2194,7 @@
                      (FLG-INNAI      =  ZERO))
                    CONTINUE
                 ELSE
-                   MOVE  WRK-HKNMST-JGNGAK-N  TO  WRK-HKNMST-JGNGAK
+                   MOVE  WRK-HKNMST-JGNGAK3  TO  WRK-HKNMST-JGNGAK
                 END-IF
              END-IF
            END-IF
@@ -2137,7 +2212,11 @@
                 IF  WRK-HKNMST-JGNGAK  =  999998
                    CONTINUE
                 ELSE
-                   PERFORM  2004114-FTNJGNCHK-HENSYU-SEC
+                   IF    WRK-RECEJGNDSPKBN2  NOT =  SPACE
+                     PERFORM  2004114X-FTNJGNCHK-HENSYU2-SEC
+                   ELSE
+                     PERFORM  2004114-FTNJGNCHK-HENSYU-SEC
+                   END-IF
                 END-IF
               END-IF
            END-IF
@@ -2463,8 +2542,12 @@
                (WRK-IRYOKEIKBN-G        = "1" OR "2"))
            OR ((LNK-FTNJGNCHK-NYUGAIKBN = "1"       ) AND
                (WRK-IRYOKEIKBN-N        = "1" OR "2"))
-               IF   WRK-KOHFTN   NOT = ZERO
+               IF   WRK-KOHFTN-HKNFTNMONEY   NOT =   ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+               END-IF
+               IF    LNK-FTNJGNCHK-RC   NOT =   ZERO
+               AND   FLG-SKJ-CHECK          =    1
+                       MOVE   ZERO      TO  LNK-FTNJGNCHK-RC
                END-IF
            ELSE
                EVALUATE   LNK-FTNJGNCHK-KOHNUM
@@ -2584,6 +2667,37 @@
       *
            .
        2004114-FTNJGNCHK-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    負担上限チェック編集
+      *****************************************************************
+       2004114X-FTNJGNCHK-HENSYU2-SEC            SECTION.
+      *
+           IF   WRK-RECEJGNDSPKBN2  =  "1" OR "2"
+                 IF   WRK-KOHFTN-HKNFTNMONEY  NOT =  ZERO
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+           ELSE
+             EVALUATE  WRK-RECEJGNDSPKBN2
+               WHEN     "3"
+                 IF   WRK-KOHFTN-JYO-HKNFTNMONEY  >=  21000
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+               WHEN     "4"
+                 IF   WRK-KOHFTN-JYO-HKNFTNMONEY  >=  20000
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+                 END-IF
+             END-EVALUATE
+           END-IF
+      *
+           IF    LNK-FTNJGNCHK-RC   NOT =   ZERO
+           AND   FLG-SKJ-CHECK          =    1
+                   MOVE   ZERO      TO  LNK-FTNJGNCHK-RC
+           END-IF
+      *
+           .
+       2004114X-FTNJGNCHK-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2733,18 +2847,7 @@
       *****************************************************************
        200412-SYUKEI-HENSYU2-SEC            SECTION.
       *
-           MOVE      ZERO       TO      WRK-KOHFTN-SKJ
-           MOVE      ZERO       TO      WRK-KOHFTN-HKNFTNMONEY
-           MOVE      ZERO       TO      WRK-SEIKYU
-           MOVE      ZERO       TO      FLG-SKJRYOYOHI-ARI
-           MOVE      ZERO       TO      FLG-ARI2
-           MOVE      ZERO       TO      FLG-SAIGAI-ARI
-           MOVE      ZERO       TO      FLG-SAIGAI-ARI2
-           MOVE      ZERO       TO      WRK-SYUSKJ-FTN
-           MOVE      ZERO       TO      WRK-SKYMONEY-SKJ
-           MOVE      ZERO       TO      FLG-SKJ-CHECK
-           MOVE      ZERO       TO      FLG-GENMEN-ARI
-           MOVE      ZERO       TO      FLG-GENMEN-NASI
+      *    患者負担金の集計
            PERFORM   UNTIL    FLG-SYUNOU     =  1
              MOVE    ZERO       TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
