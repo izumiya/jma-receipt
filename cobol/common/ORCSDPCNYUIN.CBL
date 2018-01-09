@@ -6075,6 +6075,9 @@
            PERFORM      VARYING    IDX1   FROM   1  BY  1
                         UNTIL      IDX1   >   31
       *        食事療養費（朝）
+               MOVE     ZERO          TO  SET-IDX1
+      **         DISPLAY "ASA"
+      **         DISPLAY "WRK-SKJ4-RYOYO(IDX1) = " WRK-SKJ4-RYOYO(IDX1)
                IF   WRK-SKJ4-RYOYO(IDX1)  NOT =   SPACE
       *
       *            同日再入院の食事は編集先を変更
@@ -6162,6 +6165,11 @@
                    ADD   1             TO  WRK-SKJ7-SKJFTN-SU(SET-IDX1)
                END-IF
       *        食堂加算
+      **         DISPLAY "=====  SHOUDOU ASA ========"
+      **         DISPLAY "IDX1 = " IDX1
+      **         DISPLAY "WRK-SKJ6-SHOKUDOU(IDX1) = " 
+      **                  WRK-SKJ6-SHOKUDOU(IDX1)
+      **         DISPLAY "SET-IDX1 = " SET-IDX1
                IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
                      (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
@@ -6181,6 +6189,8 @@
                MOVE      ZERO          TO  IDX2
                MOVE      ZERO          TO  SET-IDX1
                COMPUTE   IDX2     =    IDX1    +   31
+      **         DISPLAY "HIRU"
+      **         DISPLAY "WRK-SKJ4-RYOYO(IDX2) = " WRK-SKJ4-RYOYO(IDX2)
                IF    WRK-SKJ4-RYOYO(IDX2)  NOT =   SPACE
       *
       *            同日再入院の食事は編集先を変更
@@ -6268,6 +6278,11 @@
                    ADD   1             TO  WRK-SKJ7-SKJFTN-SU(SET-IDX1)
                END-IF
       *        食堂加算
+      **         DISPLAY "=====  SHOUDOU HIRU ========"
+      **         DISPLAY "IDX1 = " IDX1
+      **         DISPLAY "WRK-SKJ6-SHOKUDOU(IDX1) = " 
+      **                  WRK-SKJ6-SHOKUDOU(IDX1)
+      **         DISPLAY "SET-IDX1 = " SET-IDX1
                IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
                      (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
@@ -6287,6 +6302,8 @@
                MOVE      ZERO          TO  IDX3
                MOVE      ZERO          TO  SET-IDX1
                COMPUTE   IDX3     =    IDX1    +   62
+      **         DISPLAY "YORU"
+      **         DISPLAY "WRK-SKJ4-RYOYO(IDX3) = " WRK-SKJ4-RYOYO(IDX3)
                IF    WRK-SKJ4-RYOYO(IDX3)  NOT =   SPACE
       *
       *            同日再入院の食事は編集先を変更
@@ -6380,6 +6397,11 @@
       **             MOVE      1         TO   WRK-SKJ7-KAISU(IDX1)
       **         END-IF
       *        食堂加算
+      **         DISPLAY "=====  SHOUDOU YORU ========"
+      **         DISPLAY "IDX1 = " IDX1
+      **         DISPLAY "WRK-SKJ6-SHOKUDOU(IDX1) = " 
+      **                  WRK-SKJ6-SHOKUDOU(IDX1)
+      **         DISPLAY "SET-IDX1 = " SET-IDX1
                IF    (WRK-SKJ6-SHOKUDOU(IDX1)  NOT =   SPACE)  AND
                      (SET-IDX1     NOT =   ZERO)
                    MOVE  WRK-SKJ6-SHOKUDOU(IDX1)
