@@ -942,8 +942,10 @@
       *                Æþ±¡´ðËÜÎÁ¤È½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
-                           MOVE   NACCT-DAY(IDX1)  TO   WRK-NACCT-DAY
+                           IF     NACCT-DAY(IDX1)  NOT =  ZERO
+                             MOVE   NACCT-DAY(IDX1)  TO   WRK-NACCT-DAY
                                                                 (IDX1)
+                           END-IF
                            IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
                            AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                              MOVE    NSRY-SRYCD(1)   TO  
