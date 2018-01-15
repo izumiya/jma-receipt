@@ -4087,6 +4087,18 @@
                ELSE
                    COMPUTE WRK-HENKIN          =   SPA-GMN-SEIKYU
                                                *   -1
+      *H30.1
+      *            前回入金額以上であること
+                   IF      SPA-NAI-NYUKIN      >=  WRK-HENKIN
+                       MOVE    WRK-HENKIN          TO  SPA-GMN-HENKIN-X
+                   ELSE
+      *                前回入金額以下
+                       MOVE    SPACE           TO  SPA-GMN-HENKIN-X
+                       MOVE    "0114"          TO  SPA-ERRCD
+                       MOVE    07              TO  SPA-GMN-CUR
+                       GO      TO      450-HENKIN-CHK-EXT
+                   END-IF
+      *
                    MOVE    WRK-HENKIN          TO  SPA-GMN-HENKIN-X
                END-IF
            END-IF
@@ -4124,6 +4136,13 @@
                            CONTINUE
                        ELSE
                            MOVE    "0108"              TO  SPA-ERRCD
+                           MOVE    07                  TO  SPA-GMN-CUR
+                       END-IF
+      *H30.1
+      *                前回入金額以下であること
+                       IF     (SPA-NAI-NYUKIN      <   SPA-GMN-HENKIN)
+                          AND (SPA-ERRCD           =   SPACE         )
+                           MOVE    "0114"              TO  SPA-ERRCD
                            MOVE    07                  TO  SPA-GMN-CUR
                        END-IF
                    ELSE
@@ -7406,6 +7425,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0113"
                    STRING  "今回請求分のみの入力です。"
                            "過入金の返金はできません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H30.1
+               WHEN    "0114"
+                   STRING  "返金額が前回入金額以下となります。"
+                           "返金はできません。"
                                        DELIMITED   BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
