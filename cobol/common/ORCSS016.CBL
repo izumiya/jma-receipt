@@ -57,6 +57,7 @@
            03  WRK-OLD-NYUHEN-YMD              PIC X(08).
            03  WRK-OLD-NYUHEN-HMS              PIC X(06).
            03  WRK-SKYMONEY                    PIC S9(10).
+           03  WRK-NYUKIN                      PIC S9(10).
       *
        01  CONST-AREA.
            03  CONST-REQMODE-G.
@@ -228,6 +229,42 @@
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 49021-SYUMEI-UPD-SEC
+           END-IF
+      *
+           PERFORM 900-SYUMEI-KEY2-SEL-SEC
+      *
+           MOVE    ZERO                TO  WRK-NYUKIN
+           PERFORM UNTIL ( FLG-SYUMEI  NOT =   ZERO )
+      *
+               COMPUTE WRK-NYUKIN
+                   =   WRK-NYUKIN
+                   +   SMEI-NYUHEN-MONEY
+      *
+               PERFORM 900-SYUMEI-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syumei"    TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *    入金額の不整合をチェックし補正
+           INITIALIZE                    SYUNOU-REC
+           MOVE    SPA-HOSPNUM       TO  SYU-HOSPNUM
+           MOVE    SS016-NYUGAIKBN   TO  SYU-NYUGAIKBN
+           MOVE    SS016-PTID        TO  SYU-PTID
+           MOVE    SS016-DENPNUM     TO  SYU-DENPNUM
+           PERFORM 900-SYUNOU-KEY-SEL-SEC
+           IF    ( WRK-NYUKIN         >=  ZERO )
+            AND  ( WRK-NYUKIN      NOT =  SYU-NYUKIN-TOTAL )
+               MOVE    WRK-NYUKIN     TO  SYU-NYUKIN-TOTAL
+               MOVE    SYUNOU-REC     TO  MCPDATA-REC
+               MOVE    "tbl_syunou"   TO  MCP-TABLE
+               MOVE    "key"          TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF    ( MCP-RC              NOT =   ZERO )
+                   MOVE    "4909"     TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -838,7 +875,6 @@
            PERFORM 910-DBUPDATE-SEC
            IF    ( MCP-RC          NOT =   ZERO )
                MOVE    "4911"      TO  SPA-ERRCD
-               GO  TO  4301-PTTEIKIRRK-UPD-EXT
            END-IF
       *
            .
@@ -966,6 +1002,53 @@
       *
            .
        900-SYUMEI-KEY7-SEL-EXT.
+           EXIT.
+      **************************************************************
+      *    収納明細検索処理
+      **************************************************************
+       900-SYUMEI-KEY2-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYUMEI
+      *
+           INITIALIZE                      SYUMEI-REC
+      *
+           MOVE    SPA-HOSPNUM         TO  SMEI-HOSPNUM
+           MOVE    SS016-NYUGAIKBN     TO  SMEI-NYUGAIKBN
+           MOVE    SS016-PTID          TO  SMEI-PTID
+           MOVE    SS016-DENPNUM       TO  SMEI-DENPNUM
+           MOVE    SYUMEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syumei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUMEI-REC
+           ELSE
+               INITIALIZE                  SYUMEI-REC
+               MOVE    1               TO  FLG-SYUMEI
+           END-IF
+      *
+           .
+       900-SYUMEI-KEY2-SEL-EXT.
+           EXIT.
+      **************************************************************
+      *    収納明細FETCH処理
+      **************************************************************
+       900-SYUMEI-KEY2-FET-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYUMEI
+      *
+           MOVE    "tbl_syumei"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUMEI-REC
+           ELSE
+               INITIALIZE                  SYUMEI-REC
+               MOVE    1               TO  FLG-SYUMEI
+           END-IF
+      *
+           .
+       900-SYUMEI-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)
