@@ -34,6 +34,7 @@
       * 04.07.00     NACL-多々納  15/08/XX  入院対応、単位追加対応
       *                                     包括対象項目追加
       * 04.08.00     NACL-多々納  15/12/14  伝票番号追加対応
+      * 04.08.00     NACL-多々納  18/01/XX  レセ電データ移行分対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -1034,6 +1035,14 @@
       *****************************************************************
        20011-SRYKA-CHK-SEC         SECTION.
       *
+      *H30.1
+      *    レセ電データ移行分
+           IF     (WRK-SRYKA (1:1)     =   "A" )
+              AND (WRK-SRYKA (2:1)     NUMERIC )
+               MOVE    SPACE           TO  WRK-SRYKA-NAME
+               GO      TO      20011-SRYKA-CHK-EXT
+           END-IF
+      *
       *    診療科の存在チェック
            MOVE    SPACE               TO  SYS-1005-REC
            INITIALIZE                  SYS-1005-REC
@@ -1052,6 +1061,7 @@
                MOVE    SYS-1005-SRYKANAME1 TO  WRK-SRYKA-NAME
            ELSE
                MOVE    "13"                TO  WRK-ERRCD
+               MOVE    SPACE               TO  WRK-SRYKA-NAME
            END-IF
       *
            .
@@ -1289,6 +1299,8 @@
                                                                (IDX)
       *        伝票番号
                IF      SPA-NYUGAIKBN   =   "2"
+      *H30.1     レセ電データ移行分
+                  AND (WRK-SRYKA(1:1)  NOT =   "A" )
                    MOVE    TBL-RRK-DENPNUM (IDX)
                                        TO  MDC01RES-INVOICD-NUMBER
                                                                (IDX)
@@ -1581,7 +1593,8 @@
       *        保険組合せチェック
                PERFORM 200311-HKNCOMBI-NUM-SEC
       *        存在チェック
-               IF      WRK-ERRCD           =   SPACE
+               IF     (WRK-ERRCD           =   SPACE   )
+                  AND (WRK-HKNCOMBI    NOT =    "9999" )
                    INITIALIZE                  HKNCOMBI-REC
                    MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                    MOVE    SPA-PTID            TO  COMB-PTID
