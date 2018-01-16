@@ -247,6 +247,7 @@
       *  04.08.02    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.03    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *  05.00.01    NACL-伊藤    18/01/11  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1210,7 +1211,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
                IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "9" OR
-                                               "8" 
+                                               "8" OR  "B" 
                    MOVE    "key60"             TO  WRK-SRYACCT-PATHNAME
                ELSE
                    MOVE    "key36"             TO  WRK-SRYACCT-PATHNAME
@@ -1597,7 +1598,8 @@ grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                                                    ORCSFTNJGNCHKAREA
 grpsys                                             SPA-AREA
                        IF      WRK-PARA-PRTKBN     =   "3" OR  "5" OR
-                                                       "9" OR  "8"
+                                                       "9" OR  "8" OR
+                                                       "B"
                            DISPLAY "LNK-FTNJGNCHK-KOHNUM="
                                                LNK-FTNJGNCHK-KOHNUM
                                    " LNK-FTNJGNCHK-TENKEN-RC="
@@ -1656,7 +1658,8 @@ grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                                                    ORCSFTNJGNCHKAREA
 grpsys                                             SPA-AREA
                        IF      WRK-PARA-PRTKBN     =   "3" OR  "5" OR
-                                                       "9" OR  "8"
+                                                       "9" OR  "8" OR
+                                                       "B"
                            DISPLAY "LNK-FTNJGNCHK-KOHNUM="
                                                LNK-FTNJGNCHK-KOHNUM
                                    " LNK-FTNJGNCHK-TENKEN-RC="
@@ -3570,7 +3573,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                MOVE    SYS-2002-NYUGAIKBN  TO  ACCT-NYUGAIKBN
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               IF      WRK-PARA-PRTKBN     =   "4" OR  "5"
+               IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "B"
                    MOVE    "key61"             TO  WRK-SRYACCT-PATHNAME
                ELSE
                    MOVE    "key37"             TO  WRK-SRYACCT-PATHNAME
@@ -3690,7 +3693,7 @@ grpsys             MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                    MOVE    SRYACCT-REC         TO  MCPDATA-REC
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
                    IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "9"
-                                               OR  "8"   
+                                               OR  "8" OR  "B" 
                        MOVE    "key61"         TO  WRK-SRYACCT-PATHNAME
                    ELSE
                        MOVE    "key37"         TO  WRK-SRYACCT-PATHNAME
@@ -3795,7 +3798,8 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                        MOVE    "2"                 TO  ACCT-NYUGAIKBN
                        MOVE    SRYACCT-REC         TO  MCPDATA-REC
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       IF      WRK-PARA-PRTKBN     =   "4" OR  "5"
+                       IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR
+                                                       "B"
                            MOVE    "key61"         TO
                                                    WRK-SRYACCT-PATHNAME
                        ELSE
@@ -4291,7 +4295,8 @@ grpsys                                     SPA-AREA
        800-MISEIKYU-CHECK-SEC          SECTION.
       *
       *    ＥＦファイル作成、連係基盤用のとき未請求設定分も作成する
-           IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
+      *    診療情報システムのとき未請求設定分も作成する
+           IF      WRK-PARA-PRTKBN     =   "9" OR  "8" OR  "B"
                INITIALIZE                      SYUKA-REC
                GO  TO  800-MISEIKYU-CHECK-EXT
            END-IF

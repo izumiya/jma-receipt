@@ -200,4 +200,5 @@ db	{
 	tbl_psychotropic;
         tbl_jibai_prt;
         tbl_ptmynumber;
+        tbl_receden_tmp;
 };

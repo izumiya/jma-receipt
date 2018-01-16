@@ -522,6 +522,7 @@ RECORD_files = \
  	Q05.rec \
 	patientlst6v2.rec \
     hspmmv2.rec \
+ 	W93.rec \
 
 DEF_files = \
 
@@ -891,6 +892,7 @@ DB_files = \
 	xml_patientlst6v2res.db \
     xml_hspmmv2req.db \
     xml_hspmmv2res.db \
+	tbl_receden_tmp.db \
 
 
 shell.db: shell.db.in

@@ -451,6 +451,7 @@
       *                                     記録するよう変更
       *  04.08.14    NACL-門脇    17/08/28  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
+      *  05.00.02    NACL-伊藤    17/12/20  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8442,7 +8443,11 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            IF      WRK-PARA-PRTKBN =   "9"
                MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
            ELSE
-               MOVE    "tbl_receden"       TO  MCP-TABLE
+               IF      WRK-PARA-PRTKBN =   "B"
+                   MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+               ELSE
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+               END-IF
            END-IF
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-DBINSERT-SEC

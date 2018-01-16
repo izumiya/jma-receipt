@@ -53,6 +53,7 @@
       *  04.08.05    NACL-門脇    16/09/20  １５円以下薬剤の提出用レセプト記載
       *                                     （記録）対応
       *  04.08.06    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
+      *  05.00.02    NACL-伊藤    17/12/22  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -250,6 +251,7 @@
                05  WRK-PARA-SHELLID    PIC X(08).
                05  WRK-PARA-CREYMD     PIC X(08).
                05  WRK-PARA-CREHMS     PIC X(08).
+               05  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-SYS-SRYYMD          PIC X(08).
@@ -1212,6 +1214,7 @@
                                                WRK-PARA-HOSPNUM
                                                WRK-PARA-CREYMD
                                                WRK-PARA-CREHMS
+                                               WRK-PARA-PRTKBN
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -5852,7 +5855,11 @@
                                        TO  RECEDEN-CREHMS
       *
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
-           MOVE    "tbl_receden"       TO  MCP-TABLE
+           IF      WRK-PARA-PRTKBN     =   "B"
+               MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+           ELSE
+               MOVE    "tbl_receden"       TO  MCP-TABLE
+           END-IF
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-DBINSERT-SEC
       *

@@ -314,6 +314,8 @@ bind    "ORCL0050"      "OpenCOBOL";
 bind	"ORCBI203"	    "OpenCOBOL";
 bind    "ORCBM400"      "OpenCOBOL";
 bind	"ORCBJOBCHK1"	"OpenCOBOL";
+bind	"ORCBM501"	"OpenCOBOL";
+bind	"ORCBM701"	"OpenCOBOL";
 
 #include "orcadb.inc"
 db "shell" {

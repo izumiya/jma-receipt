@@ -424,6 +424,7 @@
       *  04.08.18    NACL-門脇    17/08/28  平成２９年１０月改正
       *                                     （入院時生活療養の見直し）
       *  05.00.02    NACL-小豆沢  17/11/07  レセ電サブ引数に保険組合せ追加
+      *  05.00.03    NACL-伊藤    17/12/20  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10048,7 +10049,11 @@
            IF      WRK-PARA-PRTKBN =   "9"
                MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
            ELSE
-               MOVE    "tbl_receden"       TO  MCP-TABLE
+               IF      WRK-PARA-PRTKBN =   "B"
+                   MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+               ELSE
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+               END-IF
            END-IF
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-DBINSERT-SEC
