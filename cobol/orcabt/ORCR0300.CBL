@@ -453,6 +453,7 @@
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *
       *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
+      *  05.00.02    NACL-°ËÆ£    17/12/20  ¿ÇÎÅ¾ðÊó¥·¥¹¥Æ¥àÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8502,7 +8503,11 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            IF      WRK-PARA-PRTKBN =   "9"
                MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
            ELSE
-               MOVE    "tbl_receden"       TO  MCP-TABLE
+               IF      WRK-PARA-PRTKBN =   "B"
+                   MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+               ELSE
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+               END-IF
            END-IF
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-DBINSERT-SEC

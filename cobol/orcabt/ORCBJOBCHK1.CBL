@@ -63,6 +63,9 @@
       *
       *    一時領域
        01  WRK-AREA.
+           03  WRK-SYSKEY.
+               05  WRK-KANRICD         PIC  X(04).
+               05  WRK-KBNCD           PIC  X(08).
            03  WRK-REC.
                05  WRK-RENKEI1         PIC X(01).
                05  WRK-RENKEI2         PIC X(01).
@@ -71,15 +74,15 @@
                05  WRK-RENKEI5         PIC X(01).
                05  WRK-RENKEI6         PIC X(01).
       *
-           COPY    "CPSHELLTBL.INC".
-      *
-           COPY    "COMMON-SPA".
-      *
        01  WRK-PARA.
            03  WRK-PARA-HOSPNUM        PIC 9(02).
            03  WRK-PARA-JOBID          PIC 9(07).
            03  WRK-PARA-SHELLID        PIC X(08).
            03  WRK-PARA-JOBNAME        PIC X(20).
+      *
+           COPY    "CPSHELLTBL.INC".
+      *
+           COPY    "COMMON-SPA".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -89,12 +92,15 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
-      *    システム管理マスタＣＬＡＩＭ通信相手先情報
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+      *    医療情報連携基盤用情報
            COPY    "CPSK9101.INC".
-      *
-      *    システム管理マスタレセプト編集区分
+      *    レセプト編集区分
            COPY    "CPSK2005.INC".
            COPY    "CPSK200501.INC".
+      *    医療情報代理機関情報
+           COPY    "CPSK9104.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -196,7 +202,10 @@
                WHEN    "renkei1"
                WHEN    "renkei2"
                    MOVE    "0"             TO  WRK-RENKEI2
-                   PERFORM 900-SYS9101-READ-SEC
+                   MOVE    "9101"          TO  WRK-KANRICD
+                   MOVE    "*"             TO  WRK-KBNCD
+                   PERFORM 900-SYSKANRI-READ-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-9101-REC
                    IF    ( FLG-SYSKANRI    =   ZERO )
                        IF      WRK-PARA-JOBNAME    =   "renkei1"
                            MOVE    SYS-9101-COOPBASE
@@ -207,20 +216,38 @@
                                                    TO  WRK-RENKEI2
                        END-IF
                    END-IF
+               WHEN    "mis"
+                   MOVE    "0"             TO  WRK-RENKEI2
+                                               WRK-RENKEI3
+                   MOVE    "9104"          TO  WRK-KANRICD
+                   MOVE    "*"             TO  WRK-KBNCD
+                   PERFORM 900-SYSKANRI-READ-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-9104-REC
+                   IF    ( FLG-SYSKANRI    =   ZERO )
+                       MOVE    SYS-9104-RECEDEN
+                                               TO  WRK-RENKEI2
+                       MOVE    SYS-9104-JMAMR  TO  WRK-RENKEI3
+                   END-IF
                WHEN    "receipt"
                    MOVE    "0"             TO  WRK-RENKEI2
                                                WRK-RENKEI3
                                                WRK-RENKEI4
                                                WRK-RENKEI5
                                                WRK-RENKEI6
-                   PERFORM 900-SYS2005-READ-SEC
+                   MOVE    "2005"          TO  WRK-KANRICD
+                   MOVE    "*"             TO  WRK-KBNCD
+                   PERFORM 900-SYSKANRI-READ-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-2005-REC
                    IF    ( FLG-SYSKANRI    =   ZERO )
                        MOVE    SYS-2005-SYARECEKBN
                                                TO  WRK-RENKEI2
                        MOVE    SYS-2005-KKHRECEKBN
                                                TO  WRK-RENKEI3
                    END-IF
-                   PERFORM 900-SYS200501-READ-SEC
+                   MOVE    "2005"          TO  WRK-KANRICD
+                   MOVE    "01"            TO  WRK-KBNCD
+                   PERFORM 900-SYSKANRI-READ-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-200501-REC
                    IF    ( FLG-SYSKANRI    =   ZERO )
                        MOVE    SYS-200501-KOUIKIRECEKBN
                                                TO  WRK-RENKEI4
@@ -291,25 +318,25 @@
       *****************************************************************
       *    システム管理マスタ検索処理
       *****************************************************************
-       900-SYS9101-READ-SEC        SECTION.
+       900-SYSKANRI-READ-SEC       SECTION.
       *
            MOVE    ZERO            TO  FLG-SYSKANRI
       *
-           INITIALIZE                  SYS-9101-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-9101-HOSPNUM
-           MOVE    "9101"          TO  SYS-9101-KANRICD
-           MOVE    "*"             TO  SYS-9101-KBNCD
-           MOVE    SMCNDATE-YMD    TO  SYS-9101-STYUKYMD
-                                       SYS-9101-EDYUKYMD
-           MOVE    SYS-9101-REC    TO  MCPDATA-REC
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    WRK-KANRICD     TO  SYS-KANRICD
+           MOVE    WRK-KBNCD       TO  SYS-KBNCD
+           MOVE    SMCNDATE-YMD    TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
            MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYS-9101-REC
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
            ELSE
                MOVE    1               TO  FLG-SYSKANRI
-               INITIALIZE                  SYS-9101-REC
+               INITIALIZE                  SYSKANRI-REC
            END-IF
       *
            MOVE    "tbl_syskanri"  TO  MCP-TABLE
@@ -317,69 +344,7 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-SYS9101-READ-EXT.
-           EXIT.
-      *****************************************************************
-      *    システム管理マスタ検索処理
-      *****************************************************************
-       900-SYS2005-READ-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYSKANRI
-      *
-           INITIALIZE                  SYS-2005-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
-           MOVE    "2005"          TO  SYS-2005-KANRICD
-           MOVE    "*"             TO  SYS-2005-KBNCD
-           MOVE    SMCNDATE-YMD    TO  SYS-2005-STYUKYMD
-                                       SYS-2005-EDYUKYMD
-           MOVE    SYS-2005-REC    TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYS-2005-REC
-           ELSE
-               MOVE    1               TO  FLG-SYSKANRI
-               INITIALIZE                  SYS-2005-REC
-           END-IF
-      *
-           MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       900-SYS2005-READ-EXT.
-           EXIT.
-      *****************************************************************
-      *    システム管理マスタ検索処理
-      *****************************************************************
-       900-SYS200501-READ-SEC      SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYSKANRI
-      *
-           INITIALIZE                  SYS-200501-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
-           MOVE    "2005"          TO  SYS-200501-KANRICD
-           MOVE    "01"            TO  SYS-200501-KBNCD
-           MOVE    SMCNDATE-YMD    TO  SYS-200501-STYUKYMD
-                                       SYS-200501-EDYUKYMD
-           MOVE    SYS-200501-REC  TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYS-200501-REC
-           ELSE
-               MOVE    1               TO  FLG-SYSKANRI
-               INITIALIZE                  SYS-200501-REC
-           END-IF
-      *
-           MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       900-SYS200501-READ-EXT.
+       900-SYSKANRI-READ-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

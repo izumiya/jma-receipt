@@ -103,6 +103,7 @@
       *  04.07.00    NACL-多々納  14/12/08  点数算定基準追加
       *  04.07.00    NACL-多々納  15/01/07  9103 処方せん連携基盤情報
       *  04.08.02    NACL-森脇    15/08/28  1001 有効期間チェック
+      *  05.00.00    NACL-森脇    17/12/18  9104 医療情報代理機関情報
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -382,6 +383,8 @@
            03  FILLER              PIC X(35)   VALUE
                "9103 処方せんデータ連携情報".
            03  FILLER              PIC X(35)   VALUE
+               "9104 医療情報代理機関情報".
+           03  FILLER              PIC X(35)   VALUE
                "9600 ＣＲＯＮ設定情報".
            03  FILLER              PIC X(35)   VALUE
                "9700 ユーザプログラム起動情報".
@@ -389,12 +392,14 @@
                "9800 排他制御情報".
        01  TBL-KANRICD-G-AREAR         REDEFINES   TBL-KANRICD-G-AREA.
       *    03  TBL-KANRICD-G-TBL           OCCURS   7.
-           03  TBL-KANRICD-G-TBL           OCCURS   8.
+      *    03  TBL-KANRICD-G-TBL           OCCURS   8.
+           03  TBL-KANRICD-G-TBL           OCCURS   9.
                05  TBL-KANRICD-G           PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI-G        PIC X(30).
       *01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   7.
-       01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   8.
+      *01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   8.
+       01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   9.
       *
       *入院のみ
        01  TBL-KANRICD-N-AREA.
@@ -431,6 +436,8 @@
            03  FILLER              PIC X(35)   VALUE
                "9103 処方せんデータ連携情報".
            03  FILLER              PIC X(35)   VALUE
+               "9104 医療情報代理機関情報".
+           03  FILLER              PIC X(35)   VALUE
                "9600 ＣＲＯＮ設定情報".
            03  FILLER              PIC X(35)   VALUE
                "9700 ユーザプログラム起動情報".
@@ -439,12 +446,14 @@
       *
        01  TBL-KANRICD-N-AREAR         REDEFINES   TBL-KANRICD-N-AREA.
       *    03  TBL-KANRICD-N-TBL           OCCURS   18.
-           03  TBL-KANRICD-N-TBL           OCCURS   19.
+      *    03  TBL-KANRICD-N-TBL           OCCURS   19.
+           03  TBL-KANRICD-N-TBL           OCCURS   20.
                05  TBL-KANRICD-N           PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI-N        PIC X(30).
       *01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   18.
-       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   19.
+      *01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   19.
+       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   20.
       *
       *    他業務からシステム管理に遷移する場合の引継ぎパラメタ
            COPY    "CPLNKSYS.INC".
@@ -2186,6 +2195,9 @@
       *        ＥＦファイル作成
                WHEN    "9102"
                    MOVE    "W92"               TO  SPA-SAKIPG
+      *        医療情報代理機関
+               WHEN    "9104"
+                   MOVE    "W93"               TO  SPA-SAKIPG
                WHEN    "9600"
                    MOVE    "W96"               TO  SPA-SAKIPG
                WHEN    "9700"
@@ -2289,6 +2301,8 @@
                WHEN    "9103"
       *        ＥＦファイル作成
                WHEN    "9102"
+      *        医療情報代理情報
+               WHEN    "9104"
       *----(04.08.01)--ADD-START---
       *        排他制御情報
                WHEN    "9800"

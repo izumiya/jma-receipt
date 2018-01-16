@@ -92,6 +92,7 @@
       *                                     食事療養」の未設定チェック
       *  04.08.07    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
+      *  05.00.01    NACL-伊藤    18/01/11  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -648,7 +649,7 @@
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
                IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "9" OR
-                                               "8"
+                                               "8" OR  "B"
                    MOVE    "key60"             TO  WRK-SRYACCT-PATHNAME
                ELSE
                    MOVE    "key36"             TO  WRK-SRYACCT-PATHNAME
@@ -1628,7 +1629,7 @@
            MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
            MOVE    SRYACCT-REC         TO  MCPDATA-REC
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           IF      WRK-PARA-PRTKBN     =   "4" OR  "5" 
+           IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "B" 
                MOVE    "key61"             TO  WRK-SRYACCT-PATHNAME
            ELSE
                MOVE    "key37"             TO  WRK-SRYACCT-PATHNAME
@@ -1769,7 +1770,7 @@
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
                IF      WRK-PARA-PRTKBN     =   "4" OR  "5" OR  "9"
-                                               OR  "8"
+                                               OR  "8" OR  "B"
                    MOVE    "key61"             TO  WRK-SRYACCT-PATHNAME
                ELSE
                    MOVE    "key37"             TO  WRK-SRYACCT-PATHNAME
@@ -2245,7 +2246,8 @@
        800-MISEIKYU-CHECK-SEC          SECTION.
       *
       *    ＥＦファイル作成、連係基盤用のとき未請求設定分も作成する
-           IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
+      *    診療情報システムのとき未請求設定分も作成する
+           IF      WRK-PARA-PRTKBN     =   "9" OR  "8" OR  "B"
                INITIALIZE                      SYUKA-REC
                GO  TO  800-MISEIKYU-CHECK-EXT
            END-IF

@@ -138,6 +138,15 @@ shell_sources = \
 	daily/rpmain1.sh.in \
 	allways/print_prv.sh.in \
 	allways/preprint.sh.in \
+	monthly/recept1_mis.sh.in \
+	monthly/recept4_mis.sh.in \
+	monthly/recept41_mis.sh.in \
+	monthly/recept6_mis.sh.in \
+	monthly/recept9_mis.sh.in \
+	monthly/recept10_mis.sh.in \
+	tools/run_mis.sh.in \
+	tools/run_receipt_mis_ika.sh.in \
+	tools/run_receipt_mis_rou.sh.in \
 
 ruby_sources = \
 	daily/print_parent2.rb.in \

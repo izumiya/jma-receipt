@@ -247,6 +247,7 @@
       *                                     での食事算定対応
       *
       *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
+      *  05.00.02    NACL-伊藤    17/12/20  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1566,8 +1567,8 @@
                PERFORM 5001-DB-DELETE-SEC
            END-IF
       *
-      *    ＥＦファイル作成・連携基盤用のとき処理終了
-           IF      WRK-PARA-PRTKBN      =   "9" OR "8"
+      *    ＥＦファイル作成・連携基盤用・診療情報システム用のとき処理終了
+           IF      WRK-PARA-PRTKBN      =   "9" OR  "8" OR "B"
                IF      WRK-PARA-PRTKBN      =   "8"
                    PERFORM 1001-EFOUT-CHECK-SEC
                END-IF
@@ -11523,8 +11524,8 @@
       *****************************************************************
        5001-DB-DELETE-SEC               SECTION.
       *
-      *    ＥＦファイル作成、連携基盤用のとき
-           IF      WRK-PARA-PRTKBN =   "9" OR  "8"
+      *    ＥＦファイル作成・連携基盤用・診療情報システム用のとき
+           IF      WRK-PARA-PRTKBN =   "9" OR  "8" OR "B"
                IF      WRK-PARA-SYOKBN     =   "1"
                    INITIALIZE                      RECEDEN-REC
                    MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
@@ -11535,7 +11536,11 @@
                    IF      WRK-PARA-PRTKBN =   "9"
                        MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
                    ELSE
-                       MOVE    "tbl_efout"         TO  MCP-TABLE
+                       IF      WRK-PARA-PRTKBN =   "8"
+                           MOVE    "tbl_efout"         TO  MCP-TABLE
+                       ELSE
+                           MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+                       END-IF
                    END-IF
                    MOVE    "del1"              TO  MCP-PATHNAME
                    PERFORM 900-ORCDBMAIN-SEC
@@ -11547,9 +11552,15 @@
                           "ＥＦファイル作成削除処理でエラーとなりました"
                                                        TO  WRK-RECEERR
                        ELSE
-                           MOVE
-                               "連係基盤削除処理でエラーとなりました"
+                           IF      WRK-PARA-PRTKBN =   "9"
+                               MOVE
+                               "連携基盤削除処理でエラーとなりました"
                                                        TO  WRK-RECEERR
+                           ELSE
+                               MOVE
+                       "診療情報システム用削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                           END-IF
                        END-IF
                        PERFORM 500-ERR-HENSYU-SEC
                        GO  TO  5001-DB-DELETE-EXT
@@ -11593,7 +11604,13 @@
                            IF      WRK-PARA-PRTKBN =   "9"
                                MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
                            ELSE
-                               MOVE    "tbl_efout"         TO  MCP-TABLE
+                               IF      WRK-PARA-PRTKBN =   "8"
+                                   MOVE    "tbl_efout"         TO
+                                                               MCP-TABLE
+                               ELSE
+                                   MOVE    "tbl_receden_tmp"   TO
+                                                               MCP-TABLE
+                               END-IF
                            END-IF
                            MOVE    "del2"              TO  MCP-PATHNAME
                            PERFORM 900-ORCDBMAIN-SEC
@@ -11606,9 +11623,15 @@
                           "ＥＦファイル作成削除処理でエラーとなりました"
                                                        TO  WRK-RECEERR
                                ELSE
-                                   MOVE
-                               "連係基盤削除処理でエラーとなりました"
+                                   IF      WRK-PARA-PRTKBN =   "9"
+                                       MOVE
+                               "連携基盤削除処理でエラーとなりました"
                                                        TO  WRK-RECEERR
+                                   ELSE
+                                       MOVE
+                       "診療情報システム用削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                                   END-IF
                                END-IF
                                PERFORM 500-ERR-HENSYU-SEC
                                GO  TO  5001-DB-DELETE-EXT

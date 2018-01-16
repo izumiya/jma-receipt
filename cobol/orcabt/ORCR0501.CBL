@@ -52,6 +52,7 @@
       *  04.08.03    NACL-藤原    17/03/02  未コード化特定器材コード廃止対応
       *
       *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
+      *  05.00.02    NACL-伊藤    17/12/22  診療情報システム対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -769,6 +770,11 @@
            OPEN    OUTPUT              RECEYMD-FILE     
       *
            MOVE    ZERO                TO  WRK-RECENUM
+      *
+      *    診療情報システム用のとき処理終了
+           IF      WRK-PARA-PRTKBN     =   "B"
+               MOVE    2                   TO  FLG-STS
+           END-IF
       *
            IF      FLG-STS             =   ZERO
               PERFORM 990-RECE41-READ-SEC
@@ -3266,6 +3272,32 @@
       *    データ削除処理
       *****************************************************************
        5001-DB-DELETE-SEC               SECTION.
+      *
+      *    診療情報システム用のとき
+           IF      WRK-PARA-PRTKBN     =   "B"
+               IF      WRK-PARA-SYOKBN     =   "1"
+      *            レセ電
+                   INITIALIZE                  RECEDEN-REC
+                   MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
+      *********    MOVE    WRK-PARA-SRYYM      TO  RECEDEN-SRYYM
+      *********    MOVE    3                   TO  RECEDEN-TEISYUTUSAKI
+                   MOVE    "2"                 TO  RECEDEN-NYUGAIKBN
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+                   MOVE    "del1"              TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                       DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
+                               " MCP-RC=" MCP-RC
+                       MOVE
+                   "診療情報システム用削除処理でエラーとなりました"
+                                               TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                   END-IF      
+               END-IF      
+               GO  TO  5001-DB-DELETE-EXT
+           END-IF      
       *
            IF      WRK-PARA-SYOKBN     =   "1"
       *        請求管理削除処理（一括分）

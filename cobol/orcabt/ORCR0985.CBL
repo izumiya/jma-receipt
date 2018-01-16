@@ -59,6 +59,7 @@
       *                                     ¡ÊÆþ±¡»þÀ¸³èÎÅÍÜ¤Î¸«Ä¾¤·¡Ë
       *
       *  05.00.01    NACL-Æ£¸¶    17/07/04  £È£Á£Ï£Ò£ÉÂÐ±þ
+      *  05.00.02    NACL-°ËÆ£    17/12/22  ¿ÇÎÅ¾ðÊó¥·¥¹¥Æ¥àÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -282,6 +283,7 @@
                05  WRK-PARA-SHELLID    PIC X(08).
                05  WRK-PARA-CREYMD     PIC X(08).
                05  WRK-PARA-CREHMS     PIC X(08).
+               05  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-SYS-SRYYMD          PIC X(08).
@@ -1176,6 +1178,7 @@
                                                WRK-PARA-HOSPNUM
                                                WRK-PARA-CREYMD
                                                WRK-PARA-CREHMS
+                                               WRK-PARA-PRTKBN
                                                RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -6160,7 +6163,11 @@
                                        TO  RECEDEN-CREHMS
       *
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
-           MOVE    "tbl_receden"       TO  MCP-TABLE
+           IF      WRK-PARA-PRTKBN     =   "B"
+               MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
+           ELSE
+               MOVE    "tbl_receden"       TO  MCP-TABLE
+           END-IF
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 900-DBINSERT-SEC
       *
