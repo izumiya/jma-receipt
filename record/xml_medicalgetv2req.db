@@ -27,6 +27,8 @@ xml_medicalgetv2req {
 		} ;
 #---     伝票番号
 		Invoice_Number		varchar(07);
+#---     レセ電移行データ対象
+		Contain_Migration	varchar(05);
 		};
    	};
 };

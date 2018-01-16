@@ -71,4 +71,7 @@
                     06  MDCREQ-RECIPIENT-NUMBER      PIC X(20).
       *         伝票番号
                 04  MDCREQ-INVOICD-NUMBER    PIC X(07).
+      *H30.1
+      *         レセ電移行分対象
+                04  MDCREQ-CONTAIN-MIGRATION     PIC X(05).
       *
