@@ -1833,6 +1833,14 @@
       *    Æþ±¡ÎÁ¤Î»»Äê
            PERFORM 200221-NYUIN-SYORI-SEC
       *
+      *H30.1
+      *    ¥Ð¥Ã¥Á°õºþ¤ÎÊÝ¸±ÁÈ¹ç¤»ÊÔ½¸
+           IF     (ORCHC33-KBN         =   "2" )
+             AND  (CNT-MEI             <   40  )
+               PERFORM 200311-HKNSYUBETU-HEN-SEC
+               MOVE    WRK-HEN-HKNCOMBIMEI     TO  HCM33N-HKNSYUBETU
+           END-IF
+      *
            PERFORM VARYING     IDX     FROM    ORCHC33-STRDD  BY  1
                    UNTIL       IDX     >   IDX-END
                MOVE    ZERO                TO  FLG-ARI
@@ -2238,6 +2246,19 @@
            MOVE    WRK-SRYYM-N         TO  HCM33N-SRYYM
       *
       *    ÊÝ¸±Ì¾¾Î
+           PERFORM 200311-HKNSYUBETU-HEN-SEC
+      *
+           MOVE    WRK-HEN-HKNCOMBIMEI     TO  HCM33N-HKNSYUBETU
+           .
+       20031-HEAD-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±Ì¾¾ÎÊÔ½¸½èÍý
+      *****************************************************************
+       200311-HKNSYUBETU-HEN-SEC                SECTION.
+      *
+      *    ÊÝ¸±Ì¾¾Î
            MOVE    SPACE                   TO  WRK-HEN-HKNCOMBIMEI
            PERFORM VARYING     IDX-H   FROM    1   BY  1
                    UNTIL      (IDX-H   >   20  )  OR
@@ -2262,10 +2283,10 @@
                END-STRING
            END-PERFORM
       *
-           MOVE    WRK-HEN-HKNCOMBIMEI     TO  HCM33N-HKNSYUBETU
            .
-       20031-HEAD-HEN-EXT.
+       200311-HKNSYUBETU-HEN-EXT.
            EXIT.
+      *
       *
       *****************************************************************
       *    ¥«¥ë¥Æ°õºþ½èÍý
