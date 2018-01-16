@@ -1097,6 +1097,7 @@
                MOVE    SYS-1005-SRYKANAME1 TO  WRK-SRYKA-NAME
            ELSE
                MOVE    "13"                TO  WRK-ERRCD
+               MOVE    SPACE               TO  WRK-SRYKA-NAME
            END-IF
       *
            .
