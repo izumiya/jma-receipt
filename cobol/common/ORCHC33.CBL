@@ -1549,6 +1549,14 @@
       *        MOVE    ZERO                TO  CNT-MEI
       *****END-IF
       *
+      *H30.1
+      *    バッチ印刷の保険組合せ編集
+           IF     (ORCHC33-KBN         =   "2" )
+             AND  (CNT-MEI             <   40  )
+               PERFORM 200311-HKNSYUBETU-HEN-SEC
+               MOVE    WRK-HEN-HKNCOMBIMEI     TO  HCM33-HKNSYUBETU
+           END-IF
+      *
            PERFORM VARYING     IDX     FROM    ORCHC33-STRDD  BY  1
                    UNTIL       IDX     >   31
                MOVE    ZERO                TO  FLG-ARI

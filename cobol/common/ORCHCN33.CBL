@@ -1923,6 +1923,14 @@
       *    入院料の算定
            PERFORM 200221-NYUIN-SYORI-SEC
       *
+      *H30.1
+      *    バッチ印刷の保険組合せ編集
+           IF     (ORCHC33-KBN         =   "2" )
+             AND  (CNT-MEI             <   40  )
+               PERFORM 200311-HKNSYUBETU-HEN-SEC
+               MOVE    WRK-HEN-HKNCOMBIMEI     TO  HCM33N-HKNSYUBETU
+           END-IF
+      *
            PERFORM VARYING     IDX     FROM    ORCHC33-STRDD  BY  1
                    UNTIL       IDX     >   IDX-END
                MOVE    ZERO                TO  FLG-ARI
