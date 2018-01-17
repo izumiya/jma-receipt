@@ -448,7 +448,23 @@
                07  NCLAIMID-BIKOUMES
                                 PIC X(100)
                                     VALUE  "備考".
-             05  NCLAIMID-UNCHKECK-G.
+             05  NCLAIMID-AUTOSET-G.
+               07  NCLAIMID-AUTOSET
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-AUTOSETJMA
+                                PIC X(05)   VALUE  "00057".
+               07  NCLAIMID-AUTOSETMES
+                                PIC X(100)
+                                    VALUE  "入院料初期値設定区分".
+             05  NCLAIMID-AUTOSET-G.
+               07  NCLAIMID-FORCE-UPDATE
+                                PIC X(20)  VALUE  "XXXXXXX".
+               07  NCLAIMID-FORCE-UPDATEJMA
+                                PIC X(05)  VALUE  "00058".
+               07  NCLAIMID-FORCE-UPDATEMES
+                                PIC X(100)
+                                    VALUE  "強制更新".
+             05  NCLAIMID-FORCE-UPDATE-G.
                07  NCLAIMID-UNCHKECK
                                 PIC X(20)   VALUE  "XXXXXXX".
                07  NCLAIMID-UNCHKECKJMA
@@ -456,8 +472,8 @@
                07  NCLAIMID-UNCHKECKMES
                                 PIC X(100)  VALUE  "不明".
            03  NCLAIMID-ITEM-R          REDEFINES   NCLAIMID-ITEM-VAL.
-             05  NCLAIMID-ITEM-OCC      OCCURS  57.
+             05  NCLAIMID-ITEM-OCC      OCCURS  59.
                07  NCLAIMID-ITEM        PIC X(20).
                07  NCLAIMID-ITEMJMA     PIC X(05).
                07  NCLAIMID-ITEMMES     PIC X(100).
-           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   57.
+           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   59.

@@ -48,7 +48,9 @@
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-PTHKNINF        PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
+           03  FLG-NYUINCDCHG      PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-KOKI            PIC 9(01).
            03  FLG-LIFE-RJN        PIC 9(01).
@@ -56,6 +58,8 @@
            03  FLG-EDIT            PIC 9(01).
            03  FLG-TARGET          PIC 9(01).
            03  FLG-SKIP            PIC 9(01).
+           03  FLG-KEEP            PIC 9(01).
+           03  FLG-BTU-SBT-CHG     PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -63,6 +67,7 @@
            03  IDX10               PIC 9(05).
            03  IDX17               PIC 9(05).
            03  IDX-LIFE            PIC 9(05).
+           03  IDXT                PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -84,8 +89,12 @@
            03  WRK-N02-G.
                05  WRK-N02                 PIC 99.
       *
+       01  LAST-AREA.
+           03  LAST-TOKNYUIN-G.
+               05 LAST-TOKNYUIN-KBN        PIC X(01).
+               05 LAST-TOKNYUIN-CD         PIC X(02).
+      *
        01  CONST-AREA.
-           03  CONST-NYUIN                 PIC X(02)   VALUE "01".
            03  CONST-H280401               PIC X(08)   VALUE "20160401".
            03  CONST-H261001               PIC X(08)   VALUE "20141001".
            03  CONST-H260401               PIC X(08)   VALUE "20140401".
@@ -95,10 +104,19 @@
            03  CONST-H200401               PIC X(08)   VALUE "20080401".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
            03  CONST-H180701               PIC X(08)   VALUE "20060701".
-           03  CONST-KANSATU               PIC X(02)    VALUE "10".
+           03  CONST-NYUIN                 PIC X(02)   VALUE "01".
+           03  CONST-IDO                   PIC X(02)   VALUE "08".
+           03  CONST-KANSATU               PIC X(02)   VALUE "10".
            03  CONST-TOKNYUIN-MAX          PIC 9(05)   VALUE  100.
       *
            COPY    "CPRYOYOCD.INC".
+      *
+       01  LAST-RRK-REC.
+           COPY    "CPPTNYUINRRK.INC"      REPLACING   //PTNYUINRRK-//
+                                           BY          //LAST-RRK-//.
+      *
+           COPY    "CPSK5001.INC"          REPLACING   //SYS-5001-//
+                                           BY          //LAST-BTU-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -140,8 +158,16 @@
        01  PTRSIINF-REC.
            COPY    "CPPTRSIINF.INC".
       *
+      *    入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
+      *
       *    点数
            COPY    "CPTENSU.INC".
+      *
+      *    入院コード置換
+       01  NYUINCDCHG-REC.
+           COPY    "CPNYUINCDCHG.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -180,15 +206,24 @@
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
+      D    DISPLAY "/_/_/_/_/_/_/_/_/_/_/_/_/_/_"
+      D    DISPLAY "AUTOSET:"      SNYUINRYO-AUTOSET
+      *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
+      *
+           INITIALIZE                  LAST-AREA
+           INITIALIZE                  LAST-RRK-REC
+           INITIALIZE                  LAST-BTU-REC
       *
            PERFORM 100-INIT-SEC
       *
            PERFORM 200-MAIN-SEC
       *
            PERFORM 300-END-SEC
+      D
+      D    DISPLAY "/_/_/_/_/_/_/_/_/_/_/_/_/_/_"
       *
            .
        000-PROC-EXT.
@@ -200,6 +235,33 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
+           IF    ( SNYUINRYO-AUTOSET       =   SPACE )
+               MOVE    ZERO                TO  SNYUINRYO-AUTOSET
+           END-IF
+      *
+           IF    ( SNYUINRYO-AUTOSET       =   "1" )
+            AND  ( SNYUINRYO-SYORIKBN      =   CONST-IDO )
+               PERFORM 900-PTNYUINRRK-KEY3-SEL-SEC
+               IF    ( SNYUINRYO-SRYYMD    <   PTNYUINRRK-TENNYUYMD )
+                   MOVE    SNYUINRYO-SRYYMD
+                                           TO  PTNYUINRRK-TENNYUYMD
+                   PERFORM 900-PTNYUINRRK-KEY73-SEL-SEC
+               END-IF
+               MOVE    PTNYUINRRK-REC          TO  LAST-RRK-REC
+               MOVE    LAST-RRK-TOKUTEI-KBN    TO  LAST-TOKNYUIN-KBN
+               MOVE    LAST-RRK-TOKUTEI-NYUIN  TO  LAST-TOKNYUIN-CD
+      *
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    "5001"              TO  SYS-KANRICD
+               MOVE    LAST-RRK-BTUNUM     TO  SYS-KBNCD
+               MOVE    SNYUINRYO-SRYYMD    TO  SYS-STYUKYMD
+                                               SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC        TO  LAST-BTU-REC
+      *
+           END-IF
+      *
            INITIALIZE                      SYSKANRI-REC
            MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
            MOVE    "5001"              TO  SYS-KANRICD
@@ -208,6 +270,12 @@
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-5001-REC
+      *
+           IF    ( SNYUINRYO-AUTOSET       =   "1" )
+            AND  ( SNYUINRYO-SYORIKBN      =   CONST-IDO )
+            AND  ( SYS-5001-BTU-SBT    NOT =   LAST-BTU-BTU-SBT )
+               MOVE    1               TO  FLG-BTU-SBT-CHG
+           END-IF
       *
            INITIALIZE                      ORCSBRMNUMAREA
            MOVE    "2"                 TO  SBRMNUM-IN-PROCKBN
@@ -302,6 +370,19 @@
                PERFORM 2001-KANSATU-EDIT-SEC
            ELSE
                PERFORM 2001-NYUINRYO-EDIT-SEC
+               EVALUATE    SNYUINRYO-AUTOSET
+               WHEN    "1"
+                   IF    ( SNYUINRYO-SYORIKBN  =   CONST-IDO )
+                       PERFORM 2001-LAST-NYUINRYO-CHK-SEC
+                   END-IF
+                   IF    ( FLG-KEEP        =   ZERO )
+                       PERFORM 2001-AUTOSET-SEC
+                       PERFORM 2002-AUTOSET-SEC
+                   END-IF
+      *
+               WHEN    "A"
+                   PERFORM 2002-AUTOSET-SEC
+               END-EVALUATE
            END-IF
       *
            MOVE    SYS-5001-BTU-KHNSRYCD   TO  SNYUINRYO-BTU-KHNSRYCD
@@ -361,6 +442,7 @@
       *
            IF    ( SYS-5001-BTU-SBT    =   "04" )
             AND  ( SNYUINRYO-SRYYMD   >=   CONST-H280401 )
+            AND  ( FLG-BTU-SBT-CHG     =   ZERO )
       *
                INITIALIZE                  SS014-AREA
                MOVE    SNYUINRYO-SRYYMD TO SS014-SRYYMD
@@ -520,6 +602,7 @@
            END-IF
       *
            IF    ( SNYUINRYO-SRYYMD >=   CONST-H240401 )
+            AND  ( FLG-BTU-SBT-CHG   =   ZERO )
                EVALUATE  TRUE
                WHEN  ( SYS-5001-BTU-SBT    =   "08" )
                 AND  ( SYS-5001-CRYOYOKBN  =   "1" )
@@ -905,28 +988,11 @@
       *
            IF    ( SYS-5001-BTU-SBT  =   "04" OR "09" )
       *
-                PERFORM VARYING IDX-LIFE    FROM    1   BY  1
-                        UNTIL ( IDX-LIFE    >   CONST-TOK-LIFECD-MAX )
-      *
-                   IF     ( FLG-LIFE-RJN        =   1    OR 2 )
-                       IF    ( CONST-TOK-LIFECD-IPN (IDX-LIFE)
-                                                =   WRK-TOKTEMP-G )
-                           MOVE    CONST-TOK-LIFECD-LIFE (IDX-LIFE)
-                                               TO   WRK-TOKTEMP-G
-                           MOVE    CONST-TOK-LIFECD-MAX
-                                               TO  IDX-LIFE
-                       END-IF
-                   ELSE
-                       IF    ( CONST-TOK-LIFECD-LIFE (IDX-LIFE)
-                                                =   WRK-TOKTEMP-G )
-                           MOVE    CONST-TOK-LIFECD-IPN (IDX-LIFE)
-                                               TO   WRK-TOKTEMP-G
-                           MOVE    CONST-TOK-LIFECD-MAX
-                                               TO  IDX-LIFE
-                       END-IF
-                   END-IF
-      *
-               END-PERFORM
+               IF     ( FLG-LIFE-RJN        =   1    OR 2 )
+                   PERFORM 20021-IPN-LIFE-EDIT-SEC
+               ELSE
+                   PERFORM 20021-LIFE-IPN-EDIT-SEC
+               END-IF
            END-IF
       *
            IF    ( SYS-5001-BTU-SBT    =   "04" OR "09" )
@@ -942,6 +1008,48 @@
       *
            .
        2002-NYUINRYO-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料編集処理
+      *****************************************************************
+       20021-IPN-LIFE-EDIT-SEC         SECTION.
+      *
+            PERFORM VARYING IDX-LIFE   FROM    1   BY  1
+                    UNTIL ( IDX-LIFE   >   CONST-TOK-LIFECD-MAX )
+      *
+               IF    ( CONST-TOK-LIFECD-IPN (IDX-LIFE)
+                                       =   WRK-TOKTEMP-G )
+                   MOVE    CONST-TOK-LIFECD-LIFE (IDX-LIFE)
+                                       TO  WRK-TOKTEMP-G
+                   MOVE    CONST-TOK-LIFECD-MAX
+                                       TO  IDX-LIFE
+               END-IF
+      *
+            END-PERFORM
+      *
+           .
+       20021-IPN-LIFE-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料編集処理
+      *****************************************************************
+       20021-LIFE-IPN-EDIT-SEC         SECTION.
+      *
+           PERFORM VARYING IDX-LIFE   FROM    1   BY  1
+                   UNTIL ( IDX-LIFE   >   CONST-TOK-LIFECD-MAX )
+      *
+               IF    ( CONST-TOK-LIFECD-LIFE (IDX-LIFE)
+                                      =   WRK-TOKTEMP-G )
+                   MOVE    CONST-TOK-LIFECD-IPN (IDX-LIFE)
+                                      TO   WRK-TOKTEMP-G
+                   MOVE    CONST-TOK-LIFECD-MAX
+                                      TO  IDX-LIFE
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       20021-LIFE-IPN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    入院料編集処理
@@ -1090,6 +1198,214 @@
       *
            .
        200211-NYUINRYO-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    前回入院料チェック処理
+      *****************************************************************
+       2001-LAST-NYUINRYO-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KEEP
+      *
+           IF    ( LAST-TOKNYUIN-G         NOT =   SPACE )
+               IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+                   MOVE    LAST-TOKNYUIN-G
+                                       TO  WRK-TOKTEMP-G
+                   PERFORM 20011-NYUINRYO-CHK-SEC
+      D            DISPLAY "A LAST-TOKNYUIN-G:" LAST-TOKNYUIN-G
+      D            DISPLAY "A TOKNYUIN-G     :" SNYUINRYO-TOKNYUIN-G
+               END-IF
+      *
+               IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+                   MOVE    LAST-TOKNYUIN-G
+                                       TO  WRK-TOKTEMP-G
+                   PERFORM 20021-IPN-LIFE-EDIT-SEC
+                   IF    ( LAST-TOKNYUIN-G NOT =   WRK-TOKTEMP-G )
+                       PERFORM 20011-NYUINRYO-CHK-SEC
+      D            DISPLAY "B TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-IF
+               END-IF
+      *
+               IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+                   MOVE    LAST-TOKNYUIN-G
+                                       TO  WRK-TOKTEMP-G
+                   PERFORM 20021-LIFE-IPN-EDIT-SEC
+                   IF    ( LAST-TOKNYUIN-G NOT =   WRK-TOKTEMP-G )
+                       PERFORM 20011-NYUINRYO-CHK-SEC
+      D            DISPLAY "C TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-IF
+               END-IF
+      *
+               IF    ( SNYUINRYO-TOKNYUIN-G    NOT =   SPACE )
+                   MOVE    LAST-RRK-TOKU-SANTEIYOUKENKBN
+                                       TO  SNYUINRYO-TOKHIGAITOKBN
+                   MOVE    1           TO  FLG-KEEP
+      D            DISPLAY "D TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+               ELSE
+      *            入院基本料がコンボボックスで選択されていた場合の考慮
+                   IF    ( SYS-5001-BTU-SBT    =   LAST-BTU-BTU-SBT )
+                       PERFORM 900-NYUINCDCHG-KEY3-SEL-SEC
+                       IF  ( NYUINCDCHG-SRYCD-AF   NOT =   SPACE )
+                           IF    ( NYUINCDCHG-SRYCD-AF
+                                           =   SYS-5001-BTU-KHNSRYCD )
+                               MOVE    1   TO  FLG-KEEP
+      D                DISPLAY "F TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                           END-IF
+                       END-IF
+                   END-IF
+               END-IF
+      *
+           ELSE
+               IF    ( LAST-BTU-BTU-KHNSRYCD
+                                       NOT =   SPACE )
+      *
+                   IF    ( LAST-BTU-BTU-KHNSRYCD
+                                           =   SYS-5001-BTU-KHNSRYCD )
+                       MOVE    1       TO  FLG-KEEP
+      D                DISPLAY "E TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-IF
+      *
+                   IF    ( FLG-KEEP        =   ZERO )
+                       IF    ( SYS-5001-BTU-SBT  = LAST-BTU-BTU-SBT )
+      *                入院基本料がコンボボックスで選択可能な場合の考慮
+                           MOVE    LAST-BTU-BTU-KHNSRYCD
+                                       TO  WRK-SRYCD
+                           PERFORM 900-NYUINCDCHG-KEY4-SEL-SEC
+      D        DISPLAY "WRK-SRYCD             =" WRK-SRYCD
+      D        DISPLAY "NYUINCDCHG-NYUINRYOCD =" NYUINCDCHG-NYUINRYOCD 
+                           IF  ( NYUINCDCHG-NYUINRYOCD NOT =   SPACE )
+                               MOVE    NYUINCDCHG-NYUINRYOCD
+                                       TO  WRK-TOKTEMP-G
+                               PERFORM 20011-NYUINRYO-CHK-SEC
+                           END-IF
+                       END-IF
+                   END-IF
+      *
+                   IF    ( SNYUINRYO-TOKNYUIN-G  NOT = SPACE )
+                       MOVE    1           TO  FLG-KEEP
+      D                DISPLAY "G TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       2001-LAST-NYUINRYO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料チェック処理
+      *****************************************************************
+       20011-NYUINRYO-CHK-SEC         SECTION.
+      *
+           PERFORM VARYING IDXT    FROM    1   BY  1
+                   UNTIL ( IDXT    >   SNYUINRYO-MAX )
+                    OR   ( SNYUINRYO-TOKNYUIN-G
+                               NOT =   SPACE )
+      *
+               IF    ( WRK-TOKTEMP-G   =   SNYUINRYO-NYUINRYO-G (IDXT))
+                   MOVE    WRK-TOKTEMP-G
+                                       TO  SNYUINRYO-TOKNYUIN-G
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       20011-NYUINRYO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料自動設定処理（特定入院料）
+      *****************************************************************
+       2001-AUTOSET-SEC                SECTION.
+      *
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               IF    ( SYS-5002-BRM-TOKTEI-NYUIN
+                                       NOT =   SPACE )
+                   MOVE    "3"         TO  WRK-TOKTEMP-KBN
+                   MOVE    SYS-5002-BRM-TOKTEI-NYUIN
+                                       TO  WRK-TOKTEMP-CD
+                   PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "1 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+               END-IF
+           END-IF
+      *
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               IF    ( SYS-5001-BTU-TOKTEI-NYUIN
+                                       NOT =   SPACE )
+                   MOVE    "2"         TO  WRK-TOKTEMP-KBN
+                   MOVE    SYS-5001-BTU-TOKTEI-NYUIN
+                                       TO  WRK-TOKTEMP-CD
+                   PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "2 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+               END-IF
+           END-IF
+      *
+           .
+       2001-AUTOSET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料自動設定処理（療養病棟入院基本料）
+      *****************************************************************
+       2002-AUTOSET-SEC                SECTION.
+      *
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               IF    ( SYS-5002-KHNKBNCD
+                                       NOT =   SPACE )
+                   MOVE    SYS-5002-KHNKBNCD
+                                       TO  WRK-TOKTEMP-G
+                   PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "3 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+               END-IF
+           END-IF
+      *
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               IF    ( SYS-5001-KHNKBNCD
+                                       NOT =   SPACE )
+                   MOVE    SYS-5001-KHNKBNCD
+                                       TO  WRK-TOKTEMP-G
+                   PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "4 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+               END-IF
+           END-IF
+      *
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               EVALUATE    SYS-5001-BTU-SBT
+               WHEN    "04"
+                   EVALUATE    SYS-5001-KHNKBNCD
+                   WHEN    SPACE
+                   WHEN    "389"
+                       MOVE    "369"   TO  WRK-TOKTEMP-G
+                       PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "5 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   WHEN    "390"
+                       MOVE    "387"   TO  WRK-TOKTEMP-G
+                       PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "6 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-EVALUATE
+               WHEN    "09"
+                   IF    ( SYS-5001-KHNKBNCD   =   SPACE )
+                       MOVE    "335"   TO  WRK-TOKTEMP-G
+                       PERFORM 20011-AUTOSET-SEC
+      D            DISPLAY "7 TOKNYUIN-G:" SNYUINRYO-TOKNYUIN-G
+                   END-IF
+               END-EVALUATE
+           END-IF
+      *
+           .
+       2002-AUTOSET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料自動設定処理
+      *****************************************************************
+       20011-AUTOSET-SEC               SECTION.
+      *
+           PERFORM 20011-NYUINRYO-CHK-SEC
+           IF    ( SNYUINRYO-TOKNYUIN-G    =   SPACE )
+               IF    (SYS-5001-BTU-SBT     =   "04"  OR  "09" )
+                   PERFORM 20021-IPN-LIFE-EDIT-SEC
+                   PERFORM 20011-NYUINRYO-CHK-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-AUTOSET-EXT.
            EXIT.
       *****************************************************************
       *    短期滞在手術等基本料３編集処理
@@ -1311,6 +1627,119 @@
            .
       *
        900-PTKOHINF-KEY6-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴報検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY3-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY3-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       900-PTNYUINRRK-KEY73-SEL-SEC    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTNYUINRRK
+      *
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key73"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1               TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key73"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTNYUINRRK-KEY73-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料置換検索処理
+      *****************************************************************
+       900-NYUINCDCHG-KEY4-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NYUINCDCHG
+      *
+           INITIALIZE                      NYUINCDCHG-REC
+           MOVE    WRK-SRYCD           TO  NYUINCDCHG-SRYCD-BF
+           MOVE    SNYUINRYO-SRYYMD    TO  NYUINCDCHG-YUKOSTYMD
+                                           NYUINCDCHG-YUKOEDYMD
+           MOVE    NYUINCDCHG-REC      TO  MCPDATA-REC
+           MOVE    "tbl_nyuincdchg"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  NYUINCDCHG-REC
+           ELSE
+               MOVE    1               TO  FLG-NYUINCDCHG
+               INITIALIZE                  NYUINCDCHG-REC
+           END-IF
+      *
+           MOVE    "tbl_nyuincdchg"    TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-NYUINCDCHG-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料置換検索処理
+      *****************************************************************
+       900-NYUINCDCHG-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-NYUINCDCHG
+      *
+           INITIALIZE                      NYUINCDCHG-REC
+           MOVE    LAST-TOKNYUIN-G     TO  NYUINCDCHG-NYUINRYOCD
+           MOVE    SNYUINRYO-SRYYMD    TO  NYUINCDCHG-YUKOSTYMD
+                                           NYUINCDCHG-YUKOEDYMD
+           MOVE    NYUINCDCHG-REC      TO  MCPDATA-REC
+           MOVE    "tbl_nyuincdchg"    TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  NYUINCDCHG-REC
+           ELSE
+               MOVE    1               TO  FLG-NYUINCDCHG
+               INITIALIZE                  NYUINCDCHG-REC
+           END-IF
+      *
+           MOVE    "tbl_nyuincdchg"    TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-NYUINCDCHG-KEY3-SEL-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索処理

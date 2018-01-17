@@ -51,6 +51,8 @@
                05  SODR-RRKEDANUM          PIC 9(03).
                05  SODR-SHONUM             PIC 9(03).
                05  SODR-SKYSTYMD           PIC X(08).
+               05  SODR-UNSKYSTYMD         PIC X(08).
+               05  SODR-UNSKYEDYMD         PIC X(08).
                05  SODR-DENPNUM-MAX        PIC 9(03).
                05  SODR-DENPNUM-G.
                    07  SODR-DENPNUM-OCC    OCCURS  10.

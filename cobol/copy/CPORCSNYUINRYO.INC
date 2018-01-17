@@ -25,6 +25,8 @@
        01  SNYUINRYO-AREA.
       *    診療日
            03  SNYUINRYO-SRYYMD            PIC X(08).
+      *    自動設定区分
+           03  SNYUINRYO-AUTOSET           PIC X(01).
       *    処理区分 (01:入院）
            03  SNYUINRYO-SYORIKBN          PIC X(02).
       *    病棟番号
@@ -62,6 +64,11 @@
            03  SNYUINRYO-SRYCDTTL          PIC 9(14).
       *    病棟設定入院料コード
            03  SNYUINRYO-BTU-KHNSRYCD      PIC X(09).
+      *    設定入院料コード
+           03  SNYUINRYO-TOKHIGAITOKBN     PIC X(01).
+           03  SNYUINRYO-TOKNYUIN-G.
+               05  SNYUINRYO-TOKNYUIN-KBN  PIC X(01).
+               05  SNYUINRYO-TOKNYUIN-CD   PIC X(02).
       *    入院料等選択
       *    （特定入院料、短期滞在以外のコードの返却がある場合は１）
            03  SNYUINRYO-SELECT            PIC 9(01).

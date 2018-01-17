@@ -6,6 +6,7 @@ xml_hsptinfmodv2req {
 	private_objects {
 		Save_Request	varchar(1);
 		Request_Number	varchar(2);
+		Force_Update		varchar(5);
 		Patient_ID		varchar(20);
 		Admission_Date		varchar(10);
 		Update_Date			varchar(10);
@@ -41,6 +42,7 @@ xml_hsptinfmodv2req {
 				Certificate_ExpiredDate		varchar(10);
 			}[4];
 		};
+		Hospital_Charge_Auto_Set		    varchar(01);
 		Hospital_Charge						varchar(09);
 		Hospital_Charge_NotApplicable		varchar(01);
 		Editing_Hospital_Charge				varchar(01);

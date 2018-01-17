@@ -36,6 +36,8 @@
                    07  HSPTINFM02RES-REQNUM-NAME      PIC X(30).
                05  HSPTINFM02RES-SKYSTYMD                 PIC X(10).
                05  HSPTINFM02RES-SKYEDYMD                 PIC X(10).
+               05  HSPTINFM02RES-UNSKYSTYMD             PIC X(10).
+               05  HSPTINFM02RES-UNSKYEDYMD             PIC X(10).
                05  HSPTINFM02RES-PTINF-AREA.
                    07  HSPTINFM02RES-PTNUM                PIC X(20).
                    07  HSPTINFM02RES-NAME                 PIC X(100).

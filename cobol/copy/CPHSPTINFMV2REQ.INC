@@ -27,6 +27,7 @@
             03  HSPTINFMREQ-PRIVATE-OBJECTS.
               05  HSPTINFMREQ-SAVEREQ           PIC X(1).
               05  HSPTINFMREQ-REQNUM            PIC X(2).
+              05  HSPTINFMREQ-FORCE-UPDATE      PIC X(5).
               05  HSPTINFMREQ-PTNUM             PIC X(20).
               05  HSPTINFMREQ-NYUINYMD          PIC X(10).
               05  HSPTINFMREQ-IDOYMD            PIC X(10).
@@ -61,6 +62,7 @@
                       11  HSPTINFMREQ-JKYSNUM   PIC X(20).
                       11  HSPTINFMREQ-KTEKSTYMD PIC X(10).
                       11  HSPTINFMREQ-KTEKEDYMD PIC X(10).
+              05  HSPTINFMREQ-AUTOSET           PIC X(1).
               05  HSPTINFMREQ-KHNCD             PIC X(9).
               05  HSPTINFMREQ-TOKHIGAITOKBN     PIC X(1).
               05  HSPTINFMREQ-NACCTKBN          PIC X(1).

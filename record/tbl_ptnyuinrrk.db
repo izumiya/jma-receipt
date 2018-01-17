@@ -1258,3 +1258,30 @@ path	key72		{
 		;
 	};
 };
+
+path	key73   { 	
+	DBSELECT	{
+		DECLARE tbl_ptnyuinrrk_key73_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnyuinrrk
+			WHERE   HOSPNUM      =   :HOSPNUM 
+			AND		PTID         =   :PTID
+			AND		RRKNUM       =   :RRKNUM
+			AND		TENNYUYMD    <=  :TENNYUYMD
+			ORDER BY RRKEDANUM DESC
+		;
+	};
+};
+
+path	del3   { 	
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptnyuinrrk
+			WHERE   HOSPNUM      =   :HOSPNUM 
+			AND		PTID         =   :PTID
+			AND		RRKNUM       =   :RRKNUM
+			AND		RRKEDANUM    >   :RRKEDANUM
+		;
+	};
+};
+

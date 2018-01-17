@@ -17,6 +17,8 @@ xml_hsptinfmod02v2res {
 		};
 		Start_Date 				varchar(10);
 		End_Date 				varchar(10);
+		Unbilled_Period_Start_Date varchar(10);
+		Unbilled_Period_End_Date   varchar(10);
 		Patient_Information{
 			Patient_ID			varchar(20);
 			WholeName			varchar(100);

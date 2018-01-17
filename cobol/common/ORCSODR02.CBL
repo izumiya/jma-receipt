@@ -123,6 +123,7 @@
            03  WRK-MCP-WINDOW          PIC X(64).
       *
        01  ITEM-AREA.
+           03  ITEM-FORCE-UPDATE       PIC X(5).
            03  ITEM-TAIINCD            PIC X(02).
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
@@ -140,6 +141,8 @@
            03  CONST-JOB-SHELLID       PIC X(08)   VALUE   "TEIKI1".
            03  CONST-JOB-JOBID         PIC 9(07)   VALUE   1.
            03  CONST-API               PIC 9(01)   VALUE   2.
+           03  CONST-TRUE              PIC X(05)   VALUE   "TRUE".
+           03  CONST-FALSE             PIC X(05)   VALUE   "FALSE".
       *
       *
       *    入院CLAIM項目IDコピー句
@@ -492,10 +495,14 @@
       *****************************************************************
        2001-INPUT-CHK-SEC              SECTION.
       *
+           MOVE    CONST-FALSE     TO  ITEM-FORCE-UPDATE
+      *
            PERFORM VARYING IDX-ODR    FROM    1   BY  1
                    UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
       *
                EVALUATE    LNK-ODRITEM-ITEMID (IDX-ODR)
+               WHEN    NCLAIMID-FORCE-UPDATEJMA
+                   PERFORM 20011-FORCE-UPDATE-CHK-SEC
                WHEN    NCLAIMID-TAIINCDJMA
                    PERFORM 20011-TAIINCD-CHK-SEC
                WHEN    NCLAIMID-NYUINKAJMA
@@ -508,6 +515,25 @@
       *
            .
        2001-INPUT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    強制更新区分チェック処理
+      *****************************************************************
+       20011-FORCE-UPDATE-CHK-SEC      SECTION.
+      *
+           EVALUATE    FUNCTION UPPER-CASE(LNK-ODRITEM-ITEM(IDX-ODR))
+           WHEN    SPACE
+           WHEN    CONST-FALSE
+               MOVE    CONST-FALSE     TO  ITEM-FORCE-UPDATE
+           WHEN    CONST-TRUE
+               MOVE    CONST-TRUE      TO  ITEM-FORCE-UPDATE
+           WHEN    OTHER
+               MOVE    "0197"          TO  ERRCD-ERRCD
+               PERFORM 2100-ITEM-ERR-SET-SEC
+           END-EVALUATE
+      *
+           .
+       20011-FORCE-UPDATE-CHK-EXT.
            EXIT.
       *****************************************************************
       *    退院事由チェック処理
@@ -804,21 +830,6 @@
                GO  TO  20021-NYUINRRK-CHK-EXT
            END-IF
       *
-      *    前回定期請求日の翌日（あるいは入院日）
-      *    〜算定開始日の翌月までの
-      *    日付が入力されていること
-           MOVE    WRK-SKYSTYMD        TO  WRK-KIJUNYMD
-           MOVE    "2"                 TO  WRK-ZOGENPTN
-           MOVE    1                   TO  WRK-ZOGEN
-           PERFORM 800-CALENDAR-SEC
-           IF    ( SODR-SRYYMD (1 : 6)
-                                   <= WRK-KEISANYMD (1 : 6) )
-               CONTINUE
-           ELSE
-               MOVE    "0055"      TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
-           END-IF
-      *
       *    月途中の定期請求終了後...(1)、
       *    定期請求区分を「2 月末時のみ請求」に変更された場合、
       *    (1)で作成された収納が未入金であること
@@ -864,49 +875,76 @@
                IF    ( PTTEIKIRRK-SKYEDYMD
                                        >=  SODR-SRYYMD )
                    MOVE    "0055"      TO  ERRCD-ORDER
-                   GO  TO  20021-SKYSTYMD-GET-EXT
-               END-IF
-      *
-               MOVE    PTTEIKIRRK-SKYEDYMD
-                                       TO  WRK-KIJUNYMD
-               MOVE    "1"             TO  WRK-ZOGENPTN
-               MOVE    1               TO  WRK-ZOGEN
-               PERFORM 800-CALENDAR-SEC
-               IF    ( PTNYUINRRK-TEIKI-SEIKYUKBN   =   "2" )
-                   IF   ( PTNYUINRRK-NYUINYMD (1 : 6)
-                                       <   WRK-KEISANYMD    (1 : 6))
-                       MOVE    WRK-KEISANYMD (1 : 6)
-                                       TO  WRK-SKYSTYMD (1 : 6)
-                       MOVE    "01"    TO  WRK-SKYSTYMD (7 : 2)
-                   END-IF
                ELSE
+                   MOVE    PTTEIKIRRK-SKYEDYMD
+                                       TO  WRK-KIJUNYMD
+                   MOVE    "1"         TO  WRK-ZOGENPTN
+                   MOVE    1           TO  WRK-ZOGEN
+                   PERFORM 800-CALENDAR-SEC
+                   IF    ( PTNYUINRRK-TEIKI-SEIKYUKBN   =   "2" )
+                       IF   ( PTNYUINRRK-NYUINYMD (1 : 6)
+                                       <   WRK-KEISANYMD    (1 : 6))
+                           MOVE    WRK-KEISANYMD (1 : 6)
+                                           TO  WRK-SKYSTYMD (1 : 6)
+                           MOVE    "01"    TO  WRK-SKYSTYMD (7 : 2)
+                       END-IF
+                   ELSE
                        MOVE    WRK-KEISANYMD
                                        TO  WRK-SKYSTYMD
+                   END-IF
+                   MOVE    1           TO  FLG-TEIKIARI
                END-IF
-      *
-               MOVE    1               TO  FLG-TEIKIARI
-      *
            END-IF
       *
            MOVE    "tbl_ptteikirrk"    TO  MCP-TABLE
            MOVE    "key7"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF    ( WRK-SKYSTYMD        =   SPACE )
-               MOVE    PTNYUINRRK-NYUINYMD
+           IF    ( ERRCD-ORDER         =   SPACE )
+               IF    ( WRK-SKYSTYMD        =   SPACE )
+                   MOVE    PTNYUINRRK-NYUINYMD
                                            TO  WRK-SKYSTYMD
-               IF    ( WRK-SKYSTYMD    <   CONST-H180401 )
-                   IF    ( PTNYUINRRK-DOUJITSUKBN  =   "1" )
+                   IF    ( WRK-SKYSTYMD    <   CONST-H180401 )
+                       IF    ( PTNYUINRRK-DOUJITSUKBN  =   "1" )
+                           MOVE    WRK-SKYSTYMD    TO  WRK-KIJUNYMD
+                           MOVE    "1"             TO  WRK-ZOGENPTN
+                           MOVE    1               TO  WRK-ZOGEN
+                           PERFORM 800-CALENDAR-SEC
+                           MOVE    WRK-KEISANYMD   TO  WRK-SKYSTYMD
+                       END-IF
+                   END-IF
+               END-IF
+      *
+      *        前回定期請求日の翌日（あるいは入院日）
+      *        〜 算定開始日の翌月までの
+      *        日付が入力されていること
+      *        強制更新="TRUE"の場合、定期請求未実施でも退院請求を
+      *        作成する
+               MOVE    SODR-SRYYMD         TO  WRK-KIJUNYMD
+               MOVE    "2"                 TO  WRK-ZOGENPTN
+               MOVE    -1                  TO  WRK-ZOGEN
+               PERFORM 800-CALENDAR-SEC
+               IF    ( WRK-KEISANYMD (1 : 6)   >   WRK-SKYSTYMD (1 : 6))
+                   IF    ( ITEM-FORCE-UPDATE   =   CONST-TRUE )
+      *
+                       MOVE    WRK-SKYSTYMD    TO  SODR-UNSKYSTYMD
+      *
+                       MOVE    WRK-KEISANYMD   TO  WRK-SKYSTYMD
+                       MOVE    "01"            TO  WRK-SKYSTYMD(7:2)
+      *
                        MOVE    WRK-SKYSTYMD    TO  WRK-KIJUNYMD
                        MOVE    "1"             TO  WRK-ZOGENPTN
-                       MOVE    1               TO  WRK-ZOGEN
+                       MOVE    -1              TO  WRK-ZOGEN
                        PERFORM 800-CALENDAR-SEC
-                       MOVE    WRK-KEISANYMD   TO  WRK-SKYSTYMD
+                       MOVE    WRK-KEISANYMD   TO  SODR-UNSKYEDYMD
+      *
+                   ELSE
+                       MOVE    "0198"          TO  ERRCD-ORDER
                    END-IF
                END-IF
            END-IF
       *
-           MOVE    WRK-SKYSTYMD                TO  SODR-SKYSTYMD
+           MOVE    WRK-SKYSTYMD            TO  SODR-SKYSTYMD
       *
            .
        20021-SKYSTYMD-GET-EXT.

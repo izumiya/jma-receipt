@@ -117,12 +117,13 @@
            03  ITEM-BRMNUM             PIC X(08).
            03  ITEM-SENTEIKBN          PIC X(01).
            03  ITEM-SAGAKUCD           PIC X(02).
+           03  ITEM-AUTOSET            PIC X(01).
            03  ITEM-TOKNYUIN-G.
                05  ITEM-TOKNYUIN-KBN   PIC X(01).
                05  ITEM-TOKNYUIN-NYUIN PIC X(02).
            03  ITEM-TOKNYUIN-SRYCD     PIC X(09).
            03  ITEM-SANTEICD           PIC X(09).
-           03  ITEM-TOKHIGAITOKBN          PIC X(01).
+           03  ITEM-TOKHIGAITOKBN      PIC X(01).
            03  ITEM-DRCD-G.
                05  ITEM-DRCD-MAX       PIC 9(02).
                05  ITEM-DRCD           PIC X(05)   OCCURS  3.
@@ -228,6 +229,9 @@
        01  LNK-PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
+      *
+      *    入院料取得サブ
+           COPY "CPORCSNYUINRYO.INC".
       *
       *    特定入院料コード取得サブ
            COPY  "CPORCSTOKNYUIN.INC".
@@ -396,6 +400,7 @@
            MOVE    "2"             TO  ITEM-NACCTKBN
            MOVE    "1"             TO  ITEM-TEIKIKBN
            MOVE    "1"             TO  ITEM-DISPKBN
+           MOVE    "0"             TO  ITEM-AUTOSET
       *
            PERFORM VARYING IDX-ODR    FROM    1   BY  1
                    UNTIL ( IDX-ODR    >   LNK-ODRITEM-MAX )
@@ -417,6 +422,8 @@
                    PERFORM 20011-KAIGOKBN-CHK-SEC
                WHEN    NCLAIMID-DRJMA
                    PERFORM 20011-DR-CHK-SEC
+               WHEN    NCLAIMID-AUTOSETJMA
+                   PERFORM 20011-AUTOSET-CHK-SEC
                WHEN    NCLAIMID-TOKNYUINJMA
                    PERFORM 20011-TOKNYUIN-CHK-SEC
                WHEN    NCLAIMID-TOKHIGAITOKBNJMA
@@ -730,6 +737,26 @@
       *
            .
        20011-DR-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料初期値設定区分チェック処理
+      *****************************************************************
+       20011-AUTOSET-CHK-SEC         SECTION.
+      *
+           IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                     NOT =   SPACE )
+               IF    ( LNK-ODRITEM-ITEM (IDX-ODR)
+                                         =   "0" OR "1" )
+                   MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                       TO  ITEM-AUTOSET
+               ELSE
+                   MOVE    "0196"      TO  ERRCD-ERRCD
+                   PERFORM 2100-ITEM-ERR-SET-SEC
+               END-IF
+           END-IF
+      *
+           .
+       20011-AUTOSET-CHK-EXT.
            EXIT.
       *****************************************************************
       *    特定入院料チェック処理
@@ -1256,6 +1283,41 @@
       *    入院料チェック処理
       *****************************************************************
        20021-NYUINRYO-CHK-SEC          SECTION.
+      *
+           EVALUATE    TRUE
+           WHEN  ( ITEM-AUTOSET        =   "1" )
+      *
+               INITIALIZE                      SNYUINRYO-AREA
+               MOVE    "1"                 TO  SNYUINRYO-AUTOSET
+               MOVE    SODR-SRYYMD         TO  SNYUINRYO-SRYYMD
+               MOVE    "01"                TO  SNYUINRYO-SYORIKBN
+               MOVE    ITEM-BTUNUM         TO  SNYUINRYO-BTUNUM
+               MOVE    ITEM-BRMNUM(3:)     TO  SNYUINRYO-BRMNUM
+               MOVE    ITEM-HKNCOMBI       TO  SNYUINRYO-HKNCOMBI
+               CALL    "ORCSNYUINRYO"      USING
+                                           SNYUINRYO-AREA
+                                           SPA-AREA
+               MOVE    SNYUINRYO-BTU-KHNSRYCD
+                                           TO  ITEM-SANTEICD
+               MOVE    SNYUINRYO-TOKNYUIN-G
+                                           TO  ITEM-TOKNYUIN-G
+           WHEN  ( ITEM-SANTEICD       =   SPACE )
+             AND ( ITEM-TOKNYUIN-G     =   SPACE )
+               INITIALIZE                      SNYUINRYO-AREA
+               MOVE    "A"                 TO  SNYUINRYO-AUTOSET
+               MOVE    SODR-SRYYMD         TO  SNYUINRYO-SRYYMD
+               MOVE    "01"                TO  SNYUINRYO-SYORIKBN
+               MOVE    ITEM-BTUNUM         TO  SNYUINRYO-BTUNUM
+               MOVE    ITEM-BRMNUM(3:)     TO  SNYUINRYO-BRMNUM
+               MOVE    ITEM-HKNCOMBI       TO  SNYUINRYO-HKNCOMBI
+               CALL    "ORCSNYUINRYO"      USING
+                                           SNYUINRYO-AREA
+                                           SPA-AREA
+               MOVE    SNYUINRYO-BTU-KHNSRYCD
+                                           TO  ITEM-SANTEICD
+               MOVE    SNYUINRYO-TOKNYUIN-G
+                                           TO  ITEM-TOKNYUIN-G
+           END-EVALUATE
       *
       *    入院料が取得できていない場合
            IF    ( ITEM-SANTEICD       =   SPACE )
@@ -1905,6 +1967,7 @@
                                        OR  NCLAIMID-DISPKBNJMA
                                        OR  NCLAIMID-BUNBENKBNJMA
                                        OR  NCLAIMID-RIYOUKBNJMA
+                                       OR  NCLAIMID-AUTOSETJMA
                                         )
                CONTINUE
            ELSE

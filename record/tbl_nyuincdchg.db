@@ -39,3 +39,27 @@ path	key2 	{
 	};
 };
 
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_nyuincdchg_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuincdchg
+			WHERE NYUINRYOCD =  :NYUINRYOCD
+			AND   YUKOSTYMD <=  :YUKOSTYMD
+			AND   YUKOEDYMD >=  :YUKOEDYMD
+		;
+	};
+};
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_nyuincdchg_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuincdchg
+			WHERE :SRYCD_BF in (SRYCD_BF,SRYCD_AF)
+			AND   YUKOSTYMD <=  :YUKOSTYMD
+			AND   YUKOEDYMD >=  :YUKOEDYMD
+		;
+	};
+};
+
