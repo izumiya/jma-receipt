@@ -1738,6 +1738,7 @@
            END-IF
       *
       **     MOVE    STUSAN-NISSU04  TO  WRK-TUSAN
+      **     DISPLAY "STUSAN-NISSU01 = " STUSAN-NISSU01
       **     DISPLAY "STUSAN-NISSU04 = " STUSAN-NISSU04
            MOVE    STUSAN-NISSU02  TO  WRK-TUSAN
            COMPUTE   WRK-TUSAN  =  WRK-TUSAN -   1
@@ -1749,6 +1750,11 @@
                IF    WRK-TUSAN     NOT =    ZERO
       **            DISPLAY "STUSAN-RRK-NISSU (IDX10) = "
       **                     STUSAN-RRK-NISSU (IDX10)
+      *AZU-ADD START(2018/01/17)
+                  IF   STUSAN-RRK-NISSU (IDX10) =  ZERO
+                      MOVE  STUSAN-NISSU01 TO  STUSAN-RRK-NISSU (IDX10)
+                  END-IF
+      *AZU-ADD END(2018/01/17)
                   COMPUTE WRK-TUSAN
                        =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
                END-IF
