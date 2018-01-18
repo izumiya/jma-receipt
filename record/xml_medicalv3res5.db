@@ -33,7 +33,7 @@ xml_medicalv3res5 {
 #---    保険組合せ番号名称
 		Insurance_Combination_Name	varchar(100);
 #---    算定日
-		PerformP_Day_Info {
+		Perform_Day_Info {
 			Perform_Day	varchar(02);
 			} [31];
 #---    登録区分１
