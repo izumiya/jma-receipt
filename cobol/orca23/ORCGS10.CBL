@@ -75,7 +75,6 @@
            03  FLG-PTNUM                   PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-PTLIST-ROW              PIC 9(01).
-           03  FLG-LOOP-END                PIC 9(01).
            03  FLG-ARI                     PIC 9(01).
            03  FLG-MAX                     PIC 9(01).
       *
@@ -392,7 +391,7 @@
       *****************************************************************
        31012-SPASET-HENSYU3-SEC              SECTION.
       *
-           IF    SYU-SECMONEY  =  4
+           IF    SYU-SECMONEY  =  4 OR 6
                MOVE    "第三者行為現物給付"
                                TO  SPA-GMN-TKBNMEI(IDXL)
                MOVE     1      TO  SPA-GMN-TSECMONEY(IDXL)
@@ -785,66 +784,6 @@
            .
       *
        900-SYUNOU-READ-EXT.
-           EXIT.
-      **************************************************************
-      *    収納マスター検索処理
-      **************************************************************
-       900-SYUNOU-KEY84-SEL-SEC        SECTION.
-      *
-           MOVE    ZERO                TO  FLG-SYUNOU
-      *
-           INITIALIZE                      SYUNOU-REC
-           MOVE    SPA-HOSPNUM         TO  SYU-HOSPNUM
-           MOVE    "2"                 TO  SYU-NYUGAIKBN
-           MOVE    SPA-S01-TUKI-SRYYM  TO  SYU-SRYYMD
-           MOVE    "%"                 TO  SYU-SRYYMD(7:)
-           MOVE    SYUNOU-REC          TO  MCPDATA-REC
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key84"             TO  MCP-PATHNAME
-           PERFORM 911-DBSELECT-SEC
-           IF    ( MCP-RC              =   ZERO )
-               PERFORM 900-SYUNOU-KEY84-FET-SEC
-           ELSE
-               INITIALIZE                  SYUNOU-REC
-               MOVE    1               TO  FLG-SYUNOU
-           END-IF
-      *
-           .
-       900-SYUNOU-KEY84-SEL-EXT.
-           EXIT.
-      **************************************************************
-      *    収納マスターFETCH処理
-      **************************************************************
-       900-SYUNOU-KEY84-FET-SEC        SECTION.
-      *
-           MOVE    ZERO                TO  FLG-SYUNOU
-           MOVE    ZERO                TO  FLG-LOOP-END
-      *
-           PERFORM UNTIL ( FLG-SYUNOU      NOT =   ZERO )
-                    OR   ( FLG-LOOP-END    NOT =   ZERO )
-      *
-               MOVE    "tbl_syunou"        TO  MCP-TABLE
-               MOVE    "key84"             TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC              =   ZERO )
-                   MOVE    MCPDATA-REC     TO  SYUNOU-REC
-      *
-                   MOVE    1               TO  FLG-LOOP-END
-                   IF  (SYU-SECMONEY     NOT = ZERO AND 9)
-                   OR  (SYU-ACCT-UPDKBN  NOT = SPACE     )
-                       CONTINUE
-                   ELSE
-                       MOVE    ZERO        TO  FLG-LOOP-END
-                   END-IF
-      *
-               ELSE
-                   INITIALIZE                  SYUNOU-REC
-                   MOVE    1               TO  FLG-SYUNOU
-               END-IF
-           END-PERFORM
-      *
-           .
-       900-SYUNOU-KEY84-FET-EXT.
            EXIT.
       *****************************************************************
       *    患者情報検索処理

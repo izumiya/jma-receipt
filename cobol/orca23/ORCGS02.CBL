@@ -114,6 +114,8 @@
       *  04.07.01    NACL-門脇    14/07/31  第三者行為の現物給付対応
       *  04.08.01    NACL-門脇    17/01/05  一括再計算該当者のリストアップ
       *                                     対応
+      *  04.08.02    NACL-門脇    17/12/15  第三者行為現物給付に関わる
+      *                                     負担金計算対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2670,6 +2672,7 @@
                     WHEN      2
                        MOVE      "2"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                     WHEN      4
+                    WHEN      6
                        MOVE      "4"   TO  SPA-GMN-SIKIBETUFLG(IDXL)
                     WHEN      7
                        MOVE      "7"   TO  SPA-GMN-SIKIBETUFLG(IDXL)

@@ -27,6 +27,8 @@
       ****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.01    NACL-門脇    17/12/15  第三者行為現物給付に関わる
+      *                                     負担金計算対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -58,6 +60,11 @@
            03  FLG-GENBUTU3                PIC 9(01).
            03  FLG-GENBUTU4                PIC 9(01).
            03  FLG-SYORI-KBN               PIC 9(01).
+           03  FLG-SRYACCT                 PIC 9(01).
+           03  FLG-SRYACT                  PIC 9(01).
+           03  FLG-HKNCOMBI                PIC 9(01).
+           03  FLG-ZAIARI                  PIC 9(01).
+           03  FLG-DAISANYUSEN             PIC 9(01).
       *
       *    ワーク領域
        01  WRK-AREA.
@@ -114,6 +121,18 @@
       *    ワーク収納データ
        01  WRK-SYUNOU-REC.
            COPY    "CPSYUNOU.INC"  REPLACING  //SYU-// BY //WRK-SYU-//.
+      *
+      *    診療会計マスタ−
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
+      *
+      *    診療行為マスタ−
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
+      *
+      *    保険組み合わせ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -300,10 +319,14 @@
            MOVE   ZERO    TO  IDX2
            INITIALIZE         WRK-DENPNUM-END-TABLE
       *
+           PERFORM  1002-SRYACT-KENSAKU-SEC
+      *
            MOVE   ZERO    TO  FLG-GENBUTU
            MOVE   ZERO    TO  FLG-GENBUTU2
            MOVE   ZERO    TO  FLG-GENBUTU3
            MOVE   ZERO    TO  FLG-GENBUTU4
+      *
+           MOVE   ZERO    TO  FLG-DAISANYUSEN
       *
            INITIALIZE                              SYUNOU-REC
            MOVE   LNK-ORCSSYUNOUCHK-HOSPNUM    TO  SYU-HOSPNUM
@@ -347,7 +370,13 @@
            PERFORM      910-DB-CLOSE-SEC
       *
            IF     FLG-GENBUTU4  =   1
+             IF   FLG-ZAIARI    =   1
+             AND  FLG-GENBUTU2  =   1
+             AND  FLG-GENBUTU3  =  ZERO
+                    MOVE    3     TO  FLG-GENBUTU
+             ELSE
                     MOVE    2     TO  FLG-GENBUTU
+             END-IF
            ELSE
              IF  (FLG-GENBUTU2  =   1)
              AND (FLG-GENBUTU3  =   1)
@@ -355,29 +384,8 @@
              END-IF
            END-IF
       *
-      *    第三者行為診療分が１件でもある場合
-           IF     FLG-GENBUTU   =   2
-      *      通常診療分の計算
-             IF     SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
-                  MOVE    "key88"        TO  WRK-IKT-PATHNAME
-             ELSE
-                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
-                  MOVE    "key89"        TO  WRK-IKT-PATHNAME
-             END-IF
-             PERFORM  1001-IKATUSAIKEI2-SEC
-      *      第三者行為診療分の計算
-             IF     SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
-                  MOVE    "key90"        TO  WRK-IKT-PATHNAME
-             ELSE
-                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
-                  MOVE    "key91"        TO  WRK-IKT-PATHNAME
-             END-IF
-             PERFORM  1001-IKATUSAIKEI2-SEC
-           ELSE
-      *      第三者行為診療分がない場合
-             IF   FLG-GENBUTU = ZERO
+           EVALUATE   FLG-GENBUTU
+             WHEN        0
                IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key35"        TO  WRK-IKT-PATHNAME
@@ -385,7 +393,8 @@
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key69"        TO  WRK-IKT-PATHNAME
                END-IF
-             ELSE
+               PERFORM  1001-IKATUSAIKEI2-SEC
+             WHEN        1
                IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key82"        TO  WRK-IKT-PATHNAME
@@ -393,9 +402,46 @@
                   MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
                   MOVE    "key83"        TO  WRK-IKT-PATHNAME
                END-IF
-             END-IF
-             PERFORM  1001-IKATUSAIKEI2-SEC
-           END-IF
+               PERFORM  1001-IKATUSAIKEI2-SEC
+             WHEN        2
+      *        通常診療分の計算
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key88"        TO  WRK-IKT-PATHNAME
+               ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key89"        TO  WRK-IKT-PATHNAME
+               END-IF
+               PERFORM  1001-IKATUSAIKEI2-SEC
+      *        第三者行為診療分の計算
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key90"        TO  WRK-IKT-PATHNAME
+               ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key91"        TO  WRK-IKT-PATHNAME
+               END-IF
+               PERFORM  1001-IKATUSAIKEI2-SEC
+             WHEN        3
+      *        第三者行為診療分の計算
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key90"        TO  WRK-IKT-PATHNAME
+               ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key91"        TO  WRK-IKT-PATHNAME
+               END-IF
+               PERFORM  1001-IKATUSAIKEI2-SEC
+      *        通常診療分の計算
+               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key88"        TO  WRK-IKT-PATHNAME
+               ELSE
+                  MOVE    "tbl_syunou"   TO  WRK-IKT-TABLE
+                  MOVE    "key89"        TO  WRK-IKT-PATHNAME
+               END-IF
+               PERFORM  1001-IKATUSAIKEI2-SEC
+           END-EVALUATE
       *
            .
        100-IKATUSAIKEI-EXT.
@@ -451,10 +497,15 @@
                                        TO   LNK-ORCSSKS-IKTSORTKBN
                  MOVE   SYS-1039-IKTKEISANKBN
                                        TO   LNK-ORCSSKS-IKTKEISANKBN
-                 IF     FLG-GENBUTU  =  1 OR 2
-                   MOVE   "1"          TO   LNK-ORCSSKS-IKTKEISANKBN
-                   MOVE   "1"          TO   LNK-ORCSSKS-IKTGENKEIFLG
-                 END-IF
+                 EVALUATE   FLG-GENBUTU
+                   WHEN        1
+                   WHEN        2
+                        MOVE   "1"     TO   LNK-ORCSSKS-IKTKEISANKBN
+                        MOVE   "1"     TO   LNK-ORCSSKS-IKTGENKEIFLG
+                   WHEN        3
+                        MOVE   "1"     TO   LNK-ORCSSKS-IKTKEISANKBN
+                        MOVE   "2"     TO   LNK-ORCSSKS-IKTGENKEIFLG
+                 END-EVALUATE
                  MOVE     "1"          TO   LNK-ORCSSKS-IKTJISSIFLG
       *
                  IF     FLG-SYORI-KBN  =  1
@@ -518,9 +569,14 @@
       **************************************************************
        10011-SYUNOU-DATA-CHECK-SEC           SECTION.
       *
+           IF  (SYU-SECMONEY  =  6)
+           OR  (FLG-GENBUTU   =  3)
+               MOVE     1     TO    FLG-DAISANYUSEN
+           END-IF
+      *
            IF  (SYU-SECMONEY         =  1 OR 2 OR 3 OR 4)
            OR  (SYU-ACCT-UPDKBN  NOT =  SPACE           )
-      *      １：第三者行為現物給付
+      *      １：第三者行為現物給付（通常診療分の優先計算該当）
              IF    SYU-SECMONEY  =  4
                MOVE     1     TO    WRK-GAITOKBN(IDX1)
              END-IF
@@ -549,7 +605,15 @@
              END-IF
            END-IF
       *
-           IF   SYU-SKYMONEY  NOT =  WRK-SYU-SKYMONEY
+      *    ７：第三者行為現物給付（第三者行為分の優先計算該当）
+           IF      FLG-DAISANYUSEN  =  1
+                 MOVE   7     TO    WRK-GAITOKBN(IDX1)
+           END-IF
+      *
+           IF  ( SYU-SKYMONEY      NOT =  WRK-SYU-SKYMONEY   )
+           OR  ((FLG-GENBUTU           =  3                 ) AND
+                (SYU-KOH1HKNNUM        =  "970"             ) AND
+                (SYU-ACCT-UPDKBN   NOT =  SPACE             ))
       *      患者請求額の変更がある方
              MOVE       1     TO    WRK-SKYMONEY-FLG(IDX1)
              MOVE       1     TO    WRK-TAISYOKBN-A(IDX1)
@@ -606,6 +670,104 @@
            EXIT.
       *
       **************************************************************
+      *    診療行為情報検索
+      **************************************************************
+       1002-SRYACT-KENSAKU-SEC           SECTION.
+      *
+           MOVE  ZERO             TO   FLG-ZAIARI
+      *
+           INITIALIZE                  SRYACT-REC
+           MOVE  LNK-ORCSSYUNOUCHK-HOSPNUM
+                                  TO   SRY-HOSPNUM
+           MOVE  LNK-ORCSSYUNOUCHK-NYUGAIKBN
+                                  TO   SRY-NYUGAIKBN
+           MOVE  WRK-PTID(IDX1)   TO   SRY-PTID
+           MOVE  LNK-ORCSSYUNOUCHK-SRYYM
+                                  TO   SRY-SRYYM
+           MOVE  "099999931"      TO   SRY-SRYCD(1)
+           MOVE  "099999931"      TO   SRY-SRYCD(2)
+           MOVE  "099999931"      TO   SRY-SRYCD(3)
+           MOVE  "099999931"      TO   SRY-SRYCD(4)
+           MOVE  "099999931"      TO   SRY-SRYCD(5)
+           MOVE  SRYACT-REC       TO   MCPDATA-REC
+           MOVE  "DBSELECT"       TO   MCP-FUNC
+           MOVE  "tbl_sryact"     TO   MCP-TABLE
+           MOVE  "key7"           TO   MCP-PATHNAME
+           CALL  "ORCDBMAIN"   USING   MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF     MCP-RC  =  ZERO
+             MOVE    "tbl_sryact"     TO   MCP-TABLE
+             MOVE    "key7"           TO   MCP-PATHNAME
+             PERFORM  900-SRYACT-READ-SEC
+             PERFORM  UNTIL  FLG-SRYACT  =  1
+                       OR    FLG-ZAIARI  =  1
+               INITIALIZE                  SRYACCT-REC
+               MOVE  SRY-HOSPNUM      TO   ACCT-HOSPNUM
+               MOVE  SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
+               MOVE  SRY-SRYKA        TO   ACCT-SRYKA
+               MOVE  SRY-PTID         TO   ACCT-PTID
+               MOVE  SRY-SRYYM        TO   ACCT-SRYYM
+               MOVE  SRY-ZAINUM       TO   ACCT-ZAINUM
+               MOVE  SRYACCT-REC      TO   MCPDATA-REC
+               MOVE  "DBSELECT"       TO   MCP-FUNC
+               MOVE  "tbl_sryacct"    TO   MCP-TABLE
+               MOVE  "key31"          TO   MCP-PATHNAME
+               CALL  "ORCDBMAIN"   USING   MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+               IF     MCP-RC  =  ZERO
+                 MOVE    "tbl_sryacct"     TO   MCP-TABLE
+                 MOVE    "key31"           TO   MCP-PATHNAME
+                 PERFORM  900-SRYACCT-READ-SEC
+                 IF    FLG-SRYACCT  =  ZERO
+                   IF  ACCT-ZAIKAISU  NOT =  ZERO
+                     INITIALIZE                 HKNCOMBI-REC
+                     MOVE  ACCT-HOSPNUM    TO   COMB-HOSPNUM
+                     MOVE  ACCT-PTID       TO   COMB-PTID
+                     MOVE  ACCT-HKNCOMBI   TO   COMB-HKNCOMBINUM
+                     MOVE  HKNCOMBI-REC    TO   MCPDATA-REC
+                     MOVE  "DBSELECT"      TO   MCP-FUNC
+                     MOVE  "tbl_hkncombi"  TO   MCP-TABLE
+                     MOVE  "key"           TO   MCP-PATHNAME
+                     CALL  "ORCDBMAIN"  USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+                     IF      MCP-RC  =  ZERO
+                       MOVE    "tbl_hkncombi"   TO   MCP-TABLE
+                       MOVE    "key"            TO   MCP-PATHNAME
+                       PERFORM  900-HKNCOMBI-READ-SEC
+                       IF    FLG-HKNCOMBI  =  ZERO
+                         IF  COMB-KOH1HKNNUM  =  "970"
+                           MOVE     1           TO   FLG-ZAIARI
+                         END-IF
+                       END-IF
+                     END-IF
+                     MOVE    "tbl_hkncombi"     TO   MCP-TABLE
+                     MOVE    "key"              TO   MCP-PATHNAME
+                     PERFORM  910-DB-CLOSE-SEC
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_sryacct"            TO   MCP-TABLE
+               MOVE    "key31"                  TO   MCP-PATHNAME
+               PERFORM  910-DB-CLOSE-SEC
+      *
+               MOVE    "tbl_sryact"             TO   MCP-TABLE
+               MOVE    "key7"                   TO   MCP-PATHNAME
+               PERFORM  900-SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_sryact"             TO   MCP-TABLE
+           MOVE        "key7"                   TO   MCP-PATHNAME
+           PERFORM      910-DB-CLOSE-SEC
+      *
+           .
+      *
+       1002-SRYACT-KENSAKU-EXT.
+           EXIT.
+      *
+      **************************************************************
       *    返却値セット１
       **************************************************************
        200-HENKYAKU-SET-SEC           SECTION.
@@ -636,17 +798,21 @@
                      MOVE   WRK-PTID(IDX1)
                                   TO   WRK-PTID2(IDX3)
                  ELSE
-                   IF  WRK-GAITOKBN(IDX1)  =  5
+                   IF  WRK-GAITOKBN(IDX1)  =  5 OR 7
                      ADD    1     TO   IDX3
                      MOVE   WRK-PTID(IDX1)
                                   TO   WRK-PTID2(IDX3)
+                     MOVE   WRK-GAITOKBN(IDX1)
+                                  TO   WRK-GAITOKBN2(IDX3)
                    END-IF
                  END-IF
                ELSE
-                 IF    WRK-GAITOKBN(IDX1)  =  5
+                 IF    WRK-GAITOKBN(IDX1)  =  5 OR 7
                      ADD    1     TO   IDX4
                      MOVE   WRK-PTID(IDX1)
                                   TO   WRK-PTID3(IDX4)
+                     MOVE   WRK-GAITOKBN(IDX1)
+                                  TO   WRK-GAITOKBN3(IDX4)
                  END-IF
                END-IF
              END-IF
@@ -695,7 +861,12 @@
              PERFORM    900-SYUNOU-READ-SEC
              PERFORM    UNTIL  FLG-SYUNOU  =  1
                IF  SYU-DENPJTIKBN  NOT = "3"
-                 MOVE     7                    TO  SYU-SECMONEY
+                 EVALUATE  WRK-GAITOKBN(IDX1)
+                   WHEN       5
+                        MOVE     7             TO  SYU-SECMONEY
+                   WHEN       7
+                        MOVE     6             TO  SYU-SECMONEY
+                 END-EVALUATE
       *
                  MOVE   SYUNOU-REC             TO  MCPDATA-REC
                  MOVE  "DBUPDATE"              TO  MCP-FUNC
@@ -832,6 +1003,72 @@
            .
       *
        900-SYUMEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療行為マスタ−読込
+      *****************************************************************
+       900-SRYACT-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACT-REC
+               MOVE    ZERO            TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           .
+      *
+       900-SRYACT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計マスタ−読込
+      *****************************************************************
+       900-SRYACCT-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACCT-REC
+               MOVE    ZERO            TO  FLG-SRYACCT
+           ELSE
+               INITIALIZE                  SRYACCT-REC
+               MOVE    1               TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+      *
+       900-SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせ読込
+      *****************************************************************
+       900-HKNCOMBI-READ-SEC          SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+               MOVE    ZERO            TO  FLG-HKNCOMBI
+           ELSE
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+      *
+           .
+      *
+       900-HKNCOMBI-READ-EXT.
            EXIT.
       *
       *****************************************************************

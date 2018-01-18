@@ -181,6 +181,11 @@
                    "診療行為で訂正登録が必要な収納あり。".
                05  FILLER              PIC X(24)   VALUE
                    "訂正登録後に再チェック。".
+           03  CONST-GAITOKBN-7.
+               05  FILLER              PIC X(18)   VALUE
+                   "第三者行為現物給付".
+               05  FILLER              PIC X(30)   VALUE
+                   "（第三者行為分の優先計算該当）".
       *
       *    プログラムオプションパラメタ
        01  TPARA-AREA.
@@ -585,6 +590,9 @@
                                        TO  HCMG008-NAIYO(CNT-LINE)
                WHEN    6
                    MOVE    CONST-GAITOKBN-6
+                                       TO  HCMG008-NAIYO(CNT-LINE)
+               WHEN    7
+                   MOVE    CONST-GAITOKBN-7
                                        TO  HCMG008-NAIYO(CNT-LINE)
            END-EVALUATE
            .
