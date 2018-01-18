@@ -2006,6 +2006,12 @@
                                                    =   "099409907"
                            MOVE    "1"         TO  LNK-S01-JIKANGAI
                        END-IF
+      *H30.1
+      *                第三者行為分計算優先フラグ
+                       IF      LNK-WKSRY-SRYCD(IDX IDS)
+                                                   =   "099999931"
+                           MOVE    "1"     TO  LNK-S01-DAISANYUSENFLG
+                       END-IF
       *                初診料算定判定
                        PERFORM 450112-SYOSIN-CHK-SEC
                    END-PERFORM
