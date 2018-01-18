@@ -493,6 +493,8 @@
       *  04.08.23    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
       *  04.08.24    NACL-門脇    17/12/07  熊本県地方公費対応
+      *  04.08.25    NACL-門脇    17/12/15  第三者行為現物給付に関わる
+      *                                     負担金計算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -12609,14 +12611,16 @@
            OR ((COMB-KOH1HKNNUM    NOT  =  "970"            ) AND
                (SYU-KOH1HKNNUM          =  "970"            ) AND
                (SYU-SKJ-FTNGAKU(2) NOT  =   ZERO            ) AND
-               (SYU-PTFTNRATE           =   ZERO            ))
+               (SYU-PTFTNRATE           =   ZERO            ) AND
+               (LNK-S01-IKTGENKEIFLG    =   SPACE OR "1"    ))
            OR ((SYU-KOH1HKNNUM          =  "970"            ) AND
                (SYU-SKJ-FTNGAKU(2)      =   ZERO            ) AND
                (FLG-DAISAN-GENBUTU2     =   ZERO            ))
            OR ((SYU-KOH1HKNNUM          =  "970"            ) AND
                (SYU-SKJ-FTNGAKU(2)      =   ZERO            ) AND
                (FLG-DAISAN-GENBUTU2     =   1               ) AND
-               (SYU-PTFTNRATE           =   ZERO            ))
+               (SYU-PTFTNRATE           =   ZERO            ) AND
+               (LNK-S01-IKTGENKEIFLG    =   SPACE OR "1"    ))
              CONTINUE
            ELSE
              IF   (SYU-SYUHKNNUM      NOT = SPACE     )
@@ -13757,14 +13761,16 @@
                OR ((COMB-KOH1HKNNUM     NOT  =  "970"             ) AND
                    (SYU-KOH1HKNNUM           =  "970"             ) AND
                    (SYU-SKJ-FTNGAKU(2)  NOT  =   ZERO             ) AND
-                   (SYU-PTFTNRATE            =   ZERO             ))
+                   (SYU-PTFTNRATE            =   ZERO             ) AND
+                   (LNK-S01-IKTGENKEIFLG     =   SPACE OR "1"     ))
                OR ((SYU-KOH1HKNNUM           =  "970"             ) AND
                    (SYU-SKJ-FTNGAKU(2)       =   ZERO             ) AND
                    (FLG-DAISAN-GENBUTU2      =   ZERO             ))
                OR ((SYU-KOH1HKNNUM           =  "970"             ) AND
                    (SYU-SKJ-FTNGAKU(2)       =   ZERO             ) AND
                    (FLG-DAISAN-GENBUTU2      =   1                ) AND
-                   (SYU-PTFTNRATE            =   ZERO             ))
+                   (SYU-PTFTNRATE            =   ZERO             ) AND
+                   (LNK-S01-IKTGENKEIFLG     =   SPACE OR "1"     ))
       *
                  IF  ((LNK-S01-KOUREI-ZAITAKU-KBN   =  "1" ) OR
                       (FLG-GENBUTU70            NOT = ZERO ))
@@ -18102,6 +18108,23 @@
                      MOVE  5  TO  WK-SYUNOU-GENBUTU70-MSG
                    END-IF
                  END-IF
+                 IF    (LNK-S01-IKTCHECKFLG   = "1")
+                 AND   (LNK-S01-IKTGENKEIFLG  = "2")
+                   IF  (COMB-KOH1HKNNUM  =  SPACE)
+                   AND (SYU-KOH1HKNNUM   =  "970")
+                     COMPUTE  WK-FUTANWARI =
+                              WK-SYUNOU-GENBUTU70-FTNRATE / 100
+                     COMPUTE  WK-SYU-SYUCOMPFTN = SYU-TOTAL-HKNTEN
+                                                * 10
+                                                * WK-FUTANWARI
+                     COMPUTE  WK-SYU-SYUCOMPFTN =
+                              WK-SYU-SYUCOMPFTN +  5
+                     COMPUTE  WK-SYU-SYUCOMPFTN =
+                              WK-SYU-SYUCOMPFTN / 10
+                     COMPUTE  WK-SYU-SYUCOMPFTN =
+                              WK-SYU-SYUCOMPFTN * 10
+                   END-IF
+                 END-IF
                ELSE
                  MOVE   ZERO  TO  WK-SYU-SYUCOMPFTN
                  MOVE   ZERO  TO  WK-ENTANI
@@ -18403,6 +18426,23 @@
                        MOVE  4    TO  WK-SYUNOU-GENBUTU70-MSG
                      END-IF
                    END-IF
+                   IF    (LNK-S01-IKTCHECKFLG   = "1")
+                   AND   (LNK-S01-IKTGENKEIFLG  = "2")
+                     IF  (COMB-KOH1HKNNUM  =  SPACE)
+                     AND (SYU-KOH1HKNNUM   =  "970")
+                       COMPUTE  WK-FUTANWARI =
+                                WK-SYUNOU-GENBUTU70-FTNRATE / 100
+                       COMPUTE  WK-SYU-SYUCOMPFTN = SYU-TOTAL-HKNTEN
+                                                  * 10
+                                                  * WK-FUTANWARI
+                       COMPUTE  WK-SYU-SYUCOMPFTN =
+                                WK-SYU-SYUCOMPFTN +  5
+                       COMPUTE  WK-SYU-SYUCOMPFTN =
+                                WK-SYU-SYUCOMPFTN / 10
+                       COMPUTE  WK-SYU-SYUCOMPFTN =
+                                WK-SYU-SYUCOMPFTN * 10
+                     END-IF
+                   END-IF
                ELSE
                    IF  ((COMB-KOH2HKNNUM   =  "972" OR "974") OR
                         (COMB-KOH3HKNNUM   =  "972" OR "974") OR
@@ -18471,6 +18511,23 @@
                         AND (FLG-DAISAN-GENBUTU2  =   1   )
                         AND (SYU-PTFTNRATE    NOT =   ZERO)
                           MOVE  4    TO  WK-SYUNOU-GENBUTU70-MSG
+                        END-IF
+                      END-IF
+                      IF    (LNK-S01-IKTCHECKFLG   = "1")
+                      AND   (LNK-S01-IKTGENKEIFLG  = "2")
+                        IF  (COMB-KOH1HKNNUM  =  SPACE)
+                        AND (SYU-KOH1HKNNUM   =  "970")
+                          COMPUTE  WK-FUTANWARI =
+                                   WK-SYUNOU-GENBUTU70-FTNRATE / 100
+                          COMPUTE  WK-SYU-SYUCOMPFTN = SYU-TOTAL-HKNTEN
+                                                     * 10
+                                                     * WK-FUTANWARI
+                          COMPUTE  WK-SYU-SYUCOMPFTN =
+                                   WK-SYU-SYUCOMPFTN +  5
+                          COMPUTE  WK-SYU-SYUCOMPFTN =
+                                   WK-SYU-SYUCOMPFTN / 10
+                          COMPUTE  WK-SYU-SYUCOMPFTN =
+                                   WK-SYU-SYUCOMPFTN * 10
                         END-IF
                       END-IF
                  ELSE
@@ -32349,6 +32406,27 @@
              END-IF
            END-IF
       *
+           IF ((FLG-GENBUTU70           NOT =   ZERO ) AND
+               (FLG-OITA-GENBUTU70          =   ZERO ))
+           OR ((LNK-S01-KOUREI-ZAITAKU-KBN  =   "1"  ) AND
+               (COMB-HKNNUM             NOT =   SPACE))
+             IF  (COMB-KOH1HKNNUM         =  "970"   )
+             AND (COMB-KOH2HKNNUM         =  SPACE   )
+             AND (COMB-KOH3HKNNUM         =  SPACE   )
+             AND (COMB-KOH4HKNNUM         =  SPACE   )
+             AND (LNK-S01-DAISANYUSENFLG  =  "1"     )
+             AND (LNK-S01-IKTGENKEIFLG    =  SPACE   )
+             AND (LNK-S01-IKTJISSIFLG     =  SPACE   )
+             AND (LNK-SYU-SRYYMD(1:6)    >=  "201204")
+               IF  WK-GENGAKUKBN  =  3 OR 4
+                 CONTINUE
+               ELSE
+                 MOVE   "1"   TO   LNK-S01-GENBUTU-MSG-FLG
+                 MOVE    6    TO   LNK-SYU-SECMONEY
+               END-IF
+             END-IF
+           END-IF
+      *
            IF  (LNK-S01-IKTGENKEIFLG         = "1"     )
            AND (LNK-SYU-SRYYMD(1:6)         >= "201205")
              IF ((FLG-GENBUTU70           NOT =   ZERO ) AND
@@ -34109,11 +34187,12 @@
                       (LNK-SYU-SRYYMD           =  SYU-SRYYMD     ) AND
                       (LNK-SYU-DENPNUM      NOT =  ZERO           ) AND
                       (LNK-SYU-DENPNUM          <  SYU-DENPNUM    ))
+      *
                OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "0" OR SPACE  ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
                       (SYU-KOH1HKNNUM       NOT =  "970"          ) AND
                       (LNK-SYU-SAIKEISANKBN     =
@@ -34125,7 +34204,7 @@
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
                       (SYU-KOH1HKNNUM       NOT =  "970"          ) AND
                       (LNK-SYU-SAIKEISANKBN     =
@@ -34137,7 +34216,7 @@
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
                       (SYU-KOH1HKNNUM       NOT =  "970"          ) AND
                       (LNK-SYU-SAIKEISANKBN     =
@@ -34148,7 +34227,7 @@
                       (LNK-SYU-DENPNUM      NOT =  ZERO           ) AND
                       (LNK-SYU-DENPNUM          <  SYU-DENPNUM    ))
                OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
                       (SYU-KOH1HKNNUM       NOT =  "970"          ) AND
                       (LNK-SYU-SAIKEISANKBN     =  SPACE          ) AND
@@ -34156,15 +34235,10 @@
                       (SYU-NYUGAIKBN            =   "2"           ))
       *
                OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
-                      (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
-                      (SYU-KOH1HKNNUM           =  "970"          ) AND
-                      (SYU-NYUGAIKBN            =   "2"           ))
-               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "0" OR SPACE  ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM          =  "970"          ) AND
                       (SYU-KOH1HKNNUM           =  "970"          ) AND
                       (SYU-NYUGAIKBN            =   "2"           ) AND
@@ -34174,7 +34248,7 @@
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM          =  "970"          ) AND
                       (SYU-KOH1HKNNUM           =  "970"          ) AND
                       (SYU-NYUGAIKBN            =   "2"           ) AND
@@ -34184,7 +34258,7 @@
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "1"           ) AND
-                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG NOT =  SPACE          ) AND
                       (COMB-KOH1HKNNUM          =  "970"          ) AND
                       (SYU-KOH1HKNNUM           =  "970"          ) AND
                       (SYU-NYUGAIKBN            =   "2"           ) AND
@@ -34192,8 +34266,22 @@
                       (LNK-SYU-SRYYMD           =  SYU-SRYYMD     ) AND
                       (LNK-SYU-DENPNUM      NOT =  ZERO           ) AND
                       (LNK-SYU-DENPNUM          <  SYU-DENPNUM    ))
+      *
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG     =   "1"           ) AND
+                      (COMB-KOH1HKNNUM      NOT =  "970"          ) AND
+                      (SYU-KOH1HKNNUM           =  "970"          ) AND
+                      (SYU-NYUGAIKBN            =   "2"           ))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
+                      (LNK-S01-IKTGENKEIFLG     =   "2"           ) AND
+                      (COMB-KOH1HKNNUM          =  "970"          ) AND
+                      (SYU-KOH1HKNNUM       NOT =  "970"          ) AND
+                      (SYU-NYUGAIKBN            =   "2"           ))
+      *
                    IF   (LNK-S01-SAIKEISAN-KBN    =   "1" )
-                   AND  (LNK-S01-IKTGENKEIFLG     =   "1" )
+                   AND  (LNK-S01-IKTGENKEIFLG NOT =  SPACE)
                    AND  (COMB-KOH1HKNNUM      NOT =  "970")
                    AND  (SYU-KOH1HKNNUM       NOT =  "970")
                    AND  (LNK-SYU-SAIKEISANKBN     =  SPACE)

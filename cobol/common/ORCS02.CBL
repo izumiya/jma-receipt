@@ -450,6 +450,8 @@
       *                                     での食事算定対応
       *  04.08.21    NACL-門脇    17/11/17  ７０歳未満の低１チェック修正
       *  04.08.22    NACL-門脇    17/12/07  熊本県地方公費対応
+      *  04.08.23    NACL-門脇    17/12/15  第三者行為現物給付に関わる
+      *                                     負担金計算対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -13965,7 +13967,8 @@
                OR ((COMB-KOH1HKNNUM     NOT  =  "970"             ) AND
                    (SYU-KOH1HKNNUM           =  "970"             ) AND
                    (SYU-SKJ-FTNGAKU(2)  NOT  =   ZERO             ) AND
-                   (SYU-PTFTNRATE            =   ZERO             ))
+                   (SYU-PTFTNRATE            =   ZERO             ) AND
+                   (LNK-S02-DAISANYUSENFLG   =   SPACE            ))
       *
                  CONTINUE
       *

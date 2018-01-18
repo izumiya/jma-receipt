@@ -72,6 +72,8 @@
            03  LNK-S01-IKTGENMKJFLG        PIC  X(01).
       *一括再計算実施フラグ
            03  LNK-S01-IKTJISSIFLG         PIC  X(01).
+      *一括再計算該当者チェックフラグ
+           03  LNK-S01-IKTCHECKFLG         PIC  X(01).
       *現物給付メッセージフラグ
            03  LNK-S01-GENBUTU-MSG-FLG     PIC  X(01).
       *

@@ -780,7 +780,7 @@
       *
            IF    ( SYU-DENPJTIKBN  NOT =   "3" )
                EVALUATE    TRUE
-               WHEN    ( SYU-SECMONEY  =   1 OR 3 OR 2 OR 4 OR 7 )
+               WHEN    ( SYU-SECMONEY  =   1 OR 3 OR 2 OR 4 OR 7 OR 6 )
                    MOVE    "2"      TO  INCOMERES01-TKEIKOKU  (IDXA)
                    MOVE    "Í×°ì³çºÆ·×»»"
                                     TO  INCOMERES01-TKEIKOKUNAME  (IDXA)

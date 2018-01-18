@@ -185,6 +185,8 @@
       *  04.08.07    NACL-門脇    17/10/12  大阪府地方公費対応
       *  04.08.08    NACL-門脇    17/10/18  入院料と異なる保険組み合わせ
       *                                     での食事算定対応
+      *  04.08.09    NACL-門脇    17/12/15  第三者行為現物給付に関わる
+      *                                     負担金計算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -367,6 +369,10 @@
            02  WRK-KOREI-TANYUIN-TBL  OCCURS   10.
               03 WRK-KOREI-TANYUINFLG      PIC X(01).
       *
+       01  WRK-DAISANYUSENFLG-TABLE.
+           02  WRK-DAISANYUSENFLG-TBL OCCURS    2.
+              03 WRK-DAISANYUSENFLG        PIC X(01).
+      *
        01  WRK-YAKTEN-TABLE.
            02  WRK-YAKTEN-TBL         OCCURS   10.
               03 WRK-CSY-YAKTEN            PIC 9(07).
@@ -471,6 +477,15 @@
            03  FLG-NYUINRYO-KASAN2-OK      PIC 9(01).
            03  FLG-NYUINRYO-KASAN-CHK      PIC 9(01).
            03  FLG-TAISYO                  PIC 9(01).
+           03  FLG-ZAIARI                  PIC 9(01).
+           03  FLG-ZAIARI1                 PIC 9(01).
+           03  FLG-SYUARI1                 PIC 9(01).
+           03  FLG-KOHARI1                 PIC 9(01).
+           03  FLG-DAISANARI1              PIC 9(01).
+           03  FLG-ZAIARI2                 PIC 9(01).
+           03  FLG-SYUARI2                 PIC 9(01).
+           03  FLG-KOHARI2                 PIC 9(01).
+           03  FLG-DAISANARI2              PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -839,6 +854,7 @@
                          WRK-KAIKEING-TABLE
                          WRK-KAIKEING2-TABLE
                          WRK-KOREI-TANYUIN-TABLE
+                         WRK-DAISANYUSENFLG-TABLE
                          WRK-YAKTEN-TABLE
                          WRK-SKJHKN-TABLE
                          WRK-SKJHKN-TAIHI-TABLE
@@ -942,6 +958,15 @@
       *
                 MOVE     WRK-KOREI-TANYUINFLG(IDX)
                                               TO  LNK-S02-KOREI-TANYUIN
+      *
+                IF       LNK-SYU-SRYYMD(IDX)(1:6)  =   WRK-SKYYM(1)
+                  MOVE   WRK-DAISANYUSENFLG(1)
+                                              TO  LNK-S02-DAISANYUSENFLG
+                END-IF
+                IF       LNK-SYU-SRYYMD(IDX)(1:6)  =   WRK-SKYYM(2)
+                  MOVE   WRK-DAISANYUSENFLG(2)
+                                              TO  LNK-S02-DAISANYUSENFLG
+                END-IF
       *
                 MOVE     WRK-DOJITU-TBL(IDX)  TO  LNK-S02-DOJITU
       *
@@ -1227,6 +1252,15 @@
       *
                 MOVE     WRK-KOREI-TANYUINFLG(IDX)
                                               TO  LNK-S02-KOREI-TANYUIN
+      *
+                IF       LNK-SYU-SRYYMD(IDX)(1:6)  =   WRK-SKYYM(1)
+                  MOVE   WRK-DAISANYUSENFLG(1)
+                                              TO  LNK-S02-DAISANYUSENFLG
+                END-IF
+                IF       LNK-SYU-SRYYMD(IDX)(1:6)  =   WRK-SKYYM(2)
+                  MOVE   WRK-DAISANYUSENFLG(2)
+                                              TO  LNK-S02-DAISANYUSENFLG
+                END-IF
       *
                 MOVE     WRK-DOJITU-TBL(IDX)  TO  LNK-S02-DOJITU
       *
@@ -1541,12 +1575,9 @@
       *
               END-IF
       *
-              MOVE    "DBCLOSECURSOR"         TO  MCP-FUNC
               MOVE    "tbl_nyuinacct"   TO      MCP-TABLE
               MOVE    "key2"            TO      MCP-PATHNAME
-              CALL    "ORCDBMAIN"       USING MCPAREA
-                                              MCPDATA-REC
-                                              SPA-AREA
+              PERFORM  CSR-CLOSE-SEC
       *
            END-PERFORM.
       *
@@ -1720,13 +1751,10 @@
       *
               END-IF
       *
-              MOVE    "DBCLOSECURSOR"         TO  MCP-FUNC
               MOVE    "tbl_sryacct"   TO      MCP-TABLE
       ***     MOVE    "key33"         TO      MCP-PATHNAME
               MOVE    "key63"         TO      MCP-PATHNAME
-              CALL "ORCDBMAIN" USING MCPAREA
-                                     MCPDATA-REC
-                                     SPA-AREA
+              PERFORM  CSR-CLOSE-SEC
       *
            END-PERFORM.
       *
@@ -1993,7 +2021,21 @@
       ******************************************************************
        HKNNUM-SYUTOKU-SYORI-SEC        SECTION.
       *
+           MOVE       ZERO    TO       FLG-ZAIARI1.
+           MOVE       ZERO    TO       FLG-ZAIARI2.
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                              UNTIL  (IDX            >     2 )
+                                OR   (WRK-SKYYM(IDX) =  SPACE)
+              PERFORM  SRYACT-KENSAKU-SEC
+           END-PERFORM.
+      *
            INITIALIZE         TABLE-CYOKI.
+           MOVE       ZERO    TO       FLG-SYUARI1.
+           MOVE       ZERO    TO       FLG-KOHARI1.
+           MOVE       ZERO    TO       FLG-DAISANARI1.
+           MOVE       ZERO    TO       FLG-SYUARI2.
+           MOVE       ZERO    TO       FLG-KOHARI2.
+           MOVE       ZERO    TO       FLG-DAISANARI2.
       *
            PERFORM    VARYING   IDX    FROM   1   BY   1
                               UNTIL  (IDX            >    10)
@@ -2019,12 +2061,9 @@
                   PERFORM   HKNCOMBI-READ-SEC
               END-IF
       *
-              MOVE    "DBCLOSECURSOR"      TO      MCP-FUNC
               MOVE    "tbl_hkncombi"   TO      MCP-TABLE
               MOVE    "key"            TO      MCP-PATHNAME
-              CALL    "ORCDBMAIN"      USING MCPAREA
-                                             MCPDATA-REC
-                                             SPA-AREA
+              PERFORM  CSR-CLOSE-SEC
       *
               MOVE COMB-TEKSTYMD      TO WRK-HANBETU-TEKSTYMD(IDX)
               IF   WRK-HANBETU-TEKSTYMD(IDX) = SPACE
@@ -2065,12 +2104,9 @@
                        MOVE  MCPDATA-REC     TO      PTHKNINF-REC
                     END-IF
                 END-IF
-                MOVE    "DBCLOSECURSOR"      TO      MCP-FUNC
                 MOVE    "tbl_pthkninf"       TO      MCP-TABLE
                 MOVE    "key"                TO      MCP-PATHNAME
-                CALL "ORCDBMAIN"  USING MCPAREA
-                                        MCPDATA-REC
-                                        SPA-AREA
+                PERFORM  CSR-CLOSE-SEC
                 IF   (COMB-HKNNUM         =   "060")
                 AND  (PTHKN-HKNJANUM  NOT =   SPACE)
                    MOVE  PTHKN-HKNJANUM  TO  WRK-HANBETU-HKNJANUM(IDX)
@@ -2323,6 +2359,76 @@
                   MOVE    "1"   TO  WRK-HANBETU-DAISANFLG(IDX)
               END-IF
       *
+              IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(1)
+                IF   (WRK-HANBETU-SYUHKNNUM(IDX)   NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH2HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH3HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH4HKNNUM(IDX)      = SPACE)
+                    MOVE     1    TO  FLG-SYUARI1
+                END-IF
+                IF   (WRK-HANBETU-SYUHKNNUM(IDX)   NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)  NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)  NOT = "970")
+                    MOVE     1    TO  FLG-KOHARI1
+                END-IF
+                IF  WRK-HANBETU-KOH1HKNNUM(IDX) = "970"
+                    MOVE     1    TO  FLG-DAISANARI1
+                END-IF
+              END-IF
+              IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(2)
+                IF   (WRK-HANBETU-SYUHKNNUM(IDX)   NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH2HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH3HKNNUM(IDX)      = SPACE)
+                AND  (WRK-HANBETU-KOH4HKNNUM(IDX)      = SPACE)
+                    MOVE     1    TO  FLG-SYUARI2
+                END-IF
+                IF   (WRK-HANBETU-SYUHKNNUM(IDX)   NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)  NOT = SPACE)
+                AND  (WRK-HANBETU-KOH1HKNNUM(IDX)  NOT = "970")
+                    MOVE     1    TO  FLG-KOHARI2
+                END-IF
+                IF  WRK-HANBETU-KOH1HKNNUM(IDX) = "970"
+                    MOVE     1    TO  FLG-DAISANARI2
+                END-IF
+              END-IF
+      *
+           END-PERFORM.
+      *
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                              UNTIL  (IDX            >    10)
+                                OR   (WRK-HANBETU-SKYYM(IDX) =  SPACE)
+      *
+              IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(1)
+                IF    FLG-DAISANARI1  =   1
+                AND   FLG-ZAIARI1     =   1
+                AND   FLG-SYUARI1     =   1
+                AND   FLG-KOHARI1     =  ZERO
+      *           第三者行為分の計算優先順位を上げる
+                  IF  WRK-HANBETU-KOH1HKNNUM(IDX) = "970"
+                      MOVE   SPACE  TO  WRK-HANBETU-DAISANFLG(IDX)
+                  ELSE
+                      MOVE    "1"   TO  WRK-HANBETU-DAISANFLG(IDX)
+                  END-IF
+                  MOVE        "1"   TO  WRK-DAISANYUSENFLG(1)
+                END-IF
+              END-IF
+              IF   WRK-HANBETU-SKYYM(IDX)  =   WRK-SKYYM(2)
+                IF    FLG-DAISANARI2  =   1
+                AND   FLG-ZAIARI2     =   1
+                AND   FLG-SYUARI2     =   1
+                AND   FLG-KOHARI2     =  ZERO
+      *           第三者行為分の計算優先順位を上げる
+                  IF  WRK-HANBETU-KOH1HKNNUM(IDX) = "970"
+                      MOVE   SPACE  TO  WRK-HANBETU-DAISANFLG(IDX)
+                  ELSE
+                      MOVE    "1"   TO  WRK-HANBETU-DAISANFLG(IDX)
+                  END-IF
+                  MOVE        "1"   TO  WRK-DAISANYUSENFLG(2)
+                END-IF
+              END-IF
+      *
            END-PERFORM.
       *
       ***
@@ -2385,6 +2491,110 @@
            END-PERFORM.
       *
        HKNNUM-SYUTOKU-SYORI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    診療行為情報検索                                            *
+      ******************************************************************
+       SRYACT-KENSAKU-SEC        SECTION.
+      *
+           MOVE  ZERO                 TO   FLG-ZAIARI
+      *
+           INITIALIZE                      SRYACT-REC
+           MOVE  LNK-S02-HOSPNUM      TO   SRY-HOSPNUM
+           MOVE  LNK-S02-NYUGAIKBN    TO   SRY-NYUGAIKBN
+           MOVE  LNK-S02-PTID         TO   SRY-PTID
+           MOVE  WRK-SKYYM(IDX)       TO   SRY-SRYYM
+           MOVE  "099999931"          TO   SRY-SRYCD(1)
+           MOVE  "099999931"          TO   SRY-SRYCD(2)
+           MOVE  "099999931"          TO   SRY-SRYCD(3)
+           MOVE  "099999931"          TO   SRY-SRYCD(4)
+           MOVE  "099999931"          TO   SRY-SRYCD(5)
+           MOVE  SRYACT-REC           TO   MCPDATA-REC
+           MOVE  "DBSELECT"           TO   MCP-FUNC
+           MOVE  "tbl_sryact"         TO   MCP-TABLE
+           MOVE  "key7"               TO   MCP-PATHNAME
+           CALL  "ORCDBMAIN"       USING   MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+           IF     MCP-RC  =  ZERO
+             MOVE    "tbl_sryact"     TO   MCP-TABLE
+             MOVE    "key7"           TO   MCP-PATHNAME
+             PERFORM  SRYACT-READ-SEC
+             PERFORM  UNTIL  FLG-SRYACT  =  1
+                       OR    FLG-ZAIARI  =  1
+               INITIALIZE                  SRYACCT-REC
+               MOVE  SRY-HOSPNUM      TO   ACCT-HOSPNUM
+               MOVE  SRY-NYUGAIKBN    TO   ACCT-NYUGAIKBN
+               MOVE  SRY-SRYKA        TO   ACCT-SRYKA
+               MOVE  SRY-PTID         TO   ACCT-PTID
+               MOVE  SRY-SRYYM        TO   ACCT-SRYYM
+               MOVE  SRY-ZAINUM       TO   ACCT-ZAINUM
+               MOVE  SRYACCT-REC      TO   MCPDATA-REC
+               MOVE  "DBSELECT"       TO   MCP-FUNC
+               MOVE  "tbl_sryacct"    TO   MCP-TABLE
+               MOVE  "key31"          TO   MCP-PATHNAME
+               CALL  "ORCDBMAIN"   USING   MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+               IF     MCP-RC  =  ZERO
+                 MOVE    "tbl_sryacct"     TO   MCP-TABLE
+                 MOVE    "key31"           TO   MCP-PATHNAME
+                 PERFORM  SRYACCT-READ-SEC
+                 IF    FLG-SRYACCT  =  ZERO
+                   IF  ACCT-ZAIKAISU  NOT =  ZERO
+                     INITIALIZE                 HKNCOMBI-REC
+                     MOVE  ACCT-HOSPNUM    TO   COMB-HOSPNUM
+                     MOVE  ACCT-PTID       TO   COMB-PTID
+                     MOVE  ACCT-HKNCOMBI   TO   COMB-HKNCOMBINUM
+                     MOVE  HKNCOMBI-REC    TO   MCPDATA-REC
+                     MOVE  "DBSELECT"      TO   MCP-FUNC
+                     MOVE  "tbl_hkncombi"  TO   MCP-TABLE
+                     MOVE  "key"           TO   MCP-PATHNAME
+                     CALL  "ORCDBMAIN"  USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+                     IF      MCP-RC  =  ZERO
+                       MOVE    "tbl_hkncombi"   TO   MCP-TABLE
+                       MOVE    "key"            TO   MCP-PATHNAME
+                       PERFORM  HKNCOMBI-READ-SEC
+                       IF    FLG-HKNCOMBI  =  ZERO
+                         IF  COMB-KOH1HKNNUM  =  "970"
+                           MOVE     1           TO   FLG-ZAIARI
+                         END-IF
+                       END-IF
+                     END-IF
+                     MOVE    "tbl_hkncombi"     TO   MCP-TABLE
+                     MOVE    "key"              TO   MCP-PATHNAME
+                     PERFORM  CSR-CLOSE-SEC
+                   END-IF
+                 END-IF
+               END-IF
+               MOVE    "tbl_sryacct"            TO   MCP-TABLE
+               MOVE    "key31"                  TO   MCP-PATHNAME
+               PERFORM  CSR-CLOSE-SEC
+      *
+               MOVE    "tbl_sryact"             TO   MCP-TABLE
+               MOVE    "key7"                   TO   MCP-PATHNAME
+               PERFORM  SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE        "tbl_sryact"             TO   MCP-TABLE
+           MOVE        "key7"                   TO   MCP-PATHNAME
+           PERFORM      CSR-CLOSE-SEC
+      *
+           IF   FLG-ZAIARI  =  1
+             EVALUATE  IDX
+               WHEN     1
+                 MOVE     1       TO   FLG-ZAIARI1
+               WHEN     2
+                 MOVE     1       TO   FLG-ZAIARI2
+             END-EVALUATE
+           END-IF
+      *
+           .
+      *
+       SRYACT-KENSAKU-EXT.
            EXIT.
       *
       ******************************************************************
@@ -2887,7 +3097,7 @@
            EXIT.
       *
       ******************************************************************
-      *    保険組み合わせ検索処理
+      *    保険組み合わせ検索
       ******************************************************************
        HKNCOMBI-KENSAKU-SEC         SECTION.
       *
@@ -2907,12 +3117,9 @@
              MOVE  "key"           TO  MCP-PATHNAME
              PERFORM  HKNCOMBI-READ-SEC
            END-IF
-           MOVE  "DBCLOSECURSOR"   TO  MCP-FUNC
            MOVE  "tbl_hkncombi"    TO  MCP-TABLE
            MOVE  "key"             TO  MCP-PATHNAME
-           CALL  "ORCDBMAIN"  USING    MCPAREA
-                                       MCPDATA-REC
-                                       SPA-AREA
+           PERFORM  CSR-CLOSE-SEC
       *
            .
       *
@@ -8705,12 +8912,9 @@ grpsys                                SPA-AREA
                INITIALIZE                  TNS-TENSU-REC
            END-IF
       *
-           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-grpsys     CALL "ORCDBMAIN" USING MCPAREA
-                                  MCPDATA-REC
-grpsys                            SPA-AREA
+           PERFORM  CSR-CLOSE-SEC
       *
            .
        TENSU-READ-EXT.
