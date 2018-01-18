@@ -4368,6 +4368,12 @@
                                                    =   "099409907"
                            MOVE    "1"         TO  LNK-S01-JIKANGAI
                        END-IF
+      *H30.1
+      *                第三者行為分計算優先フラグ
+                       IF      LNK-WKSRY-SRYCD(IDX IDS)
+                                                   =   "099999931"
+                           MOVE    "1"     TO  LNK-S01-DAISANYUSENFLG
+                       END-IF
                    END-PERFORM
                END-IF
       *        診察料算定フラグ（地方公費用）
@@ -6553,6 +6559,7 @@
       *
       *    MOVE    SPA-SRYYMD          TO  TNS-YUKOSTYMD
       *    MOVE    SPA-SRYYMD          TO  TNS-YUKOEDYMD
+      *
            MOVE    SPA-NAI-SRYYMD      TO  TNS-YUKOSTYMD
            MOVE    SPA-NAI-SRYYMD      TO  TNS-YUKOEDYMD
       *
@@ -6824,8 +6831,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
-      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
+      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
            MOVE    SPA-NAI-SRYYMD      TO  TNSP-YUKOSTYMD
            MOVE    SPA-NAI-SRYYMD      TO  TNSP-YUKOEDYMD
       *

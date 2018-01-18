@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.08.00    NACL-多々納  18/01/17  第三者行為分計算優先対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -373,6 +374,12 @@
                        IF      LNK-WKSRY-SRYCD(IDX IDS)
                                                    =   "099409907"
                            MOVE    "1"         TO  LNK-S01-JIKANGAI
+                       END-IF
+      *H30.1
+      *                第三者行為分計算優先フラグ
+                       IF      LNK-WKSRY-SRYCD(IDX IDS)
+                                                   =   "099999931"
+                           MOVE    "1"     TO  LNK-S01-DAISANYUSENFLG
                        END-IF
       *                初診料判定
                        PERFORM 1001-SYOSIN-CHK-SEC
