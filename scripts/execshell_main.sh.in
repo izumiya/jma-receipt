@@ -36,6 +36,8 @@ LOG_GZ=${LOGDIR}/${LOG_FILE}.gz
 LOG_TEMP=$(mktemp ${LOGDIR}/${SHELL_NAME%.sh}.XXXXXX)
 LOG_LOCK=${LOGDIR}/.jma-log.lock
 
+trap "rm ${LOG_TEMP}" EXIT
+
 echo $(date +"%Y-%m-%d %H:%M:%S") $(printf "[%s]" "$$" "BGN" "$@") >> ${LOG_TEMP}
 
 LOGSH="log_shell.sh"
@@ -82,6 +84,5 @@ echo $(date +"%Y-%m-%d %H:%M:%S") $(printf "[%s]" "$$" "END")  >>  ${LOG_TEMP}
   fi
 ) 200> "${LOG_LOCK}"
 
-rm ${LOG_TEMP}
 
 exit ${RET}
