@@ -64,7 +64,7 @@
            03  WRK-NISSU1                  PIC 9(05).
            03  WRK-NISSU2                  PIC 9(05).
            03  WRK-NISSU3                  PIC 9(05).
-           03  WRK-TUSAN                   PIC 9(08).
+           03  WRK-TUSAN                   PIC S9(08).
       *
       *
       *****************************************************************
@@ -254,56 +254,33 @@ grpsys*
                GO  TO  2100-91DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
+           MOVE    ZERO            TO  WRK-TUSAN
+           PERFORM VARYING IDX1    FROM    STUSAN-RRK-CNT  BY  -1
+                   UNTIL ( IDX1    <   1 )
       *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   STUSAN-RRK-CNT )
+               PERFORM 21001-NISSU-EDIT-SEC
+      *
+      D        DISPLAY "NISSU" STUSAN-RRK-NISSU(IDX1)
+      *
                IF    ( STUSAN-RRK-JTIKBN (IDX1)
                                            NOT = "5" )
-                   IF    ( STUSAN-RRK-NYUINYMD (IDX1) NOT =    SPACE )
-                    AND  ( STUSAN-RRK-NISSU (IDX1)        =    ZERO )
-                    AND  ( STUSAN-RRK-DJKBN (IDX1)        =    SPACE)
-                       COMPUTE STUSAN-RRK-NISSU (IDX1)
-                           =   STUSAN-RRK-NISSU (IDX1)    +    1
-                   END-IF
       *
-                   IF   (STUSAN-RRK-TAIINYMD(IDX1)  NOT = "99999999")
-                    IF (STUSAN-RRK-NISSU (IDX1)    =   ZERO  OR  1)
-                      CONTINUE
-                    ELSE
-                     INITIALIZE                  STS-AREA-DAY
-                     INITIALIZE                  LNK-DAY5-AREA
-                     MOVE    "51"            TO  LNK-DAY5-IRAI
-                     MOVE    STUSAN-RRK-NYUINYMD (IDX1)
-                                             TO  LNK-DAY5-START
-                     MOVE    STUSAN-RRK-TAIINYMD (IDX1)
-                                             TO  LNK-DAY5-END
-                     CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                                 LNK-DAY5-AREA
-                     MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX1)
-                    END-IF
-                   END-IF
-      *
-                   COMPUTE WRK-TUSAN
-                       =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX1)
-                   IF    ( WRK-TUSAN   <   91 )
-      *
+                   IF  ( WRK-TUSAN + STUSAN-RRK-NISSU (IDX1)
+                                              >= 91 )
                        INITIALIZE                  STS-AREA-DAY
                        INITIALIZE                  LNK-DAY6-AREA
                        MOVE    "61"            TO  LNK-DAY6-IRAI
                        MOVE    STUSAN-RRK-NYUINYMD (IDX1)
                                                TO  LNK-DAY6-KIJUN
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                       IF    ( STUSAN-RRK-DJKBN    (IDX1)
-                                               =   SPACE OR "2" )
-                           COMPUTE LNK-DAY6-ZOGEN
-                               =   91   -          WRK-TUSAN
-                       ELSE
-                           COMPUTE LNK-DAY6-ZOGEN
-                               =   92   -          WRK-TUSAN
-                       END-IF
+                       COMPUTE LNK-DAY6-ZOGEN
+                           =   91
+                           -   WRK-TUSAN
                        CALL    "ORCSDAY"   USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
+      D                DISPLAY "LNK-DAY6-KIJUN=" LNK-DAY6-KIJUN
+      D                        " LNK-DAY6-ZOGEN=" LNK-DAY6-ZOGEN
+      D                        " LNK-DAY6-KOYOMI=" LNK-DAY6-KOYOMI
                        MOVE    LNK-DAY6-KOYOMI TO  STUSANCHK-DAY-91
       *
                        IF    ( STUSAN-RRK-JTIKBN (IDX1)  =   "6" )
@@ -312,7 +289,10 @@ grpsys*
                            MOVE    ZERO        TO  STUSANCHK-DAY-91-STS
                        END-IF
       *
-                       MOVE    STUSAN-RRK-CNT      TO  IDX1
+                       MOVE    1               TO  IDX1
+                   ELSE
+                       COMPUTE WRK-TUSAN
+                           =   WRK-TUSAN + STUSAN-RRK-NISSU (IDX1)
                    END-IF
                END-IF
            END-PERFORM
@@ -330,30 +310,35 @@ grpsys*
                GO  TO  2100-180DAYS-EDIT-EXT
            END-IF
       *
-           MOVE    STUSAN-NISSU04  TO  WRK-TUSAN
       *
-           PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   STUSAN-RRK-CNT )
-               COMPUTE WRK-TUSAN
-                   =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX1)
-               IF    ( WRK-TUSAN   <   180 )
+           MOVE    ZERO            TO  WRK-TUSAN
+           PERFORM VARYING IDX1    FROM    STUSAN-RRK-CNT  BY  -1
+                   UNTIL ( IDX1    <   1 )
       *
+               PERFORM 21001-NISSU-EDIT-SEC
+      *
+      D            DISPLAY STUSAN-RRK-NYUINYMD (IDX1) "/"
+      D                   STUSAN-RRK-TAIINYMD (IDX1) "/"
+      D                   STUSAN-RRK-NISSU(IDX1)
+      *
+      D        DISPLAY "NISSU" STUSAN-RRK-NISSU(IDX1)
+      *
+               IF  ( WRK-TUSAN + STUSAN-RRK-NISSU (IDX1)
+                                          >= 180 )
                    INITIALIZE                  STS-AREA-DAY
                    INITIALIZE                  LNK-DAY6-AREA
                    MOVE    "61"            TO  LNK-DAY6-IRAI
                    MOVE    STUSAN-RRK-NYUINYMD (IDX1)
                                            TO  LNK-DAY6-KIJUN
                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   IF    ( STUSAN-RRK-DJKBN    (IDX1)
-                                           =   SPACE OR "2" )
-                       COMPUTE LNK-DAY6-ZOGEN
-                           =   180   -         WRK-TUSAN
-                   ELSE
-                       COMPUTE LNK-DAY6-ZOGEN
-                           =   181   -         WRK-TUSAN
-                   END-IF
+                   COMPUTE LNK-DAY6-ZOGEN
+                       =   180
+                       -   WRK-TUSAN
                    CALL    "ORCSDAY"   USING   STS-AREA-DAY
                                                LNK-DAY6-AREA
+      D            DISPLAY "LNK-DAY6-KIJUN=" LNK-DAY6-KIJUN
+      D                     " LNK-DAY6-ZOGEN=" LNK-DAY6-ZOGEN
+      D                     " LNK-DAY6-KOYOMI=" LNK-DAY6-KOYOMI
                    MOVE    LNK-DAY6-KOYOMI TO  STUSANCHK-DAY-180
       *
                    EVALUATE    STUSAN-RRK-JTIKBN (IDX1)
@@ -365,13 +350,54 @@ grpsys*
                        MOVE    ZERO        TO  STUSANCHK-DAY-180-STS
                    END-EVALUATE
       *
-                   MOVE    STUSAN-RRK-CNT      TO  IDX1
-      *
+                   MOVE    1               TO  IDX1
+               ELSE
+                   COMPUTE WRK-TUSAN
+                       =   WRK-TUSAN + STUSAN-RRK-NISSU (IDX1)
                END-IF
            END-PERFORM
       *
            .
        2100-180DAYS-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    日数編集処理
+      *****************************************************************
+       21001-NISSU-EDIT-SEC                SECTION.
+      *
+           IF    ( STUSAN-RRK-JTIKBN (IDX1)  NOT = "5" )
+            AND  ( STUSAN-RRK-JTIKBN (IDX1)  NOT = "6" )
+               IF   ( STUSAN-RRK-TAIINYMD(IDX1)
+                                   =   "99999999" )
+                   MOVE    999             TO  STUSAN-RRK-NISSU(IDX1)
+               ELSE
+      *
+                   INITIALIZE                  STS-AREA-DAY
+                   INITIALIZE                  LNK-DAY5-AREA
+                   MOVE    "51"            TO  LNK-DAY5-IRAI
+                   MOVE    STUSAN-RRK-NYUINYMD (IDX1)
+                                           TO  LNK-DAY5-START
+                   MOVE    STUSAN-RRK-TAIINYMD (IDX1)
+                                           TO  LNK-DAY5-END
+                   CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                               LNK-DAY5-AREA
+                   MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX1)
+      D            DISPLAY "LNK-DAY5-NISSU1 =" LNK-DAY5-NISSU1
+      D            DISPLAY "LNK-DAY5-NISSU2 =" LNK-DAY5-NISSU2
+      *
+                   IF    ( IDX1    >   1 )
+                    AND  ( STUSAN-RRK-TAIINYMD (IDX1)
+                                   =   STUSAN-RRK-NYUINYMD (IDX1 - 1 ))
+                       COMPUTE STUSAN-RRK-NISSU(IDX1)
+                           =   STUSAN-RRK-NISSU(IDX1)
+                           -   1
+                   END-IF
+      *
+               END-IF
+           END-IF
+      *
+           .
+       21001-NISSU-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    日付チェック・編集処理

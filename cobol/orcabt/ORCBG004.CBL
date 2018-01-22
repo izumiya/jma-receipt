@@ -878,7 +878,8 @@ grpsys                                         SPA-AREA
            MOVE    STUSANCHK-TSUSAN    TO  WRK-CSV-NISSU
       *
       *    £¹£±Æü°Ê¾å
-           IF    ( STUSANCHK-DAY-91       <=   PTNYUINRRK-TAIINYMD )
+           IF    ( STUSANCHK-DAY-91    NOT =  SPACE )
+            AND  ( STUSANCHK-DAY-91       <=   PTNYUINRRK-TAIINYMD )
              IF  ( STUSANCHK-DAY-91-STS    =   ZERO OR "1" )
                MOVE    STUSANCHK-DAY-91    TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
@@ -896,7 +897,8 @@ grpsys                                         SPA-AREA
            END-IF
       *
       *    £±£¸£°Æü°Ê¾å
-           IF    ( STUSANCHK-DAY-180      <=   PTNYUINRRK-TAIINYMD )
+           IF   ( STUSANCHK-DAY-180    NOT =  SPACE )
+            AND ( STUSANCHK-DAY-180      <=   PTNYUINRRK-TAIINYMD )
              IF    ( STUSANCHK-DAY-180-STS =   ZERO OR "2" )
                MOVE    STUSANCHK-DAY-180   TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
@@ -1110,7 +1112,7 @@ grpsys                                 SPA-AREA
        270-CSV-HEAD-SET-SEC        SECTION.
       *
            INITIALIZE                  WRK-REC
-                                       WRK-REC-LENGTH
+           MOVE    1               TO  WRK-REC-LENGTH
       *
            MOVE    CSV-HEAD-01     TO  WRK-DATA
            MOVE    100             TO  WRK-NAGASA
@@ -1118,15 +1120,14 @@ grpsys                                 SPA-AREA
            PERFORM 5004-MOJI-HENSYU-SEC
       *
       *    ²þ¹Ô¥³¡¼¥ÉÊÔ½¸
-           STRING  WRK-REC(1:WRK-REC-LENGTH)
-                                       DELIMITED  BY  SIZE
-                   WRK-KAIGYO          DELIMITED  BY  SIZE
-                   INTO                WRK-REC
+           STRING  WRK-KAIGYO          DELIMITED  BY  SIZE
+           INTO    WRK-REC
+           WITH    POINTER  WRK-REC-LENGTH
            END-STRING
            PERFORM 500-TOUKEICSV-SEC
       *
            INITIALIZE                  WRK-REC
-                                       WRK-REC-LENGTH
+           MOVE    1               TO  WRK-REC-LENGTH
       *
            MOVE    CSV-HEAD-02     TO  WRK-DATA
            MOVE    120             TO  WRK-NAGASA
@@ -1134,10 +1135,9 @@ grpsys                                 SPA-AREA
            PERFORM 5004-MOJI-HENSYU-SEC
       *
       *    ²þ¹Ô¥³¡¼¥ÉÊÔ½¸
-           STRING  WRK-REC(1:WRK-REC-LENGTH)
-                                       DELIMITED  BY  SIZE
-                   WRK-KAIGYO          DELIMITED  BY  SIZE
-                   INTO                WRK-REC
+           STRING  WRK-KAIGYO          DELIMITED  BY  SIZE
+           INTO    WRK-REC
+           WITH    POINTER  WRK-REC-LENGTH
            END-STRING
            PERFORM 500-TOUKEICSV-SEC
       *
@@ -1150,7 +1150,7 @@ grpsys                                 SPA-AREA
        270-CSV-BODY-SET-SEC        SECTION.
       *
            INITIALIZE                  WRK-REC
-                                       WRK-REC-LENGTH
+           MOVE    1               TO  WRK-REC-LENGTH
       *
       *    ÉÂÅï
            MOVE    WRK-CSV-BTUNAME TO  WRK-DATA
@@ -1225,10 +1225,9 @@ grpsys                                 SPA-AREA
            PERFORM 5004-MOJI-HENSYU-SEC
       *
       *    ²þ¹Ô¥³¡¼¥ÉÊÔ½¸
-           STRING  WRK-REC(1:WRK-REC-LENGTH)
-                                       DELIMITED  BY  SIZE
-                   WRK-KAIGYO          DELIMITED  BY  SIZE
-                   INTO                WRK-REC
+           STRING  WRK-KAIGYO          DELIMITED  BY  SIZE
+           INTO    WRK-REC
+           WITH    POINTER  WRK-REC-LENGTH
            END-STRING
            PERFORM 500-TOUKEICSV-SEC
       *
@@ -1287,26 +1286,17 @@ grpsys                                 SPA-AREA
            IF      WRK-DATA            =   SPACE
                CONTINUE
            ELSE
-               PERFORM VARYING IDW2    FROM    WRK-NAGASA  BY  -1
-                       UNTIL   IDW2    <       1
-                   IF      WRK-DATA (IDW2:1)   NOT =   SPACE
-                       STRING  WRK-REC(1:WRK-REC-LENGTH)
-                                                   DELIMITED   BY  SIZE
-                               WRK-DATA(1:IDW2)    DELIMITED   BY  SIZE
-                               INTO    WRK-REC
-                       END-STRING
-                       ADD     IDW2        TO  WRK-REC-LENGTH
-                       MOVE    1           TO  IDW2
-                   END-IF
-               END-PERFORM
+               STRING  FUNCTION TRIM(WRK-DATA) DELIMITED BY SIZE
+               INTO    WRK-REC
+               WITH    POINTER  WRK-REC-LENGTH
+               END-STRING
            END-IF
       *
            IF      WRK-RECEND         =   ZERO
-               STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
-                       WRK-KUGIRI                DELIMITED  BY  SIZE
-                       INTO        WRK-REC
+               STRING  WRK-KUGIRI                DELIMITED  BY  SIZE
+               INTO    WRK-REC
+               WITH    POINTER  WRK-REC-LENGTH
                END-STRING
-               ADD     1                   TO  WRK-REC-LENGTH
            END-IF
       *
            INITIALIZE                      WRK-HENSYU-AREA
