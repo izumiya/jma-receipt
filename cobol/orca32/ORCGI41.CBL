@@ -688,6 +688,9 @@
       *    通算日数取得サブ
            COPY "CPORCSTUSAN.INC".
       *
+      *    通算日数チェックサブ
+           COPY "CPORCSTUSANCHK.INC".
+      *
       *    排他制御パラメタ
            COPY    "CPORCSLOCK.INC".
       *
@@ -1795,6 +1798,35 @@
                END-IF
            END-PERFORM
            DISPLAY "3103-180DAYS-EDIT-EXT"
+      *
+      *    通算日数チェックサブ呼出
+           INITIALIZE                      ORCSTUSANCHKAREA
+grpsys     MOVE    SPA-HOSPNUM         TO  STUSANCHK-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  STUSANCHK-PTID
+           MOVE    PTNYUINRRK-NYUINYMD TO  STUSANCHK-NYUINYMD
+           IF    ( PTNYUINRRK-TAIINYMD >=  SPA-SYSYMD )
+               MOVE    SPA-SYSYMD      TO  STUSANCHK-KJNYMD
+           ELSE
+               MOVE    PTNYUINRRK-TAIINYMD
+                                       TO  STUSANCHK-KJNYMD
+           END-IF
+      *
+           MOVE    PTNYUINRRK-RRKNUM   TO  STUSANCHK-RRKNUM
+      *
+           CALL    "ORCSTUSANCHK"          USING
+                                           ORCSTUSANCHKAREA
+grpsys                                     SPA-AREA
+           IF    ( STUSANCHK-DAY-180   NOT =   SPACE )
+             IF  ( STUSANCHK-DAY-180-STS   =   ZERO OR "2"  )
+               DISPLAY "STUSANCHK-DAY-180 = " STUSANCHK-DAY-180
+               MOVE    STUSANCHK-DAY-180 TO  SPA-GMN-IJYOU180
+               MOVE    STUSANCHK-DAY-180 TO  WRK-SYMD
+               PERFORM 41012-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG     TO  SPA-GMN-IJYOU180
+             ELSE
+               MOVE    "********"  TO  SPA-GMN-IJYOU180
+             END-IF
+           END-IF
       *
            .
        3103-180DAYS-EDIT-EXT.
