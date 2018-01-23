@@ -7,6 +7,8 @@ if [ ! -f ${JMARECEIPT_ENV} ]; then
 fi
 . $JMARECEIPT_ENV
 
+MONBATCH=/usr/lib/panda/bin/monbatch
+
 #-------------------------------------------#
 #  ${1} : 医療機関識別番号(HOSPNUM)
 #  ${2} : 診療年月
