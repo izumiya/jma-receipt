@@ -75,8 +75,8 @@ xml_system01_dailyv2res {
 		};
 	    Medical_Set02_Information	{
 #--     ÌôºŞÅêÍ¿ÎÌ¥Á¥§¥Ã¥¯
-		Dosqge_Chk_Class		varchar(1);
-		Dosqge_Chk_Class_Name		varchar(40);
+		Dosage_Chk_Class		varchar(1);
+		Dosage_Chk_Class_Name		varchar(40);
 #--     ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯
 		Dosage_30Over_Chk_Class		varchar(1);
 		Dosage_30Over_Chk_Class_Name	varchar(40);
