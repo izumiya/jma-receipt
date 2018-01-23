@@ -1725,6 +1725,36 @@
                    END-IF
                END-IF
            END-PERFORM
+      *    通算日数チェックサブ呼出
+           INITIALIZE                      ORCSTUSANCHKAREA
+grpsys     MOVE    SPA-HOSPNUM         TO  STUSANCHK-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  STUSANCHK-PTID
+           MOVE    PTNYUINRRK-NYUINYMD TO  STUSANCHK-NYUINYMD
+           IF    ( PTNYUINRRK-TAIINYMD >=  SPA-SYSYMD )
+               MOVE    SPA-SYSYMD      TO  STUSANCHK-KJNYMD
+           ELSE
+               MOVE    PTNYUINRRK-TAIINYMD
+                                       TO  STUSANCHK-KJNYMD
+           END-IF
+      *
+           MOVE    PTNYUINRRK-RRKNUM   TO  STUSANCHK-RRKNUM
+      *
+           CALL    "ORCSTUSANCHK"          USING
+                                           ORCSTUSANCHKAREA
+grpsys                                     SPA-AREA
+           IF    ( STUSANCHK-DAY-91   NOT =   SPACE )
+               DISPLAY "STUSANCHK-DAY-91 = " STUSANCHK-DAY-91
+               MOVE    STUSANCHK-DAY-91 TO  SPA-GMN-IJYOU91
+               MOVE    STUSANCHK-DAY-91 TO  WRK-SYMD
+               IF      SPA-SYSYMD   >=   SPA-GMN-IJYOU91
+                  MOVE  "red"      TO   SPA-GMN-IJYOU91-STYLE
+               ELSE
+                  MOVE  "black"    TO   SPA-GMN-IJYOU91-STYLE
+               END-IF
+               PERFORM 41012-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG     TO  SPA-GMN-IJYOU91
+           END-IF
+      *
       **     DISPLAY "3103-91DAYS-EDIT-EXT"
       *
            .
