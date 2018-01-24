@@ -85,6 +85,7 @@
       *ver.4.7
            03  FLG-INPUTOK2            PIC 9(01).
            03  FLG-INPUTOK6            PIC 9(01).
+           03  FLG-INPUTOK7            PIC 9(01).
       *H29.4
            03  FLG-TANKI3HKT-OK        PIC 9(01).
            03  FLG-TANKI3HKT-NO        PIC 9(01).
@@ -1222,6 +1223,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    ZERO                TO  FLG-INPUTOK
            MOVE    ZERO                TO  FLG-INPUTOK2
            MOVE    ZERO                TO  FLG-INPUTOK6
+           MOVE    ZERO                TO  FLG-INPUTOK7
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-GMN-MAX  )
                IF     (SPA-COM-HKNCOMBI (IDX-Z)    =   "9999")
@@ -1255,9 +1257,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    END-IF
       *H24.8       （サ）、ユーザ器材
                    IF     (SPA-COM-INPUTCD (IDX-Z)     =   "820000046")
-                   OR     (SPA-COM-INPUTCD (IDX-Z)(1:3)    = "059"  )
+      ***************     (SPA-COM-INPUTCD (IDX-Z)(1:3)    = "059"  )
                        MOVE    1                   TO  FLG-INPUTOK
                        MOVE    1                   TO  FLG-INPUTOK2
+                   END-IF
+      *H30.1       ユーザ器材
+                   IF     (SPA-COM-INPUTCD (IDX-Z)(1:3)    = "059"  )
+                       MOVE    1                   TO  FLG-INPUTOK
+                       MOVE    1                   TO  FLG-INPUTOK7
                    END-IF
       *H24.8
       *            剤点数がある剤のみ
@@ -1269,6 +1276,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *                電子点数表からのチェックは、薬剤・器材のみ
                        IF     (TBL-HKTSRYCD (1)        =   SPACE )
                          AND  (FLG-INPUTOK6            =   ZERO  )
+                         AND  (FLG-INPUTOK7            =   ZERO  )
                            CONTINUE
                        ELSE
                            PERFORM 20022-SRYKBN-CHECK-SEC
@@ -1280,6 +1288,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    ZERO                TO  FLG-SANTEIOK 
                    MOVE    ZERO                TO  FLG-INPUTOK
                    MOVE    ZERO                TO  FLG-INPUTOK2
+      *H30.1
+                   MOVE    ZERO                TO  FLG-INPUTOK6
+                   MOVE    ZERO                TO  FLG-INPUTOK7
                END-IF
                IF      SPA-COM-INPUTCD (IDX-Z) =   "099999903"
                    MOVE    1                   TO  FLG-SANTEIOK
@@ -1495,6 +1506,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                           (FLG-INPUTOK2              =   ZERO))
       *H28.4           院内は点数ゼロも包括対象
                        IF    (SPA-COM-SRYSYUKBN(IDX-Z)   =   "231"
+                                                         OR  "211"
+                                                         OR  "291"
+                                                         OR  "221"
+                                                         OR  "297"
                                                          OR  "294")
                            IF      WRK-HKTKBN20    =   1
                                MOVE    1           TO  FLG-CHK3
