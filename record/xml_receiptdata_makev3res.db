@@ -22,9 +22,9 @@ xml_receiptdata_makev3res {
 			Data_Id         varchar(37);
 			Print_Id        varchar(37);
 		} [10];
-		receiptdata_Warning_Info {
-			receiptdata_Warning		varchar(3);
-			receiptdata_Warning_Message	varchar(100);
+		Receiptdata_Warning_Info {
+			Receiptdata_Warning		varchar(3);
+			Receiptdata_Warning_Message	varchar(100);
 		} [5];
 		Effective_Period_Information{
 			Info_Period_Start_Month	varchar(7);
@@ -36,6 +36,6 @@ xml_receiptdata_makev3res {
 			Info_InsuranceProvider_Name	varchar(30);
 		}[10];
 		All_Count		varchar(05);
-		All_Number_Of_Sheets    varchar(05);
+		All_Number_Of_Sheets	varchar(05);
 	};
 };
