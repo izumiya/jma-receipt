@@ -51,6 +51,9 @@
               05  STOCKRES-BASE-DATE         PIC X(10).
       *       入外区分（外来のみ）
               05  STOCKRES-INOUT             PIC X(01).
+      *       テスト患者区分(True:含む）
+              05  STOCKRES-CONTAIN-TESTPATIENT
+                                             PIC X(04).
       *       件数
               05  STOCKRES-OUTPUT-COUNT      PIC X(10).
       *

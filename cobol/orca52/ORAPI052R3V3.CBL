@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.01    NACL-藤原    18/01/24  テスト患者区分の追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -98,6 +99,7 @@
            03  WRK-PARAM.
                05  WRK-PARAM-ORCA-UID  PIC X(36).
                05  WRK-PARAM-KARTE-UID PIC X(36).
+           03  WRK-CONTAIN-TESTPATIENT PIC X(01).
       *
        01  WRK-LNK-AREA.
            COPY    "CPORCSPRTLNK.INC".
@@ -552,6 +554,15 @@
       *****MOVE    STOCKREQ-INOUT      TO  STOCKRES-INOUT
            MOVE    "O"                 TO  STOCKRES-INOUT
       *
+           MOVE    STOCKREQ-CONTAIN-TESTPATIENT
+                                       TO  STOCKRES-CONTAIN-TESTPATIENT
+           IF      STOCKREQ-CONTAIN-TESTPATIENT
+                                       =   "True"
+               MOVE    "1"                 TO  WRK-CONTAIN-TESTPATIENT
+           ELSE
+               MOVE    "0"                 TO  WRK-CONTAIN-TESTPATIENT
+           END-IF
+      *
            MOVE    STOCKREQ-REQUEST-NUMBER TO  STOCKRES-REQUEST-NUMBER
       *
            .
@@ -788,6 +799,8 @@
       *****        MOVE    "1"                 TO  SHELLTBL-ARG17
       *****END-EVALUATE
            MOVE    "2"                 TO  SHELLTBL-ARG17
+           MOVE    WRK-CONTAIN-TESTPATIENT
+                                       TO  SHELLTBL-ARG18
       *
            MOVE    "MONBLOBNEW"        TO  MCP-FUNC
            MOVE    "key"               TO  MCP-PATHNAME
@@ -795,7 +808,7 @@
            CALL    "MONFUNC"           USING
                                            MCPAREA
                                            MONBLOB
-           MOVE    MONBLOB-ID          TO  SHELLTBL-ARG18
+           MOVE    MONBLOB-ID          TO  SHELLTBL-ARG19
                                            WRK-MONBLOB-ID
       *
            MOVE    SHELLTBL            TO  MCPDATA-REC

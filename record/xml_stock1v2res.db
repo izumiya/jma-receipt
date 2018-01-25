@@ -15,6 +15,7 @@ xml_stock1v2res {
 		Reskey			varchar(100);
 		Base_Date		varchar(10);
 		InOut			varchar(1);
+		Contain_TestPatient	varchar(4);
 		Output_Count		varchar(10);
 		Data_Id_Information {
 			Data_Id         varchar(37);

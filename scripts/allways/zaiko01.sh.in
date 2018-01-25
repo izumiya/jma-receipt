@@ -18,7 +18,8 @@ fi
 #        ${15} エラーファイル名 
 #        ${16} 基準日
 #        ${17} 入外区分
-#        ${18} MONBLOB-ID
+#        ${18} テスト患者区分
+#        ${19} MONBLOB-ID
 #-------------------------------------------#
 
 cleanup(){
@@ -45,15 +46,16 @@ echo $(basename ${LOG_FILE})
 
 echo $#
 echo "arg18  = [" ${18} "]" 
+echo "arg19  = [" ${19} "]" 
 
 RENNUM=$(expr $RENNUM + 1) 
-$DBSTUB -dir $LDDIRECTORY -bd orcabt ORAPI052BR3V3 -parameter "$1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17}"
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORAPI052BR3V3 -parameter "$1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18}"
 if  [ -e ${ERR_FILE_FULL} ]; then
      exit
 else
      FILENM="stock1.xml"
      echo "filenm=[" $FILENM "]"
-     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"xml",${18}
+     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter $1,$2,$3,$RENNUM,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},$FILENM,"xml",${19}
      if  [ -e ${ERR_FILE_FULL} ]; then
          exit
      fi

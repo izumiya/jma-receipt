@@ -37,4 +37,7 @@
               03  STOCKREQ-ORCA-UID          PIC X(36).
       *       基準日
               03  STOCKREQ-BASE-DATE         PIC X(10).
+      *       テスト患者区分(True:含む）
+              03  STOCKREQ-CONTAIN-TESTPATIENT
+                                             PIC X(04).
       *
