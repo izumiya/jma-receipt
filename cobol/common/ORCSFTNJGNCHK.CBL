@@ -112,6 +112,8 @@
       *                                     ¤Ç¤Î¿©»ö»»ÄêÂÐ±þ
       *  04.08.06    NACL-ÌçÏÆ    17/12/07  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.07    NACL-ÌçÏÆ    18/01/09  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.08.08    NACL-ÌçÏÆ    18/01/25  £°ÅÀ¸øÈñ¥ì¥»µ­ºÜ½¤Àµ
+      *                                     ¡ÊÊñ³çºÞ¤Î¤ß¤Î¾ì¹ç¤âÂÐ¾Ý¤È¤¹¤ë¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -156,6 +158,7 @@
            03  FLG-HKNCOMBI-CHECK  PIC 9(01).
            03  FLG-SKJ-CHECK       PIC 9(01).
            03  FLG-SRYACCT-CHECK   PIC 9(01).
+           03  FLG-SRYACCT-CHECK3  PIC 9(01).
            03  FLG-SRYACT-CHECK    PIC 9(01).
            03  FLG-GENMEN-ARI      PIC 9(01).
            03  FLG-GENMEN-NASI     PIC 9(01).
@@ -2283,7 +2286,20 @@
                      END-IF
                   END-IF
                 ELSE
+                  MOVE     ZERO    TO   FLG-SRYACCT-CHECK3
+                  PERFORM  VARYING  IDX2  FROM  1  BY  1
+                            UNTIL  (IDX2               >  50)
+                             OR    (FLG-SRYACCT-CHECK3 =  1 )
+                    IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                      PERFORM  2004118-SRYACCT-CHECK3-SEC
+                    END-IF
+                  END-PERFORM
+                  IF  FLG-SRYACCT-CHECK3 =  1
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
+                  ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                  END-IF
                 END-IF
              END-IF
            END-IF
@@ -2843,6 +2859,40 @@
            EXIT.
       *
       *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2004118-SRYACCT-CHECK3-SEC            SECTION.
+      *
+           INITIALIZE                          SRYACCT-REC
+           MOVE   LNK-FTNJGNCHK-HOSPNUM    TO  ACCT-HOSPNUM
+           MOVE   LNK-FTNJGNCHK-NYUGAIKBN  TO  ACCT-NYUGAIKBN
+           MOVE   LNK-FTNJGNCHK-PTID       TO  ACCT-PTID
+           MOVE   LNK-FTNJGNCHK-SRYYM      TO  ACCT-SRYYM
+           MOVE   WRK-HKNCOMBINUM(IDX2)    TO  ACCT-HKNCOMBI
+           MOVE   SRYACCT-REC              TO  MCPDATA-REC
+           MOVE   "DBSELECT"               TO  MCP-FUNC
+           MOVE   "tbl_sryacct"            TO  MCP-TABLE
+           MOVE   "key71"                  TO  MCP-PATHNAME
+           CALL   "ORCDBMAIN"              USING  MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+           IF      MCP-RC   =   ZERO
+             MOVE   "tbl_sryacct"          TO  MCP-TABLE
+             MOVE   "key71"                TO  MCP-PATHNAME
+             PERFORM 910-SRYACCT-READ-SEC
+             IF    FLG-SRYACCT  =  ZERO
+                MOVE    1                  TO  FLG-SRYACCT-CHECK3
+             END-IF
+           END-IF
+           MOVE     "tbl_sryacct"          TO  MCP-TABLE
+           MOVE     "key71"                TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+       2004118-SRYACCT-CHECK3-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÊÔ½¸½èÍý£²
       *****************************************************************
        200412-SYUKEI-HENSYU2-SEC            SECTION.
@@ -2986,7 +3036,20 @@
                      END-IF
                   END-IF
                 ELSE
+                  MOVE     ZERO    TO   FLG-SRYACCT-CHECK3
+                  PERFORM  VARYING  IDX2  FROM  1  BY  1
+                            UNTIL  (IDX2               >  50)
+                             OR    (FLG-SRYACCT-CHECK3 =  1 )
+                    IF  WRK-HKNCOMBINUM-ZEROFLG(IDX2)  =  1
+                      PERFORM  2004118-SRYACCT-CHECK3-SEC
+                    END-IF
+                  END-PERFORM
+                  IF  FLG-SRYACCT-CHECK3 =  1
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
+                  ELSE
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                  END-IF
                 END-IF
              END-IF
            END-IF
