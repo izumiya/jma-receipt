@@ -1506,3 +1506,21 @@ path	key70	{
 };
 
 
+path	key71	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key71_csr CURSOR FOR
+		SELECT a.*
+		FROM tbl_jyurrk a,tbl_ptinf b
+			WHERE   a.HOSPNUM     =  :HOSPNUM
+			AND     a.NYUGAIKBN   =   :NYUGAIKBN
+			AND     a.UPYMD       >=  :UPYMD
+	        	AND     a.HOSPNUM     =  b.HOSPNUM
+	        	AND     a.PTID        =  b.PTID
+        		AND     b.TSTPTNUMKBN  <> '1'
+			ORDER   BY      a.SRYYMD,
+					a.DENPNUM,
+			                a.EDANUM
+		;
+	};
+};
+

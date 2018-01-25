@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.00    NACL-多々納  18/01/12  自費コード対象追加
+      *  05.00.00    NACL-多々納  18/01/24  残量廃棄対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -71,6 +73,8 @@
            03  FLG-CHK                 PIC 9(01).
            03  FLG-SP                  PIC 9(01).
       *
+           03  FLG-HAIKI               PIC 9(01).
+      *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-OUT                 PIC 9(10).
@@ -95,6 +99,9 @@
            03  IDX-REN                 PIC 9(02).
            03  IDX-ACT                 PIC 9(02).
       *
+           03  IDX-SRY                 PIC 9(04).
+           03  IDX1                    PIC 9(04).
+      *
       *    システム領域
        01  SYS-AREA.
            03  SYS-YMD.
@@ -111,6 +118,8 @@
            03  WRK-PARA-TERMID         PIC X(64).
            03  WRK-PARA-BASE-YMD       PIC X(08).
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
+      *    テスト患者区分
+           03  WRK-PARA-TESTKBN        PIC X(01).
            03  WRK-PARA-ERRFILE        PIC X(64).
       *
       *    一時領域
@@ -155,6 +164,9 @@
            03  WRK-SRYKA-NAME          PIC X(20).
       *
            03   WRK-GOK-SURYO          PIC 9(09)V9(5).
+      *
+           03   WRK-SRYSURYO           PIC 9(09)V9(5).
+           03   WRK-SURYO-CHU9         PIC 9(09).
       *
            03  WRK-CNT                 PIC 9(10).
            03  WRK-CNT-X               REDEFINES   WRK-CNT
@@ -245,6 +257,13 @@
            03  TBL-SRYKACD-OCC         OCCURS   99.
                05  TBL-SRYKACD         PIC X(02).
                05  TBL-SRYKA-NAME      PIC X(20).
+      *
+      *
+      *    診療行為マスタ−
+       01  HZN-SRYACT-AREA.
+         02  HZN-SRYACT-REC            OCCURS   10.
+           COPY    "CPSRYACT.INC"      REPLACING
+                                     //SRY-// BY //HZN-SRY-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -375,6 +394,7 @@
                                                RECEERR
                                                WRK-PARA-BASE-YMD
                                                WRK-PARA-NYUGAIKBN
+                                               WRK-PARA-TESTKBN
            END-UNSTRING
       *
            DISPLAY "NYUGAIKBN =" WRK-PARA-NYUGAIKBN
@@ -443,7 +463,13 @@
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    WRK-PARA-BASE-YMD   TO  JYURRK-UPYMD
       *
-           MOVE    "key66"             TO  WRK-MCP-PATHNAME
+           IF      WRK-PARA-TESTKBN    =   "1"
+      *        テスト患者を含める
+               MOVE    "key66"             TO  WRK-MCP-PATHNAME
+           ELSE
+      *        テスト患者を含めない
+               MOVE    "key71"             TO  WRK-MCP-PATHNAME
+           END-IF
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -638,20 +664,15 @@
                MOVE    1               TO  FLG-CHK
            END-IF
       *
+           INITIALIZE                  HZN-SRYACT-AREA
+           MOVE    ZERO                TO  IDX-SRY
            PERFORM
-               UNTIL  ( FLG-SRYACT      =   1  )
-                  OR  ( FLG-CHK         =   1  )
-               PERFORM VARYING     IDXA    FROM    1   BY  1
-                       UNTIL      (IDXA    >   5   )   OR
-                                  (SRY-SRYCD (IDXA)    =   SPACE)
-      *            薬剤のみ
-                   IF      (SRY-SRYCD(IDXA)(1:1)   =   "6" )
-      *             投薬のユーザ登録
-                    OR    ((SRY-SRYCD(IDXA)(1:3)   =   "059")
-                       AND (SRY-SRYKBN(1:1)        =   "2"  ))
-                       PERFORM 200341-MEISE-HEN-SEC
-                   END-IF
-               END-PERFORM
+               UNTIL  ( FLG-SRYACT     =   1  )
+                  OR  ( FLG-CHK        =   1  )
+                  OR  ( IDX-SRY        >=  10 )
+               ADD     1                   TO  IDX-SRY
+               MOVE    SRYACT-REC          TO  HZN-SRYACT-REC
+                                                     (IDX-SRY)
       *
                MOVE    "tbl_sryact"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -661,8 +682,58 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           IF      IDX-SRY         >   ZERO
+               PERFORM 200341-SRYACT-HEN-SEC
+           END-IF
            .
        20034-ZAISET-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    明細編集処理
+      *****************************************************************
+       200341-SRYACT-HEN-SEC          SECTION.
+      *
+      *
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL      (IDX1        >   IDX-SRY  )
+               PERFORM VARYING     IDXA    FROM    1   BY  1
+                       UNTIL      (IDXA    >   5   )   OR
+                                  (HZN-SRY-SRYCD (IDX1 IDXA)
+                                           =   SPACE)
+      *            薬剤
+                   MOVE    ZERO            TO  FLG-HAIKI
+                   IF      (HZN-SRY-SRYCD(IDX1 IDXA)(1:1)   =   "6" )
+      *                次行の残量廃棄コード判定
+                       IF     (IDXA            =   5  )
+                          AND (IDX1            <   IDX-SRY)
+                           IF      HZN-SRY-SRYCD (IDX1 + 1 1)
+                                               =   "099309901"
+                               MOVE    1       TO  FLG-HAIKI
+                           END-IF
+                       END-IF
+                       IF      IDXA            <   5
+                           IF      HZN-SRY-SRYCD (IDX1 IDXA + 1)
+                                               =   "099309901"
+                               MOVE    1       TO  FLG-HAIKI
+                           END-IF
+                       END-IF
+      *                明細編集処理
+                       PERFORM 200341-MEISE-HEN-SEC
+                   END-IF
+      *            自費コードはすべて対象
+                   IF     ((HZN-SRY-SRYKBN(IDX1)   =   "95"
+                                                   OR  "96" ) AND
+                           (HZN-SRY-SRYCD(IDX1 IDXA)(1:3)
+                                                   =   "095"
+                                                   OR  "096" ))
+      *                明細編集処理
+                       PERFORM 200341-MEISE-HEN-SEC
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+           .
+       200341-SRYACT-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -675,9 +746,20 @@
                GO      TO      200341-MEISE-HEN-EXT
            END-IF
       *
-           MOVE    SRY-SRYCD (IDXA)    TO  TBL-SRYCD (IDX-S)
+           MOVE    HZN-SRY-SRYCD (IDX1 IDXA)
+                                      TO  TBL-SRYCD (IDX-S)
+      *    残量廃棄あり
+           IF      FLG-HAIKI           =   1
+               COMPUTE WRK-SURYO-CHU9      =   HZN-SRY-SRYSURYO
+                                                  (IDX1 IDXA)
+                                           +   0.99999
+               MOVE    WRK-SURYO-CHU9      TO  WRK-SRYSURYO
+           ELSE
+               MOVE    HZN-SRY-SRYSURYO(IDX1 IDXA)
+                                           TO  WRK-SRYSURYO
+           END-IF
       *    数量×回数
-           COMPUTE WRK-GOK-SURYO       =   SRY-SRYSURYO (IDXA)
+           COMPUTE WRK-GOK-SURYO       =   WRK-SRYSURYO
                                        *   WRK-KAISU
            MOVE    WRK-GOK-SURYO       TO  TBL-SURYO (IDX-S)
       *
@@ -740,10 +822,16 @@
                                                TO
                                        WRK-ZAIKOUT-PRICD-MONEY     (IDY)
       *            単位
-                   MOVE    TNS-TANICD          TO
+                   IF     (TNS-SRYCD (1:1)     =   "6"   )
+                     OR  ((TNS-SRYCD (1:3)     =   "095"
+                                               OR  "096" ) AND
+                          (TNS-YKZKBN       NOT =   ZERO ))
+      *                薬剤、自費薬剤のみ
+                       MOVE    TNS-TANICD          TO
                                        WRK-ZAIKOUT-TANNICD         (IDY)
-                   MOVE    TNS-TANINAME        TO
+                       MOVE    TNS-TANINAME        TO
                                        WRK-ZAIKOUT-TANICD-NAME     (IDY)
+                   END-IF
                END-IF
            END-PERFORM
       *
