@@ -38,6 +38,7 @@
       *
       *警告メッセージ
            05  SPA-TIDCD                   PIC  X(04).
+           05  SPA-TIDMSG                  PIC  X(200).
       *警告画面より
            05  SPA-TID1-AREA. 
                07  SPA-TID1-FLG            PIC  X(02).
@@ -116,6 +117,8 @@
            05  SPA-T01-JOB-PARAM.
                07  SPA-T01-JOB-ORCA-UID    PIC X(36).
                07  SPA-T01-JOB-KARTE-UID   PIC X(36).
+      *
+           05  SPA-T01-JOB-DATAKBN         PIC X(01).
       *
            05  SPA-T01-MONBLOB-PRINT-ID    PIC X(37).
            05  SPA-T01-MONBLOB-DATA-ID     PIC X(37).

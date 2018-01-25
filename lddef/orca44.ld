@@ -21,6 +21,7 @@ bind	"TID1"		"OpenCOBOL"	"ORCGTID1";
 bind	"TID2"		"OpenCOBOL"	"ORCGTID2";
 bind	"TID3"		"OpenCOBOL"	"ORCGTID3";
 bindapi	"receiptdatamakev3"	"OpenCOBOL"	"ORAPI044R1V3";
+bindapi	"receiptdatacheckmakev3" "OpenCOBOL"	"ORAPI044R2V3";
 
 multiplex_group	orca44;
 
@@ -45,12 +46,15 @@ data	{
 		TID2;
 		TID3;
 		receiptdatamakev3;
+		receiptdatacheckmakev3;
 	};
 };
 
 db "xml2" {
  xml_receiptdata_makev3req;
  xml_receiptdata_makev3res;
+ xml_receiptdata_check_makev3req;
+ xml_receiptdata_check_makev3res;
 };
 
 #db "monblob" {

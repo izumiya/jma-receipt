@@ -18,6 +18,7 @@ fi
 #        ${19} SHELLID
 #        ${20} エラーファイル名 
 #        ${21} ファイル出力先区分
+#            8:haori(check) 9:haori
 #        ${22} 端末ｉｐアドレス
 #        ${23} HOSPNUM
 #        ${24} レセプト作成区分
@@ -28,7 +29,22 @@ fi
 #            1:履歴保存する
 #        ${28} レセ電データチェックの有無
 #            1:チェックする
+#        ${32} MONBLOB-ID(data-id)
 #-------------------------------------------#
+
+        echo "window  ${MCP_WINDOW}"
+
+        if  [ "${MCP_WINDOW}" == "receiptdatacheckmakev3" ]; then
+            mkdir -p  ${MCP_TEMPDIR}
+        fi
+
+cleanup(){
+##      パラメータファイル削除
+        if  [ -e "${PARA_FILE_FULL}" ]; then
+            rm   ${PARA_FILE_FULL}
+        fi
+}
+trap cleanup EXIT
 
     LOG_FILE="/var/log/jma-receipt/${23}recept41_kobetu.log"
     [ -e ${LOG_FILE} ] && rm ${LOG_FILE}
@@ -62,12 +78,25 @@ fi
     RECEFILE3="RREC"
     RECEFILE4="UKSRECE"
 
-    if  [ ${24} -eq '2' ]; then
-	RECEFILE1="TENC"
+
+    if  [ ${21} -eq '8' ]; then
+	RECEFILE1="CKEC"
 	RECEFILE2="TENKENT"
-	RECEFILE3="TENC"
+	RECEFILE3="CKEC"
 	RECEFILE4="UKSTENK"
-	echo "file name change!" 
+        if  [ ${24} -eq '2' ]; then
+	    RECEFILE1="TKEC"
+	    RECEFILE3="TKEC"
+        fi
+	echo "file name change!"
+    else
+        if  [ ${24} -eq '2' ]; then
+	    RECEFILE1="TENC"
+	    RECEFILE2="TENKENT"
+	    RECEFILE3="TENC"
+	    RECEFILE4="UKSTENK"
+	    echo "file name change!" 
+        fi
     fi
 
 #   該当ファイル削除
@@ -90,12 +119,20 @@ fi
     fi
 
 #   一時フォルダ作成
-    if  [ ${24} -eq '2' ]; then
-        ROUSAI_FOLDER1="${23}_TRousai_${5}"
+    if  [ ${21} -eq '8' ]; then
+        if  [ ${24} -eq '2' ]; then
+            ROUSAI_FOLDER1="${23}_CTRousai_${5}"
+        else
+            ROUSAI_FOLDER1="${23}_CCRousai_${5}"
+        fi
     else
-        ROUSAI_FOLDER1="${23}_Rousai_${5}"
+        if  [ ${24} -eq '2' ]; then
+            ROUSAI_FOLDER1="${23}_TRousai_${5}"
+        else
+            ROUSAI_FOLDER1="${23}_Rousai_${5}"
+        fi
     fi
-    if  [ ${21} -eq '5' ]|| [ ${21} -eq '6' ]; then
+    if  [ ${21} -eq '5' ]|| [ ${21} -eq '6' ]|| [ ${21} -eq '8' ]; then
         ROUSAI_FOLDER="${ROUSAI_FOLDER1}_Kobetsu"
     else
         ROUSAI_FOLDER="${ROUSAI_FOLDER1}/Kobetsu"
@@ -310,6 +347,27 @@ fi
             echo "--- iso err   ---"
             exit
 	fi
+    fi
+
+#   大容量ＡＰＩ作成
+    if  [ ${21} -eq '8' ]; then
+        cd  ${MCP_TEMPDIR}/
+        FILENM="${ROUSAI_FOLDER}.zip"
+        echo "filenm=[" $FILENM "]"
+        rm  ${ROUSAI_FOLDER}.zip
+        zip -r ${ROUSAI_FOLDER}.zip ${ROUSAI_FOLDER}/
+	RC=$?
+        echo "--- zip end   ---[" $RC  "]"
+	if  [ $RC -ne '0' ]; then
+	    ERRCD='0000'$RC
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD:${#ERRCD}-4:4},${23}
+            echo "--- zip err   ---"
+            exit
+	fi
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter ${1},${2},${3},$rennum,${5},${6},${7},${8},${9},${10},${11},${18},${19},${23},${20},$FILENM,"zip",${32}
+        if  [ -e ${MCP_TEMPDIR}/${20} ]; then
+             exit
+        fi
     fi
 
     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19},${23}

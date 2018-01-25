@@ -183,3 +183,16 @@ path    key8             {
                 ;
         };
 };
+
+path	del1	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_onrece_kanri
+		WHERE	HOSPNUM		= :HOSPNUM
+		    AND	UCNT		= :UCNT
+		    AND	SCNT		= :SCNT
+		    AND	substring(CREYMD,1,6) < :SRYYM
+		;
+	};
+};
+

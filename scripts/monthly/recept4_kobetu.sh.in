@@ -19,6 +19,7 @@ fi
 #        ${19} SHELLID
 #        ${20} エラーファイル名 
 #        ${21} ファイル出力先区分
+#            8:haori(check) 9:haori
 #        ${22} 端末ｉｐアドレス
 #        ${23} HOSPNUM
 #        ${24} レセプト作成区分
@@ -35,7 +36,22 @@ fi
 #        ${29} 入外区分
 #        ${30}-  ${31}医療機関コード別の処理指定時
 #            該当診療年月の開始、終了
+#        ${32} MONBLOB-ID(data-id)
 #-------------------------------------------#
+
+        echo "window  ${MCP_WINDOW}"
+
+        if  [ "${MCP_WINDOW}" == "receiptdatacheckmakev3" ]; then
+            mkdir -p  ${MCP_TEMPDIR}
+        fi
+
+cleanup(){
+##      パラメータファイル削除
+        if  [ -e "${PARA_FILE_FULL}" ]; then
+            rm   ${PARA_FILE_FULL}
+        fi
+}
+trap cleanup EXIT
 
     if  [ ${24} -eq '6' ] || [ ${24} -eq '7' ]; then
         LOG_FILE="/var/log/jma-receipt/${23}recept4_kobetu_renkei.log"
@@ -76,10 +92,19 @@ fi
     RECEFILE1="RECEIPTC"
     RECEFILE2="RECEDEN"
 
-    if  [ ${24} -eq '2' ]; then
-	RECEFILE1="TENKENRC"
+    if  [ ${21} -eq '8' ]; then
+	RECEFILE1="CHECKRC"
 	RECEFILE2="TENKENT"
+        if  [ ${24} -eq '2' ]; then
+	    RECEFILE1="THECKRC"
+        fi
 	echo "file name change!"
+    else
+        if  [ ${24} -eq '2' ]; then
+	    RECEFILE1="TENKENRC"
+	    RECEFILE2="TENKENT"
+	    echo "file name change!"
+        fi
     fi
 
 #   該当ファイル削除
@@ -338,6 +363,17 @@ fi
             echo "--- iso err   ---"
             exit
 	fi
+    fi
+
+#   大容量ＡＰＩ作成
+    if  [ ${21} -eq '8' ]; then
+        cp ${MCP_TEMPDIR}/${23}${RECEFILE1}.UKE ${MCP_TEMPDIR}/${RECEFILE1}.UKE
+        FILENM="${RECEFILE1}.UKE"
+        echo "filenm=[" $FILENM "]"
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBBLOBIMPORT -parameter ${1},${2},${3},$rennum,${5},${6},${7},${8},${9},${10},${11},${18},${19},${23},${20},$FILENM,"csv",${32}
+        if  [ -e ${MCP_TEMPDIR}/${20} ]; then
+             exit
+        fi
     fi
 
     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19},${23}

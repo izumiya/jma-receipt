@@ -550,6 +550,7 @@ RECORD_files = \
     hsconfroomchargev2.rec \
 	patientmedicalallv3.rec \
  	W93.rec \
+	receiptdatacheckmakev3.rec \
 
 
 DEF_files = \
@@ -1059,6 +1060,8 @@ DB_files = \
 	xml_patient_medical_allv3res.db \
 	xml_patient_medical_all.db \
 	tbl_receden_tmp.db \
+	xml_receiptdata_check_makev3req.db \
+	xml_receiptdata_check_makev3res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

@@ -45,6 +45,8 @@
       *
       *  04.08.04    NACL-藤原    16/08/08  災害該当分（非減免対象と減免対象）
       *                                     レセプトの分割対応
+      *
+      *  05.00.01    NACL-藤原    17/12/19  ＨＡＯＲＩ対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -626,6 +628,7 @@
       *
            IF      SPA-GMN-T09-TCHK (WRK-SELNO)
                                    =   "1"
+               MOVE    "0008"              TO  SPA-ERRCD
                MOVE    ZERO            TO  SPA-GMN-T09-SELNUM (IDX)
                GO  TO  410211-SELNUM-HENSYU-EXT
            END-IF
@@ -712,7 +715,7 @@
                MOVE    "1006"          TO  SPA-TIDCD
                MOVE    IDX             TO  SPA-NAI-T09-SELNUM
                GO  TO  410211-SELNUM-HENSYU-EXT
-         END-IF 
+           END-IF 
       *
       *    返戻年月未入力のときの返戻データ存在チェック
            IF      SPA-NAI-T09-THENREIYM (WRK-SELNO)
@@ -1188,6 +1191,7 @@
       *    エラーメッセージ表示理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
+      *
            MOVE    SPACE               TO  SPA-ERRMSG
       *
            MOVE    SPACE                TO  TERR
@@ -1207,6 +1211,8 @@
                WHEN    "0005"
                    MOVE    "データが選択してありません"
                                                        TO  TERR-ERRMSG
+               WHEN    "0008"
+                   MOVE    "個別指示一覧に選択済です"  TO  TERR-ERRMSG
                WHEN    "0010"
                    MOVE    "対象のレセ電データがありません"
                                                        TO  TERR-ERRMSG
@@ -1233,6 +1239,9 @@
                                                TO  TERR-ERRMSG
                    MOVE    SLOCK-MSG           TO  TERR-ERRMSG(21:)
            END-EVALUATE
+      *
+           MOVE    TERR-ERRMSG          TO  SPA-ERRMSG
+      *
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T09"                TO  SPA-MOTOPG

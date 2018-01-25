@@ -75,7 +75,11 @@
       *  04.08.07    NACL-藤原    17/03/08  初画面の診療年月が月途中の医療
       *                                     期間コード変更月のときの対応
       *  04.08.08    NACL-藤原    17/03/09  期間表示の設定の追加
+      *  04.08.09    NACL-藤原    18/01/11  労災のとき期間表示のチェック
+      *                                     は行わない
+      *
       *  05.00.00    NACL-森脇    17/12/21  クライアント印刷対応
+      *  05.00.01    NACL-藤原    17/12/19  ＨＡＯＲＩ対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -222,6 +226,10 @@
                05  WRK-SRYYMKBN-ERR
                                    PIC X(02).
       *
+           03  WRK-PARAM.
+               05  WRK-PARAM-ORCA-UID  PIC X(36).
+               05  WRK-PARAM-KARTE-UID PIC X(36).
+      *
            COPY    "CPORCSPRTLNK.INC".
       *
        01  WRK-MSG.
@@ -272,6 +280,12 @@
       *
       *    プレビュー用情報
            COPY    "CPXC01LNK.INC".
+      *
+      *    退避用
+       01  WRK-ONRECE-K-REC.
+           COPY    "CPONRECE-KANRI.INC"
+                                   REPLACING  //ONRECE-K-//
+                                   BY         //WRK-ONRECE-K-//.
       *
        01  WRK-CONS-AREA.
       *    個別指示一覧最大行
@@ -397,11 +411,11 @@
       *
       *    ユーザー情報取得
            COPY    "CPORCSLDUSER.INC".
-      *----(05.00.00)--ADD-START---
+      *
       *    クライアント印刷制御
            COPY    "CPORCSPRTCTRL.INC".
-      *----(05.00.00)--ADD-END-----
       *
+           COPY    "MONBLOB".
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -2729,13 +2743,18 @@
                IF    ( SPA-GMN-T06-SRYYMKBN-MAX
                                        >   ZERO            )
                AND   ( SPA-T01-PRTKBN  NOT =   "6" AND "7" )
-                   IF    ( SPA-NAI-T06-SRYYM
+                   IF      SPA-GMN-T06-TEISYUTUSAKI4
+                                               =   "T"
+                       CONTINUE
+                   ELSE
+                       IF    ( SPA-NAI-T06-SRYYM
                                        <   SPA-NAI-T06-SRYYMKBN-ST
                                        (SPA-NAI-T06-SRYYMKBN-SELNUM) )
-                   OR    ( SPA-NAI-T06-SRYYM
+                       OR    ( SPA-NAI-T06-SRYYM
                                        >   SPA-NAI-T06-SRYYMKBN-ED
                                        (SPA-NAI-T06-SRYYMKBN-SELNUM) )
-                       MOVE    "0030"              TO  SPA-ERRCD
+                           MOVE    "0030"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -4801,7 +4820,30 @@
                MOVE    ZERO            TO  ONRECE-K-RENNUM
            END-IF
       *
-           ADD     1                   TO  ONRECE-K-RENNUM
+           IF      ONRECE-K-RENNUM     =   999
+               MOVE    ZERO                TO  ONRECE-K-RENNUM
+           END-IF
+      *
+           ADD     1               TO  ONRECE-K-RENNUM
+           MOVE    ONRECE-K-REC    TO  WRK-ONRECE-K-REC
+      *
+      *    次の連番のデータが存在するとき
+           MOVE    "tbl_onrece_kanri"
+                                   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    ONRECE-K-REC        TO  MCPDATA-REC
+           PERFORM 900-ONRECE-KANRI-SELECT-SEC
+           MOVE    "tbl_onrece_kanri"
+                                   TO  MCP-TABLE
+           MOVE    "key"          TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF      FLG-ONRECE-K    =   ZERO
+               MOVE    "1006"          TO  SPA-ERRCD
+               GO  TO  460-RECEDEN-EXT
+           END-IF
+      *
+           MOVE    WRK-ONRECE-K-REC    TO  ONRECE-K-REC
            MOVE    SPA-NAI-T06-SKYYMD-H
                                        TO  ONRECE-K-SKYYMD
            MOVE    SPA-GMN-T06-RECE-MAX
@@ -5014,8 +5056,15 @@
                                    TO  SHELLTBL-ARG19         
            MOVE    ERRFLPARA-BASENAME
                                    TO  SHELLTBL-ARG20
-           MOVE    SPA-GMN-T98-DATAKBN
-                                   TO  SHELLTBL-ARG21
+      *    ＨＡＯＲＩのときチェック用は「８」それ以外は「９」を設定
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    SPA-T01-JOB-DATAKBN
+                                       TO  SHELLTBL-ARG21
+           ELSE
+               MOVE    SPA-GMN-T98-DATAKBN
+                                       TO  SHELLTBL-ARG21
+           END-IF
       *ipアドレス取得
       *****PERFORM 900-SYSTEM-GET-SEC
       *****MOVE    SLDUSER-HOST(1) TO  SHELLTBL-ARG22
@@ -5065,6 +5114,27 @@
                MOVE    SPA-NAI-T06-SRYYMKBN-ED
                                            (SPA-NAI-T06-SRYYMKBN-SELNUM)
                                        TO  SHELLTBL-ARG31
+           END-IF
+      *
+      *    ＨＡＯＲＩのときＭＯＮＢＬＯＢ−ＩＤを設定
+           IF      SPA-T01-JOB-PARAM
+                                   NOT =   SPACE
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SHELLTBL-ARG32
+                                               SPA-T01-MONBLOB-DATA-ID
+      *
+               MOVE    "MONBLOBNEW"        TO  MCP-FUNC
+               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "monblob"           TO  MCP-TABLE
+               CALL    "MONFUNC"           USING
+                                               MCPAREA
+                                               MONBLOB
+               MOVE    MONBLOB-ID          TO  SPA-T01-MONBLOB-PRINT-ID
            END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
@@ -5117,6 +5187,12 @@
            MOVE    WRK-CONS-JOB-SHELLID
                                    TO  JOB-SHELLID
            MOVE    SPA-TERMID      TO  JOB-TERMID
+           MOVE    SPA-T01-JOB-KARTE-UID
+                                   TO  WRK-PARAM-KARTE-UID
+           MOVE    SPA-T01-JOB-ORCA-UID
+                                   TO  WRK-PARAM-ORCA-UID
+           MOVE    WRK-PARAM       TO  JOB-PARAM
+      *
            PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
@@ -6132,6 +6208,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
       *    エラーメッセージ表示理
       *****************************************************************
        510-ERRSET-SEC              SECTION.
+      *
            MOVE    SPACE               TO  SPA-ERRMSG
       *
            MOVE    SPACE                TO  TERR
@@ -6147,9 +6224,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                    MOVE    "該当の患者が存在しません"  TO  TERR-ERRMSG
                WHEN    "0004"
                    MOVE    "対象のデータを選択してありません"
-                                                       TO  TERR-ERRMSG
-               WHEN    "0005"
-                   MOVE    "同じ診療年月で既に入力済です"
                                                        TO  TERR-ERRMSG
                WHEN    "0006"
                    MOVE    "診療年月入力エラー"        TO  TERR-ERRMSG
@@ -6270,6 +6344,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                WHEN    "1005"
                    MOVE    "パラメタＤＢが存在しません" 
                                                        TO  TERR-ERRMSG
+               WHEN    "1006"
+                   MOVE    "処理上限数を超えています" 
+                                                       TO  TERR-ERRMSG
                WHEN    "1009"
                    MOVE    "オンライン管理ＤＢが更新できません"
                                                        TO  TERR-ERRMSG
@@ -6283,6 +6360,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                WHEN    "9999"
                    MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
            END-EVALUATE
+      *
+           MOVE    TERR-ERRMSG          TO  SPA-ERRMSG
+      *
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T06"                TO  SPA-MOTOPG
@@ -6362,7 +6442,6 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
            INITIALIZE                      TID1
            MOVE    SPA-TIDCD           TO  TID1-ID1CODE
            MOVE    WRK-TIDMSG          TO  TID1-ID1MSG
-      *
       *
            EVALUATE    SPA-TIDCD
                WHEN    "1006"
