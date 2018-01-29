@@ -5901,7 +5901,9 @@
            PERFORM 5004-MOJI-HENSYU-SEC
       *½ç½øÈÖ¹æ
       *AZU-ADD START 2015.6.10
-           IF    (IDZ2        NOT =   ZERO)   AND
+           IF    (RECE62-SRYYM <=     "201703")  AND
+                 (IDZ1        =       2)      AND
+                 (IDZ2        NOT =   ZERO)   AND
                  (WRK-RENNUM  NOT =   ZERO)
                MOVE  WRK-RENNUM        TO  WRK-TAIHI-RENNUM(IDZ2)
            END-IF
