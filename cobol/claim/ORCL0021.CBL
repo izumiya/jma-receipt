@@ -2937,6 +2937,12 @@
            MOVE    SRY-JIHIMONEY(IDXA) TO  TBL-MEISAITANKA
                                                       (IDX-LF IDX-IJ)
            MOVE    1                   TO  TBL-SURYO  (IDX-LF IDX-IJ)
+      *H30.2
+      *    メモにフリーコメントの内容セット
+           IF      SRY-INPUTNUM (IDXA)  NOT =   ZERO
+               PERFORM 200221-PTCOM-SET-SEC
+           END-IF
+      *
       *    自費合計
            ADD     SRY-JIHIMONEY(IDXA) TO  TBL-GINGAKUALL(IDX-LF)
            .
