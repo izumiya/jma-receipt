@@ -44,10 +44,14 @@
            03  FLG-PTINF               PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-TENSU               PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
            03  IDX1                    PIC 9(05).
+           03  IDX2                    PIC 9(05).
+           03  IDX3                    PIC 9(05).
+           03  IDX4                    PIC 9(05).
            03  IDXA                    PIC 9(05).
            03  IDXD                    PIC 9(05).
            03  IDXK                    PIC 9(05).
@@ -159,6 +163,10 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    点数マスタ
+           COPY    "CPTENSU.INC".
+           COPY    "CPTTNS.INC".
+      *
       *    システム管理
            COPY    "CPSYSKANRI.INC".
       *    職員情報
@@ -215,6 +223,7 @@
            INITIALIZE                  TCOMB-AREA
            INITIALIZE                  TNACCT-AREA
            INITIALIZE                  TGAIHAKU-AREA
+           INITIALIZE                  TTNS-AREA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
@@ -536,8 +545,101 @@
                MOVE    WRK-NUM7Z       TO  SNINF03-SAGAKU-DATA (IDXA)
            END-IF
       *
+           MOVE    ZERO                TO  IDX4
+           PERFORM 200111-NYUINRYO-EDIT-SEC
+      *
           .
        20011-NACCT-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料編集処理
+      *****************************************************************
+       200111-NYUINRYO-EDIT-SEC        SECTION.
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SS009-HENKYAKU-MAX )
+      *
+               EVALUATE    SS009-ZAISKBKBN (IDX1)
+               WHEN    "1"
+               WHEN    "2"
+                   IF    ( SS009-SRYCDTOTAL (IDX1) NOT =   099999916 )
+                    AND  ( SS009-DAY (IDX1 IDXD)       >   ZERO )
+                       PERFORM 2001111-NYUKHN-EDIT-SEC
+                   END-IF
+               WHEN    "6"
+                   IF    ( SS009-DAY (IDX1 IDXD)       >   ZERO )
+                       PERFORM 2001111-NYUKSN-EDIT-SEC
+                   END-IF
+               END-EVALUATE
+      *
+           END-PERFORM
+      *
+          .
+       200111-NYUINRYO-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料編集処理
+      *****************************************************************
+       2001111-NYUKHN-EDIT-SEC         SECTION.
+      *
+           MOVE    ZERO            TO  IDX3
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   20 )
+                    OR   ( SS009-SRYCD (IDX1 IDX2)
+                                   =   SPACE )
+      *
+               MOVE    SS009-SRYCD (IDX1 IDX2)
+                                   TO  TTNS-CHK-SRYCD
+               MOVE    SPA-SRYYMD  TO  TTNS-CHK-YMD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               IF    ( FLG-TENSU   =   ZERO )
+                   IF    ( IDX3  <     5 )
+                       COMPUTE IDX3  = IDX3 +  1
+                       MOVE    TNS-SRYCD
+                                   TO  SNINF03-NYUKHN-DATA (IDXA IDX3)
+                       MOVE    TNS-NAME
+                                   TO  SNINF03-NYUKHN-NAME (IDXA IDX3)
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( IDX3    >   ZERO )
+               MOVE    "入院基本料等"
+                                   TO  SNINF03-NYUKHN-LBL (IDXA)
+           END-IF
+      *
+          .
+       2001111-NYUKHN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院料加算編集処理
+      *****************************************************************
+       2001111-NYUKSN-EDIT-SEC         SECTION.
+      *
+           MOVE    SS009-SRYCD (IDX1 1)
+                                   TO  TTNS-CHK-SRYCD
+           MOVE    SPA-SRYYMD      TO  TTNS-CHK-YMD
+           PERFORM 900-TENSU-KEY-SEL-SEC
+           IF    ( FLG-TENSU   =   ZERO )
+               IF    ( IDX4        <   20 )
+      *
+                   COMPUTE IDX4  = IDX4    +   1
+      *
+                   MOVE    "入院加算"
+                                   TO  SNINF03-NYUKSN-LBL (IDXA IDX4)
+      *
+                   MOVE    TNS-SRYCD
+                                   TO  SNINF03-NYUKSN-DATA (IDXA IDX4)
+                   MOVE    TNS-NAME
+                                   TO  SNINF03-NYUKSN-NAME (IDXA IDX4)
+               END-IF
+      *
+           END-IF
+      *
+          .
+       2001111-NYUKSN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    食事外泊情報編集処理
@@ -1029,6 +1131,93 @@
       *
            .
        900-NYUINACCT-KEY51-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ検索処理(KEY1)
+      *****************************************************************
+       900-TENSU-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
+      *    点数マスタ退避ワークチェック
+           PERFORM 9001-TTNS-CHK-SEC
+      *
+      *    退避ワークに存在しない場合はＤＢを検索
+           IF    ( TTNS-FLG            =   ZERO )
+      *
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    TTNS-CHK-SRYCD      TO  TNS-SRYCD
+               MOVE    TTNS-CHK-YMD        TO  TNS-YUKOSTYMD
+                                               TNS-YUKOEDYMD
+               MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+               MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+      *
+      *            点数マスタ退避ワークに編集する
+                   PERFORM 9001-TTNS-HEN-SEC
+               ELSE
+                   MOVE    1               TO  FLG-TENSU
+                   INITIALIZE                  TNS-TENSU-REC
+               END-IF
+      *
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           .
+      *
+       900-TENSU-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ退避ワークチェック処理
+      *****************************************************************
+       9001-TTNS-CHK-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  TTNS-FLG
+           INITIALIZE                      TNS-TENSU-REC
+      *
+           PERFORM VARYING TTNS-IDX    FROM    1   BY  1
+                   UNTIL ( TTNS-IDX    >   TTNS-MAX )
+                    OR   ( TTNS-FLG    =   1 )
+               IF    ( TTNS-KEY-SRYCD (TTNS-IDX)
+                                       =   TTNS-CHK-SRYCD )
+                 AND ( TTNS-KEY-YUKOSTYMD (TTNS-IDX)
+                                      <=   TTNS-CHK-YMD )
+                 AND ( TTNS-KEY-YUKOEDYMD (TTNS-IDX)
+                                      >=   TTNS-CHK-YMD )
+                   MOVE    1           TO  TTNS-FLG
+                   MOVE    TTNS-DAT (TTNS-IDX)
+                                       TO  TNS-TENSU-REC
+               END-IF
+           END-PERFORM
+      *
+           .
+       9001-TTNS-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ退避ワーク編集処理
+      *****************************************************************
+       9001-TTNS-HEN-SEC               SECTION.
+      *
+           IF    ( TTNS-CONST-MAX  >   TTNS-MAX )
+               COMPUTE TTNS-MAX    =   TTNS-MAX    +   1
+               MOVE    TNS-SRYCD       TO  TTNS-KEY-SRYCD
+                                                   (TTNS-MAX)
+               MOVE    TNS-YUKOSTYMD   TO  TTNS-KEY-YUKOSTYMD
+                                                   (TTNS-MAX)
+               MOVE    TNS-YUKOEDYMD   TO  TTNS-KEY-YUKOEDYMD
+                                                   (TTNS-MAX)
+               MOVE    TNS-TENSU-REC   TO  TTNS-DAT
+                                                   (TTNS-MAX)
+           END-IF
+      *
+           .
+       9001-TTNS-HEN-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

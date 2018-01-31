@@ -77,6 +77,16 @@
                            11  HSMEALRES-SAGAKU-LBL      PIC X(20).
                            11  HSMEALRES-SAGAKU-DATA     PIC X(07).
                            11  HSMEALRES-SAGAKU-NAME     PIC X(10).
+                       09  HSMEALRES-NYUKHN-G.
+                           11  HSMEALRES-NYUKHN-LBL      PIC X(20).
+                           11  HSMEALRES-NYUKHN-OCC      OCCURS 20.
+                               13  HSMEALRES-NYUKHN-DATA PIC X(09).
+                               13  HSMEALRES-NYUKHN-NAME PIC X(50).
+                       09  HSMEALRES-NYUKSN-G.
+                           11  HSMEALRES-NYUKSN-OCC      OCCURS 20.
+                               13  HSMEALRES-NYUKSN-LBL  PIC X(20).
+                               13  HSMEALRES-NYUKSN-DATA PIC X(09).
+                               13  HSMEALRES-NYUKSN-NAME PIC X(50).
                05  HSMEALRES-HKNCOMBI-INF-AREA.
                    07  HSMEALRES-HKNCOMBI-INF-OCC         OCCURS 10.
                        09  HSMEALRES-HKNCOMBI-KEY             PIC X(04).

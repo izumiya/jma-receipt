@@ -36,6 +36,7 @@
                    07  SS009-HKNCOMBI      PIC  X(04).
                    07  SS009-SRYKBN        PIC  X(02).
                    07  SS009-SRYSYUKBN     PIC  X(03).
+                   07  SS009-ZAISKBKBN     PIC  X(01).
                    07  SS009-ZAITEN        PIC  9(08).
                    07  SS009-ZAIKAISU      PIC  9(07).
                    07  SS009-MEISAISU      PIC  9(07).

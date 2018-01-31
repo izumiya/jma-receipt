@@ -71,6 +71,16 @@
                            11  SNINF03-SAGAKU-LBL      PIC X(20).
                            11  SNINF03-SAGAKU-DATA     PIC X(07).
                            11  SNINF03-SAGAKU-NAME     PIC X(10).
+                       09  SNINF03-NYUKHN-G.
+                           11  SNINF03-NYUKHN-LBL      PIC X(20).
+                           11  SNINF03-NYUKHN-OCC      OCCURS 20.
+                               13  SNINF03-NYUKHN-DATA PIC X(09).
+                               13  SNINF03-NYUKHN-NAME PIC X(50).
+                       09  SNINF03-NYUKSN-G.
+                           11  SNINF03-NYUKSN-OCC      OCCURS 20.
+                               13  SNINF03-NYUKSN-LBL  PIC X(20).
+                               13  SNINF03-NYUKSN-DATA PIC X(09).
+                               13  SNINF03-NYUKSN-NAME PIC X(50).
                05  SNINF03-HKNCOMBI-INF-AREA.
                    07  SNINF03-HKNCOMBI-INF-OCC         OCCURS 10.
                        09  SNINF03-HKNCOMBI-KEY             PIC X(04).

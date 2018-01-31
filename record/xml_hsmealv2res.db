@@ -65,6 +65,18 @@ xml_hsmealv2res {
 				Data			varchar(07);
 				Name			varchar(10);
 			};
+			Hospital_Charge_Information	{
+				Label			varchar(20);
+			    Hospital_Charge	{
+					Data	    varchar(09);
+					Name	    varchar(50);
+			   }[20];
+			};
+			Additional_Hospital_Charge	{
+				Label		    varchar(20);
+			    Data	        varchar(09);
+			    Name	        varchar(50);
+			}[20];
 		}[31];
 		Insurance_Information	{
 		 	Insurance_Combination_Number	varchar(04);
