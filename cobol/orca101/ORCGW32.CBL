@@ -40,6 +40,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/04/XX  ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÊñ³ç³°ÂÐ±þÂ¾
       *                                     ¾ã³²¼Ô»ÜÀßÅùÆþ±¡´ðËÜÎÁÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  18/01/24  ¿ÇÎÅ¶èÊ¬Êñ³çÂÐ¾Ý²þÀµÂÐ±þÂ¾
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -616,6 +617,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
       *    ´ÉÍýÈÖ¹æ¤Ë¤è¤êÊñ³çÁªÂò¤Î·èÄê
            PERFORM 3201-INIT-TBL-SEC
+           MOVE    ZERO                TO  SPA-NAI-KEIFLG
            IF      SPA-GMN-TBL-MAX     =   ZERO
       *        ¿·µ¬
                MOVE    1                   TO  SPA-GMN-SYORI
@@ -806,9 +808,12 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    PERFORM 200211-KBNCD-505-SEC
                WHEN    "513"
                WHEN    "517"
-               WHEN    "518"
       *            Êñ³ç¤¢¤ê
                    PERFORM 200211-KBNCD-OK-SEC
+      *H30.1
+               WHEN    "518"
+      *            ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ
+                   PERFORM 200211-KBNCD-518-SEC
                WHEN    "514"
                WHEN    "515"
                WHEN    "516"
@@ -1036,9 +1041,43 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    SPA-GMN-SRYKBN-LST (2)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
                END-IF
+      *H30.1   ºßÂðÄÉ²Ã
+               IF     (SPA-HKT-YUKOSTYMD   >=  "20160401")
+                 AND  (IDX                  =   12      )
+                   MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+               END-IF
            END-PERFORM
            .
        200211-KBNCD-514-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ½èÍý
+      *****************************************************************
+       200211-KBNCD-518-SEC       SECTION.
+      *
+      *    Êñ³ç»»Äê¶èÊ¬
+           MOVE    SPA-GMN-SANTEIKBN-LST (2)   TO  SPA-GMN-SANTEIKBN-G
+           MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    SPA-GMN-HKNCOMBIKBN-LST(1)  TO  SPA-GMN-HKNCOMBIKBN-G
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
+      *        Êñ³ç¤¹¤ë
+               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+      *        H28/4¤«¤é¡ÖÊñ³ç¤·¤Ê¤¤¡×¤¢¤ê
+               IF      SPA-HKT-YUKOSTYMD   >=  "20160401"
+                   IF      IDX             =   9
+                                           OR  12
+      *                Êü¼ÍÀþ¡¢ºßÂð¡¡¤Ê¤·
+                       MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       200211-KBNCD-518-EXT.
            EXIT.
       *****************************************************************
       *    Àº¿À²ÊµßµÞÆþ±¡ÎÁ½èÍý
@@ -1918,6 +1957,62 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO  SPA-GMN-SRYKBN-G (IDX)
                            END-IF
                        END-IF
+      *H30.1
+      *        H28.4²þÀµÊ¬
+                   WHEN    "518"
+      *            ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ
+                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+                        AND   (SPA-NAI-STYUKYMD    >=  "20160401")
+                           IF      IDX             =   9
+                                                   OR  12
+      *                        Êü¼ÍÀþ¡¢ºßÂð¡¡¤Ê¤·
+                               MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           ELSE
+                               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           END-IF
+                       END-IF
+                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+                        AND   (SPA-NAI-STYUKYMD    <   "20160401")
+                           MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                       END-IF
+                   WHEN    "514"
+                   WHEN    "515"
+                   WHEN    "516"
+      *            ¾®»ùÆþ±¡°åÎÅ´ÉÍýÎÁ
+                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+                        AND   (SPA-NAI-STYUKYMD    >=  "20160401")
+                           IF      IDX             =   1
+                                                   OR  2
+                                                   OR  4
+                                                   OR  10
+                                                   OR  12
+      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢ÉÂÍý¿ÇÃÇ¡¢ºßÂð¡¡¤Ê¤·
+                               MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           ELSE
+                               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           END-IF
+                       END-IF
+      *
+                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+                        AND   (SPA-NAI-STYUKYMD    <   "20160401")
+                           IF      IDX             =   1
+                                                   OR  2
+                                                   OR  4
+                                                   OR  10
+      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢ÉÂÍý¿ÇÃÇ¡¡¤Ê¤·
+                               MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           ELSE
+                               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+                           END-IF
+                       END-IF
+      *
                END-EVALUATE
                MOVE    ZERO                TO  FLG-CHK
                PERFORM VARYING     IDY     FROM    1   BY  1
@@ -2126,6 +2221,32 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    SPACE           TO  SPA-ERRCD
                    END-IF
                END-PERFORM
+           END-IF
+      *!
+      *H30.1
+      *    ´ü´ÖÆâ¤Ç¿ÇÎÅ¶èÊ¬¤¬ÊÑ¹¹¤È¤Ê¤ë»þ¡¢·Ù¹ðÉ½¼¨
+           IF      SPA-ERRCD           =   SPACE
+      *        H28.4 ¤«¤é²þÀµ
+               IF      (SPA-NAI-STYUKYMD   <   "20160401")
+                  AND  (SPA-NAI-EDYUKYMD   >   "20160401")
+                   IF      (SPA-GMN-KBNCD      =   "518"
+                                               OR  "514"
+                                               OR  "515"
+                                               OR  "516"
+                                               OR  "524" )
+                       AND  (SPA-NAI-KEIFLG    =   ZERO  )
+                       MOVE    1               TO  SPA-NAI-KEIFLG
+      *
+      *                ¿·µ¬
+                       IF      SPA-GMN-SELNUM      =   ZERO
+                           MOVE    "K022"          TO  SPA-ERRCD
+                           MOVE    03              TO  SPA-GMN-CUR
+                       ELSE
+                           MOVE    "K023"          TO  SPA-ERRCD
+                           MOVE    99              TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
+                END-IF
            END-IF
            .
        4900-KANRENCHK-EXT.
@@ -2482,6 +2603,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                            "´ü´Ö¤òÊÑ¹¹¤·¤Æ²¼¤µ¤¤¡£"
                                                INTO  SPA-ERRMSG
                    END-STRING
+      *H30.2
+               WHEN    "K022"
+                   STRING  "·Ù¹ð¡ª"
+                           "Ê¿À®£²£¸Ç¯£´·î¤«¤é¿ÇÎÅ¶èÊ¬¤ÎÊñ³çÆâÍÆ¤Ë"
+                           "ÊÑ¹¹¤¬¤¢¤ê¤Þ¤¹¡£´ü´ÖÊÑ¹¹¤·¤Æ²¼¤µ¤¤¡£"
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K023"
+                   STRING  "·Ù¹ð¡ª"
+                           "Ê¿À®£²£¸Ç¯£´·î¤«¤é¿ÇÎÅ¶èÊ¬¤ÎÊñ³çÆâÍÆ¤Ë"
+                           "ÊÑ¹¹¤¬¤¢¤ê¤Þ¤¹¡£´ü´ÖÄÉ²Ã¤·¤Æ²¼¤µ¤¤¡£"
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "0109"
                    STRING  "Êñ³ç¥³¡¼¥É¤¬¤¢¤ê¤Þ¤»¤ó¡£"
                                                INTO  SPA-ERRMSG
