@@ -198,6 +198,8 @@
       *  04.08.11    NACL-藤原    16/10/07  自賠責ＰＤＦファイル作成対応
       *  04.08.12    NACL-藤原    17/05/26  直接請求する保険者に地方職員
       *                                     共済組合を追加
+      *  04.08.13    NACL-藤原    18/01/26  全国公費一部負担金記載対応
+      *                                    （公費のみのレセプト）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -638,6 +640,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-15-YKZMEI
                                               PIC X(18).
+                       09  SPA-GMN-KOUHI-ICHIBU-KSI-G.
+                           11  SPA-GMN-KOUHI-ICHIBU-KSI
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-KOUHI-ICHIBU-KSIMEI
+                                              PIC X(30).
       *
                        09  SPA-GMN-FRAME-ROUPRTKBN-G.
                            11  SPA-GMN-FRAME-ROUPRTKBN
@@ -1834,6 +1842,15 @@
                        09  SPA-GMN-15-YKZMEIL
                                               PIC X(18).
                    07  SPA-GMN-15-YKZ-MAX
+                                              PIC 9(02).
+      *
+                   07  SPA-GMN-KOUHI-ICHIBU-KSILST  OCCURS  2.
+                       09  SPA-GMN-KOUHI-ICHIBU-KSIL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-KOUHI-ICHIBU-KSIMEIL
+                                              PIC X(30).
+                   07  SPA-GMN-KOUHI-ICHIBU-KSI-MAX
                                               PIC 9(02).
       *
                05  SPA-NAIB-AREA.
@@ -3324,6 +3341,16 @@
            MOVE    "記載する"          TO  SPA-GMN-15-YKZMEIL  (2)
            MOVE    2                   TO  SPA-GMN-15-YKZ-MAX 
       *
+           MOVE    "0"                 TO  SPA-GMN-KOUHI-ICHIBU-KSIL (1)
+           MOVE    "上限０円時は「０」を記載しない"
+                                       TO
+                                       SPA-GMN-KOUHI-ICHIBU-KSIMEIL  (1)
+           MOVE    "1"                 TO  SPA-GMN-KOUHI-ICHIBU-KSIL (2)
+           MOVE    "上限０円時は「０」を記載する"
+                                       TO
+                                       SPA-GMN-KOUHI-ICHIBU-KSIMEIL  (2)
+           MOVE    2                   TO  SPA-GMN-KOUHI-ICHIBU-KSI-MAX 
+      *
       *       医療機関情報
            MOVE    SPACE               TO  SYS-1001-REC
            INITIALIZE                      SYS-1001-REC
@@ -4592,6 +4619,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-KOUHI-ICHIBU-KSIKBN
+                                       TO  SPA-GMN-KOUHI-ICHIBU-KSI
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+               IF      SPA-GMN-KOUHI-ICHIBU-KSI
+                               =   SPA-GMN-KOUHI-ICHIBU-KSIL (IDY)
+                   MOVE    SPA-GMN-KOUHI-ICHIBU-KSILST (IDY)
+                                       TO  SPA-GMN-KOUHI-ICHIBU-KSI-G
+                   MOVE    SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
       *    レセプト・総括編集情報（区分コード１０のデータ読込）
            MOVE    SPACE               TO  SYS-200505-REC
            INITIALIZE                      SYS-200505-REC
@@ -5376,6 +5416,12 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-15-YKZLST (1)
                                            TO  SPA-GMN-15-YKZ-G
            END-IF
+           IF     SPA-GMN-KOUHI-ICHIBU-KSI-G
+                                           =   SPACE
+               MOVE    SPA-GMN-KOUHI-ICHIBU-KSILST (1)
+                                           TO
+                                           SPA-GMN-KOUHI-ICHIBU-KSI-G
+           END-IF
       *
       *    労災医療機関情報
            INITIALIZE                      SYS-4001-REC
@@ -5570,6 +5616,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-DISASTER-RECEIPT
                                        TO  SPA-GMN-DISASTER-RECEIPT-G
            MOVE    W12-15-YKZ          TO  SPA-GMN-15-YKZ-G
+           MOVE    W12-KOUHI-ICHIBU-KSI
+                                       TO  SPA-GMN-KOUHI-ICHIBU-KSI-G
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
            MOVE    W12-SRYKAHENKBN     TO  SPA-GMN-SRYKAHENKBN-G
@@ -5894,6 +5942,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4210-15-YKZ-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4212-KOUHI-ICHIBU-KSI-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -8643,7 +8696,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            IF      SPA-GMN-RECEDEN-DATAKBN =   SPACE
                IF      SPA-MW                  =   SPA-GINBEE
                    IF      SPA-200501-RECEDEN-DATAKBN
-                                                   =   "5" OR "6"
+                                                   =   "5" OR "6" OR
+                                                       SPACE
                        CONTINUE
                    ELSE
                        MOVE    SPACE       TO
@@ -8668,7 +8722,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                IF      SPA-MW                  =   SPA-GINBEE
                    MOVE    SPA-GMN-RECEDEN-DATAKBNLST (1)
                                        TO  SPA-GMN-RECEDEN-DATAKBN-G
-                   MOVE    SPACE       TO  SPA-GMN-RECEDEN-DATAKBN-G
+      ************ MOVE    SPACE       TO  SPA-GMN-RECEDEN-DATAKBN-G
                ELSE
                    MOVE    SPA-GMN-RECEDEN-DATAKBNLST (2)
                                        TO  SPA-GMN-RECEDEN-DATAKBN-G
@@ -9628,6 +9682,40 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    全国公費一部負担金記載区分（公費のみのレセプト）チェック
+      *****************************************************************
+       4212-KOUHI-ICHIBU-KSI-CHK-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHK
+      *
+           IF      SPA-GMN-KOUHI-ICHIBU-KSI-G
+                                   =   SPACE
+               MOVE    SPA-GMN-KOUHI-ICHIBU-KSILST (1)
+                                       TO  SPA-GMN-KOUHI-ICHIBU-KSI-G
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+                   IF      SPA-GMN-KOUHI-ICHIBU-KSI
+                                   =   SPA-GMN-KOUHI-ICHIBU-KSIL (IDY)
+                       MOVE    SPA-GMN-KOUHI-ICHIBU-KSILST (IDY)
+                                       TO  SPA-GMN-KOUHI-ICHIBU-KSI-G
+                       MOVE    SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+                                       TO  IDY
+                       MOVE    1       TO  FLG-CHK
+                   END-IF
+               END-PERFORM
+      *     
+               IF      FLG-CHK         =   ZERO
+                   MOVE    407             TO  SPA-GMN-CUR
+                   MOVE    "0138"          TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           .
+       4212-KOUHI-ICHIBU-KSI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    主科社保設定フラグチェック
       *****************************************************************
        4148-SYUKA-SYAHO-CHK-SEC   SECTION.
@@ -10377,6 +10465,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO
                                            SYS-200501-DISASTER-RECEIPT
            MOVE    SPA-GMN-15-YKZ          TO  SYS-200501-15-YKZ-PRTKBN
+           MOVE    SPA-GMN-KOUHI-ICHIBU-KSI
+                                           TO
+                                       SYS-200501-KOUHI-ICHIBU-KSIKBN
            MOVE    SPA-GMN-BTUNUM-KSIKBN   TO  SYS-200501-BTUNUM-KSIKBN
            MOVE    SPA-GMN-DRNAME-KSIKBN   TO  SYS-200501-DRNAME-KSIKBN
            MOVE    SPA-GMN-PRT-CHECKKBN    TO  SYS-200501-PRT-CHECKKBN
@@ -11498,6 +11589,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-15-YKZ-MAX  TO  W12-15-YKZ-COUNT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+               MOVE    SPA-GMN-KOUHI-ICHIBU-KSILST (IDY)
+                                       TO  W12-KOUHI-ICHIBU-KSILST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-KOUHI-ICHIBU-KSI-MAX
+                                       TO  W12-KOUHI-ICHIBU-KSI-COUNT
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-RECECOMKBN-MAX
                MOVE    SPA-GMN-RECECOMKBNLST (IDY)
                                        TO  W12-RECECOMKBNLST (IDY)
@@ -11632,6 +11731,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W12-DISASTER-RECEIPT
       *
            MOVE    SPA-GMN-15-YKZ-G    TO  W12-15-YKZ
+      *
+           MOVE    SPA-GMN-KOUHI-ICHIBU-KSI-G
+                                       TO  W12-KOUHI-ICHIBU-KSI
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-AUTODSPKBN-MAX
@@ -12568,6 +12670,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0137"
                    MOVE    "自賠責ＰＤＦファイル作成入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0138"
+                   MOVE    "全国公費一部負担金記載入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -12774,6 +12879,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "DISASTER_RECEIPT"  TO   MCP-WIDGET
                 WHEN    406
                    MOVE  "YKZ_15"            TO   MCP-WIDGET
+                WHEN    407
+                   MOVE  "KOUHI_ICHIBU"      TO   MCP-WIDGET
       *
                 WHEN    9
                     MOVE  "SYAPRTNM"         TO   MCP-WIDGET
@@ -13021,7 +13128,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE    0                TO  W12-PAGENO
                 WHEN    400 THRU    401
                 WHEN    403
-                WHEN    405 THRU    406
+                WHEN    405 THRU    407
                     MOVE    1                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -13162,6 +13269,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "DISASTER_RECEIPT"
                    MOVE    406         TO  SPA-GMN-CUR
                WHEN    "YKZ_15"
+                   MOVE    407         TO  SPA-GMN-CUR
+               WHEN    "KOUHI_ICHIBU"
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "PRTJYUNKBN4"
