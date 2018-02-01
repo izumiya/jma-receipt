@@ -244,6 +244,13 @@ W12 {
           count int;
             item varchar(20)[5];
         };
+        KOUHI_ICHIBU_COMBO {
+          KOUHI_ICHIBU {
+            textdata varchar(32);
+          };
+          count int;
+            item varchar(32)[5];
+        };
       };
       fi30 {
         SYAPRTNM {
