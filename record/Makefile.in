@@ -551,6 +551,7 @@ RECORD_files = \
 	patientmedicalallv3.rec \
  	W93.rec \
 	receiptdatacheckmakev3.rec \
+    pusheventgetv2.rec \
 
 
 DEF_files = \
@@ -1062,6 +1063,11 @@ DB_files = \
 	tbl_receden_tmp.db \
 	xml_receiptdata_check_makev3req.db \
 	xml_receiptdata_check_makev3res.db \
+    monpushevent.db \
+    xml_pusheventgetv2err.db \
+    xml_pusheventgetv2req.db \
+    xml_pusheventgetv2res.db \
+
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

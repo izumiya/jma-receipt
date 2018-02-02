@@ -1,0 +1,41 @@
+monpushevent {
+  id           integer;
+  event        varchar(64);
+  user_        varchar(32);
+  pushed_at    varchar(19);
+  data         varchar(4096);
+  pushed_from  varchar(32),virtual;
+  pushed_to    varchar(32),virtual;
+};
+
+primary  {
+    id;
+};
+
+path  key    {
+  DBSELECT  {
+    DECLARE monpushevent_key_csr CURSOR FOR
+    SELECT *
+    FROM monpushevent
+    WHERE id = :id
+    ;
+  };
+};
+
+path  key2    {
+  DBSELECT  {
+    DECLARE monpushevent_key2_csr CURSOR FOR
+    SELECT *
+    FROM monpushevent
+    WHERE
+        event = (CASE WHEN :event  <> '' THEN :event  ELSE event END)
+    AND user_ = (CASE WHEN :user_  <> '' THEN :user_  ELSE user_ END)
+        AND pushed_at >= CAST((CASE WHEN :pushed_from  <> '' THEN :pushed_from 
+                                   ELSE '1900-01-01 00:00:00' END) AS TIMESTAMP)
+        AND pushed_at <= CAST((CASE WHEN :pushed_to    <> '' THEN :pushed_to 
+                                   ELSE '9999-12-31 23:59:59' END) AS TIMESTAMP)
+    ORDER BY pushed_at,user_,event
+    ;
+  };
+};
+
