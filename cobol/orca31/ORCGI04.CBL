@@ -566,6 +566,9 @@
       *    請求書兼領収書まとめサブ
            COPY    "CPORCHCN03S02.INC".
       *
+      *    入退院登録PUSH通知
+           COPY    "CPORCSI03.INC".
+      *
        01  UIDIO-AREA.
            03  C-RET                   PIC X(2).
            03  C-UID                   PIC X(36).
@@ -4786,6 +4789,9 @@
       *        ユーザープログラム
                PERFORM 4801-USERPG-SEC
       *
+      *        PUSH通知
+               PERFORM 4801-PUSH-HOSPITAL-STAY-SEC
+      *
                IF    ( FLG-END         =   ZERO )
                    IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
                        PERFORM 220-S08-SENI-SEC
@@ -5111,6 +5117,9 @@
       *
       *    ユーザープログラム
            PERFORM 4801-USERPG-SEC
+      *
+      *    PUSH通知
+           PERFORM 4801-PUSH-HOSPITAL-STAY-SEC
       *
            IF    ( FLG-END         =   ZERO )
                IF    ( SPA-I01-I04-BUNBENFTN-FLG   =   1 )
@@ -6795,6 +6804,28 @@
       *
            .
        48011-XD01-SENI-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH通知処理
+      *****************************************************************
+       4801-PUSH-HOSPITAL-STAY-SEC         SECTION.
+      *
+           INITIALIZE                      SI03-AREA
+      *
+           MOVE    SPA-I01-I04-SYORIKBN
+                                       TO  SI03-REQNUM
+           MOVE    SPA-GMN-I01-PTNUM   TO  SI03-PTNUM
+           MOVE    WKPTNYUINRRK-NYUINYMD TO  SI03-NYUINYMD
+           IF    ( WKPTNYUINRRK-TAIINYMD NOT =   "99999999" )
+               MOVE    WKPTNYUINRRK-TAIINYMD
+                                       TO  SI03-TAIINYMD
+           END-IF
+           CALL    "ORCSI03"           USING
+                                       SI03-AREA
+                                       SPA-AREA
+      *
+           .
+       4801-PUSH-HOSPITAL-STAY-EXT.
            EXIT.
       *****************************************************************
       *    自画面編集処理

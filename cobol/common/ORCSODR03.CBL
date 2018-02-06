@@ -277,6 +277,7 @@
            IF    ( FLG-NYUINACCT           =   ZERO )
                MOVE    NACCT-SRYYM         TO  WRK-NACCTYM
                IF    ( SODR-ORDERID        =   NORDERID-GPTSTID )
+                AND  ( WRK-NACCTYM         <   SODR-SRYYMD (1:6))
                    IF    ( PTNYUINRRK-TAIINYMD =   "99999999" )
                        IF    ( WRK-NACCTYM <   WRK-LASTYM )
                            MOVE    1           TO  FLG-NACCT-NOT-FOUND
@@ -575,6 +576,7 @@
        20021-NACCT-CHK-SEC             SECTION.
       *
            IF    ( SODR-ORDERID        =   NORDERID-GPTSTID )
+            AND  ( WRK-NACCTYM         <   SODR-SRYYMD (1:6))
                IF    ( FLG-NACCT-NOT-FOUND NOT =   ZERO )
                    MOVE    "0076"      TO  ERRCD-ORDER
                END-IF

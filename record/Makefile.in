@@ -1067,6 +1067,7 @@ DB_files = \
     xml_pusheventgetv2err.db \
     xml_pusheventgetv2req.db \
     xml_pusheventgetv2res.db \
+    push_hospital_stay.db \
 
 
 shell.db: shell.db.in

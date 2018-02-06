@@ -189,6 +189,9 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //SNRRK-//.
       *
+      *    入退院登録PUSH通知
+           COPY    "CPORCSI03.INC".
+      *
       *    排他制御
            COPY    "CPORCSLOCK.INC".
       *
@@ -348,6 +351,8 @@
                    IF    ( SODR-KEYGENERATE
                                            =   CONST-API )
                        PERFORM 2101-USERPG-CALL-SEC
+      *
+                       PERFORM 2101-PUSHEVENT-SEC
                    END-IF
                END-IF
       *
@@ -646,6 +651,24 @@
       *
            .
        2101-USERPG-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH通知処理
+      *****************************************************************
+       2101-PUSHEVENT-SEC            SECTION.
+      *
+           INITIALIZE                      SI03-AREA
+      *
+           MOVE    "07"                TO  SI03-REQNUM
+           MOVE    SODR-PTNUM          TO  SI03-PTNUM
+           MOVE    TRRK-NYUINYMD       TO  SI03-NYUINYMD
+           MOVE    TRRK-TAIINYMD       TO  SI03-TAIINYMD
+           CALL    "ORCSI03"           USING
+                                       SI03-AREA
+                                       SPA-AREA
+      *
+           .
+       2101-PUSHEVENT-EXT.
            EXIT.
       *****************************************************************
       *    オーダ編集処理
@@ -1404,6 +1427,19 @@
            .
       *
        910-DBDELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＰＵＳＨＥＶＥＮＴ処理
+      *****************************************************************
+       910-PUSHEVENT-SEC               SECTION.
+      *
+           MOVE    "PUSHEVENT"         TO      MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-PUSHEVENT-EXT.
            EXIT.
       *****************************************************************
       *    排他制御処理（チェックのみ）

@@ -464,6 +464,7 @@
            03  WRK-KSN-NYUKSNKBN           PIC X(03).
            03  WRK-NYUKSNKBN               PIC X(03).
            03  WRK-STYUKYMD                PIC X(08).
+           03  WRK-NAI-TAIINYMD            PIC X(08).
            03  WRK-TAIINYMD.
                05  WRK-TAIINYM             PIC X(06).
                05  WRK-TAIINDD             PIC 9(02).
@@ -993,6 +994,9 @@
       *
       *    入院料加算算定可否チェックサブ
            COPY    "CPORCSI01.INC".
+      *
+      *    入退院登録PUSH通知
+           COPY    "CPORCSI03.INC".
       *
       *    負担金計算サブ
        01  LNK-ORCS02-REC.
@@ -9236,6 +9240,9 @@
       *    ユーザプログラム用パラメタ編集処理
            PERFORM 4801-USERPGRRK-EDIT-SEC
       *
+      *    PUSH用パラメタ編集処理
+           PERFORM 4801-PUSH-EDIT-SEC
+      *
       *    入院会計テーブルを編集する（入院時・転室時）
       *     IF    ( SPA-GMN-I01-SYORIKBN-CD =   "01"
       *                                     OR  "08" )
@@ -9299,6 +9306,9 @@
       *
       *    ユーザープログラム
            PERFORM 4801-USERPG-SEC
+      *
+      *    PUSH通知
+           PERFORM 4801-PUSH-SEC
       *
       *    画面を更新後の内容で再表示
            PERFORM 4100-PTNUM-CHK-SEC
@@ -9433,6 +9443,37 @@
       *
            .
        48011-XD01-SENI-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH通知用パラメタ編集処理
+      *****************************************************************
+       4801-PUSH-EDIT-SEC              SECTION.
+      *
+           INITIALIZE                      SI03-AREA
+      *
+           MOVE    SPA-GMN-I01-SYORIKBN-CD
+                                       TO  SI03-REQNUM
+           MOVE    SPA-GMN-I01-PTNUM   TO  SI03-PTNUM
+           MOVE    NRRK-NYUINYMD       TO  SI03-NYUINYMD
+           IF    ( SPA-GMN-I01-SYORIKBN-CD =   "07" )
+               MOVE    SPA-NAI-I01-TAIINYMD
+                                       TO  SI03-TAIINYMD
+           END-IF
+      *
+           .
+       4801-PUSH-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH通知処理
+      *****************************************************************
+       4801-PUSH-SEC                       SECTION.
+      *
+           CALL    "ORCSI03"           USING
+                                       SI03-AREA
+                                       SPA-AREA
+      *
+           .
+       4801-PUSH-EXT.
            EXIT.
       *****************************************************************
       *    関連チェック処理

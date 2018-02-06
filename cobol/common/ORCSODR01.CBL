@@ -248,6 +248,9 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //SNRRK-//.
       *
+      *    入退院登録PUSH通知
+           COPY    "CPORCSI03.INC".
+      *
       *    ユーザプログラム起動サブパラメタ
            COPY    "CPORCSUSERCHK.INC".
       *
@@ -373,6 +376,8 @@
                    IF    ( SODR-KEYGENERATE
                                            =   CONST-API )
                        PERFORM 2101-USERPG-CALL-SEC
+      *
+                       PERFORM 2101-PUSHEVENT-SEC
                    END-IF
                END-IF
       *
@@ -1870,6 +1875,23 @@
       *
            .
        2101-USERPG-CALL-EXT.
+           EXIT.
+      *****************************************************************
+      *    PUSH通知処理
+      *****************************************************************
+       2101-PUSHEVENT-SEC            SECTION.
+      *
+           INITIALIZE                      SI03-AREA
+      *
+           MOVE    "01"                TO  SI03-REQNUM
+           MOVE    SODR-PTNUM          TO  SI03-PTNUM
+           MOVE    TRRK-NYUINYMD       TO  SI03-NYUINYMD
+           CALL    "ORCSI03"           USING
+                                       SI03-AREA
+                                       SPA-AREA
+      *
+           .
+       2101-PUSHEVENT-EXT.
            EXIT.
       *****************************************************************
       *    オーダ編集処理

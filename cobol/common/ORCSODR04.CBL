@@ -301,6 +301,7 @@
                MOVE    NACCT-SRYYM         TO  WRK-NACCTYM
                IF    ( SODR-ORDERID        =   NORDERID-FOODID
                                             OR NORDERID-SAGAKUID )
+                AND  ( WRK-NACCTYM         <   SODR-SRYYMD (1:6))
                    IF    ( PTNYUINRRK-TAIINYMD =   "99999999" )
                        IF    ( WRK-NACCTYM <   WRK-LASTYM )
                            MOVE    1           TO  FLG-NACCT-NOT-FOUND
@@ -916,6 +917,7 @@
       *
            IF    ( SODR-ORDERID    =   NORDERID-FOODID
                                     OR NORDERID-SAGAKUID )
+            AND  ( WRK-NACCTYM     <   SODR-SRYYMD (1:6))
                IF    ( FLG-NACCT-NOT-FOUND NOT =   ZERO )
                    MOVE    "0084"      TO  ERRCD-ORDER
                END-IF
@@ -1311,10 +1313,6 @@
                                    TO  SODRNACCT-DAY-G
            MOVE    TRRK-REC        TO  LNK-PTNYUINRRK-REC
       *
-           DISPLAY  SODRNACCT-ORDERID ","
-                    SODRNACCT-SKJTIME ","
-                    SODRNACCT-DAY-G
-      *
            CALL    "ORCSODRNACCT"      USING
                                        SODRNACCT-AREA
                                        LNK-PTNYUINRRK-REC
@@ -1339,7 +1337,7 @@
            END-IF
       *
            MOVE    ERRCD-ORDER     TO  SODR-ERRCD
-           DISPLAY "SODR-ERRCD=" SODR-ERRCD
+      D    DISPLAY "SODR-ERRCD=" SODR-ERRCD
       *
            MOVE    FLG-END         TO  SODR-RC
       *
