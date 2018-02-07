@@ -785,6 +785,8 @@
       *                                     ２０１０のデフォルト設定修正）
       *  04.08.53    NACL-門脇    17/12/15  第三者行為現物給付に関わる
       *                                     負担金計算対応
+      *  04.08.54    NACL-門脇    18/02/01  レセプト公費一部負担金記載対応
+      *                                     （公費のみのレセプト）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3355,6 +3357,9 @@ grpsys           PERFORM 900-DBSELECT-SEC
            END-IF
            IF      SYS-200501-15-YKZ-PRTKBN         =   SPACE
                MOVE    "0"   TO  SYS-200501-15-YKZ-PRTKBN
+           END-IF
+           IF      SYS-200501-KOUHI-ICHIBU-KSIKBN   =   SPACE
+               MOVE    "0"   TO  SYS-200501-KOUHI-ICHIBU-KSIKBN
            END-IF
       *
           .
@@ -27647,6 +27652,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        "051" OR "052" OR "054" OR "079" OR
                        "012" OR "025"                              )
                   AND (TBL-HKNFTNDATA-JGNXXX(KOHFTN-IDX) = ZERO    )
+                  AND (RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1) = "1"   )
+                  AND (SYS-200501-KOUHI-ICHIBU-KSIKBN      = "0"   )
                     MOVE SPACE  TO  RECE02-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
                 END-IF
