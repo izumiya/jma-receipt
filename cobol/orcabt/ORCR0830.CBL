@@ -98,6 +98,7 @@
       *  04.08.04    NACL-ÌçÏÆ    16/09/06  Æþ±¡¼¼ÎÁ²Ã»»º¹³ÛÀÁµá¥Þ¥¹¥¿¤È
       *                                     ÆÃÊÌÏ«ºÒÉÕÅº´Ç¸îÎÁº¹³ÛÀÁµá
       *                                     ¥Þ¥¹¥¿¤ÎÂÐ±þ
+      *  04.08.05    NACL-ÌçÏÆ    18/02/01  Âè»°¼Ô¹Ô°Ù¤ÎÁªÄêÆþ±¡ÎÁÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1278,6 +1279,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-SRYYM        TO  LNK-SROUNYUIN-SANTEIYM
            MOVE    RECE82-HKNCOMBI     TO  LNK-SROUNYUIN-HKNCOMBI
            MOVE    "1"                 TO  LNK-SROUNYUIN-RYAKUKBN
+           IF   (RECE82-HKNKBN  =  "6"    )
+           AND  (RECE82-SRYYM  >= "201604")
+             MOVE  "1"                 TO  LNK-SROUNYUIN-DAISANFLG
+           END-IF
       *
            CALL    "ORCSROUNYUIN"      USING   MCPAREA
                                                ORCSROUNYUIN-AREA
@@ -1310,6 +1315,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            EVALUATE   LNK-SROUNYUIN-SRYKBN(IDY)
              WHEN   "90"
+                IF    LNK-SROUNYUIN-ZAITEN(IDY)  NOT = ZERO
                   MOVE     ZERO     TO    FLG-ARI
                   PERFORM  VARYING  ID1    FROM    1   BY  1
                                 UNTIL   ID1                   > 10
@@ -1331,29 +1337,31 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD    LNK-SROUNYUIN-ZAITEN(IDY)
                                        TO  RECE82-NYUKHNKEI(ID1)
                   END-IF
+                END-IF
       *
-                  COMPUTE  RECE82-NYUKHNKEI2  =
-                           RECE82-NYUKHNKEI2  +  
-                           LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
+                COMPUTE  RECE82-NYUKHNKEI2  =
+                         RECE82-NYUKHNKEI2  +
+                         LNK-SROUNYUIN-ZAITEN-NACCT(IDY)
       *
-                  COMPUTE  RECE82-NYUKHNKEI2  =
-                           RECE82-NYUKHNKEI2  +  
-                           LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
+                COMPUTE  RECE82-NYUKHNKEI2  =
+                         RECE82-NYUKHNKEI2  +
+                         LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
       *
-      **>         COMPUTE  RECE82-NYUTOKKEI2  =
-      **>                  RECE82-NYUTOKKEI2  +  
-      **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+      **>       COMPUTE  RECE82-NYUTOKKEI2  =
+      **>                RECE82-NYUTOKKEI2  +
+      **>                LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *
-                  COMPUTE  RECE82-NYUTOKKEI2  =
-                           RECE82-NYUTOKKEI2  -
-                           LNK-SROUNYUIN-GENTEN(IDY)
+                COMPUTE  RECE82-NYUTOKKEI2  =
+                         RECE82-NYUTOKKEI2  -
+                         LNK-SROUNYUIN-GENTEN(IDY)
       *
              WHEN   "92"
-                  COMPUTE  WRK-NYUTOKRYO  =  
-                           LNK-SROUNYUIN-ZAITEN(IDY)  +
-                           LNK-SROUNYUIN-ZAITEN-NACCT(IDY) +
-                           LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
+                COMPUTE  WRK-NYUTOKRYO                   =
+                         LNK-SROUNYUIN-ZAITEN(IDY)       +
+                         LNK-SROUNYUIN-ZAITEN-NACCT(IDY) +
+                         LNK-SROUNYUIN-ZAITEN-ACCT(IDY)
       *
+                IF    WRK-NYUTOKRYO  NOT = ZERO
                   IF     LNK-SROUNYUIN-GAIHAKU(IDY) =  ZERO
                     MOVE     ZERO     TO    FLG-ARI
                     PERFORM  VARYING  ID1    FROM    1   BY  1
@@ -1403,14 +1411,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD    WRK-NYUTOKRYO   TO  RECE82-NYUTOKKEI(ID1)
                     END-IF
                   END-IF
+                END-IF
       *
-      **>         COMPUTE  RECE82-NYUTOKKEI2  =
-      **>                  RECE82-NYUTOKKEI2  +
-      **>                  LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
+      **>       COMPUTE  RECE82-NYUTOKKEI2  =
+      **>                RECE82-NYUTOKKEI2  +
+      **>                LNK-SROUNYUIN-ZAITEN-ACCTETC(IDY)
       *
-                  COMPUTE  RECE82-NYUTOKKEI2  =
-                           RECE82-NYUTOKKEI2  -
-                           LNK-SROUNYUIN-GENTEN(IDY)
+                COMPUTE  RECE82-NYUTOKKEI2  =
+                         RECE82-NYUTOKKEI2  -
+                         LNK-SROUNYUIN-GENTEN(IDY)
       *
            END-EVALUATE
       *

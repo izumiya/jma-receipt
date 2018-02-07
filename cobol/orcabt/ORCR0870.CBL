@@ -136,6 +136,7 @@
       *  04.08.05    NACL-ÃÁœ∆    16/05/20  …∏Ω‡…È√¥≥€∑–≤·¡º√÷° ¿∫ø¿°À∆˛±°«Ø∑Ó∆¸
       *                                     §Œ•≥•·•Û•»¬–±˛
       *  04.08.06    NACL-ÃÁœ∆    16/08/23  ª˝ª≤ÃÙ¬–±˛
+      *  04.08.07    NACL-ÃÁœ∆    18/02/01  ¬Ëª∞º‘π‘∞Ÿ§Œ¡™ƒÍ∆˛±°Œ¡¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8655,6 +8656,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
                   ADD    1             TO      IDX-RECE85
                   MOVE   RECE85-SRYACT-TBL(IDX)
                              TO   WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
+                  IF   RECE84-ZAITEN   =   ZERO
+                     PERFORM   2001111-SRYACTINF-NAME-HEN-SEC
+                  END-IF
                   IF  (RECE84-JIHOKBN  NOT =  SPACE)
                   AND (RECE84-ZAIKBN       =   4   )
                      MOVE  ZERO
@@ -8730,6 +8734,28 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        200111-SRYACTINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £∞£µ°°£”£“£Ÿ£¡£√£‘£…£Œ£∆°°ÃææŒ ‘Ω∏ΩËÕ˝
+      *****************************************************************
+       2001111-SRYACTINF-NAME-HEN-SEC     SECTION.
+      *
+           IF    RECE82-SRYYM      >=    "201604"
+             EVALUATE   WRK-RECE85XX-SRYCD(IDX-RECE85 1)
+      *
+               WHEN   "190111590"
+                 MOVE  "810000001" TO  WRK-RECE85XX-SRYCD(IDX-RECE85 1)
+                 MOVE   ZERO    TO  WRK-RECE85XX-SRYSURYO(IDX-RECE85 1)
+                 MOVE   8       TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                 MOVE  "≥∞«Ò° ¡™ƒÍŒ≈Õ‹°À"
+                                TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+      *
+             END-EVALUATE
+           END-IF
+      *
+           .
+       2001111-SRYACTINF-NAME-HEN-EXT.
            EXIT.
       *
       *****************************************************************

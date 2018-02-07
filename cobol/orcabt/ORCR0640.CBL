@@ -12139,7 +12139,7 @@
                MOVE    "tbl_nyuinacct"   TO      MCP-TABLE
                MOVE    "key7"            TO      MCP-PATHNAME
                PERFORM  900-NYUINACCT-READ-SEC
-               PERFORM  UNTIL  (FLG-NYUINACCT  =    "1")
+               PERFORM  UNTIL  (FLG-NYUINACCT  =  1)
       *
                  IF     NACCT-ZAISKBKBN    =    "1"  
                    IF     NACCT-SRYCDTOTAL   NOT =    099999916         
@@ -12285,7 +12285,7 @@
                MOVE    "tbl_nyuinacct"   TO      MCP-TABLE
                MOVE    "key7"            TO      MCP-PATHNAME
                PERFORM  900-NYUINACCT-READ-SEC
-               PERFORM  UNTIL  (FLG-NYUINACCT  =    "1") 
+               PERFORM  UNTIL  (FLG-NYUINACCT  =  1)
       *
                  IF     NACCT-ZAISKBKBN    =    "1"  OR  "2"  OR
                                                 "4"  OR  "6"  OR
@@ -14935,7 +14935,7 @@
                MOVE    "tbl_nyuinact"   TO   MCP-TABLE
                MOVE    "key9"           TO   MCP-PATHNAME
                PERFORM  900-NYUINACT-READ-SEC
-               PERFORM  UNTIL  (FLG-NYUINACT  =    "1")
+               PERFORM  UNTIL  (FLG-NYUINACT  =  1)
                    PERFORM   2102061-RECE65-TENSOU2-SEC
                    IF      NACCT-ZAISKBKBN      =       "7"
                       PERFORM   2102062-RECE62-HENSYU2-SEC
@@ -15415,7 +15415,7 @@
                MOVE    "tbl_nyuinact"     TO   MCP-TABLE
                MOVE    "key9"             TO   MCP-PATHNAME
                PERFORM  900-NYUINACT-READ-SEC
-               PERFORM  UNTIL  (FLG-NYUINACT  =    "1")
+               PERFORM  UNTIL  (FLG-NYUINACT  =  1)
                    PERFORM   2102081-RECE65-TENSOU2-SEN-SEC
                    PERFORM   RECE65-WRITE-SEC
                    MOVE    "tbl_nyuinact"     TO   MCP-TABLE

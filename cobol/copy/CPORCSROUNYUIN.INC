@@ -31,6 +31,7 @@
       * 04.05.02     NACL-門脇    12/04/09  入院略称の文字数拡張
       *
       * 04.07.01     NACL-門脇    11/11/22  同日再入院対応
+      * 04.08.01     NACL-門脇    18/02/01  第三者行為の選定入院料対応
       ************************************************************
        01  ORCSROUNYUIN-AREA.
       *
@@ -47,6 +48,8 @@
       *労災乗数区分（１：２週間以内　２：２週間越え）
            03  LNK-SROUNYUIN-JOUSU-KBN               PIC  X(01)
                                                      OCCURS 31.
+      *第三者行為フラグ（自賠責（第三者行為）レセプト用）
+           03  LNK-SROUNYUIN-DAISANFLG               PIC  X(01).
       *返却項目
            03  LNK-SROUNYUIN-HENKYAKU-AREA.
       *返却テーブル
@@ -85,6 +88,8 @@
                    07  LNK-SROUNYUIN-ZAITEN-ACCTETC3 PIC  9(08).
       *包括点数の治験減点分
                    07  LNK-SROUNYUIN-GENTEN          PIC  9(08).
+      *選定入院料フラグ
+                   07  LNK-SROUNYUIN-SENTEI-FLG      PIC  X(01).
       *
       *略称（一般入院料・加算）
                05  LNK-SROUNYUIN-RYAKUSYO2           PIC  X(20)
