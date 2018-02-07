@@ -100,7 +100,8 @@
       *
       *  04.08.01    NACL-ÌçÏÆ    15/11/09  Â¾°å¼õ¿Ç¥Á¥§¥Ã¥¯ÄÉ²Ã
       *  04.08.02    NACL-ÌçÏÆ    16/03/08  Ê¿À®£²£¸Ç¯£´·î²þÀµÂÐ±þ
-      *  04.08.03    NACL-ÌçÏÆ    17/12/13  Æþ±¡ÎÁ²Ã»»¤ÎÏ«ºÒ¥Þ¥¹¥¿ÃÖ¤­´¹¤¨½¤Àµ 
+      *  04.08.03    NACL-ÌçÏÆ    17/12/13  Æþ±¡ÎÁ²Ã»»¤ÎÏ«ºÒ¥Þ¥¹¥¿ÃÖ¤­´¹¤¨½¤Àµ
+      *  04.08.04    NACL-ÌçÏÆ    18/02/01  Âè»°¼Ô¹Ô°Ù¤ÎÁªÄêÆþ±¡ÎÁÂÐ±þ
       *****************************************************************
       *
       *
@@ -133,6 +134,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-KSN             PIC 9(01).
            03  FLG-KENPOJYUNKYO    PIC 9(01).
+           03  FLG-SENTEICDCHG     PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                PIC 9(04).
@@ -335,6 +337,9 @@
            03  WRK-HYOTEN                  PIC 9(09)V99.
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
       *
+           03  WRK-SENTEI-SRYCD1           PIC X(09).
+           03  WRK-SENTEI-SRYCD2           PIC X(09).
+      *
            03  WRK-HOSPSBT                 PIC 9(01).
       *
            03  WRK-TOKUREI-SRYCD           PIC X(09).
@@ -354,6 +359,9 @@
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
                    07  WRK-CHUKSNCD        PIC X(04).
                    07  WRK-NYUKHNKBN       PIC 9(03).
+                   07  WRK-DAY-SENTEI      PIC 9(04).
+                   07  WRK-SENTEI-KHN      PIC X(09).
+                   07  WRK-SENTEI-KHNGEN   PIC X(09).
       *
       *    Æþ±¡ÎÁ²Ã»»ÂàÈòÎÎ°è
            03  WRK-NYUKSN-TABLE.
@@ -513,6 +521,10 @@
       *    Æþ±¡Î¬¾Î
        01  NYURYAKUSHO-REC.
            COPY    "CPNYUINRYAKUSHO.INC".
+      *
+      *    ÁªÄêÆþ±¡ÎÁ
+       01  SENTEICDCHG-REC.
+           COPY    "CPSENTEICDCHG.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -3513,8 +3525,20 @@
                    MOVE      ZERO     TO      WRK-KHNTEN
                                               WRK-KSNTEN
                                               WRK-HYOTEN
+                   MOVE      SPACE    TO      WRK-SENTEI-SRYCD1
+                                              WRK-SENTEI-SRYCD2
                    IF    NACCT-SRYCDTOTAL     =    99999916
-                       CONTINUE
+      *                Âè»°¼Ô¹Ô°Ù¤ÎÁªÄêÆþ±¡ÎÁÊÔ½¸
+                       IF   LNK-SROUNYUIN-DAISANFLG  =  "1"
+                         PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                    UNTIL     IDX1   >   31
+                           IF    (LNK-SROUNYUIN-NYUIN-FLG(IDX1) = "1")
+                           AND   (NACCT-DAY(IDX1)    NOT =  ZERO) 
+                               MOVE    NACCT-DAY(IDX1) TO
+                                                   WRK-DAY-SENTEI(IDX1)
+                           END-IF
+                         END-PERFORM
+                       END-IF
                    ELSE
       *                ³ºÅöÆþ±¡¹Ô°Ù¥Æ¡¼¥Ö¥ë¤ÎÆÉ¤ß¹þ¤ß
                        PERFORM    210-NYUINACT-GET-SEC
@@ -3584,6 +3608,13 @@
                                     END-IF
                                   END-PERFORM
       *
+      *                           Âè»°¼Ô¹Ô°Ù¤ÎÁªÄêÆþ±¡ÎÁÊÔ½¸
+                                  IF   LNK-SROUNYUIN-DAISANFLG  =  "1"
+                                    IF   NSRY-SRYCD(1)  NOT =   SPACE
+                                      PERFORM  220-DAISAN-HENSYU-SEC
+                                    END-IF
+                                  END-IF
+      *
                                   MOVE    NACCT-SRYKBN
                                                 TO  WRK-SRYKBN
       *                           ³°Çñ¥³¡¼¥ÉÊÔ½¸ÍÑ¤ËÆþ±¡´ðËÜÎÁ²Ã»»¶èÊ¬
@@ -3635,6 +3666,15 @@
                                IF    WRK-HYOKETU-TAIHI   NOT = SPACE
                                   MOVE  WRK-HYOKETU-TAIHI
                                                TO  WRK-HYOKETU(IDX1)
+                               END-IF
+      *
+                               IF    WRK-SENTEI-SRYCD1   NOT = SPACE
+                                  MOVE  WRK-SENTEI-SRYCD1
+                                            TO  WRK-SENTEI-KHN(IDX1)
+                               END-IF
+                               IF    WRK-SENTEI-SRYCD2   NOT = SPACE
+                                  MOVE  WRK-SENTEI-SRYCD2
+                                            TO  WRK-SENTEI-KHNGEN(IDX1)
                                END-IF
       *
                                MOVE  WRK-SRYKBN
@@ -4478,14 +4518,44 @@
       *    ¼èÆÀ¤·¤¿Ï«ºÒÆþ±¡¾ðÊó¤«¤éÆüÃ±°Ì¤ÎÆþ±¡²ñ·×¾ðÊó¤òºÆ¹½ÃÛ
            PERFORM      VARYING    IDX1   FROM   1  BY  1
                         UNTIL      IDX1   >   31
+               IF    WRK-DAY-SENTEI(IDX1)  =  ZERO
+                   MOVE  SPACE  TO  WRK-SENTEI-KHN   (IDX1)
+                   MOVE  SPACE  TO  WRK-SENTEI-KHNGEN(IDX1)
+               END-IF
+           END-PERFORM
+      *
+           PERFORM      VARYING    IDX1   FROM   1  BY  1
+                        UNTIL      IDX1   >   31
                MOVE     ZERO                TO  WRK-MEISAISU
       *        Æþ±¡´ðËÜÎÁ
                IF         WRK-NYUINKHN(IDX1)  NOT =        SPACE
-                   ADD      1               TO  WRK-MEISAISU
-                   MOVE   WRK-NYUINKHN(IDX1) TO  LNK-SROUNYUIN-SRYCD
-                                           (IDX1 WRK-MEISAISU)
-                   MOVE    "1"           TO  LNK-SROUNYUIN-SRYCD-SK
-                                           (IDX1 WRK-MEISAISU)
+                   IF   WRK-DAY-SENTEI(IDX1)  NOT =  ZERO
+                     ADD      1     TO  WRK-MEISAISU
+                     MOVE    WRK-SENTEI-KHN(IDX1)
+                                    TO  LNK-SROUNYUIN-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                     MOVE    "1"    TO  LNK-SROUNYUIN-SRYCD-SK
+                                               (IDX1 WRK-MEISAISU)
+                     MOVE    "1"    TO  LNK-SROUNYUIN-SENTEI-FLG
+                                               (IDX1)
+                     IF    WRK-SENTEI-KHNGEN(IDX1)  NOT =  SPACE
+                       ADD    1     TO  WRK-MEISAISU
+                       MOVE  WRK-SENTEI-KHNGEN(IDX1)
+                                    TO  LNK-SROUNYUIN-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                       MOVE  "B"    TO  LNK-SROUNYUIN-SRYCD-SK
+                                               (IDX1 WRK-MEISAISU)
+                       MOVE  "2"    TO  LNK-SROUNYUIN-SENTEI-FLG
+                                               (IDX1)
+                     END-IF
+                   ELSE
+                     ADD      1     TO  WRK-MEISAISU
+                     MOVE    WRK-NYUINKHN(IDX1)
+                                    TO  LNK-SROUNYUIN-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                     MOVE    "1"    TO  LNK-SROUNYUIN-SRYCD-SK
+                                               (IDX1 WRK-MEISAISU)
+                   END-IF
                END-IF
       *        ³°Çñ
                IF        (WRK-NYUINKHN(IDX1)  NOT =        SPACE)
@@ -5092,6 +5162,26 @@
       *
            EVALUATE   LNK-SROUNYUIN-SRYKBN(IDX1)
               WHEN     "90"
+               IF   WRK-DAY-SENTEI(IDX1)  NOT =  ZERO
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     1
+                      MOVE   "190107290"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     3
+                      MOVE   "190111590"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     4
+                    WHEN     5
+                    WHEN     6
+                    WHEN     7
+                      PERFORM      2101-GAIHAKU-TAKIKAN-SENTEI-SEC
+                    WHEN     8
+                    WHEN     9
+      ***           WHEN    10
+      ***           WHEN    11
+      ***           WHEN    12
+                    WHEN    13
+                      PERFORM      2101-GAIHAKU-GENSAN-SEC
+                 END-EVALUATE
+               ELSE
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     1
                       MOVE   "190107290"   TO  WRK-GAIHAKU(IDX1)
@@ -5119,7 +5209,28 @@
                          PERFORM   2101-GAIHAKU-GENSAN-SEC
                       END-IF
                  END-EVALUATE
+               END-IF
               WHEN     "92"
+               IF   WRK-DAY-SENTEI(IDX1)  NOT =  ZERO
+                 EVALUATE   NACCT-DAY(IDX1)
+                    WHEN     1
+                      MOVE   "190107490"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     3
+                      MOVE   "190111590"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     4
+                    WHEN     5
+                    WHEN     6
+                    WHEN     7
+                      PERFORM      2101-GAIHAKU-TAKIKAN-SENTEI-SEC
+                    WHEN     8
+                    WHEN     9
+      ***           WHEN    10
+      ***           WHEN    11
+      ***           WHEN    12
+                    WHEN    13
+                      PERFORM      2101-GAIHAKU-GENSAN-SEC
+                 END-EVALUATE
+               ELSE
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     1
                       MOVE   "190107490"   TO  WRK-GAIHAKU(IDX1)
@@ -5147,6 +5258,7 @@
                          PERFORM   2101-GAIHAKU-GENSAN-SEC
                       END-IF
                  END-EVALUATE
+               END-IF
            END-EVALUATE
       *
            IF       WRK-GAIHAKU(IDX1)   =    SPACE
@@ -5442,6 +5554,64 @@
       *
            .
        2101-GAIHAKU-TAKIKAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ³°Çñ¿ÇÎÅ¥³¡¼¥É¼èÆÀ¡ÊÁªÄêÎÅÍÜ¡Ë
+      *****************************************************************
+       2101-GAIHAKU-TAKIKAN-SENTEI-SEC           SECTION.
+      *
+           IF   LNK-SROUNYUIN-SANTEIYM  >=  "201604"
+             IF   NACCT-DAY(IDX1)  =   7
+               MOVE    1    TO    WRK-TAIJYUSIN-ERR
+             END-IF
+             EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+      *        ÆÃÄêÆþ±¡ÎÁ
+               WHEN   201  THRU  206
+               WHEN   208  THRU  210
+               WHEN   212  THRU  217
+               WHEN   221
+               WHEN   227  THRU  229
+               WHEN   232  THRU  236
+               WHEN   238  THRU  239
+               WHEN   241  THRU  249
+               WHEN   250  THRU  254
+               WHEN   257  THRU  267
+      *        --- H28.4 TUIKA ---
+               WHEN   268  THRU  270
+                    MOVE      1           TO   WRK-TAIJYUSIN-ERR
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+               WHEN   152
+               WHEN   173  THRU  190
+               WHEN   196
+               WHEN   199
+      *        --- H28.4 TUIKA ---
+               WHEN   048  THRU  049
+               WHEN   051  THRU  054
+               WHEN   057  THRU  068
+                    MOVE      1           TO   WRK-TAIJYUSIN-ERR
+      *        Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ
+               WHEN   153  THRU  158
+                    MOVE      1           TO   WRK-TAIJYUSIN-ERR
+      *        Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¡¦Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³
+               WHEN   226
+               WHEN   240
+                    MOVE      1           TO   WRK-TAIJYUSIN-ERR
+               WHEN   OTHER
+                 EVALUATE   NACCT-DAY(IDX1)
+                  WHEN     4
+                  WHEN     6
+                    MOVE      1           TO   WRK-TAIJYUSIN-ERR
+                  WHEN     5
+                    MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
+                 END-EVALUATE
+             END-EVALUATE
+           END-IF
+      *
+           .
+       2101-GAIHAKU-TAKIKAN-SENTEI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -5748,8 +5918,18 @@
       *            ADD   TNS-TEN     TO  LNK-SROUNYUIN-ZAITEN(IDX1)
            END-EVALUATE
       *
+           IF    (LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "2"        )
+           AND   (LNK-SROUNYUIN-SRYCD(IDX1 IDX2)    =  "190111590")
+                   MOVE  ZERO        TO  LNK-SROUNYUIN-ZAITEN(IDX1)
+           END-IF
+      *
       *    ¿ÇÎÅ¥³¡¼¥É·×
-           MOVE    TNS-SRYCD          TO  WRK-SRYCD-X
+           IF    (LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "2"        )
+           AND   (LNK-SROUNYUIN-SRYCD(IDX1 IDX2)    =  "190111590")
+             MOVE "190111590"         TO  WRK-SRYCD-X
+           ELSE
+             MOVE  TNS-SRYCD          TO  WRK-SRYCD-X
+           END-IF
            COMPUTE LNK-SROUNYUIN-SRYCDTOTAL(IDX1)  =
                    LNK-SROUNYUIN-SRYCDTOTAL(IDX1)  +   WRK-SRYCD-9
            ADD      1          TO  LNK-SROUNYUIN-MEISAISU(IDX1)
@@ -5773,6 +5953,9 @@
            END-IF
       *
            IF    ((LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "1"  ) AND
+                  (WRK-SENTEI-KHNGEN(IDX1)           =  SPACE) AND
+                  (WRK-GAIHAKU(IDX1)                 =  SPACE))
+           OR    ((LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "B"  ) AND
                   (WRK-GAIHAKU(IDX1)                 =  SPACE))
            OR    ( LNK-SROUNYUIN-SRYCD-SK(IDX1 IDX2) =  "2"   )
       *      É¸·ç¡§¡ó¸º»»
@@ -6269,7 +6452,7 @@
            EXIT.
       *
       ******************************************************************
-      *    ·îÆâ¤ËÊ£¿ô¤Î°åÎÅ´ü´Ö¾ðÊó¤¬¤Ê¤¤¤«¸¡º÷¡Ê°åÎÅµ¡´Ø¸º»»¤Î³ÎÇ§¡Ë  *
+      *    ·îÆâ¤ËÊ£¿ô¤Î°åÎÅ´ü´Ö¾ðÊó¤¬¤Ê¤¤¤«¸¡º÷¡Ê°åÎÅµ¡´Ø¸º»»¤Î³ÎÇ§¡Ë
       ******************************************************************
        210-SYS-5000-CHK-SEC                 SECTION.
       *
@@ -6316,7 +6499,7 @@
            EXIT.
       *
       ******************************************************************
-      *    ·îÆâ¤Î°åÎÅ´ü´Ö¾ðÊó¼èÆÀ¡Ê°åÎÅµ¡´Ø¸º»»¾ðÊó¡Ë                  *
+      *    ·îÆâ¤Î°åÎÅ´ü´Ö¾ðÊó¼èÆÀ¡Ê°åÎÅµ¡´Ø¸º»»¾ðÊó¡Ë
       ******************************************************************
        210-SYS-5000-GET-SEC                 SECTION.
       *
@@ -6462,7 +6645,7 @@
            EXIT.
       *
       ******************************************************************
-      *    Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ          *
+      *    Ï«ºÒÆþ±¡¤ÎÏ«ºÒ¾è¿ô¡Ê´ü´Ö²Ã»»¡Ë¤Ë´Þ¤á¤ëÃí²Ã»»¤Î¼èÆÀ
       ******************************************************************
        210-CHUKSN-GET-SEC                 SECTION.
       *
@@ -6554,6 +6737,61 @@
            .
       *
        210-CHUKSN-GET-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¤ÎÁªÄêÆþ±¡ÎÁÊÔ½¸
+      ******************************************************************
+       220-DAISAN-HENSYU-SEC                 SECTION.
+      *
+           INITIALIZE                     SENTEICDCHG-REC
+           MOVE    NSRY-SRYCD(1)      TO  SENCHG-IPNSRYCD
+           MOVE    SENTEICDCHG-REC    TO  MCPDATA-REC
+           MOVE    "DBSELECT"         TO  MCP-FUNC
+           MOVE    "tbl_senteicdchg"  TO  MCP-TABLE
+           MOVE    "key2"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"        USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE  "DBFETCH"          TO  MCP-FUNC
+             MOVE  "tbl_senteicdchg"  TO  MCP-TABLE
+             MOVE  "key2"             TO  MCP-PATHNAME
+             CALL  "ORCDBMAIN"        USING  MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+             IF    MCP-RC  =  ZERO
+               MOVE    MCPDATA-REC    TO  SENTEICDCHG-REC
+               MOVE    ZERO           TO  FLG-SENTEICDCHG
+             ELSE
+               INITIALIZE                 SENTEICDCHG-REC
+               MOVE    1              TO  FLG-SENTEICDCHG
+             END-IF
+           ELSE
+               INITIALIZE                 SENTEICDCHG-REC
+               MOVE    1              TO  FLG-SENTEICDCHG
+           END-IF
+      *
+           IF  FLG-SENTEICDCHG   =   ZERO
+             IF    SENCHG-IPNSRYCD  =  SENCHG-SENTEISRYCD
+      *        Ìë¶Ð»þ´Ö·Ð²á¸º»»¤ÎÁªÄêÂÐ±þ
+      *        "190131410","190165810","190165910","190131310"
+               IF  LNK-SROUNYUIN-SANTEIYM  >=  "201404"
+                 MOVE  SENCHG-SENTEISRYCD  TO   WRK-SENTEI-SRYCD1
+                 MOVE  "190122890"         TO   WRK-SENTEI-SRYCD2
+               END-IF
+             ELSE
+                 MOVE  SENCHG-SENTEISRYCD  TO   WRK-SENTEI-SRYCD1
+                 MOVE  SPACE               TO   WRK-SENTEI-SRYCD2
+             END-IF
+           END-IF
+           MOVE    "tbl_senteicdchg"   TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM  910-DB-CLOSE-SEC
+      *
+           .
+      *
+       220-DAISAN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
