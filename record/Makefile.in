@@ -552,6 +552,7 @@ RECORD_files = \
  	W93.rec \
 	receiptdatacheckmakev3.rec \
     pusheventgetv2.rec \
+        addressmasterlstv3.rec \
 
 
 DEF_files = \
@@ -1068,6 +1069,9 @@ DB_files = \
     xml_pusheventgetv2req.db \
     xml_pusheventgetv2res.db \
     push_hospital_stay.db \
+        xml_address_masterlstv3req.db \
+        xml_address_masterlstv3res.db \
+        xml_address_masterlst.db \
 
 
 shell.db: shell.db.in

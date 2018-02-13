@@ -318,6 +318,7 @@ bind	"ORCBJOBCHK1"	"OpenCOBOL";
 bind    "ORAPI052BR7V3" "OpenCOBOL";
 bind	"ORCBM501"	"OpenCOBOL";
 bind	"ORCBM701"	"OpenCOBOL";
+bind    "ORAPI052BR8V3" "OpenCOBOL";
 
 db "xml2" {
  fm_payment_certificate;
@@ -327,6 +328,7 @@ db "xml2" {
  xml_patient_basis_all;
  xml_patient_disease_all;
  xml_patient_medical_all;
+ xml_address_masterlst;
 };
 
 #include "orcadb.inc"
