@@ -758,6 +758,8 @@
       *                                     負担金計算対応
       *  04.08.46    NACL-門脇    18/02/01  レセプト公費一部負担金記載対応
       *                                     （公費のみのレセプト）
+      *  04.08.47    NACL-門脇    18/02/09  生活保護の食事標準負担額計算
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1279,9 +1281,6 @@
                  07  WRK-TAIHI-FTNMONEY-KOJ            PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN             PIC 9(09).
                  07  WRK-TAIHI-FTNMONEY-EN2            PIC 9(09)V9(01).
-           03  WRK-KOHTANINF-AREA.
-             05  WRK-KOHTANINF             OCCURS  5.
-                 07  WRK-KOHTAN-SHOKUJIRYOYOHI         PIC 9(09).
       *
        01  WRK-SYUNOU-CYOKI-AREA.
            03  WRK-SYUNOU-CYOKI-TABLE.
@@ -25455,8 +25454,7 @@
                   ELSE
                    IF   ((SYU-KOH1HKNNUM  NOT =
                           "010" AND "038" AND "024" AND "079" AND
-                          "051" AND "052" AND "015" AND "016" AND
-                          "054"                                 ) AND
+                          "052" AND "015" AND "016" AND "054"   ) AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ))
@@ -25465,8 +25463,7 @@
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (SYU-SKJ-FTNKBN(IDX3)  =  "3"          ))
-                   OR   ((SYU-KOH1HKNNUM      =  "051" OR
-                                                 "015" OR  "016") AND
+                   OR   ((SYU-KOH1HKNNUM      =  "015" OR  "016") AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
@@ -25476,8 +25473,6 @@
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
-                         (TBL-HKNFTNDATA-JGNXXX(KH-IDX - 1)
-                                                         = ZERO ) AND
                          (RECE62-SRYYM       <   "201501"       ))
                    OR   ((SYU-KOH1HKNNUM      =  "052" OR  "054") AND
                          (SYU-KOH2HKNNUM      =   SPACE         ) AND
@@ -25510,10 +25505,6 @@
                      END-IF
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
-                     IF    SYU-YKZKENNUM = ZERO
-                       ADD SYU-SKJ-RYOYOHI(IDX3)  TO
-                                   WRK-KOHTAN-SHOKUJIRYOYOHI(KH-IDX)
-                     END-IF
       *
                      MOVE   "1"    TO   RECE62-SKJFTNFLG(KH-IDX - 1)
                    ELSE
@@ -26508,7 +26499,7 @@
              END-IF
       *
              IF  ((RECE62-KOHNUM(KOHFTN-IDX) =  "012"         )   AND
-                  (RECE62-SRYYM             >=  "200304"      ))
+                  (RECE62-SRYYM             >=  "200604"      ))
              OR  ((RECE62-KOHNUM(KOHFTN-IDX) =  "015" OR "016")   AND
                   (RECE62-SRYYM             >=  "200304"      )   AND
                   (RECE62-SRYYM             <=  "200603"      ))
@@ -26605,11 +26596,11 @@
                   IF  (WRK-NYUJGNGAK  NOT =  ZERO               )
                   AND (WRK-NYUJGNGAK  >
                            RECE62-FTNMONEY(KOHFTN-IDX + 1)      )
-                  AND (WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
+                  AND (WRK-SKJ-FTN(KOHFTN-IDX + 1)
                                       NOT =  ZERO               )
                     COMPUTE  WRK-FTNKEI2 =
                              RECE62-FTNMONEY(KOHFTN-IDX + 1)  +
-                             WRK-KOHTAN-SHOKUJIRYOYOHI(KOHFTN-IDX + 1)
+                             WRK-SKJ-FTN(KOHFTN-IDX + 1)
                     IF  WRK-NYUJGNGAK <= WRK-FTNKEI2
                       MOVE  WRK-NYUJGNGAK
                           TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)

@@ -452,6 +452,8 @@
       *  04.08.22    NACL-ÌçÏÆ    17/12/07  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.08.23    NACL-ÌçÏÆ    17/12/15  Âè»°¼Ô¹Ô°Ù¸½ÊªµëÉÕ¤Ë´Ø¤ï¤ë
       *                                     ÉéÃ´¶â·×»»ÂÐ±þ
+      *  04.08.24    NACL-ÌçÏÆ    18/02/09  À¸³èÊÝ¸î¤Î¿©»öÉ¸½àÉéÃ´³Û·×»»
+      *                                     ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -10758,20 +10760,33 @@
                              WHEN  "025"
                               IF   (COMB-HKNNUM  NOT   =   SPACE)
                               AND  (MAX-KIN-KOHI1-M > WK-SEIHO-GENDO)
+                               IF   LNK-SYU-SRYYMD(1:6) >= "200604"
+                                IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                    > WK-SEIHO-GENDO
+                                   MOVE WK-SEIHO-GENDO
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                END-IF
+                               ELSE
                                 MOVE  WK-SEIHO-GENDO
                                      TO   MAX-KIN-KOHI1-M
                                           WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                               END-IF
                               END-IF
                               IF    FLG-TOKU75 = 1 OR 2
-                                IF  WK-NYUJGNGAK > WK-SEIHO-GENDO-TOKU75
-                                  MOVE  WK-SEIHO-GENDO-TOKU75
-                                       TO   MAX-KIN-KOHI1-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI1-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI1-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                   MOVE WK-SEIHO-GENDO-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                              WHEN  "011"
                              WHEN  "020"
@@ -10856,21 +10871,27 @@
                              WHEN  "012"
                              WHEN  "025"
                               IF  MAX-KIN-KOHI1-M > WK-SEIHO-GENDO70
-                                MOVE WK-SEIHO-GENDO70
-                                     TO MAX-KIN-KOHI1-M
-                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-SEIHO-GENDO70
+                                   MOVE WK-SEIHO-GENDO70
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                               IF    FLG-TOKU75 = 3
-                                IF  WK-NYUJGNGAK >
-                                             WK-SEIHO-GENDO70-TOKU75
-                                  MOVE  WK-SEIHO-GENDO70-TOKU75
-                                       TO   MAX-KIN-KOHI1-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI1-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI1-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                   MOVE WK-SEIHO-GENDO70-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                              WHEN  "011"
                              WHEN  "020"
@@ -11267,20 +11288,34 @@
                              WHEN  "025"
                               IF   (COMB-HKNNUM  NOT   =   SPACE)
                               AND  (MAX-KIN-KOHI2-M > WK-SEIHO-GENDO)
+
+                               IF   LNK-SYU-SRYYMD(1:6) >= "200604"
+                                IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                    > WK-SEIHO-GENDO
+                                   MOVE WK-SEIHO-GENDO
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                END-IF
+                               ELSE
                                 MOVE  WK-SEIHO-GENDO
                                      TO   MAX-KIN-KOHI2-M
                                           WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                               END-IF
                               END-IF
                               IF    FLG-TOKU75 = 1 OR 2
-                                IF  WK-NYUJGNGAK > WK-SEIHO-GENDO-TOKU75
-                                  MOVE  WK-SEIHO-GENDO-TOKU75
-                                       TO   MAX-KIN-KOHI2-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI2-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI2-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                   MOVE WK-SEIHO-GENDO-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                              WHEN  "011"
                              WHEN  "020"
@@ -11358,21 +11393,27 @@
                              WHEN  "012"
                              WHEN  "025"
                               IF  MAX-KIN-KOHI2-M > WK-SEIHO-GENDO70
-                                MOVE WK-SEIHO-GENDO70
-                                     TO MAX-KIN-KOHI2-M
-                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-SEIHO-GENDO70
+                                   MOVE WK-SEIHO-GENDO70
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                               IF    FLG-TOKU75 = 3
-                                IF  WK-NYUJGNGAK >
-                                             WK-SEIHO-GENDO70-TOKU75
-                                  MOVE  WK-SEIHO-GENDO70-TOKU75
-                                       TO   MAX-KIN-KOHI2-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI2-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI2-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                   MOVE WK-SEIHO-GENDO70-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                              WHEN  "011"
                              WHEN  "020"
@@ -11611,20 +11652,33 @@
                                           "012" OR "025"
                               IF   (COMB-HKNNUM  NOT   =   SPACE)
                               AND  (MAX-KIN-KOHI3-M > WK-SEIHO-GENDO)
+                               IF   LNK-SYU-SRYYMD(1:6) >= "200604"
+                                IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                    > WK-SEIHO-GENDO
+                                   MOVE WK-SEIHO-GENDO
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                END-IF
+                               ELSE
                                 MOVE  WK-SEIHO-GENDO
                                      TO   MAX-KIN-KOHI3-M
                                           WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                               END-IF
                               END-IF
                               IF    FLG-TOKU75 = 1 OR 2
-                                IF  WK-NYUJGNGAK > WK-SEIHO-GENDO-TOKU75
-                                  MOVE  WK-SEIHO-GENDO-TOKU75
-                                       TO   MAX-KIN-KOHI3-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI3-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI3-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                   MOVE WK-SEIHO-GENDO-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                             ELSE
                               IF  (MAX-KIN-KOHI3-M    >
@@ -11666,21 +11720,27 @@
                             IF    COMB-KOHHKNNUM(KOH-IDX) =
                                           "012" OR "025"
                               IF  MAX-KIN-KOHI3-M > WK-SEIHO-GENDO70
-                                MOVE WK-SEIHO-GENDO70
-                                     TO MAX-KIN-KOHI3-M
-                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-SEIHO-GENDO70
+                                   MOVE WK-SEIHO-GENDO70
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                               IF    FLG-TOKU75 = 3
-                                IF  WK-NYUJGNGAK >
-                                             WK-SEIHO-GENDO70-TOKU75
-                                  MOVE  WK-SEIHO-GENDO70-TOKU75
-                                       TO   MAX-KIN-KOHI3-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI3-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI3-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                   MOVE WK-SEIHO-GENDO70-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                             ELSE
                               IF  (MAX-KIN-KOHI3-M    >
@@ -11759,20 +11819,33 @@
                                           "012" OR "025"
                               IF   (COMB-HKNNUM  NOT   =   SPACE)
                               AND  (MAX-KIN-KOHI4-M > WK-SEIHO-GENDO)
+                               IF   LNK-SYU-SRYYMD(1:6) >= "200604"
+                                IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                    > WK-SEIHO-GENDO
+                                   MOVE WK-SEIHO-GENDO
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                END-IF
+                               ELSE
                                 MOVE  WK-SEIHO-GENDO
                                      TO   MAX-KIN-KOHI4-M
                                           WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                               END-IF
                               END-IF
                               IF    FLG-TOKU75 = 1 OR 2
-                                IF  WK-NYUJGNGAK > WK-SEIHO-GENDO-TOKU75
-                                  MOVE  WK-SEIHO-GENDO-TOKU75
-                                       TO   MAX-KIN-KOHI4-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI4-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI4-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO-TOKU75)
+                                   MOVE WK-SEIHO-GENDO-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                             ELSE
                               IF  (MAX-KIN-KOHI4-M    >
@@ -11814,21 +11887,27 @@
                             IF    COMB-KOHHKNNUM(KOH-IDX) =
                                           "012" OR "025"
                               IF  MAX-KIN-KOHI4-M > WK-SEIHO-GENDO70
-                                MOVE WK-SEIHO-GENDO70
-                                     TO MAX-KIN-KOHI4-M
-                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-SEIHO-GENDO70
+                                   MOVE WK-SEIHO-GENDO70
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                               IF    FLG-TOKU75 = 3
-                                IF  WK-NYUJGNGAK >
-                                             WK-SEIHO-GENDO70-TOKU75
-                                  MOVE  WK-SEIHO-GENDO70-TOKU75
-                                       TO   MAX-KIN-KOHI4-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                ELSE
-                                  MOVE  WK-NYUJGNGAK
-                                       TO   MAX-KIN-KOHI4-M-TOKU75
-                                            WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                END-IF
+                                 MOVE   WK-NYUJGNGAK
+                                     TO MAX-KIN-KOHI4-M-TOKU75
+                                        WK-TAIHI-NYUJGNGAK(KOH-IDX)
+                                 IF  (WK-NYUJGNGAK
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                             >  WK-SEIHO-GENDO70-TOKU75)
+                                   MOVE WK-SEIHO-GENDO70-TOKU75
+                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                   MOVE 3
+                                     TO WK-SYOFUKUMU-FLG(KOH-IDX)
+                                 END-IF
                               END-IF
                             ELSE
                               IF  (MAX-KIN-KOHI4-M    >
@@ -24744,6 +24823,11 @@
            IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
            OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                              OR  "068"  OR  "069"  OR  "040" )
+           OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                 (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                 (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH4HKNNUM         =   SPACE         ))
              ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                            WK-SHOKUJI-FTNL
            ELSE
@@ -24825,6 +24909,11 @@
            IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
            OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                              OR  "068"  OR  "069"  OR  "040" )
+           OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                 (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                 (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH4HKNNUM         =   SPACE         ))
              ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                            WK-SHOKUJI-FTNL
            ELSE
@@ -24985,6 +25074,11 @@
            IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
            OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                              OR  "068"  OR  "069"  OR  "040" )
+           OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                 (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                 (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                 (COMB-KOH4HKNNUM         =   SPACE         ))
              ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                            WK-SHOKUJI-FTNS
            ELSE
@@ -25385,6 +25479,11 @@
                IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
                OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                                  OR  "068"  OR  "069"  OR  "040" )
+               OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                     (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                     (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                     (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                     (COMB-KOH4HKNNUM         =   SPACE         ))
                  ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                                WK-SHOKUJI-FTNL
                ELSE
@@ -25485,6 +25584,11 @@
                 IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
                 OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                                   OR  "068"  OR  "069"  OR  "040" )
+                OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                      (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                      (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                      (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                      (COMB-KOH4HKNNUM         =   SPACE         ))
                   ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                                 WK-SHOKUJI-FTNL
                 ELSE
@@ -25604,6 +25708,11 @@
                IF   ( COMB-SYU-HKNKOHSBTKBN   =   "8"  OR  "9"   )
                OR   ( COMB-HKNNUM =  "971"  OR  "973"  OR  "975"
                                  OR  "068"  OR  "069"  OR  "040" )
+               OR   ((COMB-HKNNUM             =   SPACE         ) AND
+                     (COMB-KOH1HKNNUM         =   "012" OR "025") AND
+                     (COMB-KOH2HKNNUM         =   SPACE         ) AND
+                     (COMB-KOH3HKNNUM         =   SPACE         ) AND
+                     (COMB-KOH4HKNNUM         =   SPACE         ))
                 ADD   WK-SHOKUJI-JIHI    TO   WK-SHOKUJI-FTN
                                               WK-SHOKUJI-FTNS
                ELSE
@@ -27145,8 +27254,12 @@
            IF  WK-SYOGAI-SKJGENMEN(KOH-IDX)  =   1
                 MOVE    "3"              TO   WK-NYUSKJRYYKBN
            END-IF.
-           IF  (COMB-KOHHKNNUM(KOH-IDX)   =  "012"         )
-                MOVE    "3"              TO   WK-NYUSKJRYYKBN
+           IF  (LNK-SYU-SRYYMD(1:6)      >=  "200604"      )
+           AND (COMB-KOHHKNNUM(KOH-IDX)   =  "012"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
+           END-IF.
+           IF  (COMB-KOHHKNNUM(KOH-IDX)   =  "025"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
            END-IF.
            IF  (LNK-SYU-SRYYMD(1:6)      >=  "200310"      )
            AND (COMB-KOHHKNNUM(KOH-IDX)   =  "051"         )
