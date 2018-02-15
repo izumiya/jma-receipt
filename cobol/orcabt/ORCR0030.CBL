@@ -5330,11 +5330,11 @@ grpsys           PERFORM 900-DBSELECT-SEC
                    WHEN     "10"
                        MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                   WHEN     "38"
-                     IF  RECE02-SRYYM  <=  "201711"
-                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
+      ***          WHEN     "38"
+      ***            IF  RECE02-SRYYM  <=  "201711"
+      ***              MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+      ***            END-IF
                    WHEN     "08"
                      IF  RECE02-SRYYM  <=  "201002"
                        MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)
@@ -5357,11 +5357,11 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE02-SYUKEI-TAIKBN(IDX11 2)
                  EVALUATE   SYS-1001-PREFNUM
-                   WHEN     "38"
-                     IF  RECE02-SRYYM  <=  "201711"
-                       MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
+      ***          WHEN     "38"
+      ***            IF  RECE02-SRYYM  <=  "201711"
+      ***              MOVE "3" TO RECE02-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE02-SYUKEI-TAIKBN(IDX11 2)
+      ***            END-IF
                    WHEN     "08"
                      IF  RECE02-SRYYM  <=  "201002"
                        MOVE "4" TO RECE02-SYUKEIKBN(IDX11 2)

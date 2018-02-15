@@ -4778,11 +4778,11 @@
                    WHEN     "10"
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
                        MOVE "4" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                   WHEN     "38"
-                     IF  RECE62-SRYYM  <=  "201711"
-                       MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
+      ***          WHEN     "38"
+      ***            IF  RECE62-SRYYM  <=  "201711"
+      ***              MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+      ***            END-IF
                    WHEN     "08"
                      IF  RECE62-SRYYM  <=  "201002"
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
@@ -4805,11 +4805,11 @@
                  MOVE   SYS-2010-SYUKEI-TAIKBN
                                     TO   RECE62-SYUKEI-TAIKBN(IDX11 2)
                  EVALUATE   WRK-PREFNUM
-                   WHEN     "38"
-                     IF  RECE62-SRYYM  <=  "201711"
-                       MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
-                       MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
-                     END-IF
+      ***          WHEN     "38"
+      ***            IF  RECE62-SRYYM  <=  "201711"
+      ***              MOVE "3" TO RECE62-SYUKEIKBN(IDX11 2)
+      ***              MOVE "1" TO RECE62-SYUKEI-TAIKBN(IDX11 2)
+      ***            END-IF
                    WHEN     "08"
                      IF  RECE62-SRYYM  <=  "201002"
                        MOVE "4" TO RECE62-SYUKEIKBN(IDX11 2)
