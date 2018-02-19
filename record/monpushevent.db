@@ -1,4 +1,5 @@
 monpushevent {
+  uuid         varchar(37);
   id           integer;
   event        varchar(64);
   user_        varchar(32);
@@ -9,7 +10,7 @@ monpushevent {
 };
 
 primary  {
-    id;
+    uuid;
 };
 
 path  key    {

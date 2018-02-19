@@ -22,6 +22,7 @@
       * Maj/Min/Rev  修正者        日付      内容
       ************************************************************
       * 01  MPE-REC.
+            03  MPE-UUID                   PIC X(37).
             03  MPE-ID                     PIC S9(9)   BINARY.
             03  MPE-EVENT                  PIC X(64).
             03  MPE-USER                   PIC X(32).
