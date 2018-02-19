@@ -149,9 +149,21 @@
                COMPUTE IDXF  = IDXF  + 1
       *
                MOVE    APIPARA-DATA-REC TO PARA001-REC
+      *
                MOVE    PARA001-FORMID      TO  PUSHP001-FORMID  (IDXF)
                MOVE    PARA001-CUSTOMID    TO  PUSHP001-CUSTOMID(IDXF)
-               MOVE    PARA001-FORMNAME    TO  PUSHP001-FORMNAME(IDXF)
+               EVALUATE    TRUE
+               WHEN    ( PARA001-FORMNAME (1:8)    =    "ªŸ ß∆¸ Ã" )
+                   MOVE    "ªŸ ßæ⁄Ã¿ΩÒ° ∆¸ Ã°À"
+                                           TO  PUSHP001-FORMNAME (IDXF)
+               WHEN    ( PARA001-FORMNAME (1:8)    =    "ªŸ ß∑Ó Ã" )
+                   MOVE    "ªŸ ßæ⁄Ã¿ΩÒ° ∑Ó Ã°À"
+                                           TO  PUSHP001-FORMNAME (IDXF)
+               WHEN    ( PARA001-FORMNAME (1:8)    =    "ªŸ ßæ⁄Ã¿" )
+                   MOVE    "ªŸ ßæ⁄Ã¿ΩÒ"    TO  PUSHP001-FORMNAME (IDXF)
+               WHEN    OTHER
+                   MOVE  PARA001-FORMNAME  TO  PUSHP001-FORMNAME(IDXF)
+               END-EVALUATE
                MOVE    PARA001-DATAID      TO  PUSHP001-DATAID  (IDXF)
       *
                PERFORM 900-APIPARA-KEY2-FET-SEC

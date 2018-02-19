@@ -1407,11 +1407,14 @@
            MOVE    WRK-ZZZ9            TO  HCN011-CD (IDX)
       *
            INITIALIZE                  ORCSMKBYOMEIAREA
-           MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
-           MOVE    PTBYO-BYOMEI            TO  SMKBYO-BYOMEI
+           MOVE    PTBYO-BYOMEI        TO  SMKBYO-BYOMEI
+      *
+      *    補足コメント
+           MOVE    PTBYO-HOSOKU-COMMENT    TO  SMKBYO-HOSOKU-COMMENT
            IF    ( PARA-UTAGAIKBN      =   "1" )
-               CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+               MOVE    PTBYO-UTAGAIFLG     TO  SMKBYO-UTAGAIFLG
            END-IF
+           CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
       *    カルテ病名がある時はカルテ病名
            IF    ( PTBYO-CHARTBYOMEI   NOT =   SPACE )
                INITIALIZE                      ORCSMKBYOMEIAREA

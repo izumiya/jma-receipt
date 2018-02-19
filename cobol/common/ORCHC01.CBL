@@ -127,6 +127,8 @@
       *API
            03  FLG-APISYORI        PIC 9(01).
       *
+           03  FLG-DAISAN-COMMENT  PIC 9(01).
+      *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-ERR             PIC 9(06).
@@ -1133,7 +1135,6 @@
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       3
                IF      COMB-KOHID (IDY)    NOT =   ZERO
-                   ADD     1                   TO  IDX-KOH
                    INITIALIZE                  PTKOHINF-REC
                    MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
                    MOVE    SPA-PTID            TO  PTKOH-PTID
@@ -1214,20 +1215,52 @@
       *****************************************************************
        3103-KOHHEN-HC01-SEC         SECTION.
       *
-           PERFORM 3102-PTKOHINF-HEN-SEC
+           MOVE    ZERO                        TO  FLG-DAISAN-COMMENT
       *
-           MOVE    WRK-FTNSNO      TO  HC01-FTNSNO (IDY)
-      *****MOVE    WRK-JKYSNO      TO  HC01-JKYSNO (IDY)
-           EVALUATE    WRK-JKYSNO-MAX
+           IF    ( PTKOH-KOHNUM            =   "970" )
+               IF    ( PARA-DAISANKBN      =   "1" )
+                   CONTINUE
+               ELSE
+                   MOVE    1                   TO  FLG-DAISAN-COMMENT
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-DAISAN-COMMENT          =   ZERO )
+               ADD     1                       TO  IDX-KOH
+               PERFORM 3102-PTKOHINF-HEN-SEC
+      *
+               MOVE    WRK-FTNSNO      TO  HC01-FTNSNO (IDX-KOH)
+      *****    MOVE    WRK-JKYSNO      TO  HC01-JKYSNO (IDX-KOH)
+               EVALUATE    WRK-JKYSNO-MAX
                WHEN    0   THRU   14
-                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO (IDY)
+                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO (IDX-KOH)
                WHEN    15  THRU   20
-                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNON(IDY)
+                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNON(IDX-KOH)
                WHEN    21  THRU   24
-                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO12(IDY)
+                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO12(IDX-KOH)
                WHEN    OTHER
-                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO15(IDY)
-           END-EVALUATE
+                   MOVE    WRK-JKYSNO      TO  HC01-JKYSNO15(IDX-KOH)
+               END-EVALUATE
+           ELSE
+      *
+      *        備考へ
+               MOVE    SPACE               TO  WRK-FTNSNO
+               MOVE    SPACE               TO  WRK-JKYSNO
+               MOVE    SPACE               TO  WRK-COMMENT-G
+               IF      PTKOH-JKYSNUM       =   SPACE
+                   MOVE    COMB-KOH1-TANSEIDONAME
+                                           TO  WRK-COMMENT-G
+               ELSE
+                   STRING  COMB-KOH1-TANSEIDONAME
+                           "（"
+                           PTKOH-JKYSNUM
+                           "）"            DELIMITED  BY  SPACE
+                                           INTO    WRK-COMMENT-G
+                   END-STRING
+               END-IF
+               PERFORM 200210-H01-COMMENT-SEC
+           END-IF
+      *
            .
        3103-KOHHEN-HC01-EXT.
            EXIT.
@@ -1405,8 +1438,6 @@
                    OR    ( PTKOH-KOHNUM        =   "970"   )
                        CONTINUE
                    ELSE
-                       ADD     1               TO  IDX-KOH
-                       MOVE    IDX-KOH         TO  IDY
       *API             API公費編集
                        IF      FLG-APISYORI    =   1
                            PERFORM 200192-APIKOHHENSYU-SEC
@@ -1819,7 +1850,8 @@
            MOVE    WRK-OUT-MAX         TO  WRK-JKYSNO-MAX
       *
       *ver.4.7
-           IF      COMB-KOH1HKNNUM     =   "970"
+      *****IF      COMB-KOH1HKNNUM     =   "970"
+           IF      PTKOH-KOHNUM        =   "970"
       *        第三者行為
                IF      PARA-DAISANKBN      =   "1"
       *            負担者番号へ
@@ -1834,24 +1866,7 @@
                        END-STRING
                        ADD     4                   TO  WRK-JKYSNO-MAX
                    END-IF
-               ELSE
-      *            備考へ
-                   MOVE    SPACE               TO  WRK-FTNSNO
-                   MOVE    SPACE               TO  WRK-JKYSNO
-                   MOVE    SPACE               TO  WRK-COMMENT-G
-                   IF      PTKOH-JKYSNUM       =   SPACE
-                       MOVE    COMB-KOH1-TANSEIDONAME
-                                               TO  WRK-COMMENT-G
-                   ELSE
-                       STRING  COMB-KOH1-TANSEIDONAME
-                               "（"
-                               PTKOH-JKYSNUM
-                               "）"            DELIMITED  BY  SPACE
-                                               INTO    WRK-COMMENT-G
-                       END-STRING
-                   END-IF
                END-IF
-               PERFORM 200210-H01-COMMENT-SEC
            END-IF
       *
       *    適用開始年月日
@@ -2200,7 +2215,6 @@
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       3
                IF      COMB-KOHID (IDY)    NOT =   ZERO
-                   ADD     1                   TO  IDX-KOH
                    INITIALIZE                  PTKOHINF-REC
                    MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
                    MOVE    SPA-PTID            TO  PTKOH-PTID
@@ -2357,6 +2371,43 @@
       *****************************************************************
        200192-APIKOHHENSYU-SEC         SECTION.
       *
+           IF    ( PTKOH-KOHNUM            =   "970" )
+               IF    ( PARA-DAISANKBN      =   "1" )
+                   PERFORM 2001921-APIKOHHENSYU-SEC
+               ELSE
+      *            備考へ
+                   MOVE    SPACE               TO  WRK-FTNSNO
+                   MOVE    SPACE               TO  WRK-JKYSNO
+                   MOVE    SPACE               TO  WRK-COMMENT-G
+                   IF      PTKOH-JKYSNUM       =   SPACE
+                       MOVE    COMB-KOH1-TANSEIDONAME
+                                               TO  WRK-COMMENT-G
+                   ELSE
+                       STRING  COMB-KOH1-TANSEIDONAME
+                               "（"
+                               PTKOH-JKYSNUM
+                               "）"            DELIMITED  BY  SPACE
+                                               INTO    WRK-COMMENT-G
+                       END-STRING
+                   END-IF
+                   ADD     1                   TO  IDX-COM
+                   MOVE    WRK-COMMENT-G       TO  FMKARTE1-MEMO
+                                                            (IDX-COM)
+               END-IF
+           ELSE
+               PERFORM 2001921-APIKOHHENSYU-SEC
+           END-IF
+      *
+           .
+       2001921-APIKOHHENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    公費内容編集処理
+      *****************************************************************
+       2001921-APIKOHHENSYU-SEC         SECTION.
+      *
+           ADD     1                   TO  IDX-KOH
+      *
            MOVE    PTKOH-KOHNUM        TO  FMKARTE1-KOH-HKNNUM
                                                        (IDX-KOH)
       *    保険者情報
@@ -2391,34 +2442,8 @@
            MOVE    WRK-HEN-DATE        TO  FMKARTE1-KOH-TEKEDYMD
                                                        (IDX-KOH)
       *
-           IF      COMB-KOH1HKNNUM     =   "970"
-      *        第三者行為
-               IF      PARA-DAISANKBN      =   "1"
-                   CONTINUE
-               ELSE
-      *            備考へ
-                   MOVE    SPACE               TO  WRK-FTNSNO
-                   MOVE    SPACE               TO  WRK-JKYSNO
-                   MOVE    SPACE               TO  WRK-COMMENT-G
-                   IF      PTKOH-JKYSNUM       =   SPACE
-                       MOVE    COMB-KOH1-TANSEIDONAME
-                                               TO  WRK-COMMENT-G
-                   ELSE
-                       STRING  COMB-KOH1-TANSEIDONAME
-                               "（"
-                               PTKOH-JKYSNUM
-                               "）"            DELIMITED  BY  SPACE
-                                               INTO    WRK-COMMENT-G
-                       END-STRING
-                   END-IF
-                   ADD     1                   TO  IDX-COM
-                   MOVE    WRK-COMMENT-G       TO  FMKARTE1-MEMO
-                                                            (IDX-COM)
-               END-IF
-           END-IF
-      *
            .
-       200192-APIKOHHENSYU-EXT.
+       2001921-APIKOHHENSYU-EXT.
            EXIT.
       *
       *****************************************************************

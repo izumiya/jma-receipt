@@ -160,6 +160,8 @@
                        09  SPA-GMN-JIHIMEIL    PIC X(10).
       *
            03  SPA-NAI-AREA.
+               05  SPA-NAI-HCM31API            PIC X(01).
+               05  SPA-NAI-HCM32API            PIC X(01).
                05  SPA-NAI-STRSRYYMD.
                    07  SPA-NAI-STRYY       PIC 9(04).
                    07  SPA-NAI-STRMM       PIC 9(02).
@@ -175,6 +177,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-INIT            PIC 9(01).
+           03  FLG-API             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -196,6 +199,8 @@
            03  WRK-SYORI-PG        PIC X(20).
            03  WRK-SIDMSG          PIC X(70).
            03  WRK-ERRMSG          PIC X(80).
+           03  WRK-PRTPG           PIC X(20).
+           03  WRK-KBNCD           PIC X(08).
       *
        01  CONST-AREA.
       *
@@ -214,6 +219,7 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+           COPY    "CPSYSKANRI.INC".
            COPY    "CPSK1039.INC".
            COPY    "CPSK3003.INC".
       *
@@ -224,6 +230,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    画面日付変換サブ
            COPY    "CPORCSGDAY.INC".
@@ -571,6 +580,7 @@
        310-SPASET-SEC              SECTION.
       *
            INITIALIZE                  SPA-GMN-AREA
+                                       SPA-NAI-AREA
       *
            MOVE    1                   TO  FLG-INIT
       *
@@ -613,6 +623,20 @@
                MOVE    SYS-1039-S04JIHIPRTKBN  TO  SPA-GMN-JIHIKBN
            END-IF
       *
+           MOVE    "00000006"      TO  WRK-KBNCD
+           MOVE    "ORCHCM31"      TO  WRK-PRTPG
+           PERFORM 3101-APIPRINT-CHK-SEC
+           IF    ( FLG-API         =   1 )
+               MOVE    "1"         TO  SPA-NAI-HCM31API
+           END-IF
+      *
+           MOVE    "00000007"      TO  WRK-KBNCD
+           MOVE    "ORCHCM32"      TO  WRK-PRTPG
+           PERFORM 3101-APIPRINT-CHK-SEC
+           IF    ( FLG-API         =   1 )
+               MOVE    "1"         TO  SPA-NAI-HCM32API
+           END-IF
+      *
            PERFORM 3101-SPASET-SEC
       *
            MOVE    1               TO  SPA-GMN-CUR
@@ -644,6 +668,44 @@
       *
            .
        3101-SPASET-EXT.
+           EXIT.
+      *************************************************************
+      *    ＡＰＩ印刷チェック
+      *************************************************************
+       3101-APIPRINT-CHK-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  FLG-API
+      *
+           INITIALIZE                      ORCSPRTNMAREA
+           MOVE    "1"                 TO  ORCSPRTNM-KBN
+           MOVE    WRK-KBNCD           TO  ORCSPRTNM-KBNCD
+           MOVE    SPA-SYSYMD          TO  ORCSPRTNM-SRYYMD
+           MOVE    "2"                 TO  ORCSPRTNM-NYUGAIKBN
+           CALL    "ORCSPRTNM"         USING
+                                           ORCSPRTNMAREA
+                                           SPA-AREA
+                                           SYSKANRI-REC
+           IF    ( ORCSPRTNM-RC        =   ZERO )
+              CONTINUE
+           ELSE
+              MOVE    WRK-PRTPG        TO  ORCSPRTNM-PRTPG
+           END-IF
+      *
+           IF    ( WRK-PRTPG   =   ORCSPRTNM-PRTPG )
+               INITIALIZE                  ORCSPRGOPTIONAREA
+               MOVE    WRK-PRTPG       TO  ORCSPRGOPTION-PRGID
+               MOVE    "API_DATA"      TO  ORCSPRGOPTION-IN-DATA
+               CALL    "ORCSPRGOPTION"     USING
+                                           SPA-AREA
+                                           ORCSPRGOPTIONAREA
+               IF    ( ORCSPRGOPTION-OT-PARA
+                                       =    "1" )
+                   MOVE    1           TO  FLG-API
+               END-IF
+           END-IF
+      *
+           .
+       3101-APIPRINT-CHK-EXT.
            EXIT.
       *************************************************************
       *    コンボ初期処理
@@ -1255,6 +1317,14 @@
                    MOVE    1           TO  SPA-S01-SHR-HCM32FLG
            END-EVALUATE
       *
+           IF  ( SPA-S01-SHR-ORDER     =   "PV" )
+               PERFORM 4001-APIPV-CHK-SEC
+               IF    ( FLG-API         =   1 )
+                   MOVE    0           TO  SPA-S01-SHR-HCM31FLG
+                   MOVE    0           TO  SPA-S01-SHR-HCM32FLG
+               END-IF
+           END-IF
+      *
       *    自費内訳明細書フラグ
            EVALUATE    SPA-GMN-JIHIKBN
                WHEN    "0"
@@ -1273,7 +1343,26 @@
            .
        400-PRINT-EXT.
            EXIT.
+      *****************************************************************
+      *    API印刷時プレビュ選択ーチェック処理
+      *****************************************************************
+       4001-APIPV-CHK-SEC              SECTION.
       *
+           MOVE    ZERO                TO  FLG-API
+      *
+           IF    ( SPA-GMN-SIHARAIKBN     =   "1" )
+            AND  ( SPA-NAI-HCM31API       =   "1" )
+               MOVE    1               TO  FLG-API
+           END-IF
+      *
+           IF    ( SPA-GMN-SIHARAIKBN     =   "2" )
+            AND  ( SPA-NAI-HCM32API       =   "1" )
+               MOVE    1               TO  FLG-API
+           END-IF
+      *
+           .
+       4001-APIPV-CHK-EXT.
+           EXIT.
       *----(03.04.01)--UPD-START---
       *****************************************************************
       *    ジョブ管理チェック処理
@@ -1470,13 +1559,20 @@
                                                S04-JIHI-LIST-STATE
            END-IF
       *
+           MOVE    WIDGET-NORMAL           TO  S04-B10-STATE
+                                               S04-B12-STATE
+      *
            IF    ( SPA-GMN-SIHARAIKBN =   "0" )
-           AND   ( SPA-GMN-JIHIKBN    =   "0" )
+            AND  ( SPA-GMN-JIHIKBN    =   "0" )
                MOVE    WIDGET-INSENSITIVE  TO  S04-B10-STATE
                                                S04-B12-STATE
-           ELSE
-               MOVE    WIDGET-NORMAL       TO  S04-B10-STATE
-                                               S04-B12-STATE
+           END-IF
+      *
+           IF    ( SPA-GMN-JIHIKBN    =   "0" )
+               PERFORM 4001-APIPV-CHK-SEC
+               IF    ( FLG-API        =   1 )
+                   MOVE    WIDGET-INSENSITIVE TO  S04-B10-STATE
+               END-IF
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC

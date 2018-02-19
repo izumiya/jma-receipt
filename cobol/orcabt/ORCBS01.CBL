@@ -108,6 +108,9 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    システム管理
+           COPY    "CPSK1010.INC".
+      *
       *    患者情報
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
@@ -124,12 +127,17 @@
       *    サブプロ用領域
       *****************************************************************
       *
+           COPY    "CPORCSCOMMON.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *    COPY    "ORCA-DBPATH".
       *
       *    プログラムオプション編集パラメタ
            COPY    "CPORCSPRGOPTION.INC".
+      *
+      *    クライアント印刷制御
+           COPY    "CPORCSPRTCTRL.INC".
       *
       *    支払証明書
            COPY    "CPORCHCM31.INC".
@@ -223,6 +231,9 @@
            MOVE    SPACE           TO  WRK-JOBTITLE
                                        WRK-PRTTITLE
       *
+      *    WRK-PRTTITLEの内容はPUSH時に置き換えている。
+      *    値を変更した場合、ORCBPRT1とORCSAPIFMTERMの条件追加が
+      *    必要となるので注意
            EVALUATE    WRK-PARA-PGTYPE
            WHEN    "HC31"
                STRING  "支払日別："        DELIMITED   BY  SIZE
@@ -310,11 +321,24 @@
       *
            INITIALIZE                  SPA-AREA
       *
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
-           MOVE    ORCHCM31-PTID       TO  SPA-PTID
-           MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
                                            SPA-SRYYMD
+           MOVE    MCP-USER            TO  SPA-OPID
+      *
+      *    ＳＰＡ共通設定
+           INITIALIZE              SYS-1010-REC
+           INITIALIZE              ORCSCOMMONAREA
+           MOVE    "M00"       TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"    USING
+                                   MCPAREA
+                                   SPA-AREA
+                                   ORCSCOMMONAREA
+                                   SYS-1010-REC
+      *
+           MOVE    ORCHCM31-PTID       TO  SPA-PTID
+           MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
            MOVE    LNK-PRTKANRI-TERMID TO  SPA-TERMID
            MOVE    LNK-PRTKANRI-TBL-GROUP
                                        TO  SPA-PRT-GROUP
@@ -380,6 +404,20 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
+           IF    ( FLG-API             =   1 )
+      *
+      *        ORCSONPRTSETは使わない（UUIDが入るとXA01で選択不可になる）
+      *        CALL    "ORCSONPRTSET"      USING
+      *                                    SPA-AREA
+      *
+               INITIALIZE                  ORCSPRTCTRLAREA
+               CALL    "ORCSPRTCTRL"       USING
+                                           SPA-AREA
+                                           ORCSPRTCTRLAREA
+                                           MCPAREA
+           END-IF
+      *
+      *
            IF    ( WRK-PARA-PGTYPE     =   "HC50" )
       *
                INITIALIZE                      ORCHCM50AREA
@@ -398,6 +436,13 @@
                                                ORCSPRTAREA
                                                ORCHCM31AREA
                MOVE    ORCHCM31-OT-CNT     TO  WRK-UPDCNT
+           END-IF
+      *
+           IF    ( FLG-API             =   1 )
+      *        印刷ダミー処理
+               MOVE    "99"                TO  SPA-PRT-FLG
+               CALL    "ORCHCDUMMY"        USING
+                                           SPA-AREA
            END-IF
       *
            .
@@ -457,7 +502,7 @@
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
-           IF    ( FLG-API         =   ZERO )
+           IF    ( FLG-API     =   ZERO )
                MOVE    WRK-UPDCNT  TO  JOB-UPDCNT
            END-IF
            CALL    "ORCSJOB"           USING

@@ -528,7 +528,19 @@ grpsys     MOVE    WRK-PARA-HOSPNUM
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-           MOVE    PRTKANRI-TITLE  TO  TPUSHP001-FORMNAME (CNT-PUSH)
+           EVALUATE    TRUE
+           WHEN    ( PRTKANRI-TITLE (1:8)  =    "ªŸ ß∆¸ Ã" )
+               MOVE    "ªŸ ßæ⁄Ã¿ΩÒ° ∆¸ Ã°À"
+                                       TO  TPUSHP001-FORMNAME (CNT-PUSH)
+           WHEN    ( PRTKANRI-TITLE (1:8)  =    "ªŸ ß∑Ó Ã" )
+               MOVE    "ªŸ ßæ⁄Ã¿ΩÒ° ∑Ó Ã°À"
+                                       TO  TPUSHP001-FORMNAME (CNT-PUSH)
+           WHEN    ( PRTKANRI-TITLE (1:8)  =    "ªŸ ßæ⁄Ã¿" )
+               MOVE    "ªŸ ßæ⁄Ã¿ΩÒ"    TO  TPUSHP001-FORMNAME (CNT-PUSH)
+           WHEN    OTHER
+               MOVE    PRTKANRI-TITLE  TO  TPUSHP001-FORMNAME (CNT-PUSH)
+           END-EVALUATE
+      *
            STRING  PRTKANRI-TBL-KEY    DELIMITED BY SPACE
                    "#"                 DELIMITED BY SIZE
                    PRTKANRI-TBL-UUID   DELIMITED BY SPACE
