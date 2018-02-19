@@ -1034,6 +1034,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        OR  2
                                        OR  4
                                        OR  10
+      *H30.2   Êü¼ÍÀþ¼£ÎÅ¡¡ÄÉ²Ã
+                                       OR  9
       *            ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢ÉÂÍý¿ÇÃÇ¡¡¤Ê¤·
                    MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
@@ -1987,9 +1989,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                            IF      IDX             =   1
                                                    OR  2
                                                    OR  4
+                                                   OR  9
                                                    OR  10
                                                    OR  12
-      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢ÉÂÍý¿ÇÃÇ¡¢ºßÂð¡¡¤Ê¤·
+      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢Êü¼ÍÀþ¡¢ÉÂÍý¿ÇÃÇ¡¢ºßÂð¡¡¤Ê¤·
                                MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
                            ELSE
@@ -2003,8 +2006,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                            IF      IDX             =   1
                                                    OR  2
                                                    OR  4
+                                                   OR  9
                                                    OR  10
-      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢ÉÂÍý¿ÇÃÇ¡¡¤Ê¤·
+      *                   ÅêÌô¡¢Ãí¼Í¡¢¼ê½Ñ¡¦Ëã¿ì¡¢Êü¼ÍÀþ¡¢ÉÂÍý¿ÇÃÇ¡¡¤Ê¤·
                                MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
                            ELSE
