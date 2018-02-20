@@ -40,8 +40,6 @@
       *  04.08.01    NACL-藤原    14/07/07  一時ディレクトリ対応
       *  04.08.02    NACL-藤原    15/08/24  レセ電データ作成時の請求区分
       *                                     更新対応
-      *
-      *  05.00.01    NACL-藤原    17/07/04  ＨＡＯＲＩ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -261,36 +259,10 @@
                05  FILLER              PIC X(03).
                05  WRK-9-X             PIC X(01).
       *    日付変換用
-      *    日付変換用
            03  WRK-SYMD.
                05  WRK-SYY             PIC X(04).
                05  WRK-SMM             PIC X(02).
                05  WRK-SDD             PIC X(02).
-      *
-           03  WRK-HEN-DATE.
-               05  WRK-HEN-YY          PIC X(04).
-               05  WRK-HEN-H1          PIC X(01).
-               05  WRK-HEN-MM          PIC X(02).
-               05  WRK-HEN-H2          PIC X(01).
-               05  WRK-HEN-DD          PIC X(02).
-           03  WRK-THMS.
-               05  WRK-THH             PIC X(02).
-               05  WRK-TMM             PIC X(02).
-               05  WRK-TSS             PIC X(02).
-           03  WRK-HEN-TIME.
-               05  WRK-HEN-THH         PIC X(02).
-               05  WRK-HEN-T1          PIC X(01).
-               05  WRK-HEN-TMM         PIC X(02).
-               05  WRK-HEN-T2          PIC X(01).
-               05  WRK-HEN-TSS         PIC X(02).
-      *
-           03  WRK-CNT                 PIC 9(10).
-           03  WRK-CNT-X   REDEFINES   WRK-CNT
-                                       PIC X(10).
-      *
-           03  WRK-PARAM.
-               05  WRK-PARAM-ORCA-UID  PIC X(36).
-               05  WRK-PARAM-KARTE-UID PIC X(36).
       *
       *    パラメタＤＢ編集用
            03  WRK-BTPARA-INFO-PARA.
@@ -445,9 +417,6 @@
            COPY    "CPORCSFILESV.INC".
       *
            COPY    "CPORCSGETTEMP.INC".
-      *
-      *    PUSH
-           COPY    "CPPUSHBATCH01.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -1779,9 +1748,6 @@
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
-      *    ＰＵＳＨ通知処理
-           PERFORM 3001-PUSH-SEC
-      *
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
@@ -1980,48 +1946,6 @@
            CLOSE   UPD-FILE
            .
        310-SEIKYU-UPD-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ＰＵＳＨ通知処理
-      *****************************************************************
-       3001-PUSH-SEC        SECTION.
-      *
-           MOVE    "CHK"           TO  SJOBKANRI-MODE
-           INITIALIZE                  JOBKANRI-REC
-           PERFORM 900-CALL-ORCSJOB-SEC
-           IF    ( SJOBKANRI-RETURN
-                                   =   ZERO  )
-           AND   ( JOB-PARAM   NOT =   SPACE )
-               INITIALIZE                  PUSHBA01-REC
-               MOVE    JOB-PARAM       TO  WRK-PARAM
-               MOVE    WRK-PARAM-KARTE-UID
-                                       TO  PUSHBA01API-KARTE-UID
-               MOVE    WRK-PARAM-ORCA-UID
-                                       TO  PUSHBA01API-ORCA-UID
-               MOVE    "000"           TO  PUSHBA01API-RESULT
-               MOVE    "receiptdata_make"
-                                       TO  PUSHBA01-EVENT
-               MOVE    LNK-PRTKANRI-SRYYM
-                                       TO  WRK-SYMD
-               PERFORM 801-DAYHEN01-SEC
-               MOVE    WRK-HEN-DATE (1:7)
-                                       TO  PUSHBA01-PERFORM-MONTH
-               MOVE    WRK-RECENUM-ALL TO  WRK-CNT
-               MOVE    WRK-CNT-X       TO  PUSHBA01-OUTPUT-COUNT
-      *??
-             display "push=" PUSHBA01-REC "#"
-      *??
-               MOVE    PUSHBA01-REC    TO  MCPDATA-REC
-               MOVE    "PUSHEVENT"     TO  MCP-FUNC
-               MOVE    "push_batch01"  TO  MCP-TABLE
-               MOVE    "push_batch01"  TO  MCP-PATHNAME
-               CALL    "ORCDBMAIN"     USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-           END-IF
-           .
-       3001-PUSH-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2294,32 +2218,6 @@
       *
            .
        800-NUM-HANKAKU-HENKAN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    日付編集処理
-      *****************************************************************
-       801-DAYHEN01-SEC                SECTION.
-      *
-           INITIALIZE                  WRK-HEN-DATE
-           MOVE    WRK-SYY             TO  WRK-HEN-YY
-           MOVE    WRK-SMM             TO  WRK-HEN-MM
-           MOVE    WRK-SDD             TO  WRK-HEN-DD
-           MOVE    "-"                 TO  WRK-HEN-H1
-           MOVE    "-"                 TO  WRK-HEN-H2
-           IF      WRK-SYMD            =   "99999999"
-               MOVE    "12"                TO  WRK-HEN-MM
-               MOVE    "31"                TO  WRK-HEN-DD
-           END-IF
-      *
-           INITIALIZE                  WRK-HEN-TIME
-           MOVE    WRK-THH             TO  WRK-HEN-THH
-           MOVE    WRK-TMM             TO  WRK-HEN-TMM
-           MOVE    WRK-TSS             TO  WRK-HEN-TSS
-           MOVE    ":"                 TO  WRK-HEN-T1
-           MOVE    ":"                 TO  WRK-HEN-T2
-           .
-       801-DAYHEN01-EXT.
            EXIT.
       *
       *****************************************************************

@@ -174,6 +174,12 @@
       *
            COPY    "CPSHELLTBL.INC".
       *
+      *    ジョブ管理マスタ
+       01  WRK-JOBKANRI-REC.
+           COPY    "CPJOBKANRI.INC"
+                                   REPLACING  //JOB//
+                                   BY         //WRK-JOB//.
+      *
        01  WRK-CONS-AREA.
       *    システム管理ＤＢ（３００３）のキー値  
            03  WRK-CONS-3003-KBNCD PIC X(08)   VALUE   "044".
@@ -1927,7 +1933,7 @@
        20023-MONBLOBAPI-SEC        SECTION.
       *             
            MOVE    SPACE               TO  SHELLTBL
-           MOVE    "recept4_monblobapi.sh"
+           MOVE    "haori_monblobapi.sh"
                                        TO  SHELLTBL-NAME
       *
            MOVE    SPACE               TO  LNK-PRTKANRI-AREA
@@ -1939,7 +1945,7 @@
            MOVE    ZERO                TO  LNK-PRTKANRI-SHORI-RENNUM
            MOVE    SPA-NAI-SKYYM       TO  LNK-PRTKANRI-SRYYM 
            MOVE    SPA-NAI-SKYYMD      TO  LNK-PRTKANRI-SKYYMD
-           MOVE    "recept4_monblobapi"
+           MOVE    "haori_monblobapi.sh"
                                        TO  LNK-PRTKANRI-SHELLID
            MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
            MOVE    WRK-CONS-TERMID     TO  LNK-PRTKANRI-TERMID
@@ -1969,11 +1975,13 @@
                                        TO  SHELLTBL-ARG15
            MOVE    SPA-T01-MONBLOB-PRINT-ID
                                        TO  SHELLTBL-ARG16
+           MOVE    "receiptdata_check_make"
+                                       TO  SHELLTBL-ARG17
       *
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "monthly"           TO  MCP-PATHNAME
+           MOVE    "allways"           TO  MCP-PATHNAME
            PERFORM 900-ORCDBMAIN-SEC
       *
            .
@@ -1986,60 +1994,67 @@
        2003-RECEIPTDATA-CHECK-SEC      SECTION.
       *
       *    ジョブ管理チェック処理
-           MOVE    "CHK"           TO  SJOBKANRI-MODE
-           INITIALIZE                  JOBKANRI-REC
-           MOVE    1               TO  JOB-JOBID
-           MOVE    WRK-CONS-JOB-SHELLID
-                                   TO  JOB-SHELLID
-           PERFORM 900-CALL-ORCSJOB-SEC
-           IF      SJOBKANRI-RETURN
-                                   =   ZERO
-      *        パラメータとカルテUID+オルカUID をチェック
-               MOVE    SPACE           TO WRK-PARAM
-               MOVE    RECEDMAKEQ-KARTE-UID
-                                       TO  WRK-PARAM-KARTE-UID
-               MOVE    RECEDMAKEQ-ORCA-UID
-                                       TO  WRK-PARAM-ORCA-UID
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       2
+               MOVE    "CHK"           TO  SJOBKANRI-MODE
+               INITIALIZE                  JOBKANRI-REC
+               MOVE    IDX             TO  JOB-JOBID
+               MOVE    WRK-CONS-JOB-SHELLID
+                                       TO  JOB-SHELLID
+               PERFORM 900-CALL-ORCSJOB-SEC
+               IF      SJOBKANRI-RETURN
+                                       =   ZERO
+      *            パラメータとカルテUID+オルカUID をチェック
+                   MOVE    SPACE           TO WRK-PARAM
+                   MOVE    RECEDMAKEQ-KARTE-UID
+                                           TO  WRK-PARAM-KARTE-UID
+                   MOVE    RECEDMAKEQ-ORCA-UID
+                                           TO  WRK-PARAM-ORCA-UID
       *
-               IF    ( WRK-PARAM   NOT =   JOB-PARAM     )
-                   MOVE    "E41"           TO  WRK-ERRCD
-                   GO  TO  2003-RECEIPTDATA-CHECK-EXT
-               END-IF
+                   IF    ( WRK-PARAM   NOT =   JOB-PARAM     )
+                       MOVE    "E41"           TO  WRK-ERRCD
+                       GO  TO  2003-RECEIPTDATA-CHECK-EXT
+                   END-IF
       *
-               IF      JOB-ENDYMD      =   SPACE
-                   MOVE    "E70"           TO  WRK-ERRCD
-                   MOVE    SPACE           TO  WRK-ERRMSG
-                   STRING  "処理中です【"  DELIMITED   BY  SIZE
-                           JOB-SHELLMSG    DELIMITED   BY  SPACE
-                           "】"            DELIMITED   BY  SIZE
+                   IF      JOB-ENDYMD      =   SPACE
+                       MOVE    "E70"           TO  WRK-ERRCD
+                       MOVE    SPACE           TO  WRK-ERRMSG
+                       STRING  "処理中です【"  DELIMITED   BY  SIZE
+                               JOB-SHELLMSG    DELIMITED   BY  SPACE
+                               "】"            DELIMITED   BY  SIZE
                                            INTO    WRK-ERRMSG
-                   END-STRING
+                       END-STRING
+                       GO  TO  2003-RECEIPTDATA-CHECK-EXT
+                   END-IF
+               ELSE
+                   MOVE    "E40"           TO  WRK-ERRCD
                    GO  TO  2003-RECEIPTDATA-CHECK-EXT
                END-IF
-           ELSE
-               MOVE    "E40"           TO  WRK-ERRCD
-               GO  TO  2003-RECEIPTDATA-CHECK-EXT
-           END-IF
       *
-           IF      JOB-UPDCNT2     >   ZERO
+               IF      IDX             =   1
+                   MOVE    JOBKANRI-REC    TO  WRK-JOBKANRI-REC
+               END-IF
+           END-PERFORM
+      *
+           IF      WRK-JOB-UPDCNT2     >   ZERO
       *        対象レセプトあり
-               MOVE    JOB-UPDCNT2     TO  WRK-9
+               MOVE    WRK-JOB-UPDCNT2 TO  WRK-9
                MOVE    WRK-X2          TO  RECEDMAKES-ALL-COUNT
-               MOVE    JOB-UPDCNT      TO  WRK-9
+               MOVE    WRK-JOB-UPDCNT  TO  WRK-9
                MOVE    WRK-X2          TO
                                        RECEDMAKES-ALL-NUMBER-OF-SHEETS
-               IF      JOB-UPDCNT1     >   ZERO
+               IF      WRK-JOB-UPDCNT1 >   ZERO
       *            チェックリストあり
                    ADD     1                   TO  WRK-WARNING-MAX
                    MOVE    "【チェックリストが作成されました】"
-                                           TO  WRK-WARNING-MSG
+                                               TO  WRK-WARNING-MSG
                                                        (WRK-WARNING-MAX)
                    MOVE    "W03"           TO  WRK-WARNING
                                                        (WRK-WARNING-MAX)
                END-IF
            ELSE
                MOVE    "E35"           TO  WRK-ERRCD
-               MOVE    JOB-YOBI        TO  WRK-ERRMSG
+               MOVE    WRK-JOB-YOBI    TO  WRK-ERRMSG
            END-IF
       *
            .
