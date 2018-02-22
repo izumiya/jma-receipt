@@ -97,7 +97,7 @@ fi
 echo "--- file name  [" ${MCP_TEMPDIR}/${20}${RECEFILE2}${3}.txt "=>" ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE "]"
 nkf -s ${MCP_TEMPDIR}/${20}${RECEFILE2}${3}.txt > ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE
 
-if [ "${MCP_MIDDLEWARE_NAME}" = "panda" ]; then
+if ! [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ]; then
   if ! test -d  "${13}"; then
        mkdir ${13}
        RC=$?
