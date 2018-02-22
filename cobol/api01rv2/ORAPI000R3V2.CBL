@@ -235,7 +235,9 @@
            END-IF
       *
            IF    ( SPA-MW              =   SPA-GINBEE )
-               CONTINUE
+      *        CONTINUE
+               MOVE    "0099"          TO  SPA-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            ELSE
                MOVE    "0099"          TO  SPA-ERRCD
                PERFORM 990-EXIT-PROGRAM-SEC
