@@ -122,6 +122,11 @@ fi
 #    を毎日と確定の処理区分として流用する
 #    0:毎日、1:確定
 #-------------------------------------------#
+if [ ${5} -eq 0 ]; then
+  SYORINO="0001"
+else
+  SYORINO="0002"
+fi
 
 ARG05=${EXYM}
 ARG06=${EXYMD}
@@ -141,10 +146,10 @@ export MCP_TENANT=1
  
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
 
-PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="${SYORINO} MISRECE1 \"${ARG06}${STIME}\" 0001 \"${ARG05}\" \"${ARG06}\" \
        recept4_mis.sh 0000 AAAABBBBCCCCDDDD orcacron prt 1 \
-       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
-       2 \"${ARG20}\" 2 ${5} 0 0 99999999 0"
+       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
+       2 \"${ARG20}\" 2 ${5} 0 0 99999999 0 999999 999999"
 
 ${MONBATCH} "recept4_mis.sh ${PARAM}"
 R4RC=$?
@@ -164,10 +169,10 @@ export MCP_TENANT=1
  
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
  
-PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="${SYORINO} MISRECE1 \"${ARG06}${STIME}\" 0002 \"${ARG05}\" \"${ARG06}\" \
        recept4_mis.sh 0000 AAAABBBBCCCCDDDD orcacron prt 4 \
-       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
-       2 \"${ARG20}\" 2 ${5} 0 0 99999999 0"
+       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
+       2 \"${ARG20}\" 2 ${5} 0 0 99999999 0 999999 999999"
  
 ${MONBATCH} "recept4_mis.sh ${PARAM}"
 R4RC=$?
@@ -268,6 +273,12 @@ fi
 #    を毎日と確定の処理区分として流用する
 #    0:毎日、1:確定
 #-------------------------------------------#
+if [ ${5} -eq 0 ]; then
+  SYORINO="0011"
+else
+  SYORINO="0012"
+fi
+
 ARG05=${EXYM}
 ARG06=${EXYMD}
 ARG13="$4/"
@@ -286,10 +297,10 @@ export MCP_TENANT=1
  
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
 
-PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="${SYORINO} MISRECE1 \"${ARG06}${STIME}\" 0001 \"${ARG05}\" \"${ARG06}\" \
        recept4_mis.sh 0000 AAAABBBBCCCCDDDD orcacron prt 1 \
-       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
-       1 \"${ARG20}\" 2 ${5} 0 0 99999999 0"
+       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
+       1 \"${ARG20}\" 2 ${5} 0 0 99999999 0 999999 999999"
 
 ${MONBATCH} "recept4_mis.sh ${PARAM}"
 R4RC=$?
@@ -309,10 +320,10 @@ export MCP_TENANT=1
  
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
  
-PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+PARAM="${SYORINO} MISRECE1 \"${ARG06}${STIME}\" 0002 \"${ARG05}\" \"${ARG06}\" \
        recept4_mis.sh 0000 AAAABBBBCCCCDDDD orcacron prt 4 \
-       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
-       1 \"${ARG20}\" 2 ${5} 0 0 99999999 0"
+       \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
+       1 \"${ARG20}\" 2 ${5} 0 0 99999999 0 999999 999999"
  
 ${MONBATCH} "recept4_mis.sh ${PARAM}"
 R4RC=$?

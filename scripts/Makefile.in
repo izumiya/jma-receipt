@@ -148,6 +148,7 @@ shell_sources = \
 	tools/run_mis.sh.in \
 	tools/run_receipt_mis_ika.sh.in \
 	tools/run_receipt_mis_rou.sh.in \
+	allways/export_monblob.sh.in \
 
 ruby_sources = \
 	daily/print_parent2.rb.in \

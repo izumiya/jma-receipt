@@ -103,27 +103,42 @@ fi
 echo "--- file name  [ ${MCP_TEMPDIR}/${20}${RECEFILE2}01.txt => ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE ]"
 nkf -s ${MCP_TEMPDIR}/${20}${RECEFILE2}01.txt > ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE
 
-if ! test -d  "${13}"; then
-     mkdir ${13}
-     RC=$?
-     echo "--- mkdir end   ---[ $RC ]"
-     if  [ $RC -ne '0' ]; then
-         ERRCD='0077'
-         $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD},${20}
-         echo "--- mkdir  err   ---"
-         exit
-     fi
-     chmod -R g+r ${13}
-     echo "--- mkdir data mining holder ---"
-fi
-echo "--- folder name  [ ${13} ]"
+if [ "${MCP_MIDDLEWARE_NAME}" = "panda" ]; then
+  if ! test -d  "${13}"; then
+       mkdir ${13}
+       RC=$?
+       echo "--- mkdir end   ---[ $RC ]"
+       if  [ $RC -ne '0' ]; then
+           ERRCD='0077'
+           $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD},${20}
+           echo "--- mkdir  err   ---"
+           exit
+       fi
+       chmod -R g+r ${13}
+       echo "--- mkdir data mining holder ---"
+  fi
+  echo "--- folder name  [ ${13} ]"
 
-echo "--- file name  [ ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE => ${13}${RECEFILE1}${5}${3}.UKE ]"
-cp -p ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE ${13}${RECEFILE1}${5}${3}.UKE
-chmod -R g+r ${13}${RECEFILE1}${5}${3}.UKE
+  echo "--- file name  [ ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE => ${13}${RECEFILE1}${5}${3}.UKE ]"
+  cp -p ${MCP_TEMPDIR}/${20}${RECEFILE1}${5}${3}.UKE ${13}${RECEFILE1}${5}${3}.UKE
+  chmod -R g+r ${13}${RECEFILE1}${5}${3}.UKE
 
-if ! [ -s ${13}${RECEFILE1}${5}${3}.UKE ]; then
-  rm ${13}${RECEFILE1}${5}${3}.UKE
+  if ! [ -s ${13}${RECEFILE1}${5}${3}.UKE ]; then
+    rm ${13}${RECEFILE1}${5}${3}.UKE
+  fi
+else
+  if [ "${18}" = "cron" ]; then
+    CSVFILE="${RECEFILE1}${5}${3}.UKE"
+    if [ -s ${MCP_TEMPDIR}/${20}${CSVFILE} ]; then
+      RECCNT="$(wc -l ${MCP_TEMPDIR}/${20}${CSVFILE} | awk '{i=split($0,arr," ");printf("%06d",arr[1])}')"
+      ${MONBLOB} -dir ${LDDIRECTORY} -import ${MCP_TEMPDIR}/${20}${CSVFILE} > ${MCP_TEMPDIR}/blobid-$$
+      MONBLOBID=`cat ${MCP_TEMPDIR}/blobid-$$`
+
+      PARAM="${1},${2},${3},${4},${5},${3:0:8},${7},1,${9},${10},${11},${12},${14},${15},${20},${19},${MCP_TEMPDIR},${CSVFILE},${RECCNT},${MONBLOBID}"
+
+      ${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBFILEMIS -parameter "${PARAM}"
+    fi
+  fi
 fi
 
 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20}

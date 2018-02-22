@@ -14,13 +14,22 @@ if [ `whoami` != "${ORCAUSER}" ]; then
   echo "${ORCAUSER}ユーザーで実行してください。"
   exit 1
 fi
-if [ $# -ne 2 ]; then
-  echo "オプション不正"
-  exit 1
-fi
-if ! [ -d $2 ]; then 
-  echo "連携基盤用データ出力ディレクトリが見つかりません"
-  exit 1
+if [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ]; then
+  if [ $# -ne 1 ]; then
+    echo "オプション不正"
+    exit 1
+  fi
+  DATADIR="monblob"
+else
+  if [ $# -ne 2 ]; then
+    echo "オプション不正"
+    exit 1
+  fi
+  if ! [ -d $2 ]; then 
+    echo "連携基盤用データ出力ディレクトリが見つかりません"
+    exit 1
+  fi
+  DATADIR="$2/"
 fi
 
 RUNDATE=$(date  '+%Y%m%d%H%M%S')
@@ -212,7 +221,7 @@ if [ ${RENKEI1} -ne 0 ]; then
  
   ARG05=${EXYM}
   ARG06=${EXYMD}
-  ARG13="$2/"
+  ARG13=${DATADIR}
   ARG18="127.0.0.1"
   ARG20=`printf "%02d" $1`
   ARG16="/tmp/${ARG20}00OR044ERRAAAABBBBCCCCDDDD.dat"
@@ -228,9 +237,9 @@ if [ ${RENKEI1} -ne 0 ]; then
   # 社保
   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
 
-  PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+  PARAM="0001 RENKEI1 \"${ARG06}${STIME}\" 0001 \"${ARG05}\" \"${ARG06}\" \
          recept4.sh 0000 AAAABBBBCCCCDDDD orcacron prt 1 \
-         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
+         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
          2 \"${ARG20}\" 6 0 0 0 99999999 0"
 
   /usr/lib/panda/bin/monbatch "recept4.sh ${PARAM}"
@@ -252,9 +261,9 @@ if [ ${RENKEI1} -ne 0 ]; then
   # 国保・広域
   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
  
-  PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+  PARAM="0001 RENKEI1 \"${ARG06}${STIME}\" 0002 \"${ARG05}\" \"${ARG06}\" \
          recept4.sh 0000 AAAABBBBCCCCDDDD orcacron prt 4 \
-         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
+         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
          2 \"${ARG20}\" 6 0 0 0 99999999 0"
  
   /usr/lib/panda/bin/monbatch "recept4.sh ${PARAM}"
@@ -297,7 +306,7 @@ if [ ${RENKEI2} -ne 0 ]; then
 
   ARG05=${EXYM}
   ARG06=${EXYMD}
-  ARG13="$2/"
+  ARG13=${DATADIR}
   ARG18="127.0.0.1"
   ARG20=`printf "%02d" $1`
   ARG16="/tmp/${ARG20}00OR044ERRAAAABBBBCCCCDDDD.dat"
@@ -313,9 +322,9 @@ if [ ${RENKEI2} -ne 0 ]; then
   # 社保
   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
  
-  PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+  PARAM="0002 RENKEI1 \"${ARG06}${STIME}\" 0001 \"${ARG05}\" \"${ARG06}\" \
          recept4_renkei2.sh 0000 AAAABBBBCCCCDDDD orcacron prt 1 \
-         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
+         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
          2 \"${ARG20}\" 6 0 0 0 99999999 0"
  
   /usr/lib/panda/bin/monbatch "recept4_renkei2.sh ${PARAM}"
@@ -337,9 +346,9 @@ if [ ${RENKEI2} -ne 0 ]; then
   # 国保・広域
   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
  
-  PARAM="0001 SOKATU \"${ARG06}${STIME}\" 0000 \"${ARG05}\" \"${ARG06}\" \
+  PARAM="0002 RENKEI1 \"${ARG06}${STIME}\" 0002 \"${ARG05}\" \"${ARG06}\" \
          recept4_renkei2.sh 0000 AAAABBBBCCCCDDDD orcacron prt 4 \
-         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 \"${ARG18}\" \
+         \"${ARG13}\" 0000001 SOKATU \"${ARG16}\" 4 cron \
          2 \"${ARG20}\" 6 0 0 0 99999999 0"
  
   /usr/lib/panda/bin/monbatch "recept4_renkei2.sh ${PARAM}"

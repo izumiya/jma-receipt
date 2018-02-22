@@ -23,23 +23,33 @@ if [ `whoami` != "${ORCAUSER}" ]; then
   echo "${ORCAUSER}ユーザーで実行してください。"
   exit 1
 fi
-if [ $# -ne 3 ]; then
-  echo "オプション不正"
-  exit 1
-fi
-if ! [ -d $3 ]; then 
-  echo "診療情報システム用データ出力ディレクトリが見つかりません"
-  exit 1
-fi
-touch ${3}/misdirtest
-if [ "$?" -eq 0 ]; then
-  rm ${3}/misdirtest
+if [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ]; then
+  if [ $# -ne 2 ]; then
+    echo "オプション不正"
+    exit 1
+  fi
+  DATADIR="monblob"
 else
-  echo "診療情報システム用データ出力ディレクトリの権限が不足しています"
-  exit 1
+  if [ $# -ne 3 ]; then
+    echo "オプション不正"
+    exit 1
+  fi
+  if ! [ -d $3 ]; then 
+    echo "診療情報システム用データ出力ディレクトリが見つかりません"
+    exit 1
+  fi
+  touch ${3}/misdirtest
+  if [ "$?" -eq 0 ]; then
+    rm ${3}/misdirtest
+  else
+    echo "診療情報システム用データ出力ディレクトリの権限が不足しています"
+    exit 1
+  fi
+  DATADIR="$3"
 fi
 
-RUNDATE=$(date  '+%Y%m%d%H%M%S')
+EXDATE=$(date  '+%Y%m%d%H%M')
+RUNDATE="${EXDATE}00"
 FLG_TEMPDIR_GEN=0
 if [ -z "${MCP_TEMPDIR}" ]; then
   export MCP_TEMPDIR=/tmp/orca_root/$(uuidgen)
@@ -103,13 +113,13 @@ if [ ${EXMISRECE} -eq 1 ]; then
   # 医科・デイリー分作成
   #-------------------------------------------#
 
-  run_receipt_mis_ika.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${3} "0"
+  run_receipt_mis_ika.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${DATADIR} "0"
 
   #-------------------------------------------#
   # 労災・デイリー分作成
   #-------------------------------------------#
 
-  run_receipt_mis_rou.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${3} "0"
+  run_receipt_mis_rou.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${DATADIR} "0"
 
   #-------------------------------------------#
   # 確定分作成
@@ -118,6 +128,7 @@ if [ ${EXMISRECE} -eq 1 ]; then
   # 処理年月を前月として処理をする
   #-------------------------------------------#
 
+  RUNDATE="${EXDATE}30"
   if [ "${RUNDATE:6:2}" = "${2}" ]; then
      WKYY="${RUNDATE:0:4}"
      WKMM="${RUNDATE:4:2}"
@@ -132,13 +143,13 @@ if [ ${EXMISRECE} -eq 1 ]; then
      # 医科・確定分作成
      #-------------------------------------------#
    
-     run_receipt_mis_ika.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${3} "1"
+     run_receipt_mis_ika.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${DATADIR} "1"
 
      #-------------------------------------------#
      # 労災・確定分作成
      #-------------------------------------------#
 
-     run_receipt_mis_rou.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${3} "1"
+     run_receipt_mis_rou.sh ${HOSPNUM} ${SRYYM} ${RUNDATE} ${DATADIR} "1"
   fi
 fi
 

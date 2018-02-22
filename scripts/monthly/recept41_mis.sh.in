@@ -78,7 +78,7 @@ RECEFILE1="RREC${DCKBN}${NGKBN}"
 RECEFILE2="TENKENT"
 
 #   該当ファイル削除
-rm -fr ${13}${20}${RECEFILE1}*.UKE
+#rm -fr ${13}${20}${RECEFILE1}*.UKE
 rm -fr ${MCP_TEMPDIR}/${RECEFILE1}*.UKE
 rm -fr ${MCP_TEMPDIR}/${20}${RECEFILE2}*.txt
 
@@ -94,6 +94,12 @@ echo "ファイルの処理(sjis変換)"
 
 cd ${MCP_TEMPDIR}/
 
+if [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ] && [ "${18}" = "cron" ]; then
+  DATADIR=""
+else
+  DATADIR="${13}"
+fi
+
 all=`ls  ${20}${RECEFILE2}*.txt`
  
 for f in $all ; do
@@ -102,8 +108,21 @@ for f in $all ; do
 ##  echo "nn = " ${f:11:2}
 
     if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
-        echo ${13}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
-        nkf -s $f > ${13}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
+        echo ${DATADIR}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
+        nkf -s $f > ${DATADIR}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
+    fi
+
+    if [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ] && [ "${18}" = "cron" ]; then
+      CSVFILE="${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE"
+      if [ -s ${CSVFILE} ]; then
+        RECCNT="$(wc -l ${CSVFILE} | awk '{i=split($0,arr," ");printf("%06d",arr[1])}')"
+        ${MONBLOB} -dir ${LDDIRECTORY} -import ${CSVFILE} > blobid-$$
+        MONBLOBID=`cat blobid-$$`
+
+        PARAM="${1},${2},${3},${f:9:2}${f:11:2},${5},${3:0:8},${7},1,${9},${10},${11},${12},${14},${15},${20},${19},${MCP_TEMPDIR},${CSVFILE},${RECCNT},${MONBLOBID}"
+
+        ${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBFILEMIS -parameter "${PARAM}"
+      fi
     fi
 done
 
