@@ -226,7 +226,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 08:31:04 GMT</last_modification_time>
       </signal>
-      <label></label>
+      <label>診療情報</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 

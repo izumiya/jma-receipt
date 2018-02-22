@@ -171,3 +171,17 @@ path	all2	{
 		;
 	};
 };
+
+path	all3	{
+	DBSELECT	{
+		DECLARE tbl_receden_tmp_all3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_receden_tmp
+                WHERE   HOSPNUM		= :HOSPNUM
+                  AND   SRYYM		= :SRYYM
+		  AND	NYUGAIKBN	= :NYUGAIKBN
+		  AND	(TEISYUTUSAKI	= 2
+		  OR	TEISYUTUSAKI	= 6)
+		;
+	};
+};

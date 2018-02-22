@@ -294,6 +294,8 @@ grpsys COPY    "COMMON-SPA".
       *    タイトル
            03  WRK-SFILESV-TITLE       PIC X(100).
       *
+           03  WRK-MCP-PATHNAME        PIC X(64).
+      *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR             PIC X(200).
            03  WRK-ERRMSG              PIC X(300).
@@ -538,13 +540,18 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            PERFORM 120-SKYYM-HENSYU-SEC
       *
+           IF      WRK-PARA-TEISYUTUSAKI   =   "4"
+               MOVE    "all3"              TO  WRK-MCP-PATHNAME
+           ELSE
+               MOVE    "all2"              TO  WRK-MCP-PATHNAME
+           END-IF
            PERFORM 900-RECEDEN-SELECT-SEC
            IF      FLG-RECEDEN     =   1
                DISPLAY "!!!!!! RECEDEN NOT FOUND !!!!!"
                MOVE    1                   TO  FLG-END
            END-IF
            MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
-           MOVE    "all2"              TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
            .
        100-INIT-EXT.
@@ -684,7 +691,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                END-PERFORM
       *
                MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
-               MOVE    "all2"              TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
       *
       *        データ出力処理
@@ -1623,7 +1630,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       **   MOVE    "1"                 TO  RECEDEN-RECKBN
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
            MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
-           MOVE    "all2"              TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
 grpsys     PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                PERFORM 900-RECEDEN-READ-SEC
@@ -1640,7 +1647,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        900-RECEDEN-READ-SEC           SECTION.
       *
            MOVE    "tbl_receden_tmp"   TO  MCP-TABLE
-           MOVE    "all2"              TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
 grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECEDEN

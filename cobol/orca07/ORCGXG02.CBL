@@ -125,12 +125,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "XG01.INC".
-           COPY    "XG02.INC".
-           COPY    "XG03.INC".
-           COPY    "XG99.INC".
-           COPY    "XGERR.INC".
-           COPY    "XGID1.INC".
+           COPY    "ORCA07SCRAREA.INC".
       *
       ******************************************************************
        PROCEDURE                   DIVISION    USING
@@ -249,6 +244,14 @@
                                            TO  SPA-GMN-XG02-FILE-G
                END-IF 
            END-IF
+           IF      SPA-NAI-XG04-TBL-KEY
+                                       =   "RENKEI1"   OR
+                                           "MISRECE1"  OR
+                                           "MISJMAMR"
+               MOVE    "2"             TO  SPA-GMN-XG02-CDKBNL   (1)
+               MOVE    "£Ó¡Ý£ê£é£ó"    TO  SPA-GMN-XG02-CDKBNMEIL(1)
+               MOVE    1               TO  SPA-GMN-XG02-CDKBN-MAX
+           ELSE
            MOVE    "1"             TO  SPA-GMN-XG02-CDKBNL   (1)
            MOVE    "£Å£Õ£Ã"        TO  SPA-GMN-XG02-CDKBNMEIL(1)
            MOVE    "2"             TO  SPA-GMN-XG02-CDKBNL   (2)
@@ -256,6 +259,7 @@
            MOVE    "3"             TO  SPA-GMN-XG02-CDKBNL   (3)
            MOVE    "£Õ£Ô£Æ¡Ý£¸"    TO  SPA-GMN-XG02-CDKBNMEIL(3)
            MOVE    3               TO  SPA-GMN-XG02-CDKBN-MAX
+           END-IF
            MOVE    SPA-GMN-XG02-CDKBNLST (1)
                                    TO  SPA-GMN-XG02-CDKBN-G
       *
@@ -658,7 +662,7 @@
       *****************************************************************
        210-BACK                    SECTION.
       *
-           MOVE    "XG01"          TO  SPA-SAKIPG
+           MOVE    SPA-MOTOPG      TO  SPA-SAKIPG
            MOVE    "XG02"          TO  SPA-MOTOPG
       *
            MOVE    "JOIN"          TO  MCP-PUTTYPE

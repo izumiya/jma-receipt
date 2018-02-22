@@ -27,6 +27,7 @@
       *  01.00.04    NACL-藤原    03/12/03  統計データ作成追加
       *
       *  04.05.01    NACL-藤原    09/10/01  統計ＣＳＶ出力追加
+      *  05.00.01    NACL-伊藤    18/02/02  連携基盤追加
       *****************************************************************
        01  MNAME-DATA-REC.
            03  FILLER               PIC X(08)   VALUE   "RECEPT1".
@@ -119,10 +120,22 @@
            03  FILLER               PIC X(40)   VALUE
                                     "感染症サーベイ".
       *
+           03  FILLER               PIC X(08)   VALUE   "RENKEI1".
+           03  FILLER               PIC X(40)   VALUE
+                                    "連携基盤".
+      *
+           03  FILLER               PIC X(08)   VALUE   "MISRECE1".
+           03  FILLER               PIC X(40)   VALUE
+                                    "診療情報用レセ電".
+      *
+           03  FILLER               PIC X(08)   VALUE   "MISJMAMR".
+           03  FILLER               PIC X(40)   VALUE
+                                    "診療情報フォーマット".
+      *
        01  MNAME-DATA-REC-R         REDEFINES   MNAME-DATA-REC.
-           03  MNAME-TBL-OCC        OCCURS      26  INDEXED TBL-IDX.
+           03  MNAME-TBL-OCC        OCCURS      29  INDEXED TBL-IDX.
                05  MNAME-SHELLID    PIC X(08).
                05  MNAME-JOBNAME    PIC X(40).
       *
-       01  MNAME-MAX                PIC 9(04)   VALUE   26.
+       01  MNAME-MAX                PIC 9(04)   VALUE   29.
       *

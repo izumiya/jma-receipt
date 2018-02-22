@@ -112,12 +112,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "XG01.INC".
-           COPY    "XG02.INC".
-           COPY    "XG03.INC".
-           COPY    "XG99.INC".
-           COPY    "XGERR.INC".
-           COPY    "XGID1.INC".
+           COPY    "ORCA07SCRAREA.INC".
       *
       ******************************************************************
        PROCEDURE                   DIVISION    USING
@@ -208,7 +203,7 @@
       *
            MOVE    SPACE               TO  SPA-XG99-FLG
       *
-           MOVE    "XG01"              TO  SPA-SAKIPG
+           MOVE    SPA-MOTOPG          TO  SPA-SAKIPG
            MOVE    "XG99"              TO  SPA-MOTOPG
       *
            MOVE    "JOIN"              TO  MCP-PUTTYPE

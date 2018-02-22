@@ -262,4 +262,5 @@ db	{
 	tbl_material_k_master;
         tbl_receden_tmp;
     monpushevent;
+        tbl_file_mis;
 };

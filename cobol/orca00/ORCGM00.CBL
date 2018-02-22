@@ -1290,6 +1290,9 @@
       *        システム日付設定
                WHEN    "CLICKED"       ALSO    "B06"
                    PERFORM 460-M95-SEC
+      *        情報連携
+               WHEN    "CLICKED"       ALSO    "B08"
+                   PERFORM 440-MIS-SEC
       *        情報画面
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 470-MVER-SEC
@@ -1530,6 +1533,29 @@
            END-IF
            .
        420-SYS1006-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    データファイル出力指示業務
+      *****************************************************************
+       440-MIS-SEC                 SECTION.
+      *
+           MOVE    "M00"               TO  SPA-MOTOPG
+           MOVE    "XG04"              TO  SPA-SAKIPG
+           MOVE    SPACE               TO  SPA-MOTOPG2
+      *
+           INITIALIZE                  SPA-KYOTUKEY
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *    戻り時、画面を元へ戻す
+           MOVE    SPA-M00             TO  LNK-FREE
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
+           MOVE   "XG04"               TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       440-MIS-EXT.
            EXIT.
       *
       *****************************************************************

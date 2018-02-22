@@ -68,6 +68,7 @@
                            11  SPA-NAI-TSRYYMD     PIC X(08).
       *
                05  SPA-NAI-FILENO                  PIC 9(03).
+               05  SPA-NAI-XG04-TBL-KEY            PIC X(08).
       *
            03  SPA-XG02-AREA.
                05  SPA-GMN-XG02-CUR    PIC 9(05).
@@ -105,7 +106,6 @@
                05  SPA-XG02-CLIENT-SAVE            PIC X(01).
       *
                05  SPA-NAI-XG02-FILENAME           PIC X(100).
-
       *
            03  SPA-XG99-AREA.
                05  SPA-SFILESV-AREA.
