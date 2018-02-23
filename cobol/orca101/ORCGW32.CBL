@@ -1951,7 +1951,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *H28.4
       *            ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ
                    WHEN    "524"
-                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+      ***              IF     (SPA-GMN-SELNUM  =   ZERO   )
+                       IF     (SPA-GMN-SYORI   =   1      )
                           AND (IDX             =   04     )
       *                    H28.4¤«¤é¼ê½Ñ¤ÏÊñ³çÂÐ¾Ý³°
                            IF     (SPA-NAI-STYUKYMD    >=  "20160401")
@@ -1963,7 +1964,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *        H28.4²þÀµÊ¬
                    WHEN    "518"
       *            ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ
-                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+      ***              IF     (SPA-GMN-SELNUM  =   ZERO   )
+                       IF     (SPA-GMN-SYORI   =   1      )
                         AND   (SPA-NAI-STYUKYMD    >=  "20160401")
                            IF      IDX             =   9
                                                    OR  12
@@ -1975,7 +1977,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO  SPA-GMN-SRYKBN-G (IDX)
                            END-IF
                        END-IF
-                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+      ****             IF     (SPA-GMN-SELNUM  =   ZERO   )
+                       IF     (SPA-GMN-SYORI   =   1      )
                         AND   (SPA-NAI-STYUKYMD    <   "20160401")
                            MOVE    SPA-GMN-SRYKBN-LST (2)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
@@ -1984,7 +1987,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    WHEN    "515"
                    WHEN    "516"
       *            ¾®»ùÆþ±¡°åÎÅ´ÉÍýÎÁ
-                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+      ***              IF     (SPA-GMN-SELNUM  =   ZERO   )
+                       IF     (SPA-GMN-SYORI   =   1      )
                         AND   (SPA-NAI-STYUKYMD    >=  "20160401")
                            IF      IDX             =   1
                                                    OR  2
@@ -2001,7 +2005,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                            END-IF
                        END-IF
       *
-                       IF     (SPA-GMN-SELNUM  =   ZERO   )
+      ***              IF     (SPA-GMN-SELNUM  =   ZERO   )
+                       IF     (SPA-GMN-SYORI   =   1      )
                         AND   (SPA-NAI-STYUKYMD    <   "20160401")
                            IF      IDX             =   1
                                                    OR  2
@@ -2227,6 +2232,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-PERFORM
            END-IF
       *!
+      *H30.1
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-GMN-SYORI       =    1
+                   PERFORM 4115-SRYKBN-CHK-SEC
+               END-IF
+           END-IF
       *H30.1
       *    ´ü´ÖÆâ¤Ç¿ÇÎÅ¶èÊ¬¤¬ÊÑ¹¹¤È¤Ê¤ë»þ¡¢·Ù¹ðÉ½¼¨
            IF      SPA-ERRCD           =   SPACE
