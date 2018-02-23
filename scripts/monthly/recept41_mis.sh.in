@@ -78,7 +78,7 @@ RECEFILE1="RREC${DCKBN}${NGKBN}"
 RECEFILE2="TENKENT"
 
 #   該当ファイル削除
-rm -fr ${13}${20}${RECEFILE1}*.UKE
+#rm -fr ${13}${20}${RECEFILE1}*.UKE
 rm -fr ${MCP_TEMPDIR}/${RECEFILE1}*.UKE
 rm -fr ${MCP_TEMPDIR}/${20}${RECEFILE2}*.txt
 

@@ -39,7 +39,8 @@ else
   exit 1
 fi
 
-RUNDATE=$(date  '+%Y%m%d%H%M%S')
+EXDATE=$(date  '+%Y%m%d%H%M')
+RUNDATE="${EXDATE}00"
 FLG_TEMPDIR_GEN=0
 if [ -z "${MCP_TEMPDIR}" ]; then
   export MCP_TEMPDIR=/tmp/orca_root/$(uuidgen)
@@ -118,6 +119,7 @@ if [ ${EXMISRECE} -eq 1 ]; then
   # 処理年月を前月として処理をする
   #-------------------------------------------#
 
+  RUNDATE="${EXDATE}30"
   if [ "${RUNDATE:6:2}" = "${2}" ]; then
      WKYY="${RUNDATE:0:4}"
      WKMM="${RUNDATE:4:2}"

@@ -79,6 +79,11 @@ else
     RECEFILE1="RECEIPTCDK1"
     RECEFILE2="RECEDENK1"
 fi
+
+#   該当ファイル削除
+rm  ${MCP_TEMPDIR}/${20}${RECEFILE1}*.UKE
+rm  ${MCP_TEMPDIR}/${20}${RECEFILE2}*.txt
+
 echo "file name change![" ${RECEFILE1} ${RECEFILE2} "]"
 
 # レセプト作成区分=A for 連携基盤当日
