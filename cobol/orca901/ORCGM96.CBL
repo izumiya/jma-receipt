@@ -799,9 +799,11 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    PERFORM 210-BACK
       *        情報削除
                WHEN    "CLICKED"       ALSO    "B02"
-      **           PERFORM 211-JYOUKYOU-SEC
-                   MOVE   ZERO                 TO  SPA-NAI-CANCEL
-                   PERFORM 201-DELETE-SEC
+                   IF      M96-B02-VISIBLE     =   "T"
+      **               PERFORM 211-JYOUKYOU-SEC
+                       MOVE   ZERO                 TO  SPA-NAI-CANCEL
+                       PERFORM 201-DELETE-SEC
+                   END-IF
       *        キー取得
                WHEN    "CLICKED"       ALSO    "B05"
                    PERFORM 221-GETKEY-SEC
@@ -814,16 +816,22 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
       *
       *        処理中止
                WHEN    "CLICKED"       ALSO    "B10"
-                   PERFORM 210-CANCEL-SEC
+                   IF      M96-B10-VISIBLE     =   "T"
+                       PERFORM 210-CANCEL-SEC
+                   END-IF
       *        情報
                WHEN    "CLICKED"   ALSO    "pandatimer1"
                WHEN    "CLICKED"       ALSO    "B11"
-                   PERFORM 211-JYOUKYOU-SEC
+                   IF      M96-B11-VISIBLE     =   "T"
+                       PERFORM 211-JYOUKYOU-SEC
+                   END-IF
       *        更新
                WHEN    "CLICKED"       ALSO    "B12"
-      **           PERFORM 211-JYOUKYOU-SEC
-                   MOVE   ZERO                 TO  SPA-NAI-CANCEL
-                   PERFORM 212-UPDATE-SEC
+                   IF      M96-B12-VISIBLE     =   "T"
+      **               PERFORM 211-JYOUKYOU-SEC
+                       MOVE   ZERO                 TO  SPA-NAI-CANCEL
+                       PERFORM 212-UPDATE-SEC
+                   END-IF
            END-EVALUATE.
       *
        200-GMNSENI-EXT.
