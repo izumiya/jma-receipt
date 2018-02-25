@@ -157,7 +157,7 @@ fi
 # 日医版診療情報データ
 #-------------------------------------------#
 if [ ${EXMISJMAMR} -eq 1 ]; then
-  echo "JMAMR START"
+  run_jmamr_mis.sh ${HOSPNUM} ${RUNDATE} ${DATADIR}
 fi
 
 delete_tempdir

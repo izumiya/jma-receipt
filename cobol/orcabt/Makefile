@@ -433,6 +433,9 @@ SRCS = ORCBD001.CBL \
        ORAPI052BR8V3.CBL \
        ORCBPUSH.CBL \
        ORCBFILEMIS.CBL \
+       ORCBMRCSV09.CBL \
+       ORCBMRCSV10B.CBL \
+       ORCBMRCSV10L.CBL \
 
 
 top_builddir = ../..

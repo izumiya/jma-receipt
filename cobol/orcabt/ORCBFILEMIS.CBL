@@ -338,35 +338,30 @@
       *****************************************************************
        20011-MISJMAMR-TITLE-SEC    SECTION.
       *
-      *     MOVE    "連携基盤・"        TO  WRK-TITLE
-      *     IF      WRK-PARA-NYUGAIKBN  =   "1"
-      *         STRING  WRK-TITLE           DELIMITED BY SPACE
-      *                 "入院・"            DELIMITED BY SIZE
-      *                 INTO    WRK-TITLE
-      *         END-STRING
-      *     ELSE
-      *         STRING  WRK-TITLE           DELIMITED BY SPACE
-      *                 "外来・"            DELIMITED BY SIZE
-      *                 INTO    WRK-TITLE
-      *         END-STRING
-      *     END-IF
-      *     IF      WRK-PARA-TEISYUTUSAKI   =   "1"
-      *         STRING  WRK-TITLE           DELIMITED BY SPACE
-      *                 "社保"              DELIMITED BY SIZE
-      *                 INTO    WRK-TITLE
-      *         END-STRING
-      *     ELSE
-      *         STRING  WRK-TITLE           DELIMITED BY SPACE
-      *                 "国保"              DELIMITED BY SIZE
-      *                 INTO    WRK-TITLE
-      *         END-STRING
-      *     END-IF
-      *     IF      LNK-PRTKANRI-SHELLID    =   "recept4_renkei2.sh"
-      *         STRING  WRK-TITLE           DELIMITED BY SPACE
-      *                 "（当日受診分）"    DELIMITED BY SIZE
-      *                 INTO    WRK-TITLE
-      *         END-STRING
-      *     END-IF
+           MOVE    "診療情報・"        TO  WRK-TITLE
+           IF      WRK-PARA-NYUGAIKBN  =   "1"
+               STRING  WRK-TITLE           DELIMITED BY SPACE
+                       "入院"              DELIMITED BY SIZE
+                       INTO    WRK-TITLE
+               END-STRING
+           ELSE
+               STRING  WRK-TITLE           DELIMITED BY SPACE
+                       "外来"              DELIMITED BY SIZE
+                       INTO    WRK-TITLE
+               END-STRING
+           END-IF
+           IF      LNK-PRTKANRI-TBL-GROUP(1:8)
+                                           =   LNK-PRTKANRI-SKYYMD
+               STRING  WRK-TITLE           DELIMITED BY SPACE
+                       "・当日分"          DELIMITED BY SIZE
+                       INTO    WRK-TITLE
+               END-STRING
+           ELSE
+               STRING  WRK-TITLE           DELIMITED BY SPACE
+                       "（訂正分）"        DELIMITED BY SIZE
+                       INTO    WRK-TITLE
+               END-STRING
+           END-IF
            .
        20011-MISJMAMR-TITLE-EXT.
            EXIT.
