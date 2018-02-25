@@ -1520,9 +1520,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-GMN28-AGREEMENT-LST(2)
            MOVE    2                   TO  SPA-GMN28-AGREEMENT-MAX
       *    日医データフォーマット区分
-           MOVE    "1 Ver.0.9"
-                                       TO  SPA-GMN28-JMAMRVER-LST(1)
-           MOVE    1                   TO  SPA-GMN28-JMAMRVER-MAX
+           MOVE    "1 Ver.0.9"         TO  SPA-GMN28-JMAMRVER-LST(1)
+           MOVE    "2 Ver.1.0"         TO  SPA-GMN28-JMAMRVER-LST(2)
+           MOVE    2                   TO  SPA-GMN28-JMAMRVER-MAX
       *ver.4.7
       *    患者介護設定
       *    要介護状態区分
