@@ -15,7 +15,7 @@ fi
 #  ${3} : データ出力ディレクトリ
 #-------------------------------------------#
 
-export PATH=${PATCHSCRIPTSDIR}/tools:${SCRIPTSDIR}/tools:${SITESCRIPTSDIR}/monthly:${PATCHSCRIPTSDIR}/monthly:${SCRIPTSDIR}/monthly:$PATH
+export PATH=${PATCHSCRIPTSDIR}/tools:${SCRIPTSDIR}/tools:${SITESCRIPTSDIR}/monthly:${PATCHSCRIPTSDIR}/monthly:${SCRIPTSDIR}/monthly:${SITESCRIPTSDIR}/allways:${PATCHSCRIPTSDIR}/allways:${SCRIPTSDIR}/allways:$PATH
 
 export COB_LIBRARY_PATH=${PATCHLIBDIR}:${ORCALIBDIR}:/usr/lib/panda
 

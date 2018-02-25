@@ -2020,8 +2020,6 @@
       *
            PERFORM VARYING IDX-J   FROM    1   BY  1
                    UNTIL ( TBL-NAIYOU-KEY(IDX-J)   =   SPACE )
-               DISPLAY "TBL-DOUJITU ( " IDX-J " ) : WRK-DOUJITU [ "
-                       WRK-DOUJITU " ]"
                 IF    ( TBL-DOUJITU(IDX-J)  NOT =   WRK-DOUJITU )
                    MOVE    TBL-DOUJITU(IDX-J)  TO  WRK-DOUJITU
                    MOVE    SPACE               TO  WRK-SRYKA
@@ -2653,10 +2651,8 @@
                PERFORM 400-DATAOUT-SEC
            END-IF
       *    特定器材レコード
-debug*     DISPLAY "WRK-SRYCD [ " WRK-SRYCD " ]"
            IF    ( WRK-SRYCD       >=  "700000000" )   AND
                  ( WRK-SRYCD       <=  "799999999" )
-debug*     DISPLAY "TOKUTEI KIZAI START"
                MOVE    SPACE               TO  TBL-MRCSV-REC
                MOVE    "161"               TO  TBL-MRCSV-DATA (1)
                MOVE    WRK-ZAISEQ          TO  WRK-SURYO

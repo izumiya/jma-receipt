@@ -53,11 +53,14 @@ if [ "${PTID}" = "9999999999" ]; then
     if [ -s ${TEMPMRCSV} ]; then
       TEMPSJISMRCSV=$(mktemp -p ${MCP_TEMPDIR})
       nkf -EsLw ${TEMPMRCSV} > ${TEMPSJISMRCSV}
-      CSVFILE="JMAMR${HOSPCD}${dataymd}${EXYMD}${EXTIME}.csv"
+      if [ ${NYUGAI} -eq 1 ]; then
+        CSVFILE="JMAMR${HOSPCD}N${dataymd}${EXYMD}${EXTIME}.csv"
+      else
+        CSVFILE="JMAMR${HOSPCD}G${dataymd}${EXYMD}${EXTIME}.csv"
+      fi
       if ! [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ]; then
         cp -p ${TEMPSJISMRCSV} ${9}/${CSVFILE}
       else
-        ######RENNUM=`printf "%04d" ${NYUGAI}`
         rennum=$(expr ${rennum} + 1) 
         RECCNT="$(wc -l ${TEMPSJISMRCSV} | awk '{i=split($0,arr," ");printf("%06d",arr[1])}')"
         ${MONBLOB} -dir ${LDDIRECTORY} -import ${TEMPSJISMRCSV} > ${MCP_TEMPDIR}/blobid-$$
