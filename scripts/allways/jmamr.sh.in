@@ -58,7 +58,8 @@ if [ "${PTID}" = "9999999999" ]; then
       else
         CSVFILE="JMAMR${HOSPCD}G${dataymd}${EXYMD}${EXTIME}.csv"
       fi
-      cp -p ${TEMPSJISMRCSV} ${9}/${CSVFILE}
+      cp ${TEMPSJISMRCSV} ${9}/${CSVFILE}
+      chmod g+rw ${9}/${CSVFILE}
     fi
   done
 else

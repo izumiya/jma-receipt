@@ -104,6 +104,7 @@ for f in $all ; do
     if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
         echo ${13}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
         nkf -s $f > ${13}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
+        chmod g+rw ${13}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
     fi
 done
 

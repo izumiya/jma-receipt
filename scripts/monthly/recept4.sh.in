@@ -131,7 +131,7 @@ fi
                      echo "--- mkdir  err   ---" >>$LOG_FILE
                      exit
                  fi
-                 chmod -R g+r ${13}
+                 chmod -R g+rw ${13}
                  echo "--- mkdir rireki holder ---" >>$LOG_FILE
 #           else
 #                rm ${13}${RECEFILE1}*.UKE
@@ -141,7 +141,7 @@ fi
 
             echo "--- file name  [" ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE "=>" ${13}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
             cp  ${MCP_TEMPDIR}/${20}${RECEFILE1}${3}.UKE ${13}${RECEFILE1}${3}.UKE
-            chmod -R g+r ${13}${RECEFILE1}${3}.UKE
+            chmod -R g+rw ${13}${RECEFILE1}${3}.UKE
 
             if ! [ -s ${13}${RECEFILE1}${3}.UKE ]; then
               rm ${13}${RECEFILE1}${3}.UKE
