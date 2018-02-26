@@ -59,7 +59,8 @@ if [ "${PTID}" = "9999999999" ]; then
         CSVFILE="JMAMR${HOSPCD}G${dataymd}${EXYMD}${EXTIME}.csv"
       fi
       if ! [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ]; then
-        cp -p ${TEMPSJISMRCSV} ${9}/${CSVFILE}
+        cp ${TEMPSJISMRCSV} ${9}/${CSVFILE}
+        chmod g+rw ${9}/${CSVFILE}
       else
         rennum=$(expr ${rennum} + 1) 
         RECCNT="$(wc -l ${TEMPSJISMRCSV} | awk '{i=split($0,arr," ");printf("%06d",arr[1])}')"

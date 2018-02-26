@@ -110,6 +110,7 @@ for f in $all ; do
     if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
         echo ${DATADIR}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
         nkf -s $f > ${DATADIR}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
+        chmod g+rw ${DATADIR}${RECEFILE1}${f:9:2}${f:11:2}${5}${3}.UKE
     fi
 
     if [ "${MCP_MIDDLEWARE_NAME}" = "ginbee" ] && [ "${18}" = "cron" ]; then
