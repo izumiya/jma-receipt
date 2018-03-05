@@ -1508,7 +1508,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WIDGET-INSENSITIVE      TO  M96-B10-STATE
       *
            MOVE    "T"                     TO  M96-B02-VISIBLE
-                                               M96-B09-VISIBLE
                                                M96-B10-VISIBLE
                                                M96-B11-VISIBLE
                                                M96-B12-VISIBLE
@@ -1550,7 +1549,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            EVALUATE    SPA-M96-CUR
                WHEN    1
-                   MOVE    "B12"               TO  MCP-WIDGET
+                   IF    ( SPA-MW              NOT =   SPA-PANDA )
+                       MOVE    "B01"               TO  MCP-WIDGET
+                   ELSE
+                       MOVE    "B12"               TO  MCP-WIDGET
+                   END-IF
            END-EVALUATE
            .
       *

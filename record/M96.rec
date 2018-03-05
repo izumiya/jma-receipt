@@ -5,10 +5,6 @@ M96 {
     };
     B05 {
       label varchar(10);
-      state int;
-    };
-    B09 {
-      visible bool;
     };
     B10 {
       visible bool;
