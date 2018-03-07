@@ -107,6 +107,7 @@ tbl_tensu {
 	KUBUNBANGOU		varchar(30);
 	ROSAIKBN		number(1,0);
 	SISIKSN			number(1,0);
+	AKUSEIBYORIKSN		number(1,0);
 	OLDTENSKB			number(1,0);
 	OLDTEN   			number(11,2);
 	MADOKUKBN  			number(1,0);
@@ -589,6 +590,7 @@ path	upd1	{
 	KUBUNBANGOU		=	:KUBUNBANGOU,
 	ROSAIKBN		=	:ROSAIKBN,
 	SISIKSN			=	:SISIKSN,
+	AKUSEIBYORIKSN		=	:AKUSEIBYORIKSN,
 	OLDTENSKB		=	:OLDTENSKB,
 	OLDTEN 			=	:OLDTEN,
 	MADOKUKBN 		=	:MADOKUKBN,
