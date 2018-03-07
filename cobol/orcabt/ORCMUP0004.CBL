@@ -218,10 +218,6 @@ grpsys     COPY    "COMMON-SPA".
        01  TNSWK-TENSU-REC-V06.
            03  TNSWK-V06-AREA-01       PIC X(1098).
            03  TNSWK-V06-AREA-02       PIC X(187).
-      *    µÏ•ﬁ•π•ø•«°º•ø¬‡»ÚŒŒ∞Ë
-       01  TNSWK-TENSU-REC-V07.
-           03  TNSWK-V07-AREA-01       PIC X(1132).
-           03  TNSWK-V07-AREA-02       PIC X(193).
       *
        01  CONST-AREA.
            03  CONST-HOMEDIR           PIC X(28)  VALUE
