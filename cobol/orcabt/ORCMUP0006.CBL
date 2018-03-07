@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0004.
+       PROGRAM-ID.                 ORCMUP0006.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -32,8 +32,6 @@
       * 04.06.00     NACL-伊藤    10/12/02  点数マスタレイアウト変更
       *                                     対応
       * 04.07.00     NACL-伊藤    14/03/06  点数マスタレイアウト変更
-      *                                     対応
-      * 04.08.00     NACL-伊藤    16/03/01  点数マスタレイアウト変更
       *                                     対応
       *****************************************************************
       *
@@ -145,6 +143,10 @@ grpsys     COPY    "COMMON-SPA".
       *    点数保存
            03  WRK-HZN-TEN             PIC  9(09)V99.
            03  WRK-HZN-OLDTEN          PIC  9(09)V99.
+      *    単位保存
+           03  WRK-HZN-TANICD          PIC  X(03).
+           03  WRK-HZN-TANIMOJISU      PIC  9(01).
+           03  WRK-HZN-TANINAME        PIC  X(24).
       *
            03  WRK-IN                  PIC X(01). 
       *
@@ -157,7 +159,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0004.CBL】".
+                                       "【PGID:ORCMUP0006.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -216,8 +218,8 @@ grpsys     COPY    "COMMON-SPA".
       *---(04.06.00) LINE ADD START -------------------------------------
       *    旧マスタデータ退避領域
        01  TNSWK-TENSU-REC-V06.
-           03  TNSWK-V06-AREA-01       PIC X(1098).
-           03  TNSWK-V06-AREA-02       PIC X(187).
+           03  TNSWK-V06-AREA-01       PIC X(1132).
+           03  TNSWK-V06-AREA-02       PIC X(193).
       *
        01  CONST-AREA.
            03  CONST-HOMEDIR           PIC X(28)  VALUE
@@ -321,7 +323,7 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT           IN-FILE
            IF  STS-IN          NOT =   ZERO
                MOVE    1           TO  FLG-IN
-               DISPLAY "*(ORCMUP0004)* IN-FILE OPN STS["
+               DISPLAY "*(ORCMUP0006)* IN-FILE OPN STS["
                                        STS-IN "]"
            END-IF
       *
@@ -567,8 +569,19 @@ grpsys     MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
             AND   (TNS-SRYCD(1:1)      =   "7"  )
       ***** AND  ((TNS-TENSIKIBETU     =   2    ) OR
       *****       (TNS-OLDTEN      NOT =   WRK-TNS-TEN ))
-            AND   (TNS-TENSIKIBETU     =   2    )
-               MOVE    WRK-TNS-TEN         TO  TNS-TEN
+               IF     (TNS-TENSIKIBETU     =   2)  OR
+                      (TNS-SANSOKBN        =   2 OR 3 OR 4 OR 5)
+                   MOVE    WRK-TNS-TEN         TO  TNS-TEN
+               END-IF
+      *        ユーザーにより単位設定がある場合
+               IF     (TNS-TANICD          =   "000"   OR
+                                               SPACE)  AND
+                     ((WRK-TNS-TANICD  NOT =   "000")  AND
+                      (WRK-TNS-TANICD  NOT =   SPACE))
+                   MOVE    WRK-TNS-TANICD      TO  TNS-TANICD
+                   MOVE    WRK-TNS-TANIMOJISU  TO  TNS-TANIMOJISU
+                   MOVE    WRK-TNS-TANINAME    TO  TNS-TANINAME
+               END-IF
            END-IF
       *
            MOVE    LNK-MNTYMD          TO  TNS-CREYMD
@@ -769,14 +782,31 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                IF     (TNS-YUKOSTYMD   <=  TNSWK-YUKOSTYMD ) AND
                       (TNS-YUKOEDYMD   >=  TNSWK-YUKOSTYMD )
       *            特定器材で点数識別＝２の時、点数を変更しない
+      *            特定器材で酸素の時、点数を変更しない
                    IF     (TNSWK-SRYCD(1:1)    =   "7"  )  AND
                          ((TNSWK-TENSIKIBETU   =   2    )  OR
+                          (TNSWK-SANSOKBN      =   2 OR 3 OR 4 OR 5) OR
                           (TNSWK-OLDTEN    NOT =   TNS-TEN ))
                        MOVE    TNS-TEN         TO  WRK-HZN-TEN
                        MOVE    TNS-OLDTEN      TO  WRK-HZN-OLDTEN
                    ELSE
                        MOVE    TNSWK-TEN       TO  WRK-HZN-TEN
                        MOVE    TNSWK-OLDTEN    TO  WRK-HZN-OLDTEN
+                   END-IF
+      *            特定器材でユーザーにより単位設定がある場合
+                   IF     (TNSWK-SRYCD(1:1)    =   "7"  )  AND
+                          (TNSWK-TANICD        =   "000"   OR
+                                                   SPACE)  AND
+                         ((TNS-TANICD      NOT =   "000")  AND
+                          (TNS-TANICD      NOT =   SPACE))
+                       MOVE    TNS-TANICD      TO  WRK-HZN-TANICD
+                       MOVE    TNS-TANIMOJISU  TO  WRK-HZN-TANIMOJISU
+                       MOVE    TNS-TANINAME    TO  WRK-HZN-TANINAME
+                   ELSE
+                       MOVE    TNSWK-TANICD    TO  WRK-HZN-TANICD
+                       MOVE    TNSWK-TANIMOJISU
+                                               TO  WRK-HZN-TANIMOJISU
+                       MOVE    TNSWK-TANINAME  TO  WRK-HZN-TANINAME
                    END-IF
       *
       *            更新
@@ -791,6 +821,10 @@ grpsys             MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
       *            点数の入れ替え
                    MOVE    WRK-HZN-TEN         TO  TNS-TEN
                    MOVE    WRK-HZN-OLDTEN      TO  TNS-OLDTEN
+      *            単位の入れ替え
+                   MOVE    WRK-HZN-TANICD      TO  TNS-TANICD
+                   MOVE    WRK-HZN-TANIMOJISU  TO  TNS-TANIMOJISU
+                   MOVE    WRK-HZN-TANINAME    TO  TNS-TANINAME
       *
                    MOVE    WRK-TNSUP-KEY       TO  TNSUP-KEY
                    PERFORM 20102-TENSU-UPD-SEC
@@ -936,14 +970,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            OPEN    OUTPUT              ERR-FILE
            IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0004)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0006)* OUTFILE OPN STS[" STS-ERR "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT              PLF-FILE
            IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0004)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0006)* PLFFILE OPN STS[" STS-PLF "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
            ACCEPT  SYS-DATE            FROM    DATE
@@ -988,13 +1022,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            END-IF
       *
-           DISPLAY "*(ORCMUP0004)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0004)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0004)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0004)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0004)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0004)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0004)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0006)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0006)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0006)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0006)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0006)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0006)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0006)* RC             [" LNK-RC "]"
       **** ACCEPT  WRK-IN
       *
            .
@@ -1047,19 +1081,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    WHEN    LNK-DBRVERSION (3:6)    <   "040700"
       *        PERFORM 900-TNSWK-V05-SET
       *
-      *    WHEN    LNK-DBRVERSION (3:6)    <   "040800"
-      *        PERFORM 900-TNSWK-V06-SET
-      *
       *    WHEN    OTHER
       *        MOVE    IN-REC      TO  TNSWK-TENSU-REC
       *    END-EVALUATE
       *
-           IF      LNK-DBRVERSION (3:6)    =   "040700"
-               PERFORM 900-TNSWK-V06-SET
-           ELSE
-               DISPLAY "version unmatch ! [ " LNK-DBRVERSION " ]"
-           END-IF
-      *
+           MOVE    IN-REC              TO  TNSWK-TENSU-REC
           .
        900-IN-DATA-SET-EXT.
            EXIT.
@@ -1168,7 +1194,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *---(04.07.00) LINE ADD END   -------------------------------------
-      *---(04.08.00) LINE ADD START -------------------------------------
       *****************************************************************
       *    変更後レイアウト移送処理
       *****************************************************************
@@ -1176,15 +1201,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    IN-REC              TO  TNSWK-TENSU-REC-V06
       *
-           MOVE    TNSWK-V06-AREA-01   TO  TNSWK-TENSU-REC (1    : 1098)
-      *****MOVE    ZERO                TO  TNSWK-HISINSYUMONITORKSN
-      *****MOVE    ZERO                TO  TNSWK-TOUKETUHOZONKSN
-      *****MOVE    SPACE               TO  TNSWK-KUBUNBANGOU
-      *****MOVE    ZERO                TO  TNSWK-ROSAIKBN
-      *****MOVE    ZERO                TO  TNSWK-SISIKSN
-           MOVE    ZERO                TO  TNSWK-TENSU-REC (1099 : 2)
-           MOVE    SPACE               TO  TNSWK-TENSU-REC (1101 : 30)
-           MOVE    ZERO                TO  TNSWK-TENSU-REC (1131 : 2)
+           MOVE    TNSWK-V06-AREA-01   TO  TNSWK-TENSU-REC (1    : 1132)
       *****MOVE    ZERO                TO  TNSWK-AKUSEIBYORIKSN
            MOVE    ZERO                TO  TNSWK-TENSU-REC (1133 : 1)
            MOVE    TNSWK-V06-AREA-02   TO  TNSWK-TENSU-REC (1134 :)
@@ -1193,7 +1210,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        900-TNSWK-V06-EXT.
            EXIT.
       *
-      *---(04.08.00) LINE ADD END   -------------------------------------
       *****************************************************************
       *    点数マスター読込
       *****************************************************************

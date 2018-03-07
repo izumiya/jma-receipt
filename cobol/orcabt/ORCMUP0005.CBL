@@ -216,6 +216,10 @@ grpsys     COPY    "COMMON-SPA".
            03  TNSWK-V05-AREA-01       PIC X(1094).
            03  TNSWK-V05-AREA-02       PIC X(206).
       *---(04.06.00) LINE ADD START -------------------------------------
+      *    旧マスタデータ退避領域
+       01  TNSWK-TENSU-REC-V06.
+           03  TNSWK-V06-AREA-01       PIC X(1132).
+           03  TNSWK-V06-AREA-02       PIC X(193).
       *
        01  CONST-AREA.
            03  CONST-HOMEDIR           PIC X(28)  VALUE
@@ -1060,27 +1064,33 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        900-IN-DATA-SET-SEC         SECTION.
       *
-           EVALUATE    TRUE
-           WHEN    LNK-DBRVERSION (3:6)    <   "000907"
-               PERFORM 900-TNSWK-V01-SET
+      *    EVALUATE    TRUE
+      *    WHEN    LNK-DBRVERSION (3:6)    <   "000907"
+      *        PERFORM 900-TNSWK-V01-SET
       *
-           WHEN    LNK-DBRVERSION (3:6)    <   "020800"
-               PERFORM 900-TNSWK-V02-SET
+      *    WHEN    LNK-DBRVERSION (3:6)    <   "020800"
+      *        PERFORM 900-TNSWK-V02-SET
       *
-           WHEN    LNK-DBRVERSION (3:6)    <   "040200"
-               PERFORM 900-TNSWK-V03-SET
+      *    WHEN    LNK-DBRVERSION (3:6)    <   "040200"
+      *        PERFORM 900-TNSWK-V03-SET
       *
       ***  WHEN    LNK-DBRVERSION (3:6)    <   "040600"
-           WHEN    LNK-DBRVERSION (3:6)    <   "040500"
-               PERFORM 900-TNSWK-V04-SET
+      *    WHEN    LNK-DBRVERSION (3:6)    <   "040500"
+      *        PERFORM 900-TNSWK-V04-SET
       *
-           WHEN    LNK-DBRVERSION (3:6)    <   "040700"
-               PERFORM 900-TNSWK-V05-SET
+      *    WHEN    LNK-DBRVERSION (3:6)    <   "040700"
+      *        PERFORM 900-TNSWK-V05-SET
       *
-           WHEN    OTHER
-               MOVE    IN-REC      TO  TNSWK-TENSU-REC
-           END-EVALUATE
+      *    WHEN    OTHER
+      *        MOVE    IN-REC      TO  TNSWK-TENSU-REC
+      *    END-EVALUATE
       *
+           IF     (LNK-DBRVERSION (3:6)    =   "040800") AND
+                  (LNK-DBRVERSION (12:8)   <   "20180306")
+               PERFORM 900-TNSWK-V06-SET
+           ELSE
+               DISPLAY "version unmatch ! [ " LNK-DBRVERSION " ]"
+           END-IF
           .
        900-IN-DATA-SET-EXT.
            EXIT.
@@ -1189,6 +1199,22 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *---(04.07.00) LINE ADD END   -------------------------------------
+      *****************************************************************
+      *    変更後レイアウト移送処理
+      *****************************************************************
+       900-TNSWK-V06-SET          SECTION.
+      *
+           MOVE    IN-REC              TO  TNSWK-TENSU-REC-V06
+      *
+           MOVE    TNSWK-V06-AREA-01   TO  TNSWK-TENSU-REC (1    : 1132)
+      *****MOVE    ZERO                TO  TNSWK-AKUSEIBYORIKSN
+           MOVE    ZERO                TO  TNSWK-TENSU-REC (1133 : 1)
+           MOVE    TNSWK-V06-AREA-02   TO  TNSWK-TENSU-REC (1134 :)
+      *
+          .
+       900-TNSWK-V06-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    点数マスター読込
       *****************************************************************

@@ -40,6 +40,7 @@
       *                                     点数表区分番号
       *                                     労災算定不可
       *                                     四肢加算（労災）
+      * 04.08.00     NACL-伊藤    18/03/05  悪性腫瘍病理組織標本加算
       ************************************************************
        01  TNSWK-TENSU-REC.
       *(1)
@@ -147,6 +148,9 @@
            03  TNSWK-ROSAIKBN            PIC  9(01).
            03  TNSWK-SISIKSN             PIC  9(01).
       *H28.4 ADD END
+      *H30.4 ADD START
+           03  TNSWK-AKUSEIBYORIKSN      PIC  9(01).
+      *H30.4 ADD END
            03  TNSWK-OLDTENSKB           PIC  9(01).
            03  TNSWK-OLDTEN              PIC  9(09)V99.
            03  TNSWK-MADOKUKBN           PIC  9(01).
