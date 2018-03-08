@@ -611,7 +611,7 @@
       *         
            INITIALIZE                      SYS-200501-REC
            MOVE    "2005"              TO  SYS-200501-KANRICD
-           MOVE    "*"                 TO  SYS-200501-KBNCD
+           MOVE    "01"                TO  SYS-200501-KBNCD
            MOVE    WRK-PARA-STSRYYM    TO  SYS-200501-STYUKYMD (1:6)
            MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
            MOVE    SYS-2005-STYUKYMD   TO  SYS-200501-EDYUKYMD
@@ -632,10 +632,10 @@
                                     SYS-2005-BYOMEIHENKBN1
            DISPLAY "SYS-2005-RJNGNBKKBN       ="
                                     SYS-2005-RJNGNBKKBN
-           DISPLAY "SYS-200501-TENKIBYOMEI-KBN="
-                                    SYS-200501-TENKIBYOMEI-KBN
            DISPLAY "SYS-2005-TENKIHENKBN      ="
                                     SYS-2005-TENKIHENKBN
+           DISPLAY "SYS-200501-TENKIBYOMEI-KBN="
+                                    SYS-200501-TENKIBYOMEI-KBN
       *
       *    ДќДж
            IF      WRK-PARA-STSRYYM    =   WRK-PARA-EDSRYYM
