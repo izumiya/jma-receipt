@@ -298,6 +298,9 @@
            03  FILLER          PIC X(32)  VALUE   "2 TOUKETUHOZONKSN".
       *    四肢加算（労災）
            03  FILLER          PIC X(32)  VALUE   "2 SISIKSN".
+      *H30.4
+      *    悪性腫瘍病理組織標本加算
+           03  FILLER          PIC X(32)  VALUE   "2 AKUSEIBYORIKSN".
       *
            03  FILLER          PIC X(32)  VALUE   "2 NYUKHNKBN".
            03  FILLER          PIC X(32)  VALUE   "2 NYUKHNKSNKBN".
@@ -343,13 +346,14 @@
       **** 03  TBL-GMN-OCC                 OCCURS  118
       **** 03  TBL-GMN-OCC                 OCCURS  119
       ***  03  TBL-GMN-OCC                 OCCURS  121
-           03  TBL-GMN-OCC                 OCCURS  130
+      **** 03  TBL-GMN-OCC                 OCCURS  130
+           03  TBL-GMN-OCC                 OCCURS  131
                                            INDEXED  IDX-GMN.
                05  TBL-PAGE                PIC 9(01).
                05  TBL-YOBI1               PIC X(01).
                05  TBL-WIDGET              PIC X(30).
       *
-       01  TBL-GMN-MAX                     PIC 9(04)   VALUE   130.
+       01  TBL-GMN-MAX                     PIC 9(04)   VALUE   131.
       *
       *    単位の項目順テーブル
            COPY    "CMTANICD.INC".
@@ -984,6 +988,9 @@
            MOVE  TNS-ROSAIKBN              TO  SPA-GMN-ROSAIKBN
       *    四肢加算（労災）
            MOVE  TNS-SISIKSN               TO  SPA-GMN-SISIKSN
+      *H30.4
+      *    悪性腫瘍病理組織標本加算
+           MOVE  TNS-AKUSEIBYORIKSN        TO  SPA-GMN-AKUSEIBYORIKSN
       *                                          
            PERFORM  VARYING  IDXX
                     FROM  1  BY  1  UNTIL  IDXX  >  10
@@ -1378,7 +1385,12 @@
                                        TO  SPA-GMN-HOSPSRYKBNCOB (2)
            MOVE    "2 診療所のみ"
                                        TO  SPA-GMN-HOSPSRYKBNCOB (3)
-           MOVE    3                   TO  SPA-HOSPSRYKBN-MAX
+      *H30.4
+           MOVE    "3 短期滞在手術等基本料２"
+                                       TO  SPA-GMN-HOSPSRYKBNCOB (4)
+           MOVE    "4 短期滞在手術等基本料３"
+                                       TO  SPA-GMN-HOSPSRYKBNCOB (5)
+           MOVE    5                   TO  SPA-HOSPSRYKBN-MAX
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-HOSPSRYKBN-MAX
                IF      SPA-GMN-HOSPSRYKBN  =   SPA-GMN-HOSPSRYKBNCOB
@@ -1901,6 +1913,9 @@
       *    労災算定不可
            MOVE    Z03-ROSAIKBN            TO  SPA-GMN-ROSAIKBN
            MOVE    Z03-SISIKSN             TO  SPA-GMN-SISIKSN
+      *H30.4
+      *    悪性腫瘍病理組織標本加算
+           MOVE    Z03-AKUSEIBYORIKSN      TO  SPA-GMN-AKUSEIBYORIKSN
       *
       *        施設基準コード１〜１０
            MOVE    Z03-SSTKIJUNCD1     TO  SPA-GMN-SSTKIJUNCD(1)
@@ -4297,6 +4312,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    労災算定不可
            MOVE  SPA-GMN-ROSAIKBN          TO  TNS-ROSAIKBN
            MOVE  SPA-GMN-SISIKSN           TO  TNS-SISIKSN
+      *    悪性腫瘍病理組織標本加算
+           MOVE  SPA-GMN-AKUSEIBYORIKSN    TO  TNS-AKUSEIBYORIKSN
       *
            PERFORM  VARYING  IDXX
                     FROM  1  BY  1  UNTIL  IDXX  >  10
@@ -4773,6 +4790,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    労災算定不可
            MOVE  SPA-GMN-ROSAIKBN              TO  Z03-ROSAIKBN
            MOVE  SPA-GMN-SISIKSN               TO  Z03-SISIKSN
+      *H30.4
+      *    悪性腫瘍病理組織標本加算
+           MOVE  SPA-GMN-AKUSEIBYORIKSN        TO  Z03-AKUSEIBYORIKSN
       *                                          
            MOVE  SPA-GMN-SSTKIJUNCD(1)         TO  Z03-SSTKIJUNCD1     
            MOVE  SPA-GMN-SSTKIJUNCD(2)         TO  Z03-SSTKIJUNCD2     

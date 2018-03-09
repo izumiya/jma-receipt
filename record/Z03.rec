@@ -44,10 +44,10 @@ Z03 {
         };
         HOSPSRYKBNCOMB {
           HOSPSRYKBN {
-            textdata varchar(20);
+            textdata varchar(30);
           };
           count int;
-            item varchar(20)[70];
+            item varchar(30)[70];
         };
         TANICDCOB {
           TANICD {
@@ -395,6 +395,9 @@ Z03 {
           numdata number(1);
         };
         SISIKSN { #GtkNumberEntry
+          numdata number(1);
+        };
+        AKUSEIBYORIKSN { #GtkNumberEntry
           numdata number(1);
         };
       };

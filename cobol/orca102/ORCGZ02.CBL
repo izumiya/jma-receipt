@@ -2011,6 +2011,9 @@
       *    カラム位置チェック
            IF     (SPA-Z01-SRYCD(1:2)  =   "84"  )  OR
                   (SPA-Z01-SRYCD(1:4)  =   "0084")
+      *H30.4
+      *        調剤分割
+              OR  (SPA-Z01-SRYCD(1:7)  =   "0992081" )
                CONTINUE
            ELSE
                PERFORM 41092-COLUMN-CHK-SEC
