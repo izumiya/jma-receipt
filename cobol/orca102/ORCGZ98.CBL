@@ -2036,6 +2036,12 @@
       *    ÉÂ±¡¿ÇÎÅ½ê¶èÊ¬È½Äê
            IF      (TNS-HOSPSRYKBN     =   ZERO        )  OR
                    (TNS-HOSPSRYKBN     =   SPA-HOSPSBT )
+      *H30.4
+      *       Ã»´üÂÚºß¼ê½Ñ´ðËÜ£²¡ÊÉÂ±¡¡¦¿ÇÎÅ½ê¡Ë
+              OR   (TNS-HOSPSRYKBN     =   3   )
+      *       Ã»´üÂÚºß¼ê½Ñ´ðËÜ£³¡ÊÉÂ±¡¤Î¤ß¡Ë
+              OR  ((TNS-HOSPSRYKBN     =   4   )   AND
+                   (SPA-HOSPSBT        =   1   ))
                CONTINUE
            ELSE
                MOVE   1                TO  FLG-CHK
@@ -2310,6 +2316,25 @@
                END-STRING
            END-IF
       *!!
+      *
+      *H29.5
+      *    ´ïºàÊÌÉ½¶èÊ¬ÊÔ½¸
+           IF     (TNS-SRYCD(1:1)      =   "7" )
+             AND  (TNS-CDKBN-BU        =   "01"
+                                       OR  "08" )
+               MOVE    SPACE               TO  SPA-Z98-GMN-NAME (IDX)
+               IF      TNS-CDKBN-BU        =   "01"
+                   STRING  "¡Úºß¡Û"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-Z98-GMN-NAME(IDX)
+                   END-STRING
+               ELSE
+                   STRING  "¡ÚÄ´¡Û"            DELIMITED   BY  SIZE
+                          TNS-NAME             DELIMITED   BY  SPACE
+                          INTO                 SPA-Z98-GMN-NAME(IDX)
+                   END-STRING
+               END-IF
+           END-IF
       *H24.6
       *    Ï«ºÒ¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
            IF      (TNS-SRYCD(1:3)     =   "101")

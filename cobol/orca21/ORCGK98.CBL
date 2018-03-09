@@ -2075,6 +2075,12 @@
       *    病院診療所区分判定
            IF      (TNS-HOSPSRYKBN     =   ZERO        )  OR
                    (TNS-HOSPSRYKBN     =   SPA-HOSPSBT )
+      *H30.4
+      *       短期滞在手術基本２（病院・診療所）
+              OR   (TNS-HOSPSRYKBN     =   3   )
+      *       短期滞在手術基本３（病院のみ）
+              OR  ((TNS-HOSPSRYKBN     =   4   )   AND
+                   (SPA-HOSPSBT        =   1   ))
                CONTINUE
            ELSE
                MOVE   1                TO  FLG-CHK
