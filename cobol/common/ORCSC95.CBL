@@ -71,6 +71,7 @@
       *  04.08.00    NACL-多々納  16/10/04  要介護状態表示対応
       *  04.08.00    NACL-多々納  16/12/08  病名レセ非表示対応
       *  04.08.00    NACL-多々納  16/12/XX  指導料等自動算定対応
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
       *
@@ -2147,7 +2148,7 @@
       *****************************************************************
       *    前回の保険組合せとの判定処理
       *****************************************************************
-       1001312-MAE-HKNCOMBICHEK-SEC              SECTION.
+       1001312-MAE-HKNCOMBICHEK-SEC    SECTION.
       *
            INITIALIZE                  HKNCOMBI-REC
            MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
@@ -2432,6 +2433,8 @@
       *H28.4
            MOVE    ZERO                TO  SPA-NNCHIH-ARI
            MOVE    ZERO                TO  SPA-SYOUNI-ARI
+      *H30.4
+           MOVE    ZERO                TO  SPA-NINPUKBN-ARI
       *H28.9
       *    要介護対象
            MOVE    ZERO                TO  SPA-YOUKAIGO-ARI
@@ -2464,6 +2467,8 @@
                WHEN    "2"
                    MOVE    "女"                TO  SPA-SEX
            END-EVALUATE
+      *H30.4
+           MOVE    PTINF-SEX           TO  SPA-NAI-SEX
       *
            MOVE    PTINF-BIRTHDAY      TO  SPA-BIRTHDAY
            MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
@@ -2896,6 +2901,7 @@
       *
            MOVE    ZERO                TO  SPA-NNCHIH-ARI
            MOVE    ZERO                TO  SPA-SYOUNI-ARI
+           MOVE    ZERO                TO  SPA-NINPUKBN-ARI
       *
            INITIALIZE                  PTCONF-REC
            MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
@@ -2937,6 +2943,12 @@
                    WHEN    "JIDOSANTEI-3"
                        MOVE    PTCONF-CDATA(1:9)
                                            TO  SPA-AUTOSIDOU (3)
+      *H30.4
+               WHEN    "NINPUKBN"
+      *            妊婦設定
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-NINPUKBN-ARI
+                   END-IF
       *
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
@@ -4118,7 +4130,6 @@
                INITIALIZE              SPA-DOUSYOSIN-AREA
                MOVE    SPACE           TO  SPA-DOUYMD
            END-IF
-      *
       *    保険組合せが使用できるかのチェック
       *****PERFORM 100131-HKNCOMBI-CHK-SEC
       *
@@ -6019,6 +6030,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    受診履歴一覧編集
            MOVE    ZERO                TO  SPA-RRK-PAGE
            PERFORM 2002-JYURRK-SET-SEC
+      *API00
+      *    受付から保険組合せ設定
+           IF      LNK-SC95-PG         =   SPACE
+               MOVE    ZERO                TO  FLG-UKETUKE-ARI
+               MOVE    SPA-SRYKA           TO  SPA-GMN-SRYKA
+               PERFORM 10014-UKETUKE-CHK-SEC
+           END-IF
+      *
       *    受診履歴より、診療科等を確定する
            PERFORM 10011-JYURRK-SEC
       *V3対応
@@ -6047,6 +6066,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  SPA-SYOYMD 
            MOVE    SPACE               TO  SPA-LSTYMD 
            PERFORM 1101-HKN-SYOYMD-SET-SEC
+      *
+      *H29.8 APIデフォルト取得
+      *    最終来院日からの判定
+           IF      LNK-SC95-PG         =   SPACE
+               IF      SPA-LAST-KIKAN      NOT =   ZERO
+                   PERFORM 2003-LAST-KIKAN-CHK-SEC
+               END-IF
+           END-IF
       *
       *    病名編集
            PERFORM 11012-BYOMEI-HENSYU-SEC

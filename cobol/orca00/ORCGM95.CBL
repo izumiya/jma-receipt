@@ -38,6 +38,7 @@
       *  04.05.00    NACL-多々納  09/07/15  小児科特例時間外区分追加
       *  04.07.00    NACL-多々納  12/01/26  背景色変更追加
       *  04.07.00    NACL-多々納  12/05/28  タブラベル対応
+      *  04.08.00    NACL-多々納  18/03/XX  平成３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -518,10 +519,27 @@
            MOVE    5                   TO  SPA-JIKANKBN-MAX
       *
            IF      WRK-JIKANTOKU-NYU   =   1
+                                       OR  2
                MOVE    "5 小児科特例夜間"  TO  SPA-GMN-JIKANKBN-LST(6)
                MOVE    "6 小児科特例休日"  TO  SPA-GMN-JIKANKBN-LST(7)
                MOVE    "7 小児科特例深夜"  TO  SPA-GMN-JIKANKBN-LST(8)
                ADD     3                   TO  SPA-JIKANKBN-MAX
+           END-IF
+      *
+      *H30.4
+      *    産科・産婦人科
+           IF     (SPA-NAI-SYSYMD      >=  "20180401" )
+               IF      WRK-JIKANTOKU-NYU   =   1
+                                           OR  2
+                                           OR  3
+                   MOVE    "5 小児・産・産婦人科特例夜間"
+                                           TO  SPA-GMN-JIKANKBN-LST(6)
+                   MOVE    "6 小児・産・産婦人科特例休日"
+                                           TO  SPA-GMN-JIKANKBN-LST(7)
+                   MOVE    "7 小児・産・産婦人科特例深夜"
+                                           TO  SPA-GMN-JIKANKBN-LST(8)
+                   MOVE    8               TO  SPA-JIKANKBN-MAX
+               END-IF
            END-IF
       *
            IF      WRK-YAKANKBN        =   1

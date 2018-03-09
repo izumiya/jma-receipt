@@ -444,6 +444,9 @@
                    MOVE    "P028_AUTOSRYCD2"   TO  MCP-WIDGET
                WHEN    48
                    MOVE    "P028_AUTOSRYCD3"   TO  MCP-WIDGET
+      *H30.4   Ç¥ÉØ¶èÊ¬
+               WHEN    49
+                   MOVE    "P028_NINPUKBN"      TO  MCP-WIDGET
       *
                WHEN    90
                    MOVE    "B08"                TO  MCP-WIDGET
@@ -504,9 +507,18 @@
                      AND  (SPA-GMN28-CRTEKEDYMD    =   SPACE )
       *********        MOVE    90          TO  SPA-GMN28-CUR
                        MOVE    30          TO  SPA-GMN28-CUR
+      *H30.4
+      *                ½÷À­¤Ç£±£¶ºÐ°Ê¾å¤ÏÇ¥ÉØ¶èÊ¬¤Ø
+                       IF     (SPA-GMN-SEX         =   "2" )
+                         AND  (SPA-NAI-NENREI-YY   >=  16  )
+                           MOVE    49          TO  SPA-GMN28-CUR
+                       END-IF
                    ELSE
                        MOVE    25          TO  SPA-GMN28-CUR
                    END-IF
+      *H30.4   Ç¥ÉØ¶èÊ¬
+               WHEN    "P028_NINPUKBN"
+                   MOVE    30              TO  SPA-GMN28-CUR
       *ÃÏ°èÊñ³çÂÐ¾Ý¼ÀÉÂ
                WHEN    "P028_CHKHKTBYO1"
                    MOVE    31              TO  SPA-GMN28-CUR
@@ -587,6 +599,10 @@
       *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÂÐ¾Ý
                WHEN    "CLICKED"       ALSO    "P028_SYOUNIKBN"
                    PERFORM 4802-SYOUNIKBN-SEC
+      *H30.4
+      *    Ç¥ÉØ¶èÊ¬
+               WHEN    "CLICKED"       ALSO    "P028_NINPUKBN"
+                   PERFORM 4802-NINPUKBN-SEC
       *H28.12
       *    ´µ¼Ô¸Ä¿ÍÈÖ¹æÅÐÏ¿
                WHEN    "CLICKED"       ALSO    "BCMY2"
@@ -819,6 +835,49 @@
            END-IF
           .
        4802-SYOUNIKBN-EXT.
+           EXIT.
+      *
+      *H30.4
+      *****************************************************************
+      *    Ç¥ÉØ¶èÊ¬ÂÐ¾Ý½èÍý
+      *****************************************************************
+       4802-NINPUKBN-SEC        SECTION.
+      *
+           EVALUATE    SPA-GMN28-NINPUKBN
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN28-NINPUKBN
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN28-NINPUKBN
+           END-EVALUATE
+      *
+           IF      SPA-GMN28-NINPUKBN  =   "1"
+      *        ÃËÀ­¤Ï¥¨¥é¡¼
+               IF      SPA-GMN-SEX         =   "1"
+                   MOVE    "0"             TO  SPA-GMN28-NINPUKBN
+                   MOVE    "2853"          TO  SPA-ERRCD
+                   MOVE    30              TO  SPA-GMN28-CUR
+               END-IF
+      *        £±£¶ºÐÌ¤Ëþ¤Ï·Ù¹ð
+               IF      SPA-NAI-NENREI-YY   <   16
+                   IF     (SPA-NAI28-KEININP   =   ZERO )
+                     AND  (SPA-ERRCD           =   SPACE )
+                       MOVE    "K287"          TO  SPA-ERRCD
+                       MOVE    1               TO  SPA-NAI28-KEININP
+                       MOVE    49              TO  SPA-GMN28-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-TOUROKU
+      *    ÆþÎÏ¥Á¥§¥Ã¥¯½èÍý
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    30              TO  SPA-GMN28-CUR
+           END-IF
+           .
+       4802-NINPUKBN-EXT.
            EXIT.
       *
       *****************************************************************

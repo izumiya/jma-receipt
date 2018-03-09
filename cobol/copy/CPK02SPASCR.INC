@@ -188,7 +188,7 @@
                            11  SPA-COM-KZMFLG7       PIC X(01).
       *                    警告（リハビリ減点）
                            11  SPA-COM-KZMFLG8       PIC X(01).
-      *                    警告（予備）
+      *                    警告（包括算定入力警告(H29.9）
                            11  SPA-COM-KZMFLG9       PIC X(01).
       *                    入院料併用警告
                            11  SPA-COM-KZMFLGNK      PIC X(01).
@@ -455,6 +455,11 @@
                        09  SPA-COM-HISINKSN        PIC  X(01).
       *                凍結保存同種組織加算
                        09  SPA-COM-TOUKETUHOZONKSN PIC  X(01).
+      *H30.4
+      *                悪性腫瘍病理組織標本加算
+                       09  SPA-COM-AKUSEIBYORIKSN  PIC  X(01).
+      *H29.1           ユーザー管理区分
+                       09  SPA-COM-MASTER-CLASS    PIC  X(01).
       *
       *    点数マスタ付加情報より
       *                採血区分

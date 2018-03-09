@@ -11196,6 +11196,21 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-KOHMSG      TO  K02N-KOHMSG-DATA
            END-IF
       *
+      *H30.4
+           IF     (SPA-SRYYMD          >=  "20180401")
+               IF     (SPA-NINPUKBN-ARI    =   1    )
+                   MOVE    "（妊婦）"      TO  K02N-MODE3-VALUE
+                   MOVE    "blue"          TO  K02N-MODE3-STYLE
+               ELSE
+      *            手入力で妊婦
+                   IF     (SPA-NINPUKBN-IN     =   1    )
+                   MOVE    "（妊婦）"      TO  K02N-MODE3-VALUE
+                   MOVE    "black"         TO  K02N-MODE3-STYLE
+                   END-IF
+               END-IF
+           END-IF
+      *TEST
+      *
       *    非活性処理
            PERFORM 510-GSRAUTH-SEC
       *

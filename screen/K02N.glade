@@ -1619,6 +1619,25 @@
           <data>CLICKED</data>
         </signal>
       </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>MODE3</name>
+        <x>508</x>
+        <y>64</y>
+        <width>80</width>
+        <height>20</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label></label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
+        <wrap>False</wrap>
+      </widget>
     </widget>
   </widget>
 </GTK-Interface>

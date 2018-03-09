@@ -139,6 +139,7 @@
       *  04.08.00    NACL-多々納  17/03/XX  訂正時の自動発生（処方料）追加
       *  04.08.00    NACL-多々納  17/04/XX  投薬３０日超チェック追加
       *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算区分追加
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -190,7 +191,15 @@
                        09  SPA-GMN-JIKANTOKU-NYU-G.
                            11  SPA-GMN-JIKANTOKU-NYU   PIC X(01).
                            11  SPA-GMN-FN              PIC X(01).
-                           11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(10).
+      **                   11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(10).
+                           11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(28).
+      *H30.4
+      *                産婦人科特例対応
+                       09  SPA-GMN-JIKANTOKU-NYU-COMB.
+                           11  SPA-GMN-JIKANTOKU-NYU-LIST  PIC X(30)
+                                                       OCCURS   9.
+                       09  SPA-GMN-JIKANTOKU-MAX       PIC 9(02).
+      *
       *                画像診断管理加算１
                        09  SPA-GMN-GAZOUKSN1-G.
                            11  SPA-GMN-GAZOUKSN1       PIC X(01).
@@ -1930,6 +1939,15 @@
            MOVE    "1 チェックする"
                                        TO  SPA-GMN-SHOHOU30CHK-LIST (2)
            MOVE    2                   TO  SPA-GMN-SHOHOU30CHK-MAX
+      *H30.4
+      *    時間外加算特例 産婦人科特例対応
+           MOVE    "0 算定しない"      TO  SPA-GMN-JIKANTOKU-NYU-LIST(1)
+           MOVE    "1 算定する"        TO  SPA-GMN-JIKANTOKU-NYU-LIST(2)
+           MOVE    "2 算定する（小児科のみ）"
+                                       TO  SPA-GMN-JIKANTOKU-NYU-LIST(3)
+           MOVE    "3 算定する（産・産婦人科のみ）"
+                                       TO  SPA-GMN-JIKANTOKU-NYU-LIST(4)
+           MOVE    4                   TO  SPA-GMN-JIKANTOKU-MAX
       *
       *
       *    病名表示区分
@@ -2228,11 +2246,9 @@
       *    確認画面名称表示区分
            MOVE    "0 一般名表示"      TO  SPA-GMN-GENERICFLG-LST(1)
            MOVE    "1 銘柄名表示"      TO  SPA-GMN-GENERICFLG-LST(2)
-           MOVE    2                   TO  SPA-GMN-GENERICFLG-MAX
-      *v5.0 から
-      **   MOVE    "2 一般名表示（全画面）"
-      *                                TO  SPA-GMN-GENERICFLG-LST(3)
-      **   MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
+           MOVE    "2 一般名表示（全画面）"
+                                       TO  SPA-GMN-GENERICFLG-LST(3)
+           MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
       *
            MOVE    "0 発行しない"      TO  SPA-GMN-SYUSKYPRTGLST(1)
            MOVE    "1 発行する"        TO  SPA-GMN-SYUSKYPRTGLST(2)
@@ -2820,19 +2836,22 @@
            END-IF
       *
       *    時間外加算特例乳幼児
+      *H30.4
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDY         FROM    1   BY  1
-                   UNTIL   IDY         >   SPA-GMN-DATA-MAX
+                   UNTIL   IDY         >   SPA-GMN-JIKANTOKU-MAX
                IF      SPA-GMN-JIKANTOKU-NYU
-                                       =   SPA-GMN-DATAL(IDY)
-                   MOVE    SPA-GMN-DATALST(IDY)
+                                       =   SPA-GMN-JIKANTOKU-NYU-LIST
+                                                (IDY)(1:1)
+                   MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(IDY)
                                            TO SPA-GMN-JIKANTOKU-NYU-G
                    MOVE    1                   TO  FLG-OK
-                   MOVE    SPA-GMN-DATA-MAX    TO  IDY
+                   MOVE    SPA-GMN-JIKANTOKU-MAX   TO  IDY
                END-IF
            END-PERFORM
            IF      FLG-OK              =   ZERO
-               MOVE    SPA-GMN-DATALST(01) TO SPA-GMN-JIKANTOKU-NYU-G
+               MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(01)
+                                       TO SPA-GMN-JIKANTOKU-NYU-G
            END-IF
       *
       *    画像診断管理加算
@@ -6869,10 +6888,22 @@
       *
            MOVE    ZERO                TO  FLG-OK
       *
+      *    PERFORM VARYING     IDY     FROM    1   BY  1
+      *            UNTIL       IDY     >   SPA-GMN-DATA-MAX
+      *        IF      SPA-GMN-JIKANTOKU-NYU   =   SPA-GMN-DATAL(IDY)
+      *            MOVE    SPA-GMN-DATALST (IDY)
+      *                                    TO  SPA-GMN-JIKANTOKU-NYU-G
+      *            MOVE    1               TO  FLG-OK
+      *        END-IF
+      *    END-PERFORM
+      *
            PERFORM VARYING     IDY     FROM    1   BY  1
-                   UNTIL       IDY     >   SPA-GMN-DATA-MAX
-               IF      SPA-GMN-JIKANTOKU-NYU   =   SPA-GMN-DATAL(IDY)
-                   MOVE    SPA-GMN-DATALST (IDY)
+                   UNTIL      (IDY     >   SPA-GMN-JIKANTOKU-MAX)
+                           OR (FLG-OK  =   1         )
+               IF      SPA-GMN-JIKANTOKU-NYU
+                                       =   SPA-GMN-JIKANTOKU-NYU-LIST
+                                                        (IDY)(1:1)
+                   MOVE    SPA-GMN-JIKANTOKU-NYU-LIST (IDY)
                                            TO  SPA-GMN-JIKANTOKU-NYU-G
                    MOVE    1               TO  FLG-OK
                END-IF
@@ -11594,12 +11625,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    時間外加算特例乳幼児
            MOVE    SPA-GMN-JIKANTOKU-NYU-G TO  W07-JIKANTOKUNYU
+      *    PERFORM VARYING IDY     FROM    1   BY  1
+      *            UNTIL   IDY     >       SPA-GMN-DATA-MAX
+      *        MOVE    SPA-GMN-DATALST(IDY)
+      *                                TO  W07-JIKANTOKUNYU-ITEM(IDY)
+      *    END-PERFORM
+      ***  MOVE    SPA-GMN-DATA-MAX    TO  W07-JIKANTOKUNYU-COUNT
            PERFORM VARYING IDY     FROM    1   BY  1
-                   UNTIL   IDY     >       SPA-GMN-DATA-MAX
-               MOVE    SPA-GMN-DATALST(IDY)
+                   UNTIL   IDY     >       SPA-GMN-JIKANTOKU-MAX
+               MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(IDY)
                                        TO  W07-JIKANTOKUNYU-ITEM(IDY)
            END-PERFORM
-           MOVE    SPA-GMN-DATA-MAX    TO  W07-JIKANTOKUNYU-COUNT
+           MOVE    SPA-GMN-JIKANTOKU-MAX    TO  W07-JIKANTOKUNYU-COUNT
       *
       *    画像診断管理加算１（写真診断）
            MOVE    SPA-GMN-GAZOUKSN1-G TO  W07-GAZOUKSN1

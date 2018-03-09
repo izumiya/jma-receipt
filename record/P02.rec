@@ -470,6 +470,10 @@ P02 {
           style varchar(20);
           textdata varchar(10);
         };
+        TEIMSG3 {
+          style varchar(20);
+          textdata varchar(10);
+        };
         BHR {
           state int;
           label varchar(4);
@@ -1352,6 +1356,9 @@ P02 {
         };
         P028_AUTONAME3 { #GtkLabel
           textdata varchar(40);
+        };
+        P028_NINPUKBN { #GtkCheckButton
+          isactive bool;
         };
       };
     };

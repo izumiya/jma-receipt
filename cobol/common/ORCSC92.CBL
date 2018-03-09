@@ -76,6 +76,7 @@
       *  04.07.00    NACL-多々納  14/04/25  施設基準チェック対応
       *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
       *  04.08.00    NACL-多々納  16/04/20  向精神薬区分追加対応
+      *  05.00.00    NACL-多々納  17/01/XX  点数マスタユーザ対応
       *****************************************************************
       *
       *
@@ -1001,6 +1002,9 @@
                   (LNK-SC92-SRYCD  (1:3)   =   "008"  )
             OR    (LNK-SC92-SRYCD  (1:1)   =   "6"    )
             OR    (LNK-SC92-SRYCD  (1:1)   =   "7"    )
+      *H30.4
+      *     分割調剤
+            OR    (LNK-SC92-SRYCD  (1:7)   =   "0992081")
       ******OR    (TNS-SSTKIJUNCD(01)      =   ZERO   )
                CONTINUE
            ELSE
@@ -1428,6 +1432,8 @@
            IF     (LNK-SC92-SRYCD (1:2)    =   "84") 
              OR   (LNK-SC92-SRYCD (1:4)    =   "0084")
              OR   (LNK-SC92-SRYCD (1:3)    =   "001" )
+      *H30.4
+             OR   (LNK-SC92-SRYCD (1:7)    =   "0992081" )
                IF     (LNK-SC97-MCNT1      >   8   )
                   OR  (LNK-SC97-MCNT2      >   8   )
                   OR  (LNK-SC97-MCNT3      >   8   )
@@ -3853,6 +3859,7 @@
       *    基礎点数
            MOVE    TNS-TEN             TO  SPA-COM-TEN      (IDX-T)
            MOVE    TNS-TEN             TO  SPA-COM-KISOTEN  (IDX-T)
+      *
       *H28.4
       *    薬剤　除算金額（１０で除す）
            IF     (TNS-SRYCD(1:1)      =   "6"  ) AND
@@ -3945,6 +3952,12 @@
                 PERFORM 3005-INPUT-MEISYO3-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-MEISYO (IDX-T)
            END-IF
+      *H30.4
+      *    分割調剤など
+           IF     (SPA-COM-INPUTCD(IDX-T)(1:7) =   "0992081" )
+                PERFORM 3002-INPUT-MEISYO-SEC
+                MOVE    WRK-MEISYO    TO  SPA-GMN-MEISYO (IDX-T)
+           END-IF
       *!
       *    器材商品名コードの発生分
            IF     (SPA-COM-INPUTCD (IDX-T)(1:1)    =   "7"   )  AND
@@ -3993,7 +4006,7 @@
       *H25.2
       *    自賠責特定コードの単位
       **** IF     (SPA-COM-INPUTCD (IDX-T)(1:5)    =   "09593" )
-      *H29.3   自費の薬剤のみ
+      *H29.2   自費の薬剤のみ
            IF     (SPA-COM-INPUTCD (IDX-T)(1:3)    =   "095"
                                                    OR  "096" )
               AND (TNS-TANICD              NOT =   ZERO   )
@@ -4210,6 +4223,10 @@
            MOVE    TNS-HISINSYUMONITORKSN  TO  SPA-COM-HISINKSN(IDX-T)
       *    凍結保存同種組織加算
            MOVE    TNS-TOUKETUHOZONKSN TO  SPA-COM-TOUKETUHOZONKSN
+                                                             (IDX-T)
+      *H30.4
+      *    悪性腫瘍病理組織標本加算
+           MOVE    TNS-AKUSEIBYORIKSN  TO  SPA-COM-AKUSEIBYORIKSN
                                                              (IDX-T)
       *
       *    点数マスタ付加情報より編集
@@ -4686,7 +4703,8 @@
            END-PERFORM
       *    ユーザコメントで位置のみ指定
            IF     (FLG-KCHK            =   1    )  AND
-                  (SPA-COM-INPUTCD (IDX-T)(1:4)  =  "0084" )
+                 ((SPA-COM-INPUTCD (IDX-T)(1:4)  =  "0084" )
+               OR (SPA-COM-INPUTCD (IDX-T)(1:7) =   "0992081"))
                PERFORM 30011-FUKYO-MEIHEN02-SEC
                GO      TO  3002-INPUT-MEISYO-EXT
            END-IF
@@ -5679,6 +5697,8 @@
       *    入力値のある時、再編集
            IF     (SPA-COM-INPUTCD (IDX-T)(1:2)    =   "84" )  OR
                   (SPA-COM-INPUTCD (IDX-T)(1:4)    =   "0084")
+      *H30.4
+              OR  (SPA-COM-INPUTCD (IDX-T)(1:7)    =   "0992081")
                MOVE    LNK-SC92-SRYCD      TO  TNS-SRYCD
                PERFORM 910-TENSU-READ-SEC
                IF      FLG-TENSU           =   ZERO
@@ -5985,6 +6005,8 @@
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
            MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
            MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
            MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
@@ -6053,6 +6075,7 @@
            .
        9102-TENSUPLUS2-READ-EXT.
            EXIT.
+      *
       *****************************************************************
       *    点数マスター読込（算定履歴検索用）
       *****************************************************************

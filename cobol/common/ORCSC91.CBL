@@ -50,6 +50,7 @@
       *                                     费鲁介搀掐薄泣滦炳
       *  04.07.00    NACL-驴」羌  13/02/XX  汐阂レセ排コ〖ド滦炳(H25.7)
       *  04.07.00    NACL-驴」羌  13/07/14  戮奉眶　６０∈５钳∷滦炳
+      *  04.08.00    NACL-驴」羌  18/03/XX  士喇３０钳４奉猖赖滦炳
       *****************************************************************
       *
       *
@@ -305,21 +306,51 @@
       *    客供空隆∈その戮∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140007710".
-      *    客供空隆∈４箕粗踏塔∷
+      *    客供空隆∈４箕粗踏塔∷∈H30.3　まで∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140036710".
-      *    客供空隆∈４箕粗笆惧から５箕粗踏塔∷
+      *    客供空隆∈４箕粗笆惧から５箕粗踏塔∷∈H30.3　まで∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140051010".
-      *    客供空隆∈５箕粗笆惧∷
+      *    客供空隆∈５箕粗笆惧∷∈H30.3　まで∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140051110".
       *    积鲁此靳及缝闭呱册
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140029850".
-      *    客供空隆∈她拉拜积譬老呱册∷
+      *    客供空隆∈她拉拜积譬老呱册∷∈H30.3　まで∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140052810".
+      *
+      *Ｈ３０ˉ４　客供空隆の纳裁
+      *    客供空隆∈她拉拜积譬老１∈４箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140057810".
+      *    客供空隆∈她拉拜积譬老１∈４箕粗笆惧５箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140057910".
+      *    客供空隆∈她拉拜积譬老１∈５箕粗笆惧∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058010".
+      *    客供空隆∈她拉拜积譬老２∈４箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058110".
+      *    客供空隆∈她拉拜积譬老２∈４箕粗笆惧５箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058210".
+      *    客供空隆∈她拉拜积譬老２∈５箕粗笆惧∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058310".
+      *    客供空隆∈她拉拜积譬老３∈４箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058410".
+      *    客供空隆∈她拉拜积譬老３∈４箕粗笆惧５箕粗踏塔∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058510".
+      *    客供空隆∈她拉拜积譬老３∈５箕粗笆惧∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140058610".
+      *
       *
       *    费鲁瓷妄裁换∈办忍∷
            03  FILLER                  PIC X(04)   VALUE   "006".
@@ -339,14 +370,17 @@
       *****03  TBL-DOUJI-OCC           OCCURS   9   INDEXED   TBL-IDX.
       *****03  TBL-DOUJI-OCC           OCCURS   13  INDEXED   TBL-IDX.
       **** 03  TBL-DOUJI-OCC           OCCURS   24  INDEXED   TBL-IDX.
-           03  TBL-DOUJI-OCC           OCCURS   34  INDEXED   TBL-IDX.
+      *****03  TBL-DOUJI-OCC           OCCURS   34  INDEXED   TBL-IDX.
+      *H30.4
+           03  TBL-DOUJI-OCC           OCCURS   43  INDEXED   TBL-IDX.
                05  TBL-CODE                PIC X(03).
                05  TBL-CHK                 PIC X(01).
                05  TBL-SRYCD               PIC X(09).
       *01  TBL-MAX                     PIC 9(04)   VALUE   9.
       *01  TBL-MAX                     PIC 9(04)   VALUE   18.
       *01  TBL-MAX                     PIC 9(04)   VALUE   24.
-       01  TBL-MAX                     PIC 9(04)   VALUE   34.
+      *01  TBL-MAX                     PIC 9(04)   VALUE   34.
+       01  TBL-MAX                     PIC 9(04)   VALUE   43.
       *
       *    瘦副侍换年旺悟テ〖ブル
            COPY   "CMSANTEITBL.INC".

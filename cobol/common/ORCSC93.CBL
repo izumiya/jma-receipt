@@ -2136,6 +2136,19 @@
                            ELSE
                                MOVE    "2062"        TO  SPA-ERRCD
                            END-IF
+      *H30.4
+      *               分割調剤
+                       WHEN    "099208101"
+                           IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
+                                                           OR  "22"
+                                                           OR  "23" )
+                               MOVE    SPA-COM-SRYKBN(IDX - 1)
+                                                     TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                           ELSE
+                               MOVE    "0281"        TO  SPA-ERRCD
+                           END-IF
+      *
       *                後発医薬品への変更可（処方せん毎）
                        WHEN    "099209902"
       *                後発医薬品への変更不可
@@ -2692,6 +2705,10 @@
       *平成１８年４月
                WHEN    11
       *            特異的ＩＧＥ
+                   MOVE    2             TO  WRK-KENSA-MAX
+      *平成３０年４月
+               WHEN    12
+      *            悪性腫瘍遺伝子検査
                    MOVE    2             TO  WRK-KENSA-MAX
                WHEN    OTHER
                    MOVE    ZERO          TO  WRK-KENSA-MAX

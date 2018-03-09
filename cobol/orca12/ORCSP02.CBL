@@ -167,7 +167,7 @@
                05  WRK-TMSG1           PIC X(10).
                05  WRK-TMSG2           PIC X(02).
                05  WRK-TMSG3           PIC X(10).
-           03  WRK-TEIMSG              PIC X(20).
+           03  WRK-TEIMSG              PIC X(30).
       *
            03  WRK-IDOMSG              PIC X(10).
       *
@@ -1559,14 +1559,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE               TO  PTINF-REC
            INITIALIZE                      PTINF-REC
       *H29.11°°∫ÔΩ¸
-      ***  IF      SPA-NAME        NOT =   SPACE
+      **** IF      SPA-NAME        NOT =   SPACE
       *        MOVE    SPA-NAME            TO  PTINF-NAME
       *    END-IF
       *
       *    IF      SPA-NAME        NOT =   SPACE
       *        MOVE    SPA-NAME            TO  SPA-GMN-NAMEH
       *        MOVE    SPA-NAME            TO  SPA-GMN-NAME
-      ***  END-IF
+      **** END-IF
       *
       *    ¥µº‘»÷πÊ —¥π•ﬁ•π•øΩÈ¥¸ ‘Ω∏
            MOVE    SPACE               TO  PTNUM-REC
@@ -3022,6 +3022,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN    "JIDOSANTEI-3"
                        MOVE    PTCONF-CDATA(1:9)
                                            TO  SPA-GMN28-AUTOSRYCD(3)
+      *H30.4
+                   WHEN    "NINPUKBN"
+      *            «•…ÿ∂Ë ¨
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-NINPUKBN
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -3874,6 +3879,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            MOVE    WRK-TEIMSG          TO  P02-TEIMSG-VALUE
            MOVE    "blue"              TO  P02-TEIMSG-STYLE
+      *H30.4
+      *TEST
+           IF      SPA-GMN28-NINPUKBN  =   "1"
+               MOVE    "° «•…ÿ°À"            TO  P02-TEIMSG3-VALUE
+               MOVE    "blue"              TO  P02-TEIMSG3-STYLE
+           END-IF
+      *TEST
       *
            IF      SPA-NAI-GRPHOSPNUM  =   ZERO
                MOVE    SPACE               TO  P02-TEIMSG2-VALUE
@@ -5347,6 +5359,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN28-AUTONAME (1)  TO  P02-P028-AUTONAME1 
            MOVE    SPA-GMN28-AUTONAME (2)  TO  P02-P028-AUTONAME2 
            MOVE    SPA-GMN28-AUTONAME (3)  TO  P02-P028-AUTONAME3 
+      *H30.4
+      *    «•…ÿ∂Ë ¨
+           IF      SPA-GMN28-NINPUKBN  =   "1"
+               MOVE    "T"                 TO  P02-P028-NINPUKBN
+           ELSE
+               MOVE    "F"                 TO  P02-P028-NINPUKBN
+           END-IF
            .
        2001-P028-SET-EXT.
            EXIT.

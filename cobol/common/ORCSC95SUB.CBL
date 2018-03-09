@@ -327,7 +327,15 @@
                ELSE
                    MOVE    SYS-1008-JIKANTOKU-NYU-FLG
                                            TO  SPA-JIKANTOKU-NYU
+      *H30.4
+      *            H30.4¤«¤é»ºÉØ¿Í²ÊÆÃÎãÂÐ±þ
+                   IF     (SPA-SRYYMD          <   "20180401" )
+                     AND  (SPA-JIKANTOKU-NYU   =   "2"
+                                               OR  "3"         )
+                       MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                   END-IF
                END-IF
+      *
       *        ²èÁü¿ÇÃÇ´ÉÍý²Ã»»£±¡Ê¼Ì¿¿¿ÇÃÇ¡Ë
                IF      SYS-1008-GAZOUKSN1-FLG  =   SPACE
                    MOVE    "1"             TO  SPA-GAZOUKSN1
@@ -1009,6 +1017,15 @@
                            MOVE    ZERO            TO  SPA-SYOUNIKJN
                        END-IF
                    END-IF
+      *H30.4
+      *            IF      SPA-SRYYMD      >=  "20180401"
+      *                µ¡Ç½¶¯²½²Ã»»¡Ê½é¿Ç¡Ë¡Ê????)
+      *??ÉÔÌÀ          IF      SYS-1006-SSTKIJUN (XXX) =   1
+      *                    MOVE    1               TO  SPA-KYOUKAKSN
+      *                ELSE
+      *                    MOVE    ZERO            TO  SPA-KYOUKAKSN
+      *                END-IF
+      ***          END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
@@ -1432,7 +1449,15 @@
                ELSE
                    MOVE    SYS-1008-JIKANTOKU-NYU-FLG
                                            TO  SPA-JIKANTOKU-NYU
+      *H30.4
+      *            H30.4¤«¤é»ºÉØ¿Í²ÊÆÃÎãÂÐ±þ
+                   IF     (SPA-SRYYMD          <   "20180401" )
+                     AND  (SPA-JIKANTOKU-NYU   =   "2"
+                                               OR  "3"        )
+                       MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                   END-IF
                END-IF
+      *
       *        ²èÁü¿ÇÃÇ´ÉÍý²Ã»»£±¡Ê¼Ì¿¿¿ÇÃÇ¡Ë
                IF      SYS-1008-GAZOUKSN1-FLG  =   SPACE
                    MOVE    "1"             TO  SPA-GAZOUKSN1

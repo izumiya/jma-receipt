@@ -94,6 +94,9 @@
                05  SPA-SYOUNIKJN           PIC  9(01).
       *在宅療養加算（施設基準）
                05  SPA-ZATAKUKJN           PIC  9(01).
+      *H30.4
+      *        機能強化加算（施設基準）
+               05  SPA-KYOUKAKSN           PIC  9(01).
       *
       *病院種別
                05  SPA-NAI-HOSPSBT         PIC 9(01).
@@ -378,9 +381,11 @@
       *年齢（表示）
                05  SPA-NENREI-HEN          PIC X(10).
       *         老人区分
-               05  SPA-NAI-ROUJIN            PIC 9(01).
+               05  SPA-NAI-ROUJIN          PIC 9(01).
       *         老人公費有無
-               05  SPA-NAI-ROUJIN2           PIC 9(01).
+               05  SPA-NAI-ROUJIN2         PIC 9(01).
+      *性別区分
+               05  SPA-NAI-SEX             PIC X(01).
       *
       *外来管理料算定有無（Ｋ０２で使用）
                05  SPA-NAI-GAIFLG          PIC 9(01).
@@ -448,6 +453,9 @@
       *H28.9
       *        要介護対象
                05  SPA-YOUKAIGO-ARI        PIC 9(01).
+      *H30.4
+      *        妊婦区分（患者登録）
+               05  SPA-NINPUKBN-ARI        PIC 9(01).
       *
       *H28.12
       *        指導料等自動算定コード
@@ -667,6 +675,16 @@
       *H29.4
       *投薬３０日超チェックチェック区分
                05  SPA-SHOH30-CHK          PIC 9(01).
+      *
+      *H30.4
+      *        妊婦区分（入力）
+               05  SPA-NINPUKBN-IN         PIC 9(01).
+      *        抗不安・不眠長期区分
+               05  SPA-FUANCHOKI           PIC 9(01).
+      *H30.4
+      *        オンライン診療料算定
+               05  SPA-ONLINE-ARI          PIC 9(01).
+               05  SPA-ONLINE-ARI2         PIC 9(01).
       *@
            03  SPA-SONOTA-AREA.
       *確認メッセージ
@@ -749,6 +767,10 @@
                05  SPA-PSYCHO-80-OCC       OCCURS   10.
                    07  SPA-PSY80-ARI       PIC 9(01).
                    07  SPA-PSY80-KA        PIC X(02).
+      *H30.4
+      *    不安不眠薬投与確認
+           03  SPA-FUANCHK-CHK          PIC  9(01).
+           03  SPA-FUANCHK-OK           PIC  9(01).
       *
       *(4.7　は予備使用）
       *    予備
