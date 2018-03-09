@@ -48,9 +48,9 @@
                     06  Z03-VALUE   PIC S9(1).
                   05  Z03-HOSPSRYKBNCOMB.
                     06  Z03-HOSPSRYKBN.
-                      07  Z03-VALUE   PIC X(20).
+                      07  Z03-VALUE   PIC X(30).
                     06  Z03-HOSPSRYKBN-COUNT   PIC S9(9)   BINARY.
-                    06  Z03-HOSPSRYKBN-ITEM    PIC X(20)   OCCURS  70.
+                    06  Z03-HOSPSRYKBN-ITEM    PIC X(30)   OCCURS  70.
                   05  Z03-TANICDCOB.
                     06  Z03-TANICD.
                       07  Z03-VALUE   PIC X(28).
@@ -291,6 +291,8 @@
                   05  Z03-TOUKETUHOZONKSN.
                     06  Z03-NUMDATA PIC S9(1).
                   05  Z03-SISIKSN.
+                    06  Z03-NUMDATA PIC S9(1).
+                  05  Z03-AKUSEIBYORIKSN.
                     06  Z03-NUMDATA PIC S9(1).
                 04  Z03-FIXED12.
                   05  Z03-SSTKIJUNCD1.

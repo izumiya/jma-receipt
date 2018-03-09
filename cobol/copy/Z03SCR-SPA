@@ -170,10 +170,10 @@
                    07  SPA-GMN-HOSPSRYKBN-G.
                        09  SPA-GMN-HOSPSRYKBN      PIC X(1).
                        09  SPA-GMN-F3              PIC X(1).
-                       09  SPA-GMN-HOSPSRYKBNMEI   PIC X(18).
+                       09  SPA-GMN-HOSPSRYKBNMEI   PIC X(28).
                    07  SPA-GMN-HOSPSRYKBNCOB-G.
-                       09  SPA-GMN-HOSPSRYKBNCOB   PIC X(20)
-                                                   OCCURS  3.
+                       09  SPA-GMN-HOSPSRYKBNCOB   PIC X(30)
+                                                   OCCURS  9.
                    07  SPA-HOSPSRYKBN-MAX           PIC 9(04).
       *            °åÎÅ´Ñ»¡Ë¡
                    07  SPA-GMN-IRYOKAN-G.
@@ -334,6 +334,9 @@
                    07  SPA-GMN-TOUKETUHOZONKSN  PIC 9(1).
       *            Ï«ºÒ»Í»è²Ã»»¶èÊ¬
                    07  SPA-GMN-SISIKSN          PIC 9(01).
+      *H30.4
+      *            °­À­¼ðáçÉÂÍýÁÈ¿¥É¸ËÜ²Ã»»
+                   07  SPA-GMN-AKUSEIBYORIKSN  PIC 9(01).
       *            
                05  SPA-GMN-BANGO.
                    07  SPA-GMN-SSTKIJUNCDTBL   OCCURS 10.
