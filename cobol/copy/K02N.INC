@@ -144,6 +144,9 @@
               03  K02N-KOHMSG.
                 04  K02N-KOHMSG-STYLE  PIC X(20).
                 04  K02N-KOHMSG-DATA   PIC X(50).
+              03  K02N-MODE3.
+                04  K02N-MODE3-STYLE   PIC X(20).
+                04  K02N-MODE3-VALUE   PIC X(10).
               03  K02N-BSH2.
                 04  K02N-BSH2-STYLE  PIC X(20).
                 04  K02N-BSH2-LABEL  PIC X(8).

@@ -171,6 +171,10 @@ K02N {
       style varchar(20);
       textdata varchar(50);
     };
+    MODE3 {
+      style varchar(20);
+      textdata varchar(10);
+    };
     BSH2 { #GtkButton
       style varchar(20);
       label varchar(8);

@@ -122,10 +122,10 @@ W07 {
         };
         JIKANTOKUNYU_COMB {
           JIKANTOKUNYU {
-            textdata varchar(12);
+            textdata varchar(30);
           };
           count int;
-            item varchar(12)[2];
+            item varchar(30)[9];
         };
         GAZOUKSN1_COMB {
           GAZOUKSN1 {

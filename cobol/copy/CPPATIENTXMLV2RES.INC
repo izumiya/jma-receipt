@@ -316,6 +316,11 @@
                   04  PTRES-COMMUNITY-DISEASE.
                       05  PTRES-TARGET-DISEASE     PIC X(05)
                                                    OCCURS   4.
+      *H30.4
+      *           患者個別情報
+                  04  PTRES-PTCONF-INFO.
+      *               妊婦設定
+                      05  PTRES-NINPUKBN             PIC X(05).
       *
       *           患者個人番号情報
                   04  PTRES-PTMYNUMBER-G.

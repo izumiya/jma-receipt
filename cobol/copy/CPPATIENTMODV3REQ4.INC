@@ -144,4 +144,6 @@
                   05  PTMODREQ-NINTIHOKATU          PIC X(05).
       *           小児かかりつけ診療
                   05  PTMODREQ-SYOUNIKAKARI         PIC X(05).
+      *H30.4      妊婦設定
+                  05  PTMODREQ-NINPUKBN             PIC X(05).
       *

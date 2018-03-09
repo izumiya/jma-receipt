@@ -4374,6 +4374,14 @@
                    MOVE    3               TO  SPA-GMN-CUR
            END-EVALUATE
       *
+      *H30.4
+      *    «•…ÿ∂Ë ¨•¡•ß•√•Ø
+           IF     (SPA-GMN-SEX         =   "1"  )
+              AND (SPA-GMN28-NINPUKBN  =   "1"  )
+              MOVE    "0"             TO  SPA-GMN28-NINPUKBN
+              MOVE    "2853"          TO  SPA-ERRCD
+              MOVE    3               TO  SPA-GMN-CUR
+           END-IF
            .
        4101-SEX-CHK-EXT.
            EXIT.

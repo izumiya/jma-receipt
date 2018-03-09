@@ -1012,6 +1012,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT
            END-IF
+      *H30.4
+      *    Ç¥ÉØ¶èÊ¬
+           IF      SPA-GMN28-NINPUKBN   =   ZERO
+               MOVE    SPACE           TO  SPA-GMN28-NINPUKBN
+           END-IF
+           MOVE    SPA-GMN28-NINPUKBN  TO  WRK-CONF-CDATA
+           MOVE    "NINPUKBN"          TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
       *H28.12
       *    »ØÆ³ÎÁÅù¼«Æ°»»Äê
            MOVE    ZERO                TO  IDH2

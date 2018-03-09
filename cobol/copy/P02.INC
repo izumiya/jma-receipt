@@ -364,6 +364,9 @@
                   05  P02-TEIMSG2.
                     06  P02-TEIMSG2-STYLE   PIC X(20).
                     06  P02-TEIMSG2-VALUE   PIC X(10).
+                  05  P02-TEIMSG3.
+                    06  P02-TEIMSG3-STYLE   PIC X(20).
+                    06  P02-TEIMSG3-VALUE   PIC X(10).
                   05  P02-BHR.
                     06  P02-BHR-STATE   PIC S9(9)   BINARY.
                     06  P02-BHR-LABEL   PIC X(4).
@@ -992,4 +995,6 @@
                     06  P02-TEXTDATA    PIC X(40).
                   05  P02-P028-AUTONAME3.
                     06  P02-TEXTDATA    PIC X(40).
+                  05  P02-P028-NINPUKBN.
+                    06  P02-VALUE   PIC X.
 

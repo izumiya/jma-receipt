@@ -3271,9 +3271,9 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P02_DEATHKBN</name>
-            <x>704</x>
+            <x>716</x>
             <y>8</y>
-            <width>76</width>
+            <width>70</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>True</can_focus>
@@ -3300,7 +3300,7 @@
           <widget>
             <class>GtkLabel</class>
             <name>label2010</name>
-            <x>640</x>
+            <x>656</x>
             <y>8</y>
             <width>62</width>
             <height>24</height>
@@ -3320,34 +3320,34 @@
             <name>TEIMSG</name>
             <x>462</x>
             <y>8</y>
-            <width>138</width>
+            <width>140</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
-            <xalign>0.5</xalign>
+            <xalign>0</xalign>
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label></label>
+            <label>12345678901234568</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
           <widget>
             <class>GtkLabel</class>
             <name>TEIMSG2</name>
-            <x>592</x>
+            <x>614</x>
             <y>8</y>
-            <width>48</width>
+            <width>54</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
-            <xalign>0.5</xalign>
+            <xalign>0</xalign>
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label></label>
+            <label>123456</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
@@ -4291,6 +4291,24 @@
             <ypad>0</ypad>
             <label>ｇ</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>TEIMSG3</name>
+            <x>574</x>
+            <y>8</y>
+            <width>60</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label></label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
         </widget>
@@ -12444,7 +12462,7 @@
             <class>GtkHSeparator</class>
             <name>hseparator5</name>
             <x>580</x>
-            <y>352</y>
+            <y>316</y>
             <width>418</width>
             <height>20</height>
             <visible>True</visible>
@@ -12457,9 +12475,9 @@
             <class>GtkVSeparator</class>
             <name>vseparator1</name>
             <x>572</x>
-            <y>360</y>
+            <y>328</y>
             <width>20</width>
-            <height>268</height>
+            <height>304</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -12469,8 +12487,8 @@
           <widget>
             <class>GtkLabel</class>
             <name>label54</name>
-            <x>600</x>
-            <y>372</y>
+            <x>596</x>
+            <y>388</y>
             <width>200</width>
             <height>24</height>
             <visible>True</visible>
@@ -12488,8 +12506,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_CHKHKTBYO1</name>
-            <x>664</x>
-            <y>394</y>
+            <x>616</x>
+            <y>412</y>
             <width>140</width>
             <height>24</height>
             <visible>True</visible>
@@ -12518,8 +12536,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_CHKHKTBYO2</name>
-            <x>836</x>
-            <y>394</y>
+            <x>708</x>
+            <y>412</y>
             <width>140</width>
             <height>24</height>
             <visible>True</visible>
@@ -12548,8 +12566,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_CHKHKTBYO3</name>
-            <x>664</x>
-            <y>420</y>
+            <x>792</x>
+            <y>412</y>
             <width>140</width>
             <height>24</height>
             <visible>True</visible>
@@ -12578,9 +12596,9 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_CHKHKTBYO4</name>
-            <x>836</x>
-            <y>420</y>
-            <width>140</width>
+            <x>900</x>
+            <y>412</y>
+            <width>110</width>
             <height>24</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12608,8 +12626,8 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_NNCHIKBN</name>
-            <x>616</x>
-            <y>464</y>
+            <x>596</x>
+            <y>450</y>
             <width>206</width>
             <height>24</height>
             <visible>True</visible>
@@ -12638,7 +12656,7 @@
           <widget>
             <class>GtkCheckButton</class>
             <name>P028_SYOUNIKBN</name>
-            <x>616</x>
+            <x>596</x>
             <y>488</y>
             <width>216</width>
             <height>24</height>
@@ -13129,6 +13147,36 @@
             <label></label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkCheckButton</class>
+            <name>P028_NINPUKBN</name>
+            <x>596</x>
+            <y>352</y>
+            <width>110</width>
+            <height>24</height>
+            <visible>True</visible>
+            <sensitive>True</sensitive>
+            <can_focus>True</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <label>妊婦</label>
+            <relief>GTK_RELIEF_NORMAL</relief>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <response_id>0</response_id>
+            <active>False</active>
+            <draw_indicator>True</draw_indicator>
+            <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
+              <name>clicked</name>
+              <handler>send_event</handler>
+              <data>CLICKED</data>
+              <after>True</after>
+            </signal>
           </widget>
         </widget>
         <widget>

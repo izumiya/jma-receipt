@@ -116,6 +116,7 @@
       *  04.08.00    NACL-多々納  16/05/XX  一般名表示対応
       *  04.08.00    NACL-多々納  16/06/XX  中心静脈（植入型カテーテル）対応
       *  04.08.00    NACL-多々納  16/12/XX  電子お薬手帳連携対応
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2711,8 +2712,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
-      *H29.10
             IF   (IDX              >=  IDX-STR3 )
+      *H29.10
              OR  (SPA-COM-KZMFLG (IDX) =   "C"  )
                MOVE    SPACE           TO  SPA-COM-KZMFLGAREA (IDX)
                MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG (IDX)
@@ -13750,6 +13751,21 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "(銘柄名)"          TO  K02-MODE2-VALUE
                END-IF
            END-IF
+      *
+      *H30.4
+           IF     (SPA-SRYYMD          >=  "20180401")
+               IF     (SPA-NINPUKBN-ARI    =   1    )
+                   MOVE    "（妊婦）"      TO  K02-MODE3-VALUE
+                   MOVE    "blue"          TO  K02-MODE3-STYLE
+               ELSE
+      *            手入力で妊婦
+                   IF     (SPA-NINPUKBN-IN     =   1    )
+                   MOVE    "（妊婦）"      TO  K02-MODE3-VALUE
+                   MOVE    "black"         TO  K02-MODE3-STYLE
+                   END-IF
+               END-IF
+           END-IF
+      *TEST
       *
       *    MOVE    SPA-DRCD-NAME       TO  K02-DRNAME
       *    ドクター

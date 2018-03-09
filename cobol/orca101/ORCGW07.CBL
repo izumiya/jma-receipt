@@ -139,6 +139,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/03/XX  ÄûÀµ»þ¤Î¼«Æ°È¯À¸¡Ê½èÊýÎÁ¡ËÄÉ²Ã
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/04/XX  ÅêÌô£³£°ÆüÄ¶¥Á¥§¥Ã¥¯ÄÉ²Ã
       *  04.08.00    NACL-Â¿¡¹Ç¼  17/07/XX  ¿´¿ÈÎÅË¡£²£°Ì¤Ëþ²Ã»»¶èÊ¬ÄÉ²Ã
+      *  04.08.00    NACL-Â¿¡¹Ç¼  18/03/XX  £È£³£°Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -190,7 +191,15 @@
                        09  SPA-GMN-JIKANTOKU-NYU-G.
                            11  SPA-GMN-JIKANTOKU-NYU   PIC X(01).
                            11  SPA-GMN-FN              PIC X(01).
-                           11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(10).
+      **                   11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(10).
+                           11  SPA-GMN-JIKANTOKU-NYUMEI    PIC X(28).
+      *H30.4
+      *                »ºÉØ¿Í²ÊÆÃÎãÂÐ±þ
+                       09  SPA-GMN-JIKANTOKU-NYU-COMB.
+                           11  SPA-GMN-JIKANTOKU-NYU-LIST  PIC X(30)
+                                                       OCCURS   9.
+                       09  SPA-GMN-JIKANTOKU-MAX       PIC 9(02).
+      *
       *                ²èÁü¿ÇÃÇ´ÉÍý²Ã»»£±
                        09  SPA-GMN-GAZOUKSN1-G.
                            11  SPA-GMN-GAZOUKSN1       PIC X(01).
@@ -1930,6 +1939,15 @@
            MOVE    "1 ¥Á¥§¥Ã¥¯¤¹¤ë"
                                        TO  SPA-GMN-SHOHOU30CHK-LIST (2)
            MOVE    2                   TO  SPA-GMN-SHOHOU30CHK-MAX
+      *H30.4
+      *    »þ´Ö³°²Ã»»ÆÃÎã »ºÉØ¿Í²ÊÆÃÎãÂÐ±þ
+           MOVE    "0 »»Äê¤·¤Ê¤¤"      TO  SPA-GMN-JIKANTOKU-NYU-LIST(1)
+           MOVE    "1 »»Äê¤¹¤ë"        TO  SPA-GMN-JIKANTOKU-NYU-LIST(2)
+           MOVE    "2 »»Äê¤¹¤ë¡Ê¾®»ù²Ê¤Î¤ß¡Ë"
+                                       TO  SPA-GMN-JIKANTOKU-NYU-LIST(3)
+           MOVE    "3 »»Äê¤¹¤ë¡Ê»º¡¦»ºÉØ¿Í²Ê¤Î¤ß¡Ë"
+                                       TO  SPA-GMN-JIKANTOKU-NYU-LIST(4)
+           MOVE    4                   TO  SPA-GMN-JIKANTOKU-MAX
       *
       *
       *    ÉÂÌ¾É½¼¨¶èÊ¬
@@ -2818,19 +2836,22 @@
            END-IF
       *
       *    »þ´Ö³°²Ã»»ÆÃÎãÆýÍÄ»ù
+      *H30.4
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDY         FROM    1   BY  1
-                   UNTIL   IDY         >   SPA-GMN-DATA-MAX
+                   UNTIL   IDY         >   SPA-GMN-JIKANTOKU-MAX
                IF      SPA-GMN-JIKANTOKU-NYU
-                                       =   SPA-GMN-DATAL(IDY)
-                   MOVE    SPA-GMN-DATALST(IDY)
+                                       =   SPA-GMN-JIKANTOKU-NYU-LIST
+                                                (IDY)(1:1)
+                   MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(IDY)
                                            TO SPA-GMN-JIKANTOKU-NYU-G
                    MOVE    1                   TO  FLG-OK
-                   MOVE    SPA-GMN-DATA-MAX    TO  IDY
+                   MOVE    SPA-GMN-JIKANTOKU-MAX   TO  IDY
                END-IF
            END-PERFORM
            IF      FLG-OK              =   ZERO
-               MOVE    SPA-GMN-DATALST(01) TO SPA-GMN-JIKANTOKU-NYU-G
+               MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(01)
+                                       TO SPA-GMN-JIKANTOKU-NYU-G
            END-IF
       *
       *    ²èÁü¿ÇÃÇ´ÉÍý²Ã»»
@@ -6867,10 +6888,22 @@
       *
            MOVE    ZERO                TO  FLG-OK
       *
+      *    PERFORM VARYING     IDY     FROM    1   BY  1
+      *            UNTIL       IDY     >   SPA-GMN-DATA-MAX
+      *        IF      SPA-GMN-JIKANTOKU-NYU   =   SPA-GMN-DATAL(IDY)
+      *            MOVE    SPA-GMN-DATALST (IDY)
+      *                                    TO  SPA-GMN-JIKANTOKU-NYU-G
+      *            MOVE    1               TO  FLG-OK
+      *        END-IF
+      *    END-PERFORM
+      *
            PERFORM VARYING     IDY     FROM    1   BY  1
-                   UNTIL       IDY     >   SPA-GMN-DATA-MAX
-               IF      SPA-GMN-JIKANTOKU-NYU   =   SPA-GMN-DATAL(IDY)
-                   MOVE    SPA-GMN-DATALST (IDY)
+                   UNTIL      (IDY     >   SPA-GMN-JIKANTOKU-MAX)
+                           OR (FLG-OK  =   1         )
+               IF      SPA-GMN-JIKANTOKU-NYU
+                                       =   SPA-GMN-JIKANTOKU-NYU-LIST
+                                                        (IDY)(1:1)
+                   MOVE    SPA-GMN-JIKANTOKU-NYU-LIST (IDY)
                                            TO  SPA-GMN-JIKANTOKU-NYU-G
                    MOVE    1               TO  FLG-OK
                END-IF
@@ -11592,12 +11625,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    »þ´Ö³°²Ã»»ÆÃÎãÆýÍÄ»ù
            MOVE    SPA-GMN-JIKANTOKU-NYU-G TO  W07-JIKANTOKUNYU
+      *    PERFORM VARYING IDY     FROM    1   BY  1
+      *            UNTIL   IDY     >       SPA-GMN-DATA-MAX
+      *        MOVE    SPA-GMN-DATALST(IDY)
+      *                                TO  W07-JIKANTOKUNYU-ITEM(IDY)
+      *    END-PERFORM
+      ***  MOVE    SPA-GMN-DATA-MAX    TO  W07-JIKANTOKUNYU-COUNT
            PERFORM VARYING IDY     FROM    1   BY  1
-                   UNTIL   IDY     >       SPA-GMN-DATA-MAX
-               MOVE    SPA-GMN-DATALST(IDY)
+                   UNTIL   IDY     >       SPA-GMN-JIKANTOKU-MAX
+               MOVE    SPA-GMN-JIKANTOKU-NYU-LIST(IDY)
                                        TO  W07-JIKANTOKUNYU-ITEM(IDY)
            END-PERFORM
-           MOVE    SPA-GMN-DATA-MAX    TO  W07-JIKANTOKUNYU-COUNT
+           MOVE    SPA-GMN-JIKANTOKU-MAX    TO  W07-JIKANTOKUNYU-COUNT
       *
       *    ²èÁü¿ÇÃÇ´ÉÍý²Ã»»£±¡Ê¼Ì¿¿¿ÇÃÇ¡Ë
            MOVE    SPA-GMN-GAZOUKSN1-G TO  W07-GAZOUKSN1

@@ -2471,7 +2471,7 @@
             <name>JIKANTOKUNYU_COMB</name>
             <x>320</x>
             <y>256</y>
-            <width>120</width>
+            <width>180</width>
             <height>24</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -2948,7 +2948,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>時間外加算（小児科特例）</label>
+            <label>時間外加算（小児・産・産婦人科特例）</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>

@@ -1439,6 +1439,19 @@
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+      *H30.4
+               WHEN    "2853"
+                   STRING  "性別が男性です。"
+                           "妊婦の設定は解除しました。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K287"
+                   STRING  "警告！"
+                           "１６歳未満です。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
       *
       *        患者番号取得エラー
                WHEN    "8000"

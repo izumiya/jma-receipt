@@ -98,6 +98,11 @@
                 05  PTMODREQ-COMMENT-1            PIC  X(200).
       *         コメント２
                 05  PTMODREQ-COMMENT-2            PIC  X(200).
+      *H30.4
+      *         患者個別情報
+                05  PTMODREQ-PTCONF-INFO.
+      *             妊婦設定
+                    07  PTMODREQ-NINPUKBN             PIC X(05).
       *
       *         保険情報
                 05  PTMODREQ-INSURANCE-INFO-G.

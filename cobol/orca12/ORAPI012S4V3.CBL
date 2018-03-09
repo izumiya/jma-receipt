@@ -29,6 +29,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.08.00    NACL-多々納  17/05/XX  境界層該当対応
+      *  05.00.00    NACL-多々納  18/03/XX  妊婦設定対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -99,10 +100,11 @@
            03  IDD                     PIC 9(04).
            03  IDD2                    PIC 9(04).
            03  IDF                     PIC 9(04).
-           03  IDX3                     PIC 9(04).
-           03  IDX-T                    PIC 9(04).
-           03  IDX-N                    PIC 9(04).
+           03  IDX3                    PIC 9(04).
+           03  IDX-T                   PIC 9(04).
+           03  IDX-N                   PIC 9(04).
       *
+           03  IDXE                    PIC 9(04).
       *    カウント領域
       *01  CNT-AREA.
       *
@@ -162,6 +164,10 @@
            03  WRK-ERRCD-TBLG.
                05  WRK-ERRCD-TBL       OCCURS   100.
                    07  WRK-ERRCD-T         PIC X(02).
+      *
+           03  WRK-KEICD-TBLG.
+               05  WRK-KEICD-TBL       OCCURS   10.
+                   07  WRK-KEICD-T         PIC X(02).
       *
       *
       *    認定範囲名称
@@ -760,10 +766,30 @@
                MOVE    WRK-ERRCD-G         TO  PTMODRES-API-RESULT
                MOVE    WRK-ERRMSG          TO  PTMODRES-API-RESULT-MSG
            END-IF
+      *H30.4
+           IF     (WRK-ERRCD           =   ZERO )
+              AND (IDX-WAR             >   ZERO )
+      *        ワーニング有
+               MOVE    "W"                 TO  WRK-ERRKBN
+               IF      FLG-SYORI           =   2
+                   MOVE    SPACE               TO  WRK-OKMSG
+                   STRING  "登録処理終了。"
+                           "警告メッセージがあります。"
+                           "確認して下さい。"
+                                           DELIMITED  BY  SIZE
+                                           INTO  WRK-OKMSG
+                   END-STRING
+               END-IF
+               MOVE    WRK-ERRCD-G         TO  PTMODRES-API-RESULT
+               MOVE    WRK-OKMSG           TO  PTMODRES-API-RESULT-MSG
+           END-IF
       *
            IF     (IDX-ERR             >   ZERO )
+      *H30.4
+              OR  (IDX-WAR             >   ZERO )
                PERFORM 290-ERROR-HEN-SEC
            END-IF
+      *
       *
            IF      APILST06-BODY     NOT =   LOW-VALUE
                DISPLAY "MDCRES-OBJECT not low_value"
@@ -1856,6 +1882,14 @@
                MOVE    "True"          TO  PTMODRES-SYOUNIKAKARI
            ELSE
                MOVE    "False"         TO  PTMODRES-SYOUNIKAKARI
+           END-IF
+      *
+      *H30.4
+      *    妊婦設定
+           IF     SPA-GMN28-NINPUKBN   =   "1"
+               MOVE    "True"          TO  PTMODRES-NINPUKBN
+           ELSE
+               MOVE    "False"         TO  PTMODRES-NINPUKBN
            END-IF
       *
            .
@@ -3468,6 +3502,9 @@
            END-PERFORM
            MOVE    PTMODREQ-NINTIHOKATU    TO  PTMODRES-NINTIHOKATU
            MOVE    PTMODREQ-SYOUNIKAKARI   TO  PTMODRES-SYOUNIKAKARI
+      *H30.4
+      *    妊婦設定
+           MOVE    PTMODREQ-NINPUKBN   TO  PTMODRES-NINPUKBN
       *
       *    出生時体重
            MOVE    ZERO                TO  WRK-WEIGHT
@@ -3530,6 +3567,34 @@
                                                             (IDX-ERR)
                    END-IF
            END-EVALUATE
+      *H30.4
+      *    妊婦設定
+           EVALUATE    PTMODREQ-NINPUKBN
+               WHEN    "True"
+      *            妊婦
+                   IF      SPA-GMN-SEX         =   "1"
+      *                男性はエラー
+                       IF      IDX-ERR             <   100
+                           ADD     1               TO  IDX-ERR
+                           MOVE    "66"            TO  WRK-ERRCD-T
+                                                            (IDX-ERR)
+                       END-IF
+                   END-IF
+      *           １６歳未満は警告
+                   IF     (SPA-NAI-NENREI-YY   <   16 )
+                     AND  (SPA-GMN-SEX         =   "2")
+                       ADD     1               TO  IDX-WAR
+                       MOVE    "K6"            TO  WRK-KEICD-T (IDX-WAR)
+                   END-IF
+               WHEN    "False"
+                   CONTINUE
+               WHEN    OTHER
+                   IF      IDX-ERR             <   100
+                       ADD     1               TO  IDX-ERR
+                       MOVE    "65"            TO  WRK-ERRCD-T
+                                                            (IDX-ERR)
+                   END-IF
+           END-EVALUATE
       *
            .
        200252-PTCONF-CHK-EXT.
@@ -3555,6 +3620,11 @@
       *    小児かかりつけ診療
            MOVE    SPACE               TO  WRK-CONF-CDATA
            MOVE    "SYOUNIKAKARI"      TO  WRK-CONF-CKEY
+           PERFORM 2002521-PTCONF-DBSYORI-SEC
+      *H30.4
+      *    妊婦設定
+           MOVE    SPACE               TO  WRK-CONF-CDATA
+           MOVE    "NINPUKBN"          TO  WRK-CONF-CKEY
            PERFORM 2002521-PTCONF-DBSYORI-SEC
       *
            .
@@ -3618,6 +3688,18 @@
                MOVE    SPACE               TO  WRK-CONF-CDATA
            END-IF
            MOVE    "SYOUNIKAKARI"          TO  WRK-CONF-CKEY
+           PERFORM 2002521-PTCONF-DBSYORI-SEC
+           IF      WRK-ERRCD       NOT =   SPACE
+               GO      TO      200252-PTCONF-UPDATE-EXT
+           END-IF
+      *H30.4
+      *    妊婦設定
+           IF      PTMODREQ-NINPUKBN       =   "True"
+               MOVE    "1"                 TO  WRK-CONF-CDATA
+           ELSE
+               MOVE    SPACE               TO  WRK-CONF-CDATA
+           END-IF
+           MOVE    "NINPUKBN"          TO  WRK-CONF-CKEY
            PERFORM 2002521-PTCONF-DBSYORI-SEC
            IF      WRK-ERRCD       NOT =   SPACE
                GO      TO      200252-PTCONF-UPDATE-EXT
@@ -3779,6 +3861,7 @@
       ****************************************************************
        290-ERROR-HEN-SEC           SECTION.
       *
+           MOVE    ZERO                TO  IDXE
            PERFORM VARYING   IDX       FROM   1   BY  1
                    UNTIL    (IDX       >   50     )
                       OR    (WRK-ERRCD-T (IDX)    =   SPACE )
@@ -3786,10 +3869,26 @@
                PERFORM 8901-PTERRCD-SETAPI-SEC
                MOVE    "AP"                TO  SPA-ERRCD(1:2)
                MOVE    WRK-ERRCD-T (IDX)   TO  SPA-ERRCD(3:2)
+               ADD     1                   TO  IDXE
                MOVE    SPA-ERRCD           TO  PTMODRES-ERROR
-                                                           (IDX)
+                                                           (IDXE)
                MOVE    WRK-ERRMSG          TO  PTMODRES-ERROR-MSG
-                                                           (IDX)
+                                                           (IDXE)
+           END-PERFORM
+      *
+      *    ワーニング
+           PERFORM VARYING   IDX       FROM   1   BY  1
+                   UNTIL    (IDX       >   50     )
+                      OR    (WRK-KEICD-T (IDX)    =   SPACE )
+               MOVE    WRK-KEICD-T (IDX)   TO  WRK-ERRCD
+               PERFORM 8901-PTERRCD-SETAPI-SEC
+               MOVE    "AP"                TO  SPA-ERRCD(1:2)
+               MOVE    WRK-KEICD-T (IDX)   TO  SPA-ERRCD(3:2)
+               ADD     1                   TO  IDXE
+               MOVE    SPA-ERRCD           TO  PTMODRES-ERROR
+                                                           (IDXE)
+               MOVE    WRK-ERRMSG          TO  PTMODRES-ERROR-MSG
+                                                           (IDXE)
            END-PERFORM
            .
        290-ERROR-HEN-EXT.
@@ -4397,6 +4496,16 @@
                                                TO  WRK-ERRMSG
            WHEN    "64"
                MOVE    "小児かかりつけ診療区分エラー"
+                                               TO  WRK-ERRMSG
+      *H30.4
+           WHEN    "65"
+               MOVE    "妊婦設定エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "66"
+               MOVE    "性別が男性です。妊婦設定はできません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "K6"
+               MOVE    "警告！１６歳未満です。"
                                                TO  WRK-ERRMSG
            END-EVALUATE
             .

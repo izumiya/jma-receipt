@@ -37,6 +37,7 @@
       * 04.08.00     NACL-多々納  17/04/XX  入金方法、状態等追加
       *                                     保険組合せ非表示追加
       * 04.08.00     NACL-多々納  17/05/XX  テスト患者・死亡区分追加
+      * 04.08.00     NACL-多々納  18/03/XX  妊婦設定追加
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -793,6 +794,36 @@
                END-PERFORM
                IF      FLG-CONFCHK         =   ZERO
                    MOVE    SPACE           TO  PTRES-COMMUNITY-DISEASE
+               END-IF
+           END-IF
+      *
+      *H30.4
+      *    妊婦設定
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    "NINPUKBN"          TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-PTCONF          =   ZERO
+               IF      PTCONF-CDATA(1:1)   =   "1"
+                   MOVE    "True"          TO  PTRES-NINPUKBN
                END-IF
            END-IF
       *

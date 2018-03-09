@@ -95,10 +95,10 @@
                     06  W07-CHOKICHK-ITEM    PIC X(22)   OCCURS  2.
                   05  W07-JIKANTOKUNYU-COMB.
                     06  W07-JIKANTOKUNYU.
-                      07  W07-VALUE   PIC X(12).
+                      07  W07-VALUE   PIC X(30).
                     06  W07-JIKANTOKUNYU-COUNT   PIC S9(9)   BINARY.
                     06  W07-JIKANTOKUNYU-ITEM
-                            PIC X(12)   OCCURS  2 TIMES.
+                            PIC X(30)   OCCURS  9 TIMES.
                   05  W07-GAZOUKSN1-COMB.
                     06  W07-GAZOUKSN1.
                       07  W07-VALUE   PIC X(12).

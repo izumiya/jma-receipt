@@ -31,6 +31,7 @@
       * 04.07.00     NACL-多々納  13/11/01  API保険・公費追加対応
       *                                     保険組合せ番号追加他
       * 04.07.00     NACL-多々納  15/01/XX  性別・生年月日変更対応
+      * 04.08.00     NACL-多々納  18/03/XX  妊婦設定対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -64,6 +65,7 @@
            03  FLG-PTNYUINRRK          PIC 9(01).
            03  FLG-HKNJAINF            PIC 9(01).
            03  FLG-KYUSEIRRK           PIC 9(01).
+           03  FLG-PTCONF              PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-HKNEND              PIC 9(01).
@@ -150,6 +152,12 @@
       *
            03  WRK-OPID                PIC X(16).
            03  HZN-SPA-OPID            PIC X(16).
+      *H30.4
+      *    患者個別設定　設定ＫＥＹ
+           03  WRK-CONF-CKEY           PIC  X(25).
+      *                  設定データ
+           03  WRK-CONF-CDATA          PIC  X(10).
+      *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
            03  WRK-MAE-INPUT           PIC X(100).
@@ -312,6 +320,11 @@
       *    患者病名
        01  PTBYOMEI-REC.
            COPY    "CPPTBYOMEI.INC".
+      *
+      *H30.4
+      *    患者個別設定テーブル
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *    パラメタテーブル
        01  PARA-REC.
@@ -763,6 +776,8 @@
       *    コメント
            MOVE    PTMODREQ-COMMENT-1      TO  PTMODRES-COMMENT-1
            MOVE    PTMODREQ-COMMENT-2      TO  PTMODRES-COMMENT-2
+      *    妊婦設定
+           MOVE    PTMODREQ-NINPUKBN       TO  PTMODRES-NINPUKBN
       *
       *    保険情報（登録のみ）
            IF      FLG-SYORI           =   1
@@ -1290,6 +1305,12 @@
            IF     (WRK-ERRCD           =   SPACE ) 
            AND    (SPA-ERRCD           =   SPACE )
                PERFORM 200211-OFFICETEL-CHK-SEC
+           END-IF
+      *H30.4
+      *    妊婦設定
+           IF     (WRK-ERRCD           =   SPACE ) 
+           AND    (SPA-ERRCD           =   SPACE )
+               PERFORM 200211-NINPUKBN-CHK-SEC
            END-IF
       *
            IF     (WRK-ERRCD           =   SPACE ) 
@@ -1951,6 +1972,35 @@
        200211-OFFICETEL-CHK-EXT.
            EXIT.
       *
+      *H30.4
+      *****************************************************************
+      *    妊婦設定チェック処理
+      *****************************************************************
+       200211-NINPUKBN-CHK-SEC        SECTION.
+      *
+      *    妊婦設定
+           EVALUATE    PTMODREQ-NINPUKBN
+               WHEN    "True"
+      *            妊婦
+                   MOVE    "1"             TO  SPA-GMN28-NINPUKBN
+                   IF      SPA-GMN-SEX         =   "1"
+      *                男性はエラー
+                       MOVE    "34"            TO  WRK-ERRCD
+                   END-IF
+      *           １６歳未満は警告
+                   IF     (SPA-NAI-NENREI-YY   <   16 )
+                     AND  (WRK-ERRCD           =   SPACE )
+                       ADD     1               TO  IDX-W
+                       MOVE    "K5"            TO  WRK-KEICD (IDX-W)
+                   END-IF
+               WHEN    OTHER
+      *            妊婦解除
+                   MOVE    "0"             TO  SPA-GMN28-NINPUKBN
+           END-EVALUATE
+           .
+       200211-NINPUKBN-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    保険情報更新処理
       *****************************************************************
@@ -2240,12 +2290,13 @@
                    CONTINUE
                ELSE
                    MOVE    1               TO  FLG-DATA
+      *            公費編集
       *H29.11
                    IF      SPA-PTKOH-MAX       >=  TBL-MAX-KOH
                        MOVE    "65"            TO  WRK-ERRCD
                    ELSE
       *!!
-      *            公費編集
+      *
                    ADD     1               TO  SPA-PTKOH-MAX
                    MOVE    SPA-PTKOH-MAX   TO  IDY
       *            新規の時公費ＩＤ取得
@@ -2412,6 +2463,15 @@
       *        登録
                PERFORM 200232-PTINF-INSERT-SEC
            END-IF
+      *H30.4
+      *    妊婦設定処理
+           IF     WRK-ERRCD            =   SPACE
+      *        登録
+               IF      SPA-GMN28-NINPUKBN   =   "1"
+                   PERFORM 200234-NINPUKBN-SYORI-SEC
+               END-IF
+           END-IF
+      *
       *    保険情報編集処理
            IF     WRK-ERRCD            =   SPACE
       *        登録
@@ -2514,7 +2574,7 @@
            IF      MCP-RC          NOT =   ZERO
                DISPLAY "API PTINF INS ERR:" MCP-RC
                            ",KEY:" PTINF-KEY
-               MOVE    "90"             TO  WRK-ERRCD
+               MOVE    "44"             TO  WRK-ERRCD
            END-IF
       *
            .
@@ -2721,6 +2781,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    更新処理
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20023-PTINFUPD-SYORI-SEC
+           END-IF
+      *H30.4
+      *    妊婦設定処理
+           IF     WRK-ERRCD            =   SPACE
+               PERFORM 200234-NINPUKBN-SYORI-SEC
            END-IF
       *
       *    CLAIM送信チェック
@@ -2933,6 +2998,147 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        20021-PTMODRES-HEN-EXT.
            EXIT.
+      *
+      *H30.4
+      *****************************************************************
+      *    妊婦設定処理
+      *****************************************************************
+       200234-NINPUKBN-SYORI-SEC     SECTION.
+      *
+      *    妊婦区分
+           IF      SPA-GMN28-NINPUKBN   =   ZERO
+               MOVE    SPACE           TO  SPA-GMN28-NINPUKBN
+           END-IF
+           MOVE    SPA-GMN28-NINPUKBN  TO  WRK-CONF-CDATA
+           MOVE    "NINPUKBN"          TO  WRK-CONF-CKEY
+           PERFORM 2002341-PTCONF-DBSYORI-SEC
+           .
+       200234-NINPUKBN-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定登録処理
+      *****************************************************************
+       2002341-PTCONF-DBSYORI-SEC        SECTION.
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    WRK-CONF-CKEY       TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PTCONF-REC
+                   MOVE    ZERO            TO  FLG-PTCONF
+               ELSE
+                   MOVE    1               TO  FLG-PTCONF
+                   INITIALIZE                  PTCONF-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    ＤＢあり
+           IF      FLG-PTCONF          =   ZERO
+               IF      WRK-CONF-CDATA      =   SPACE
+      *            ＤＢ削除
+                   MOVE    PTCONF-REC          TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_ptconf"        TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+                   IF      MCP-RC          NOT =   ZERO
+                       DISPLAY "API PTCONF DEL ERR:" MCP-RC
+                               ",KEY:" PTCONF-KEY
+                       MOVE    "83"             TO  WRK-ERRCD
+                   END-IF
+               ELSE
+      *            ＤＢ更新
+                   PERFORM 21111-PTCONF-UPS-SEC
+               END-IF
+           ELSE
+               IF      WRK-CONF-CDATA  NOT =   SPACE
+      *            登録
+                   PERFORM 21112-PTCONF-INS-SEC
+               END-IF
+           END-IF
+      *
+           .
+       2111-PTCONF-DBSYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定データ登録処理
+      *****************************************************************
+       21112-PTCONF-INS-SEC        SECTION.
+      *
+           INITIALIZE                      PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    WRK-CONF-CKEY       TO  PTCONF-CKEY
+      *    入力値編集
+           MOVE    WRK-CONF-CDATA      TO  PTCONF-CDATA
+      *    作成年月日
+           MOVE    SMCNDATE-YMD        TO  PTCONF-CREYMD
+           MOVE    SMCNDATE-YMD        TO  PTCONF-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTCONF-UPHMS
+           MOVE    WRK-OPID            TO  PTCONF-OPID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "API PTCONF INS ERR:" MCP-RC
+                           ",KEY:" PTCONF-KEY
+               MOVE    "45"             TO  WRK-ERRCD
+           END-IF
+           .
+       21112-PTCONF-INS-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定データ更新処理
+      *****************************************************************
+       21111-PTCONF-UPS-SEC        SECTION.
+      *
+      *    入力値編集
+           MOVE    WRK-CONF-CDATA      TO  PTCONF-CDATA
+      *    更新年月日
+           MOVE    SMCNDATE-YMD        TO  PTCONF-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTCONF-UPHMS
+           MOVE    WRK-OPID            TO  PTCONF-OPID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "API PTCONF UPD ERR:" MCP-RC
+                           ",KEY:" PTCONF-KEY
+               MOVE    "54"             TO  WRK-ERRCD
+           END-IF
+           .
+       21111-PTCONF-UPS-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    保険組合せ編集処理
@@ -3400,7 +3606,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "PUTG"              TO  MCP-STATUS
                CALL    "ORCGP02W1"     USING   MCPAREA
                                                SPAAREA
-                                                LINKAREA
+                                               LINKAREA
                                                SCRAREA
                MOVE    SPA-COMMON          TO  SPA-AREA
                MOVE    SPA-FREE            TO  SPA-P02SCRAREA
@@ -4086,6 +4292,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            WHEN    "33"
                MOVE    "番号全角エラー"
                                                TO  WRK-ERRMSG
+      *H30.4
+           WHEN    "34"
+               MOVE    "妊婦設定はできません。"
+                                               TO  WRK-ERRMSG
+      *
            WHEN    "39"
                MOVE    "労災・自賠責保険は登録できません。"
                                                TO  WRK-ERRMSG
@@ -4109,6 +4320,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            WHEN    "43"
                MOVE    "患者番号登録済みエラー"
                                                TO  WRK-ERRMSG
+      *H30.4
+           WHEN    "44"
+               MOVE    "患者情報登録エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "45"
+               MOVE    "患者個別情報登録エラー"
+                                               TO  WRK-ERRMSG
       *更新
            WHEN    "50"
                STRING  "患者登録内容が一致しません。"
@@ -4124,6 +4342,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  WRK-ERRMSG
            WHEN    "53"
                MOVE    "更新区分エラー"
+                                               TO  WRK-ERRMSG
+           WHEN    "54"
+               MOVE    "患者個別情報更新エラー"
                                                TO  WRK-ERRMSG
       *削除
            WHEN    "81"
@@ -4192,6 +4413,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-STRING
            WHEN    "K4"
                STRING  "保険組合せが２０件以上存在します。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+      *H30.4
+           WHEN    "K5"
+               STRING  "警告！"
+                       "１６歳未満です。"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-ERRMSG
                END-STRING

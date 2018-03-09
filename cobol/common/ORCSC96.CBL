@@ -618,9 +618,9 @@
                WHEN    "0112"
                    MOVE    "小児科特例時間外区分は算定できません。"
                                        TO  SPA-ERRMSG
-               WHEN    "0113"
-                   MOVE    "小児科特例時間外は算定できません。"
-                                       TO  SPA-ERRMSG
+      *        WHEN    "0113"
+      *            MOVE    "小児科特例時間外は算定できません。"
+      *                                TO  SPA-ERRMSG
                WHEN    "0130"
                    STRING  "特定薬剤治療管理料が３月目以内です。"
                            "算定できません。"
@@ -1183,6 +1183,13 @@
                WHEN    "0600"
                    STRING  "コンタクトレンズ検査料算定時に算定できない"
                            "検査です。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H30.4
+               WHEN    "0604"
+                   STRING  "コンタクトレンズ検査料算定時に"
+                           "算定できません"
                                        DELIMITED   BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
@@ -2233,6 +2240,97 @@
                            "別剤として入力して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
+                   END-STRING
+      *
+      *H30.2
+               WHEN    "0701"
+                   STRING  "撮影料の合計数量と違います。"
+                           "同じ数量を入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K701"
+                   STRING  "警告！撮影料の合計数量と違います。"
+                           "同じ数量を入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
+      *H30.4
+               WHEN    "0181"
+                   STRING  "妊婦加算と初・再診料が違います。"
+                           "正しい加算を入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0182"
+                   STRING  "６歳未満です。妊婦加算の入力はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0183"
+                   STRING  "男性です。妊婦加算の入力はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0184"
+                   STRING  "既に妊婦加算の入力があります。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0113"
+                   STRING  "小児・産・産婦人科特例時間外は"
+                           "算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
+               WHEN    "0281"
+                   STRING  "分割調剤は院外投薬で入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0282"
+                   STRING  "分割調剤は１剤に１つ入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0283"
+                   STRING  "分割調剤は３０日以上で入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0284"
+                   STRING  "分割調剤の日数入力が違います。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0285"
+                   STRING  "分割調剤の合計日数と投薬日数が違います。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
+               WHEN    "K120"
+                   STRING  "警告！"
+                           "皮膚保湿薬の入力があります。"
+                           "確認して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K274"
+                   STRING  "警告！"
+                           "悪性腫瘍病理組織標本加算の"
+                           "算定できる手術の算定がありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
+               WHEN    "K503"
+                   STRING  "警告！術中脳灌流モニタリング加算の"
+                           "算定できる手術ではありません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
                    END-STRING
       *
            END-EVALUATE

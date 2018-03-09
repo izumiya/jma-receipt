@@ -76,6 +76,7 @@
       * 04.08.00     NACL-多々納  14/10/23  連続挿入対応
       * 04.08.00     NACL-多々納  17/01/17  翌月入院料チェック対応
       * 04.08.00     NACL-多々納  17/05/XX  公費期間表示、メモ対応
+      * 04.08.00     NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -11211,6 +11212,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    "red"               TO  K02N-KOHMSG-STYLE
                MOVE    SPA-GMN-KOHMSG      TO  K02N-KOHMSG-DATA
+           END-IF
+      *
+      *H30.4
+           IF     (SPA-SRYYMD          >=  "20180401")
+               IF     (SPA-NINPUKBN-ARI    =   1    )
+                   MOVE    "（妊婦）"      TO  K02N-MODE3-VALUE
+                   MOVE    "blue"          TO  K02N-MODE3-STYLE
+               ELSE
+      *            手入力で妊婦
+                   IF     (SPA-NINPUKBN-IN     =   1    )
+                   MOVE    "（妊婦）"      TO  K02N-MODE3-VALUE
+                   MOVE    "black"         TO  K02N-MODE3-STYLE
+                   END-IF
+               END-IF
            END-IF
       *
       *    非活性処理

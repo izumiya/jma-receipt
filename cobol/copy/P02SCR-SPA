@@ -1312,6 +1312,9 @@
                05  SPA-GMN28-NNCHIKBN          PIC X(01).
       *    ¾®»ù¤«¤«¤ê¤Ä¤±¿ÇÎÅÂÐ¾Ý
                05  SPA-GMN28-SYOUNIKBN         PIC X(01).
+      *H30.4
+      *    Ç¥ÉØ¶èÊ¬
+               05  SPA-GMN28-NINPUKBN          PIC X(01).
       *H28.12
       *        °åÎÅÅù£É£Ä¾ðÊó
                05  SPA-GMN28-MYID-AREA.
@@ -1339,6 +1342,9 @@
       *H28.12
                05  SPA-GMN28-AUTOIDX               PIC 9(02).
                05  SPA-NAI28-KEIFLG                PIC 9(01).
+      *H30.4
+      *    Ç¥ÉØ¶èÊ¬·Ù¹ð
+               05  SPA-NAI28-KEININP               PIC 9(01).
       *
       *    P0201¡ÊÌ¤ÅÐÏ¿¼õÉÕ¼Ô°ìÍ÷¡Ë
            03  SPA-P0201-AREA.

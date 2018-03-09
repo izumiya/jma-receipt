@@ -191,6 +191,10 @@ xml_patientinfov2res {
 			Target_Disease			varchar(05);
 	            	} [4];
     		};
+#---            妊婦設定
+		Personally_Information	{
+            		Pregnant_Class			varchar(05);
+    		};
 #-----> 	個人番号情報
 		Individual_Number  {
 			In_Id			varchar(10);

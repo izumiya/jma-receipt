@@ -94,6 +94,8 @@ xml_patientmodv3req4 {
             	Community_Disease2		varchar(05);
 #---            小児かかりつけ診療
             	Community_Disease3		varchar(05);
+#---            妊婦設定
+            	Pregnant_Class			varchar(05);
             	};
         };
     };
