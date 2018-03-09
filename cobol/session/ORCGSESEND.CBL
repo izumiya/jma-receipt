@@ -63,6 +63,7 @@
            DISPLAY   MCP-TERM
            DISPLAY   MCP-USER
            PERFORM 910-LOCK-DLT-SEC
+           MOVE    "CURRENT"           TO  MCP-PUTTYPE
            EXIT    PROGRAM.
       *****************************************************************
       *    排他制御削除処理
