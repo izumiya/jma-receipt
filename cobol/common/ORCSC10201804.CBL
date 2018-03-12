@@ -1702,15 +1702,15 @@
                IF      WRK-JIKANKBN        =   8
       *            £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                    IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                               OR  2  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "2"  )
                        MOVE    5               TO  WRK-JIKANKBN
                    END-IF
       *H30.4
       *            Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                    IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                               OR  3  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "3"  )
                       AND (SPA-NINPUKBN-ARI    =   1  )
                        MOVE    5               TO  WRK-JIKANKBN
                    END-IF
@@ -1723,8 +1723,8 @@
       *H30.4
       *            Ç¥ÉØ¤ÇÆÃÎã¤Ê¤·¤Î»þ
                      IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                              OR  3  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                              OR   "3"  )
                          CONTINUE
                      ELSE
                        IF     (WRK-JIKANKBN        =   5
@@ -1833,15 +1833,15 @@
                IF      WRK-JIKANKBN        =   8
       *            £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                    IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                               OR  2  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "2"  )
                        MOVE    5               TO  WRK-JIKANKBN
                    END-IF
       *H30.4
       *            Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                    IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                               OR  3  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "3"  )
                       AND (SPA-NINPUKBN-ARI    =   1  )
                        MOVE    5               TO  WRK-JIKANKBN
                    END-IF
@@ -1854,8 +1854,8 @@
       *H30.4
       *            Ç¥ÉØ¤ÇÆÃÎã¤Ê¤·¤Î»þ
                      IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   1
-                                              OR  3  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                              OR   "3"  )
                          CONTINUE
                      ELSE
                        IF     (WRK-JIKANKBN        =   5
