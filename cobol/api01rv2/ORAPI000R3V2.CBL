@@ -235,9 +235,7 @@
            END-IF
       *
            IF    ( SPA-MW              =   SPA-GINBEE )
-      *        CONTINUE
-               MOVE    "0099"          TO  SPA-ERRCD
-               PERFORM 990-EXIT-PROGRAM-SEC
+               CONTINUE
            ELSE
                MOVE    "0099"          TO  SPA-ERRCD
                PERFORM 990-EXIT-PROGRAM-SEC
@@ -750,10 +748,18 @@
            INITIALIZE                  MPE-REC
            MOVE    PEGREQ-EVENT    TO  MPE-EVENT
            MOVE    PEGREQ-USER     TO  MPE-USER
-           MOVE    API-START-TIMESTAMP
-                                   TO  MPE-PUSHED-FROM
-           MOVE    API-END-TIMESTAMP
-                                   TO  MPE-PUSHED-TO
+           IF    ( API-START-TIMESTAMP NOT =   SPACE )
+               STRING API-START-TIMESTAMP  DELIMITED BY SIZE
+                      " JST"               DELIMITED BY SIZE
+               INTO   MPE-PUSHED-FROM
+               END-STRING
+           END-IF
+           IF    ( API-END-TIMESTAMP   NOT =   SPACE )
+               STRING API-END-TIMESTAMP    DELIMITED BY SIZE
+                      " JST"               DELIMITED BY SIZE
+               INTO   MPE-PUSHED-TO
+               END-STRING
+           END-IF
            MOVE    MPE-REC         TO  MCPDATA-REC
            MOVE    "monpushevent"  TO  MCP-TABLE
            MOVE    "key2"          TO  MCP-PATHNAME

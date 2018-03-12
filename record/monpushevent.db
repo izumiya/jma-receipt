@@ -29,12 +29,10 @@ path  key2    {
     SELECT *
     FROM monpushevent
     WHERE
-        event = (CASE WHEN :event  <> '' THEN :event  ELSE event END)
-    AND user_ = (CASE WHEN :user_  <> '' THEN :user_  ELSE user_ END)
-        AND pushed_at >= CAST((CASE WHEN :pushed_from  <> '' THEN :pushed_from 
-                                   ELSE '1900-01-01 00:00:00' END) AS TIMESTAMP)
-        AND pushed_at <= CAST((CASE WHEN :pushed_to    <> '' THEN :pushed_to 
-                                   ELSE '9999-12-31 23:59:59' END) AS TIMESTAMP)
+        (CASE WHEN :event  <> ''       THEN event = :event ELSE true end)
+    AND (CASE WHEN :user_  <> ''       THEN user_ = :user_ ELSE true end)
+    AND (CASE WHEN :pushed_from  <> '' THEN pushed_at >= timestamp with time zone :pushed_from else true end)
+    AND (CASE WHEN :pushed_to    <> '' THEN pushed_at <= timestamp with time zone :pushed_to   else true end)
     ORDER BY pushed_at,user_,event
     ;
   };
