@@ -330,9 +330,12 @@
       *H30.4
       *            H30.4から産婦人科特例対応
                    IF     (SPA-SRYYMD          <   "20180401" )
-                     AND  (SPA-JIKANTOKU-NYU   =   "2"
-                                               OR  "3"         )
-                       MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                       IF      SPA-JIKANTOKU-NYU   =   "2"
+                           MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                       END-IF
+                       IF      SPA-JIKANTOKU-NYU   =   "3"
+                           MOVE    ZERO            TO  SPA-JIKANTOKU-NYU
+                       END-IF
                    END-IF
                END-IF
       *
@@ -1452,9 +1455,12 @@
       *H30.4
       *            H30.4から産婦人科特例対応
                    IF     (SPA-SRYYMD          <   "20180401" )
-                     AND  (SPA-JIKANTOKU-NYU   =   "2"
-                                               OR  "3"        )
-                       MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                       IF      SPA-JIKANTOKU-NYU   =   "2"
+                           MOVE    "1"             TO  SPA-JIKANTOKU-NYU
+                       END-IF
+                       IF      SPA-JIKANTOKU-NYU   =   "3"
+                           MOVE    ZERO            TO  SPA-JIKANTOKU-NYU
+                       END-IF
                    END-IF
                END-IF
       *
