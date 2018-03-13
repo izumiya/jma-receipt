@@ -856,7 +856,12 @@ class Receden_check < Receden_common
                     @errors.push("34900",rece,zai,nil,nil,myfooter)
                   end
 
-                  shokei_tensu   += zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  if flg_minus == false
+                    shokei_tensu   += zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  else
+                    shokei_tensu   -= zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  end
+
                   shokei_kingaku += zai["KINGAKU"].value.to_i * zai["KAISU"].value.to_i
 
                 end
@@ -917,7 +922,11 @@ class Receden_check < Receden_common
                  end
                 end
 
-                shokei_tensu   += zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  if flg_minus == false
+                    shokei_tensu   += zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  else
+                    shokei_tensu   -= zai["TEN"].value.to_i   * zai["KAISU"].value.to_i
+                  end
 
               when  "TO"
 
