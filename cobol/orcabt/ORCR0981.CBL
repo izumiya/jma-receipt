@@ -55,6 +55,7 @@
       *  04.08.05    NACL-ÃÁœ∆    16/08/23  ª˝ª≤ÃÙ¬–±˛
       *  04.08.06    NACL-ÃÁœ∆    16/09/15  •Í•œ•”•Í•ﬁ•π•øƒ…≤√¬–±˛
       *  04.08.07    NACL-∆£∏∂    17/03/02  Ã§•≥°º•…≤Ω∆√ƒÍ¥Ô∫‡•≥°º•…«—ªﬂ¬–±˛
+      *  04.08.08    NACL-ÃÁœ∆    18/03/01   ø¿Æ£≥£∞«Ø£¥∑Ó≤˛¿µ¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7449,11 +7450,20 @@
            AND  (FLG-RECE85        =  ZERO                         )
            AND  (WRK-RECE85-SRYCD(1)  =  "190108890" OR "190142190"
                                       OR "190108790" OR "190142090"
-                                      OR "190108990" OR "190109090"
+                                      OR "190109090"
                                       OR "190142290" OR "190141590"
                                       OR "190153190" OR "190153390"
                                       OR "190153290" OR "190153090"
-                                      OR "190182990"               )
+                                      OR "190182990"
+      ***                             OR "190161470" OR "190161570"
+      ***                             OR "190161870" OR "190162070"
+      ***                             OR "190161670" OR "190161770"
+      ***                             OR "190161970" OR "190162170"
+      ***                             OR "190198570" OR "190198670"
+                                      OR "190213790" OR "190214290"
+                                      OR "190213890" OR "190214090"
+                                      OR "190214390" OR "190213990"
+                                      OR "190214190"               )
               MOVE    1     TO    FLG-NG
            END-IF
       *
@@ -8702,6 +8712,9 @@
                   ADD    1             TO      IDX-RECE85
                   MOVE   RECE85-SRYACT-TBL(IDX)
                              TO   WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
+                  IF   RECE84-ZAITEN   =   ZERO
+                     PERFORM   2001111-SRYACTINF-NAME-HEN-SEC
+                  END-IF
                   IF  (RECE84-JIHOKBN  NOT =  SPACE)
                   AND (RECE84-ZAIKBN       =   4   )
                      MOVE  ZERO
@@ -8773,6 +8786,27 @@
       *
            .
        200111-SRYACTINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £∞£µ°°£”£“£Ÿ£¡£√£‘£…£Œ£∆°°ÃææŒ ‘Ω∏ΩËÕ˝
+      *****************************************************************
+       2001111-SRYACTINF-NAME-HEN-SEC     SECTION.
+      *
+           IF    RECE82-SRYYM      >=    "201604"
+             EVALUATE   WRK-RECE85XX-SRYCD(IDX-RECE85 1)
+      *
+               WHEN   "190111590"
+                 MOVE  "810000001" TO  WRK-RECE85XX-SRYCD(IDX-RECE85 1)
+                 MOVE   ZERO    TO  WRK-RECE85XX-SRYSURYO(IDX-RECE85 1)
+                 MOVE   8       TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+                 MOVE  "≥∞«Ò° ¡™ƒÍŒ≈Õ‹°À"
+                                TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+             END-EVALUATE
+           END-IF
+      *
+           .
+       2001111-SRYACTINF-NAME-HEN-EXT.
            EXIT.
       *
       *****************************************************************

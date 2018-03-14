@@ -175,6 +175,7 @@
       *  04.08.08    NACL-門脇    16/05/30  １９原爆一般の特殊計算対応
       *  04.08.09    NACL-門脇    16/08/23  持参薬対応
       *  04.08.10    NACL-門脇    16/09/15  リハビリマスタ追加対応
+      *  04.08.11    NACL-門脇    18/03/01  平成３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9393,7 +9394,16 @@
                                       OR "999999994"
                                       OR "190153190" OR "190153390"
                                       OR "190153290" OR "190153090"
-                                      OR "190182990"               )
+                                      OR "190182990"
+      ***                             OR "190161470" OR "190161570"
+      ***                             OR "190161870" OR "190162070"
+      ***                             OR "190161670" OR "190161770"
+      ***                             OR "190161970" OR "190162170"
+      ***                             OR "190198570" OR "190198670"
+                                      OR "190213790" OR "190214290"
+                                      OR "190213890" OR "190214090"
+                                      OR "190214390" OR "190213990"
+                                      OR "190214190"               )
               MOVE    1     TO    FLG-NG
            END-IF
       *
@@ -10653,20 +10663,6 @@
                  MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
                  MOVE   8       TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
                  MOVE  "外泊（選定療養）"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-      *
-               WHEN   "190107490"
-                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   12      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "外泊（特定入院料の減額）"
-                                TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
-      *
-               WHEN   "190107590"
-                 MOVE  "810000001" TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
-                 MOVE   ZERO    TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
-                 MOVE   22      TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
-                 MOVE  "外泊（特定入院料の減額）（精神障害等の患者）"
                                 TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
              END-EVALUATE
            ELSE

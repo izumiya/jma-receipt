@@ -28591,6 +28591,16 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                            END-IF
                          END-IF
                        END-IF
+                     ELSE
+                       COMPUTE WRK-SKY-KEISAN2 = WRK-SKY-FTNMONEY-KOH9
+                                               - RECE02-FTNMONEY-SKY
+                       IF  RECE02-SKYIRYO-HOKENJA > WRK-SKY-KEISAN2
+                         COMPUTE RECE02-SKYIRYO-HOKENJA =
+                                 RECE02-SKYIRYO-HOKENJA -
+                                 WRK-SKY-KEISAN2
+                       ELSE
+                         MOVE    ZERO    TO    RECE02-SKYIRYO-HOKENJA
+                       END-IF
                      END-IF
                    ELSE
                      COMPUTE   WRK-SKY-KEISAN  = WRK-SKY-ZENGAKU-KOH

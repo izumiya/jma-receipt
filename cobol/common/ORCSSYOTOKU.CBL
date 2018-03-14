@@ -758,9 +758,9 @@
                      CONTINUE
                    ELSE
                      IF  ( WRK-DAY-HKNNUM(IDX2)     =
-                                                   "060" OR  "067" )
+                                                   "060"           )
                      OR  ((WRK-DAY-HKNNUM(IDX2) NOT =
-                                                   "060" AND "067") AND
+                                                   "060"          ) AND
                           (WRK-DAY-HOJOKBN(IDX2)    =  SPACE      ))
                        IF  WRK-DAY-KOH976(IDX2)     = "1"
                           MOVE   "2"      TO  WRK-DAY-NENREIFLG(IDX2)

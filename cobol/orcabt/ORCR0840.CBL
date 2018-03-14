@@ -714,7 +714,7 @@
       *
        01  WRK-CHUKSNSRYCD-TABLE.
            03  WRK-CHUKSNSRYCD                         PIC X(09)
-                                                       OCCURS   50.
+                                                       OCCURS   100.
       *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
@@ -2368,7 +2368,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
               MOVE    "key30"        TO  MCP-PATHNAME
               PERFORM  900-TENSU-READ-SEC
               PERFORM  UNTIL  (FLG-TENSU  =     1)
-                        OR    (IDX14     >=    50)
+                        OR    (IDX14     >=   100)
                  IF   TNS-SRYCD  =  "190134270"
                                  OR "190135470"
                                  OR "190135670"
@@ -2403,6 +2403,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                                  OR "190198570"
                                  OR "190198670"
+      *
+                                 OR "190200970"
+                                 OR "190214470"
+                                 OR "190205270"
+                                 OR "190205370"
+                                 OR "190205470"
+                                 OR "190205870"
                    CONTINUE
                  ELSE
                    ADD    1          TO  IDX14
@@ -2575,7 +2582,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF   (ACCT-SRYKBN  =  "90" OR "92")
                  AND  (ACCT-JIHOKBN =  SPACE       )
                    PERFORM  VARYING  ID4    FROM   1   BY   1
-                             UNTIL  (ID4                  >   50  )
+                             UNTIL  (ID4                  >   100 )
                                OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
                                OR   (FLG-JYOGAI           =   1   )
                      IF  ACCT-SRYCDTOTAL(6:9) = WRK-CHUKSNSRYCD(ID4)
@@ -2844,7 +2851,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF   (ACCT-SRYKBN  =  "90" OR "92")
                AND  (ACCT-JIHOKBN =  SPACE       )
                  PERFORM  VARYING  ID4    FROM   1   BY   1
-                           UNTIL  (ID4                  >   50  )
+                           UNTIL  (ID4                  >   100 )
                              OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
                              OR   (FLG-JYOGAI           =   1   )
                    IF  SRY-SRYCD(1) = WRK-CHUKSNSRYCD(ID4)
@@ -8964,7 +8971,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE     ZERO    TO    FLG-JYOGAI
                    IF    NACCT-ZAISKBKBN    =  "6"
                      PERFORM  VARYING  ID4    FROM   1   BY   1
-                               UNTIL  (ID4                  >   50  )
+                               UNTIL  (ID4                  >   100 )
                                  OR   (WRK-CHUKSNSRYCD(ID4) =  SPACE)
                                  OR   (FLG-JYOGAI           =   1   )
                        IF  NACCT-SRYCDTOTAL(6:9) = WRK-CHUKSNSRYCD(ID4)

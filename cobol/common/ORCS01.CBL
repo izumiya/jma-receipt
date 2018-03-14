@@ -4250,8 +4250,8 @@
                                         OR "068" OR "069")
                 CONTINUE
              ELSE
-              IF ( COMB-HKNNUM      = "060" OR  "067" )
-              OR ((COMB-HKNNUM  NOT = "060" AND "067") AND
+              IF ( COMB-HKNNUM      = "060"           )
+              OR ((COMB-HKNNUM  NOT = "060"          ) AND
                   (COMB-HOJOKBN     = SPACE          ))
                 INITIALIZE                     PTKOHINF-REC
                 MOVE    LNK-SYU-HOSPNUM    TO  PTKOH-HOSPNUM
