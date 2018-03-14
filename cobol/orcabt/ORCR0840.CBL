@@ -2448,6 +2448,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
            ADD     1          TO  IDX14
            MOVE  "190182690"  TO  WRK-CHUKSNSRYCD(IDX14)
       *
+           ADD     1          TO  IDX14
+           MOVE  "190212670"  TO  WRK-CHUKSNSRYCD(IDX14)
+      *
            .
        140-NYUINKASAN-JYOGAI-EXT.
            EXIT.
