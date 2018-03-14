@@ -98,6 +98,7 @@
                   09  FMSHOHO-HOSP-ADRS         PIC X(200)
                                                 OCCURS   3.
                 07  FMSHOHO-HOSP-TEL            PIC X(15).
+                07  FMSHOHO-HOSP-FAX            PIC X(15).
               05  FMSHOHO-DOCTOR-AREA.
                 07  FMSHOHO-DR-CODE             PIC X(5).
                 07  FMSHOHO-DR-NAME             PIC X(50).
