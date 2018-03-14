@@ -3248,11 +3248,11 @@
                OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
                OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
                                           OR "040" OR "039"
-                                          OR "067" OR "069")
+                                          OR "068" OR "069")
                 CONTINUE
                ELSE
-                IF ( COMB-HKNNUM      = "060" OR  "068" )
-                OR ((COMB-HKNNUM  NOT = "060" AND "068") AND
+                IF ( COMB-HKNNUM      = "060"           )
+                OR ((COMB-HKNNUM  NOT = "060"          ) AND
                     (COMB-HOJOKBN     = SPACE          ))
                   INITIALIZE                         PTKOHINF-REC
                   MOVE    LNK-FTNJGNCHK-HOSPNUM  TO  PTKOH-HOSPNUM
@@ -3270,9 +3270,15 @@
                     MOVE    "key4"               TO  MCP-PATHNAME
                     PERFORM  910-PTKOHINF-READ-SEC
                     PERFORM  UNTIL   FLG-PTKOHINF  =  1
-                      IF  (PTKOH-TEKSTYMD      <=  LNK-FTNJGNCHK-SRYYM)
-                      AND (LNK-FTNJGNCHK-SRYYM <=  PTKOH-TEKEDYMD     )
-                      AND (PTKOH-SAKJOKBN       =  SPACE              )
+                      MOVE   LNK-FTNJGNCHK-SRYYM TO  WRK-SRYYMD(1:6)
+                      IF     COMB-TEKSTYMD(1:6)   >= LNK-FTNJGNCHK-SRYYM
+                        MOVE COMB-TEKSTYMD(7:2)  TO  WRK-SRYYMD(7:2)
+                      ELSE
+                        MOVE  "01"               TO  WRK-SRYYMD(7:2)
+                      END-IF
+                      IF  (PTKOH-TEKSTYMD  <=  WRK-SRYYMD    )
+                      AND (WRK-SRYYMD      <=  PTKOH-TEKEDYMD)
+                      AND (PTKOH-SAKJOKBN   =  SPACE         )
                          MOVE    1               TO  FLG-KOREI-HIGAITO
                          MOVE    1               TO  FLG-PTKOHINF
                       ELSE

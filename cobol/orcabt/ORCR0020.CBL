@@ -2809,8 +2809,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR  "90" OR  "91")
                 CONTINUE
              ELSE
-              IF ( RECE02-HKNNUM      = "060" OR  "067" )
-              OR ((RECE02-HKNNUM  NOT = "060" AND "067") AND
+              IF ( RECE02-HKNNUM      = "060"           )
+              OR ((RECE02-HKNNUM  NOT = "060"          ) AND
                   (RECE02-HOJOKBN     = SPACE          ))
                 MOVE      RECE01-SRYYM       TO   WRK-SRYYYMM
                 IF   RECE02-TEKSTYMD(1:6)  >=  RECE01-SRYYM

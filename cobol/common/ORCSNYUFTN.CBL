@@ -187,6 +187,7 @@
       *                                     §«§Œø©ªˆªªƒÍ¬–±˛
       *  04.08.09    NACL-ÃÁœ∆    17/12/15  ¬Ëª∞º‘π‘∞Ÿ∏Ω ™µÎ…’§À¥ÿ§Ô§Î
       *                                     …È√¥∂‚∑◊ªª¬–±˛
+      *  04.08.10    NACL-ÃÁœ∆    18/03/01   ø¿Æ£≥£∞«Ø£¥∑Ó≤˛¿µ¬–±˛
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3659,26 +3660,14 @@ grpsys                            SPA-AREA
                                               SDAY-HKNTEN(SYU-IDX) +   
                                             ((WRK-KHNTEN      *  0.3)  
                                                               +  0.5)  
-      *                          ≥∞«Ò° ¡™ƒÍŒ≈Õ‹»Ò°À
-                                 WHEN   3
-                                     COMPUTE  SYU-HKNTEN(15)  =
-                                              SYU-HKNTEN(15)  +
-                                            ((WRK-KHNTEN      *
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                              +  0.5)
-                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =   
-                                              SDAY-HKNTEN(SYU-IDX) +   
-                                            ((WRK-KHNTEN      *        
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                              +  0.5)  
-      *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«° £±£µ°Û°À ø¿Æ£±£∂«Ø£¥∑Ó§Ë§Í£≥£∞°Û§À —ππ
+      *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«
                                  WHEN   4
-      *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«° £∑£∞°Û°À
                                  WHEN   5
-      *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«° £¥£µ°Û°À
                                  WHEN   6
-      *                          ¬æ∞ÂŒ≈µ°¥ÿºıø«° £∏£µ°Û°À
                                  WHEN   7
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
                                    PERFORM   NYUKHNKSNKBN-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       4
@@ -3717,6 +3706,15 @@ grpsys                            SPA-AREA
                                         COMPUTE WRK-TENSU-KEISAN  =
                                                (WRK-KHNTEN * 0.85) + 0.5
                                      END-IF
+                                    WHEN      14
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.95) + 0.5
+                                    WHEN      15
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.65) + 0.5
+                                    WHEN      16
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.85) + 0.5
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3734,13 +3732,12 @@ grpsys                            SPA-AREA
                                    COMPUTE  SDAY-HKNTEN(SYU-IDX) =
                                             SDAY-HKNTEN(SYU-IDX) +
                                             WRK-TENSU-KEISAN
-      *                          ∏∫≥€° £π£≤°Û°À
+      *                          ∏∫≥€
                                  WHEN   8
                                  WHEN   9
-      ***                        WHEN  10
       ***                        WHEN  11
-      ***                        WHEN  12
                                  WHEN  13
+                                 WHEN  17
                                    PERFORM   CHUKSNCD-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       8
@@ -3749,24 +3746,12 @@ grpsys                            SPA-AREA
                                     WHEN       9
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-KHNTEN * 0.92) + 0.5
-      ***                           WHEN      10
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-KHNTEN * 0.92) + 0.5
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-TENSU-KEISAN
-      ***                                                * 0.3 ) + 0.5
       ***                           WHEN      11
       ***                             COMPUTE WRK-TENSU-KEISAN  =
       ***                                    (WRK-KHNTEN * 0.92) + 0.5
       ***                             COMPUTE WRK-TENSU-KEISAN  =
       ***                                    (WRK-TENSU-KEISAN
       ***                                                * 0.7 ) + 0.5
-      ***                           WHEN      12
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-KHNTEN * 0.92) + 0.5
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-TENSU-KEISAN
-      ***                                                * 0.3 ) + 0.5
                                     WHEN      13
                                      IF  SYU-SRYYMD(1:6) >= "201604"
                                         COMPUTE WRK-TENSU-KEISAN  =
@@ -3781,6 +3766,12 @@ grpsys                            SPA-AREA
                                                (WRK-TENSU-KEISAN
                                                            * 0.7 ) + 0.5
                                      END-IF
+                                    WHEN      17
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-KHNTEN * 0.92) + 0.5
+                                        COMPUTE WRK-TENSU-KEISAN  =
+                                               (WRK-TENSU-KEISAN
+                                                           * 0.95) + 0.5
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3806,19 +3797,8 @@ grpsys                            SPA-AREA
                                      ADD    WRK-SENTEI-ZAITEN
                                            TO  SYU-HKNTEN(15)
                                                SDAY-HKNTEN(SYU-IDX)    
-      *                          ≥∞«Ò
-                                 WHEN   1
-                                     COMPUTE  SYU-HKNTEN(15)  =
-                                              SYU-HKNTEN(15)  +
-                                            ((WRK-KHNTEN    *
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                             +  0.5)
-                                     COMPUTE  SDAY-HKNTEN(SYU-IDX) =   
-                                              SDAY-HKNTEN(SYU-IDX) +   
-                                            ((WRK-KHNTEN    *          
-                                              WRK-SENTEI-GAIHAKU-KEISU)
-                                                             +  0.5)   
       *                          ≥∞«Ò° ¡™ƒÍŒ≈Õ‹»Ò°À
+                                 WHEN   1
                                  WHEN   3
                                      COMPUTE  SYU-HKNTEN(15)  =
                                               SYU-HKNTEN(15)  +
@@ -3891,6 +3871,9 @@ grpsys                            SPA-AREA
                                  WHEN   5
                                  WHEN   6
                                  WHEN   7
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
                                    PERFORM   NYUKHNKSNKBN-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       5
@@ -3921,6 +3904,18 @@ grpsys                            SPA-AREA
                                              (WRK-SENTEI-KHNTEN * 0.85)
                                                                 + 0.5
                                      END-IF
+                                    WHEN      14
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.95)
+                                                                + 0.5
+                                    WHEN      15
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.65)
+                                                                + 0.5
+                                    WHEN      16
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.85)
+                                                                + 0.5
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -3941,10 +3936,9 @@ grpsys                            SPA-AREA
       *                          ∏∫≥€
                                  WHEN   8
                                  WHEN   9
-      ***                        WHEN  10
       ***                        WHEN  11
-      ***                        WHEN  12
                                  WHEN  13
+                                 WHEN  17
                                    PERFORM   CHUKSNCD-CHECK-SEC
                                    EVALUATE  TBL-GAIHAKU(SYU-IDX)
                                     WHEN       8
@@ -3955,26 +3949,12 @@ grpsys                            SPA-AREA
                                       COMPUTE WRK-TENSU-KEISAN  =
                                              (WRK-SENTEI-KHNTEN * 0.92)
                                                                 + 0.5
-      ***                           WHEN      10
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-SENTEI-KHNTEN * 0.92)
-      ***                                                       + 0.5
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-TENSU-KEISAN  * 0.3 )
-      ***                                                       + 0.5
       ***                           WHEN      11
       ***                             COMPUTE WRK-TENSU-KEISAN  =
       ***                                    (WRK-SENTEI-KHNTEN * 0.92)
       ***                                                       + 0.5
       ***                             COMPUTE WRK-TENSU-KEISAN  =
       ***                                    (WRK-TENSU-KEISAN  * 0.7 )
-      ***                                                       + 0.5
-      ***                           WHEN      12
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-SENTEI-KHNTEN * 0.92)
-      ***                                                       + 0.5
-      ***                             COMPUTE WRK-TENSU-KEISAN  =
-      ***                                    (WRK-TENSU-KEISAN  * 0.3 )
       ***                                                       + 0.5
                                     WHEN      13
                                      IF  SYU-SRYYMD(1:6) >= "201604"
@@ -3992,6 +3972,13 @@ grpsys                            SPA-AREA
                                              (WRK-TENSU-KEISAN  * 0.7 )
                                                                 + 0.5
                                      END-IF
+                                    WHEN      17
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.92)
+                                                                + 0.5
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-TENSU-KEISAN  * 0.95)
+                                                                + 0.5
                                    END-EVALUATE
                                    COMPUTE   WRK-TENSU-KEISAN  =
                                              WRK-TENSU-KEISAN  +
@@ -4212,214 +4199,14 @@ grpsys                                    SPA-AREA
       **************************************************************
        NYUKHNKSNKBN-CHECK-SEC           SECTION.
       *
-           IF   SYU-SRYYMD(1:6)  >=  "201604"
-             IF   TBL-GAIHAKU(SYU-IDX)  =   7
-               MOVE    1    TO    WRK-TAIJYUSIN-ERR
-             END-IF
-             EVALUATE   WRK-NYUKHNKSNKBN
-      *        ∆√ƒÍ∆˛±°Œ¡
-               WHEN   201  THRU  206
-               WHEN   208  THRU  210
-               WHEN   212  THRU  217
-               WHEN   221
-               WHEN   227  THRU  229
-               WHEN   232  THRU  236
-               WHEN   238  THRU  239
-               WHEN   241  THRU  249
-               WHEN   250  THRU  254
-               WHEN   257  THRU  267
-      *        --- H28.4 TUIKA ---
-               WHEN   268  THRU  270
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
-      *          √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡
-                 IF  WRK-NYUKHNKSNKBN = 221 OR 232 OR 217 OR 268
-                   CONTINUE
-                 ELSE
-                   IF  TBL-GAIHAKU(SYU-IDX) =  6
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                   END-IF
-                 END-IF
-      *        Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
-               WHEN   004  THRU  008
-               WHEN   010  THRU  012
-               WHEN   152
-               WHEN   173  THRU  190
-               WHEN   196
-               WHEN   199
-      *        --- H28.4 TUIKA ---
-               WHEN   048  THRU  049
-               WHEN   051  THRU  054
-               WHEN   057  THRU  068
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-                 IF    TBL-GAIHAKU(SYU-IDX) =  6
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
-               WHEN   153  THRU  158
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
-               WHEN   226
-               WHEN   240
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-      *        ¬æ
-               WHEN   OTHER
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
-                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-             END-EVALUATE
+           IF      SYU-SRYYMD(1:6)  >=  "201804"
+                  PERFORM   NYUKHNKSNKBN-CHECK3-SEC
            ELSE
-            IF  SYU-SRYYMD(1:6)  >=  "201004"
-             EVALUATE   WRK-NYUKHNKSNKBN
-      *        ∆√ƒÍ∆˛±°¥À‹Œ¡
-               WHEN   099  THRU  100
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        ∆√ƒÍ∆˛±°Œ¡
-               WHEN   201  THRU  219
-               WHEN   221  THRU  222
-               WHEN   224
-               WHEN   227  THRU  229
-               WHEN   230  THRU  239
-               WHEN   241  THRU  249
-               WHEN   250  THRU  255
-      *        (H26-ADD-ST)
-               WHEN   256
-               WHEN   257  THRU  259
-               WHEN   260  THRU  261
-               WHEN   262  THRU  265
-               WHEN   266  THRU  267
-      *        (H26-ADD-ED)
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡
-                 IF    WRK-NYUKHNKSNKBN = 221 OR 232
-      *            ° £∂£±∆¸∞ æÂ°À
-                   IF   WRK-CHK-SRYCD = "190740010" OR "190813510" OR
-                                        "190722510" OR "190722810"
-                     IF    TBL-GAIHAKU(SYU-IDX)  =    7
-                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                     END-IF
-                   END-IF
-      *            ° £∂£∞∆¸∞ ∆‚°À
-                   IF   WRK-CHK-SRYCD = "190151610" OR "190739910" OR
-                                        "190151710" OR "190813410" OR
-                                        "190722310" OR "190722410" OR
-                                        "190722610" OR "190722710"
-                     IF    TBL-GAIHAKU(SYU-IDX)  =    6
-                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                     END-IF
-                   END-IF
-                 ELSE
-      *            ¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡°¢¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡
-      *            ¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
-                   IF  WRK-NYUKHNKSNKBN = 229 OR 238 OR 215 OR 216 OR
-                                          217 OR 239 OR 252
-                     IF    TBL-GAIHAKU(SYU-IDX)  =    7
-                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                     END-IF
-                   ELSE
-                     IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
-                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                     END-IF
-                   END-IF
-                 END-IF
-      *        Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
-               WHEN   013  THRU  021
-               WHEN   101  THRU  109
-               WHEN   147  THRU  152
-               WHEN   173  THRU  190
-               WHEN   196
-      *        (H26-ADD-ST)
-               WHEN   199
-               WHEN   004  THRU  008
-               WHEN   010  THRU  012
-      *        (H26-ADD-ED)
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *
-               WHEN   075  THRU  080
-                    CONTINUE
-      *        Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
-               WHEN   085  THRU  086
-               WHEN   132  THRU  133
-               WHEN   153  THRU  158
-                 IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-                 IF  WRK-NYUKHNKSNKBN = 153 OR 154 OR 155 OR 156 OR
-                                        157 OR 158
-                   IF    TBL-GAIHAKU(SYU-IDX)  =    6
-                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                   END-IF
-                 ELSE
-                   IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
-                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                   END-IF
-                 END-IF
-      *        √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
-               WHEN   226
-               WHEN   240
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-      *        ¿∫ø¿…¬≈Ô∆˛±°¥À‹Œ¡
-               WHEN   031
-               WHEN   033
-               WHEN   034
-               WHEN   035
-               WHEN   038
-               WHEN   170
-               WHEN   191
-      *        (H26-ADD-ST)
-               WHEN   017  THRU  020
-      *        (H26-ADD-ED)
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        ∑Î≥À…¬≈Ô∆˛±°¥À‹Œ¡
-               WHEN   022
-               WHEN   023
-               WHEN   024
-               WHEN   025
-               WHEN   026
-               WHEN   029
-               WHEN   136
-               WHEN   168
-               WHEN   169
-      *        (H26-ADD-ST)
-               WHEN   013  THRU  016
-      *        (H26-ADD-ED)
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡
-               WHEN   081
-               WHEN   083
-               WHEN   172
-      *        (H26-ADD-ST)
-               WHEN   032  THRU  037
-      *        (H26-ADD-ED)
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-      *        ¬æ
-               WHEN   OTHER
-                 IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 7
-                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
-                 END-IF
-             END-EVALUATE
-            END-IF
+             IF    SYU-SRYYMD(1:6)  >=  "201604"
+                  PERFORM   NYUKHNKSNKBN-CHECK2-SEC
+             ELSE
+                  PERFORM   NYUKHNKSNKBN-CHECK1-SEC
+             END-IF
            END-IF
       *
            .
@@ -4428,72 +4215,300 @@ grpsys                                    SPA-AREA
            EXIT.
       *
       **************************************************************
+      *    ¬æ∞ÂŒ≈µ°¥ÿºıø«•¡•ß•√•Ø£±
+      **************************************************************
+       NYUKHNKSNKBN-CHECK1-SEC           SECTION.
+      *
+           EVALUATE   WRK-NYUKHNKSNKBN
+      *      ∆√ƒÍ∆˛±°¥À‹Œ¡
+             WHEN   099  THRU  100
+               IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      ∆√ƒÍ∆˛±°Œ¡
+             WHEN   201  THRU  219
+             WHEN   221  THRU  222
+             WHEN   224
+             WHEN   227  THRU  229
+             WHEN   230  THRU  239
+             WHEN   241  THRU  249
+             WHEN   250  THRU  255
+      *      (H26-ADD-ST)
+             WHEN   256
+             WHEN   257  THRU  259
+             WHEN   260  THRU  261
+             WHEN   262  THRU  265
+             WHEN   266  THRU  267
+      *      (H26-ADD-ED)
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *        «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡
+               IF    WRK-NYUKHNKSNKBN = 221 OR 232
+      *          ° £∂£±∆¸∞ æÂ°À
+                 IF   WRK-CHK-SRYCD = "190740010" OR "190813510" OR
+                                      "190722510" OR "190722810"
+                   IF    TBL-GAIHAKU(SYU-IDX)  =    7
+                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                   END-IF
+                 END-IF
+      *          ° £∂£∞∆¸∞ ∆‚°À
+                 IF   WRK-CHK-SRYCD = "190151610" OR "190739910" OR
+                                      "190151710" OR "190813410" OR
+                                      "190722310" OR "190722410" OR
+                                      "190722610" OR "190722710"
+                   IF    TBL-GAIHAKU(SYU-IDX)  =    6
+                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                   END-IF
+                 END-IF
+               ELSE
+      *          ¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡°¢¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡
+      *          ¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
+                 IF  WRK-NYUKHNKSNKBN = 229 OR 238 OR 215 OR 216 OR
+                                        217 OR 239 OR 252
+                   IF    TBL-GAIHAKU(SYU-IDX)  =    7
+                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                   END-IF
+                 ELSE
+                   IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
+                      MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                   END-IF
+                 END-IF
+               END-IF
+      *      Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
+             WHEN   013  THRU  021
+             WHEN   101  THRU  109
+             WHEN   147  THRU  152
+             WHEN   173  THRU  190
+             WHEN   196
+      *      (H26-ADD-ST)
+             WHEN   199
+             WHEN   004  THRU  008
+             WHEN   010  THRU  012
+      *      (H26-ADD-ED)
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+               IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *
+             WHEN   075  THRU  080
+                  CONTINUE
+      *      Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
+             WHEN   085  THRU  086
+             WHEN   132  THRU  133
+             WHEN   153  THRU  158
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+               IF  WRK-NYUKHNKSNKBN = 153 OR 154 OR 155 OR 156 OR
+                                      157 OR 158
+                 IF    TBL-GAIHAKU(SYU-IDX)  =    6
+                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+               ELSE
+                 IF    TBL-GAIHAKU(SYU-IDX)  =    6 OR 7
+                    MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+               END-IF
+      *      √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
+             WHEN   226
+             WHEN   240
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+      *      ¿∫ø¿…¬≈Ô∆˛±°¥À‹Œ¡
+             WHEN   031
+             WHEN   033
+             WHEN   034
+             WHEN   035
+             WHEN   038
+             WHEN   170
+             WHEN   191
+      *      (H26-ADD-ST)
+             WHEN   017  THRU  020
+      *      (H26-ADD-ED)
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      ∑Î≥À…¬≈Ô∆˛±°¥À‹Œ¡
+             WHEN   022
+             WHEN   023
+             WHEN   024
+             WHEN   025
+             WHEN   026
+             WHEN   029
+             WHEN   136
+             WHEN   168
+             WHEN   169
+      *      (H26-ADD-ST)
+             WHEN   013  THRU  016
+      *      (H26-ADD-ED)
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡
+             WHEN   081
+             WHEN   083
+             WHEN   172
+      *      (H26-ADD-ST)
+             WHEN   032  THRU  037
+      *      (H26-ADD-ED)
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      ¬æ
+             WHEN   OTHER
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 7
+                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       NYUKHNKSNKBN-CHECK1-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ¬æ∞ÂŒ≈µ°¥ÿºıø«•¡•ß•√•Ø£≤  201604
+      **************************************************************
+       NYUKHNKSNKBN-CHECK2-SEC           SECTION.
+      *
+           IF   TBL-GAIHAKU(SYU-IDX)  =   7
+             MOVE    1    TO    WRK-TAIJYUSIN-ERR
+           END-IF
+           EVALUATE   WRK-NYUKHNKSNKBN
+      *      ∆√ƒÍ∆˛±°Œ¡
+             WHEN   201  THRU  206
+             WHEN   208  THRU  210
+             WHEN   212  THRU  217
+             WHEN   221
+             WHEN   227  THRU  229
+             WHEN   232  THRU  236
+             WHEN   238  THRU  239
+             WHEN   241  THRU  249
+             WHEN   250  THRU  254
+             WHEN   257  THRU  267
+      *      --- H28.4 TUIKA ---
+             WHEN   268  THRU  270
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *        «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
+      *        √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡
+               IF  WRK-NYUKHNKSNKBN = 221 OR 232 OR 217 OR 268
+                 CONTINUE
+               ELSE
+                 IF  TBL-GAIHAKU(SYU-IDX) =  6
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+               END-IF
+      *      Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
+             WHEN   004  THRU  008
+             WHEN   010  THRU  012
+             WHEN   152
+             WHEN   173  THRU  190
+             WHEN   196
+             WHEN   199
+      *      --- H28.4 TUIKA ---
+             WHEN   048  THRU  049
+             WHEN   051  THRU  054
+             WHEN   057  THRU  068
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+               IF    TBL-GAIHAKU(SYU-IDX) =  6
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
+             WHEN   153  THRU  158
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
+             WHEN   226
+             WHEN   240
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+      *      ¬æ
+             WHEN   OTHER
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       NYUKHNKSNKBN-CHECK2-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ¬æ∞ÂŒ≈µ°¥ÿºıø«•¡•ß•√•Ø£≥  201804
+      **************************************************************
+       NYUKHNKSNKBN-CHECK3-SEC           SECTION.
+      *
+           IF   TBL-GAIHAKU(SYU-IDX)  =   7
+             MOVE    1    TO    WRK-TAIJYUSIN-ERR
+           END-IF
+           EVALUATE   WRK-NYUKHNKSNKBN
+      *      ∆√ƒÍ∆˛±°Œ¡
+             WHEN   200  THRU  257
+             WHEN   260  THRU  263
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *        «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
+      *        √œ∞Ë∞‹π‘µ°«Ω∂Ø≤Ω…¬≈Ô∆˛±°Œ¡
+               IF  WRK-NYUKHNKSNKBN = 255 OR 254 OR 257
+                 CONTINUE
+               ELSE
+                 IF  TBL-GAIHAKU(SYU-IDX) =  6 OR 16
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                 END-IF
+               END-IF
+      *      Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
+             WHEN    11  THRU   14
+             WHEN    51
+             WHEN   901
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+               IF    TBL-GAIHAKU(SYU-IDX) =  6 OR 16
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
+             WHEN    26
+             WHEN    53
+             WHEN   909
+               IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+      *      √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤°¶√ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≥
+             WHEN   258  THRU  259
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+      *      ¬æ
+             WHEN   OTHER
+               IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6 OR 15 OR 16
+                   MOVE    1    TO    WRK-TAIJYUSIN-ERR
+               END-IF
+           END-EVALUATE
+      *
+           .
+      *
+       NYUKHNKSNKBN-CHECK3-EXT.
+           EXIT.
+      *
+      **************************************************************
       *    ∏∫ªª•¡•ß•√•Ø
       **************************************************************
        CHUKSNCD-CHECK-SEC           SECTION.
       *
-           IF   SYU-SRYYMD(1:6)  >=  "201604"
-            EVALUATE   TBL-GAIHAKU(SYU-IDX)
-             WHEN        8
-      ***    WHEN       10
-      ***    WHEN       11
-               EVALUATE   WRK-CHUKSNCD
-                 WHEN   "9017"
-                 WHEN   "9026"
-                 WHEN   "9030"
-                 WHEN   "9090"
-                   IF  TBL-GAIHAKU(SYU-IDX) = 10 OR 11
-                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
-                   END-IF
-                 WHEN    OTHER
-                   MOVE    1    TO    WRK-GENSAN-ERR
-               END-EVALUATE
-             WHEN        9
-      ***    WHEN       12
-             WHEN       13
-               EVALUATE   WRK-CHUKSNCD
-                 WHEN   "9017"
-                 WHEN   "9026"
-                 WHEN   "9030"
-                 WHEN   "9090"
-                   IF  TBL-GAIHAKU(SYU-IDX) = 12 OR 13
-                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
-                   END-IF
-                 WHEN    OTHER
-                   MOVE    1    TO    WRK-GENSAN-ERR2
-               END-EVALUATE
-            END-EVALUATE
+           IF      SYU-SRYYMD(1:6)  >=  "201804"
+                  PERFORM   CHUKSNCD-CHECK3-SEC
            ELSE
-            EVALUATE   TBL-GAIHAKU(SYU-IDX)
-             WHEN        8
-      ***    WHEN       10
-      ***    WHEN       11
-               EVALUATE   WRK-CHUKSNCD
-                 WHEN   "9017"
-                 WHEN   "9018"
-                 WHEN   "9026"
-                 WHEN   "9030"
-                   IF  TBL-GAIHAKU(SYU-IDX) = 10 OR 11
-                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
-                   END-IF
-                 WHEN    OTHER
-                   MOVE    1    TO    WRK-GENSAN-ERR
-               END-EVALUATE
-             WHEN        9
-      ***    WHEN       12
-             WHEN       13
-               EVALUATE   WRK-CHUKSNCD
-                 WHEN   "9017"
-                 WHEN   "9018"
-                 WHEN   "9026"
-                 WHEN   "9030"
-                   IF  TBL-GAIHAKU(SYU-IDX) = 12 OR 13
-                      PERFORM   NYUKHNKSNKBN-CHECK2-SEC
-                   END-IF
-                 WHEN    OTHER
-                   MOVE    1    TO    WRK-GENSAN-ERR2
-               END-EVALUATE
-            END-EVALUATE
+             IF    SYU-SRYYMD(1:6)  >=  "201604"
+                  PERFORM   CHUKSNCD-CHECK2-SEC
+             ELSE
+                  PERFORM   CHUKSNCD-CHECK1-SEC
+             END-IF
            END-IF
       *
            .
@@ -4502,34 +4517,109 @@ grpsys                                    SPA-AREA
            EXIT.
       *
       **************************************************************
-      *    ¬æ∞ÂŒ≈µ°¥ÿºıø«•¡•ß•√•Ø£≤
+      *    ∏∫ªª•¡•ß•√•Ø£±
       **************************************************************
-       NYUKHNKSNKBN-CHECK2-SEC           SECTION.
+       CHUKSNCD-CHECK1-SEC           SECTION.
       *
-           IF   SYU-SRYYMD(1:6)  >=  "201604"
-               IF    TBL-GAIHAKU(SYU-IDX)  =   11 OR 13
-                  CONTINUE
-               ELSE
-                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
-               END-IF
-           ELSE
-            EVALUATE   WRK-NYUKHNKSNKBN
-      *      ∆√ƒÍ∆˛±°¥À‹Œ¡
-             WHEN   099  THRU  100
-               CONTINUE
-      *      ¬æ
-             WHEN   OTHER
-               IF    TBL-GAIHAKU(SYU-IDX)  =   11 OR 13
-                  CONTINUE
-               ELSE
-                  MOVE    1    TO    WRK-TAIJYUSIN-ERR
-               END-IF
-            END-EVALUATE
-           END-IF
+           EVALUATE   TBL-GAIHAKU(SYU-IDX)
+             WHEN        8
+      ***    WHEN       11
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9018"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR
+               END-EVALUATE
+             WHEN        9
+             WHEN       13
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9018"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR2
+               END-EVALUATE
+           END-EVALUATE
       *
            .
       *
-       NYUKHNKSNKBN-CHECK2-EXT.
+       CHUKSNCD-CHECK1-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ∏∫ªª•¡•ß•√•Ø£≤  201604
+      **************************************************************
+       CHUKSNCD-CHECK2-SEC           SECTION.
+      *
+           EVALUATE   TBL-GAIHAKU(SYU-IDX)
+             WHEN        8
+      ***    WHEN       11
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR
+               END-EVALUATE
+             WHEN        9
+             WHEN       13
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR2
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+      *
+       CHUKSNCD-CHECK2-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ∏∫ªª•¡•ß•√•Ø£≥  201804
+      **************************************************************
+       CHUKSNCD-CHECK3-SEC           SECTION.
+      *
+           EVALUATE   TBL-GAIHAKU(SYU-IDX)
+             WHEN        8
+      ***    WHEN       11
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR
+               END-EVALUATE
+             WHEN        9
+             WHEN       13
+             WHEN       17
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                 WHEN   "9090"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR2
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+      *
+       CHUKSNCD-CHECK3-EXT.
            EXIT.
       *
       **************************************************************
@@ -4838,6 +4928,21 @@ grpsys                            SPA-AREA
                               MOVE   TNS-TEN   TO   WRK-KHNTEN
                               MOVE   TNS-NYUKHNKSNKBN
                                                TO   WRK-NYUKHNKSNKBN
+      *                       ∆˛±°¥À‹Œ¡≤√ªª∂Ë ¨√÷§≠¥π§®
+                              IF  SYU-SRYYMD(1:6) >= "201804"
+      *                         Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡
+      *                                       ° ∆√ Ã∆˛±°¥À‹Œ¡°À
+                                IF   (TNS-NYUKHNKSNKBN = 27 )
+                                AND  (TNS-CDKBN-KBNNUM = 101)
+                                  MOVE   901   TO   WRK-NYUKHNKSNKBN
+                                END-IF
+      *                         Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡
+      *                                       ° ∆√ Ã∆˛±°¥À‹Œ¡°À
+                                IF   (TNS-NYUKHNKSNKBN = 27 )
+                                AND  (TNS-CDKBN-KBNNUM = 109)
+                                  MOVE   909   TO   WRK-NYUKHNKSNKBN
+                                END-IF
+                              END-IF
                               MOVE   TNS-CHUKSNCD
                                                TO   WRK-CHUKSNCD
                               MOVE   NSRY-SRYCD(NYUINACT-IDX)
@@ -5214,6 +5319,7 @@ grpsys                            SPA-AREA
                                               WRK-SENTEI-KHNTEN) * 
                                               SYS-5000-SENTEI-TANKA)
       *                          ≥∞«Ò° £±£µ°Û§»¡™ƒÍ≥∞«Ò§Œ∫π≥€°À
+                                 WHEN   1
                                  WHEN   3
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -5276,10 +5382,12 @@ grpsys                            SPA-AREA
                                  WHEN   7
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  11
                                  WHEN  13
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
+                                 WHEN  17
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -5310,6 +5418,7 @@ grpsys                            SPA-AREA
                                                WRK-KEISAN
                                      END-IF
       *                          ≥∞«Ò° £±£µ°Û§»¡™ƒÍ≥∞«Ò§Œ∫π≥€°À
+                                 WHEN   1
                                  WHEN   3
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -5400,10 +5509,12 @@ grpsys                            SPA-AREA
                                  WHEN   7
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  11
                                  WHEN  13
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
+                                 WHEN  17
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -5456,6 +5567,7 @@ grpsys                            SPA-AREA
                            WHEN   "0"
                                EVALUATE   TBL-GAIHAKU(SYU-IDX)
                                  WHEN   ZERO
+                                 WHEN   1
                                  WHEN   3
                                  WHEN   4
                                  WHEN   5
@@ -5463,10 +5575,12 @@ grpsys                            SPA-AREA
                                  WHEN   7
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  11
                                  WHEN  13
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
+                                 WHEN  17
                                      COMPUTE  NYUIN-TGMONEY =
                                               NYUIN-TGMONEY +
                                               SYS-5000-SENTEI-KINGAKU
@@ -5475,6 +5589,7 @@ grpsys                            SPA-AREA
                            WHEN   "1"
                                EVALUATE   TBL-GAIHAKU(SYU-IDX)
                                  WHEN   ZERO
+                                 WHEN   1
                                  WHEN   3
                                  WHEN   4
                                  WHEN   5
@@ -5482,10 +5597,12 @@ grpsys                            SPA-AREA
                                  WHEN   7
                                  WHEN   8
                                  WHEN   9
-                                 WHEN  10
-                                 WHEN  11
-                                 WHEN  12
+      ***                        WHEN  11
                                  WHEN  13
+                                 WHEN  14
+                                 WHEN  15
+                                 WHEN  16
+                                 WHEN  17
                                      COMPUTE  NYUIN-TGMONEY-TAX =
                                               NYUIN-TGMONEY-TAX +
                                               SYS-5000-SENTEI-KINGAKU
@@ -5528,6 +5645,7 @@ grpsys                            SPA-AREA
                                             WRK-SENTEI-KHNTEN) * 
                                          SBTUSENTEI-DAY-TANKA(SYU-IDX))
       *                      ≥∞«Ò° £±£µ°Û§»¡™ƒÍ≥∞«Ò§Œ∫π≥€°À
+                             WHEN   1
                              WHEN   3
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -5590,10 +5708,12 @@ grpsys                            SPA-AREA
                              WHEN   7
                              WHEN   8
                              WHEN   9
-                             WHEN  10
-                             WHEN  11
-                             WHEN  12
+      ***                    WHEN  11
                              WHEN  13
+                             WHEN  14
+                             WHEN  15
+                             WHEN  16
+                             WHEN  17
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -5624,6 +5744,7 @@ grpsys                            SPA-AREA
                                            WRK-KEISAN
                                  END-IF
       *                      ≥∞«Ò° £±£µ°Û§»¡™ƒÍ≥∞«Ò§Œ∫π≥€°À
+                             WHEN   1
                              WHEN   3
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
@@ -5714,10 +5835,12 @@ grpsys                            SPA-AREA
                              WHEN   7
                              WHEN   8
                              WHEN   9
-                             WHEN  10
-                             WHEN  11
-                             WHEN  12
+      ***                    WHEN  11
                              WHEN  13
+                             WHEN  14
+                             WHEN  15
+                             WHEN  16
+                             WHEN  17
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -5745,6 +5868,7 @@ grpsys                            SPA-AREA
                        WHEN   "0"
                            EVALUATE   TBL-GAIHAKU(SYU-IDX)
                              WHEN   ZERO
+                             WHEN   1
                              WHEN   3
                              WHEN   4
                              WHEN   5
@@ -5752,10 +5876,12 @@ grpsys                            SPA-AREA
                              WHEN   7
                              WHEN   8
                              WHEN   9
-                             WHEN  10
-                             WHEN  11
-                             WHEN  12
+      ***                    WHEN  11
                              WHEN  13
+                             WHEN  14
+                             WHEN  15
+                             WHEN  16
+                             WHEN  17
                                  COMPUTE  NYUIN-TGMONEY =
                                           NYUIN-TGMONEY +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)
@@ -5764,6 +5890,7 @@ grpsys                            SPA-AREA
                        WHEN   "1"
                            EVALUATE   TBL-GAIHAKU(SYU-IDX)
                              WHEN   ZERO
+                             WHEN   1
                              WHEN   3
                              WHEN   4
                              WHEN   5
@@ -5771,10 +5898,12 @@ grpsys                            SPA-AREA
                              WHEN   7
                              WHEN   8
                              WHEN   9
-                             WHEN  10
-                             WHEN  11
-                             WHEN  12
+      ***                    WHEN  11
                              WHEN  13
+                             WHEN  14
+                             WHEN  15
+                             WHEN  16
+                             WHEN  17
                                  COMPUTE  NYUIN-TGMONEY-TAX =
                                           NYUIN-TGMONEY-TAX +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)

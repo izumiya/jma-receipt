@@ -2241,8 +2241,8 @@
              OR  (RECE62-HKNNUM(1:2)  =   "98" OR  "90" OR  "91")
                 CONTINUE
              ELSE
-              IF ( RECE62-HKNNUM      = "060" OR  "067" )
-              OR ((RECE62-HKNNUM  NOT = "060" AND "067") AND
+              IF ( RECE62-HKNNUM      = "060"           )
+              OR ((RECE62-HKNNUM  NOT = "060"          ) AND
                   (RECE62-HOJOKBN     = SPACE          ))
                 MOVE      RECE61-SRYYM       TO   WRK-SRYYYMM
                 IF   RECE62-TEKSTYMD(1:6)  >=  RECE61-SRYYM

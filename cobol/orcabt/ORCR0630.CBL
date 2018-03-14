@@ -135,6 +135,7 @@
       *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
       *  04.08.09    NACL-ÌçÏÆ    17/12/12  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¥·¥¹¥Æ¥à´ÉÍý
       *                                     £²£°£±£°¤Î¥Ç¥Õ¥©¥ë¥ÈÀßÄê½¤Àµ¡Ë
+      *  04.08.10    NACL-ÌçÏÆ    18/03/01  Ê¿À®£³£°Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -1944,6 +1945,9 @@
                        WHEN   5
                        WHEN   6
                        WHEN   7
+                       WHEN  14
+                       WHEN  15
+                       WHEN  16
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       5
                             IF    RECE62-SRYYM  >=  "201604"
@@ -1973,6 +1977,18 @@
                                      (WRK-SENTEI-KHNTEN  *  0.85)
                                                          +  0.5
                             END-IF
+                           WHEN      14
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.95)
+                                                         +  0.5
+                           WHEN      15
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.65)
+                                                         +  0.5
+                           WHEN      16
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.85)
+                                                         +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
                                   WRK-NYUKHNRYO +
@@ -1986,10 +2002,9 @@
                          END-IF
                        WHEN   8
                        WHEN   9
-      ***              WHEN  10
       ***              WHEN  11
-      ***              WHEN  12
                        WHEN  13
+                       WHEN  17
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUKHNRYO =
@@ -1999,26 +2014,12 @@
                              COMPUTE  WRK-NYUKHNRYO =
                                      (WRK-SENTEI-KHNTEN  *  0.92)
                                                          +  0.5
-      ***                  WHEN      10
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-SENTEI-KHNTEN  *  0.92)
-      ***                                                +  0.5
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-NYUKHNRYO      *  0.3 )
-      ***                                                +  0.5
       ***                  WHEN      11
       ***                    COMPUTE  WRK-NYUKHNRYO =
       ***                            (WRK-SENTEI-KHNTEN  *  0.92)
       ***                                                +  0.5
       ***                    COMPUTE  WRK-NYUKHNRYO =
       ***                            (WRK-NYUKHNRYO      *  0.7 )
-      ***                                                +  0.5
-      ***                  WHEN      12
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-SENTEI-KHNTEN  *  0.92)
-      ***                                                +  0.5
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-NYUKHNRYO      *  0.3 )
       ***                                                +  0.5
                            WHEN      13
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2036,6 +2037,13 @@
                                      (WRK-NYUKHNRYO      *  0.7 )
                                                          +  0.5
                             END-IF
+                           WHEN      17
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO      *  0.95)
+                                                         +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
                                   WRK-NYUKHNRYO +
@@ -2065,6 +2073,9 @@
                        WHEN   5
                        WHEN   6
                        WHEN   7
+                       WHEN  14
+                       WHEN  15
+                       WHEN  16
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       4
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2110,6 +2121,18 @@
                                        (WRK-KHNTEN    *  0.85)
                                                       +  0.5
                             END-IF
+                           WHEN      14
+                               COMPUTE  WRK-NYUKHNRYO =
+                                       (WRK-KHNTEN    *  0.95)
+                                                      +  0.5
+                           WHEN      15
+                               COMPUTE  WRK-NYUKHNRYO =
+                                       (WRK-KHNTEN    *  0.65)
+                                                      +  0.5
+                           WHEN      16
+                               COMPUTE  WRK-NYUKHNRYO =
+                                       (WRK-KHNTEN    *  0.85)
+                                                      +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
                                   WRK-NYUKHNRYO +
@@ -2123,10 +2146,9 @@
                          END-IF
                        WHEN   8
                        WHEN   9
-      ***              WHEN  10
       ***              WHEN  11
-      ***              WHEN  12
                        WHEN  13
+                       WHEN  17
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUKHNRYO =
@@ -2136,26 +2158,12 @@
                              COMPUTE  WRK-NYUKHNRYO =
                                      (WRK-KHNTEN    *  0.92)
                                                     +  0.5
-      ***                  WHEN      10
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-KHNTEN    *  0.92)
-      ***                                           +  0.5
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-NYUKHNRYO *  0.3 )
-      ***                                           +  0.5
       ***                  WHEN      11
       ***                    COMPUTE  WRK-NYUKHNRYO =
       ***                            (WRK-KHNTEN    *  0.92)
       ***                                           +  0.5
       ***                    COMPUTE  WRK-NYUKHNRYO =
       ***                            (WRK-NYUKHNRYO *  0.7 )
-      ***                                           +  0.5
-      ***                  WHEN      12
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-KHNTEN    *  0.92)
-      ***                                           +  0.5
-      ***                    COMPUTE  WRK-NYUKHNRYO =
-      ***                            (WRK-NYUKHNRYO *  0.3 )
       ***                                           +  0.5
                            WHEN      13
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2173,6 +2181,13 @@
                                      (WRK-NYUKHNRYO *  0.7 )
                                                     +  0.5
                             END-IF
+                           WHEN      17
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO *  0.95)
+                                                    +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
                                   WRK-NYUKHNRYO +
@@ -2311,6 +2326,9 @@
                        WHEN   5
                        WHEN   6
                        WHEN   7
+                       WHEN  14
+                       WHEN  15
+                       WHEN  16
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       5
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2340,6 +2358,18 @@
                                      (WRK-SENTEI-KHNTEN  *  0.85)
                                                          +  0.5
                             END-IF
+                           WHEN      14
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.95)
+                                                         +  0.5
+                           WHEN      15
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.65)
+                                                         +  0.5
+                           WHEN      16
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.85)
+                                                         +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
                                   WRK-NYUTOKRYO +
@@ -2354,10 +2384,9 @@
                          MOVE   1   TO   FLG-GAIHAKU
                        WHEN   8
                        WHEN   9
-      ***              WHEN  10
       ***              WHEN  11
-      ***              WHEN  12
                        WHEN  13
+                       WHEN  17
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUTOKRYO =
@@ -2367,26 +2396,12 @@
                              COMPUTE  WRK-NYUTOKRYO =
                                      (WRK-SENTEI-KHNTEN  *  0.92)
                                                          +  0.5
-      ***                  WHEN      10
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-SENTEI-KHNTEN  *  0.92)
-      ***                                                +  0.5
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-NYUTOKRYO      *  0.3 )
-      ***                                                +  0.5
       ***                  WHEN      11
       ***                    COMPUTE  WRK-NYUTOKRYO =
       ***                            (WRK-SENTEI-KHNTEN  *  0.92)
       ***                                                +  0.5
       ***                    COMPUTE  WRK-NYUTOKRYO =
       ***                            (WRK-NYUTOKRYO      *  0.7 )
-      ***                                                +  0.5
-      ***                  WHEN      12
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-SENTEI-KHNTEN  *  0.92)
-      ***                                                +  0.5
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-NYUTOKRYO      *  0.3 )
       ***                                                +  0.5
                            WHEN      13
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2404,6 +2419,13 @@
                                      (WRK-NYUTOKRYO      *  0.7 )
                                                          +  0.5
                             END-IF
+                           WHEN      17
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO      *  0.95)
+                                                         +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
                                   WRK-NYUTOKRYO +
@@ -2436,6 +2458,9 @@
                        WHEN   5
                        WHEN   6
                        WHEN   7
+                       WHEN  14
+                       WHEN  15
+                       WHEN  16
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       4
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2481,6 +2506,18 @@
                                        (WRK-KHNTEN    *  0.85)
                                                       +  0.5
                             END-IF
+                           WHEN      14
+                               COMPUTE  WRK-NYUTOKRYO =
+                                       (WRK-KHNTEN    *  0.95)
+                                                      +  0.5
+                           WHEN      15
+                               COMPUTE  WRK-NYUTOKRYO =
+                                       (WRK-KHNTEN    *  0.65)
+                                                      +  0.5
+                           WHEN      16
+                               COMPUTE  WRK-NYUTOKRYO =
+                                       (WRK-KHNTEN    *  0.85)
+                                                      +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
                                   WRK-NYUTOKRYO +
@@ -2495,10 +2532,9 @@
                          MOVE   1   TO   FLG-GAIHAKU
                        WHEN   8
                        WHEN   9
-      ***              WHEN  10
       ***              WHEN  11
-      ***              WHEN  12
                        WHEN  13
+                       WHEN  17
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUTOKRYO =
@@ -2508,26 +2544,12 @@
                              COMPUTE  WRK-NYUTOKRYO =
                                      (WRK-KHNTEN    *  0.92)
                                                     +  0.5
-      ***                  WHEN      10
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-KHNTEN    *  0.92)
-      ***                                           +  0.5
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-NYUTOKRYO *  0.3 )
-      ***                                           +  0.5
       ***                  WHEN      11
       ***                    COMPUTE  WRK-NYUTOKRYO =
       ***                            (WRK-KHNTEN    *  0.92)
       ***                                           +  0.5
       ***                    COMPUTE  WRK-NYUTOKRYO =
       ***                            (WRK-NYUTOKRYO *  0.7 )
-      ***                                           +  0.5
-      ***                  WHEN      12
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-KHNTEN    *  0.92)
-      ***                                           +  0.5
-      ***                    COMPUTE  WRK-NYUTOKRYO =
-      ***                            (WRK-NYUTOKRYO *  0.3 )
       ***                                           +  0.5
                            WHEN      13
                             IF    RECE62-SRYYM  >=  "201604"
@@ -2545,6 +2567,13 @@
                                      (WRK-NYUTOKRYO *  0.7 )
                                                     +  0.5
                             END-IF
+                           WHEN      17
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO *  0.95)
+                                                    +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
                                   WRK-NYUTOKRYO +
@@ -3581,9 +3610,9 @@
               PERFORM  VARYING  IDX1    FROM    1   BY  1
                         UNTIL  (IDX1                  >  10 )
                          OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
-                IF   (WRK-DAY1(IDY)   NOT  =  ZERO              )
-                AND  (WRK-DAY2(IDY)        =  8 OR 9 OR 10 OR 11
-                                                     OR 12 OR 13)
+                IF   (WRK-DAY1(IDY)   NOT  =  ZERO                    )
+      ***       AND  (WRK-DAY2(IDY)        =  8 OR 9 OR 11 OR 13 OR 17)
+                AND  (WRK-DAY2(IDY)        =  8 OR 9 OR 13 OR 17      )
                   IF  WRK-DAY5(IDY) =  RECE62-HKNCOMBI(IDX1)
                      PERFORM   2001133-GENSAN-GET3-SEC
                      MOVE  10    TO    IDX1
@@ -3874,8 +3903,7 @@
       *
            EVALUATE    WRK-DAY2(IDY)
               WHEN          8
-              WHEN         10
-              WHEN         11
+      ***     WHEN         11
                  MOVE     ZERO     TO    FLG-ARI
                  PERFORM  VARYING  ID1    FROM    1   BY  1
                            UNTIL  (ID1                    >  20  )
@@ -3889,8 +3917,8 @@
                      MOVE  "¸áÁ°¸º"  TO   RECE62-NYUSYUBETU(ID1)(1:6)
                  END-IF
               WHEN          9
-              WHEN         12
               WHEN         13
+              WHEN         17
                  MOVE     ZERO     TO    FLG-ARI
                  PERFORM  VARYING  ID1    FROM    1   BY  1
                            UNTIL  (ID1                    >  20  )
