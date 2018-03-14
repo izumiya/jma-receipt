@@ -59,8 +59,8 @@
        01  FLG-AREA.
            03  FLG-END                         PIC 9(01).
            03  FLG-SYSKANRI                    PIC 9(01).
-           03  FLG-HKNCOMBI                    PIC 9(01). 
-           03  FLG-HKNNUM                      PIC 9(01). 
+           03  FLG-HKNCOMBI                    PIC 9(01).
+           03  FLG-HKNNUM                      PIC 9(01).
            03  FLG-PTHKNINF                    PIC 9(01).
            03  FLG-PTKOHINF                    PIC 9(01).
            03  FLG-PTINF                       PIC 9(01).
@@ -71,7 +71,7 @@
            03  FLG-PT-HDIST-DAY                PIC 9(01).
            03  FLG-SYUKA                       PIC 9(01).
       * 
-           03  FLG-LASTHKNID                   PIC 9(01). 
+           03  FLG-LASTHKNID                   PIC 9(01).
            03  FLG-SEIHO                       PIC 9(01).
            03  FLG-WRITE                       PIC 9(01).
            03  FLG-CHK                         PIC 9(01).
@@ -99,6 +99,7 @@
            03  IDYY                            PIC 9(04).
            03  IDZZ                            PIC 9(04).
            03  IDXD                            PIC 9(04).
+           03  IDY2                            PIC 9(04).
       *
        01  KEY-AREA                            VALUE   LOW-VALUE.
            03  KEY-NEW.
@@ -194,6 +195,15 @@
       *
        01  TOUKEI01-REC. 
            COPY    "CPTCF001.INC".
+           03  TOUKEI01-HKNCOMBIINF-AREA.
+               05  TOUKEI01-HKNCOMBI-G     OCCURS  10.
+                   07  TOUKEI01-HKNNUMHC
+                                   PIC X(03).
+                   07  TOUKEI01-KOHNUMHCINF    OCCURS  4.
+                       09  TOUKEI01-KOHNUMHC
+                                   PIC X(03).
+                       09  TOUKEI01-KOHIDHC
+                                   PIC 9(10).
       *     
       *    ワーク保険組合せ（入院会計用） 
        01  WRK-HKNCOMBI-TABLE.
@@ -206,8 +216,18 @@
            02  WRK-TOUKEI01-OCC    OCCURS  100.
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //WRK-TOUKEI01//.
+           03  WRK-TOUKEI01-HKNCOMBIINF-AREA.
+               05  WRK-TOUKEI01-HKNCOMBI-G    OCCURS  10.
+                   07  WRK-TOUKEI01-HKNNUMHC
+                                   PIC X(03).
+                   07  WRK-TOUKEI01-KOHNUMHCINF    OCCURS  4.
+                       09  WRK-TOUKEI01-KOHNUMHC
+                                   PIC X(03).
+                       09  WRK-TOUKEI01-KOHIDHC
+                                   PIC 9(10).
                03  WRK-TOUKEI01-SYOKBN
                                    PIC X(01).
+      *     
            02  WRK-TOUKEI01-SEIHO-OCC
                                    OCCURS  100.
                03  WRK-TOUKEI01-SEIHO-KEY
@@ -217,12 +237,30 @@
        01  WRK-SEIHO-TOUKEI01-REC. 
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //WRK-SEIHO-TOUKEI01//.
-      *
+           03  WRK-SEIHO-TOUKEI01-HKNCOMBIINF-AREA.
+               05  WRK-SEIHO-TOUKEI01-HKNCOMBI-G   OCCURS  10.
+                   07  WRK-SEIHO-TOUKEI01-HKNNUMHC
+                                   PIC X(03).
+                   07  WRK-SEIHO-TOUKEI01-KOHNUMHCINF    OCCURS  4.
+                       09  WRK-SEIHO-TOUKEI01-KOHNUMHC
+                                   PIC X(03).
+                       09  WRK-SEIHO-TOUKEI01-KOHIDHC
+                                   PIC 9(10).
+       *
       *    ワーク生保まとめ
        01  TBL-SEIHO-TOUKEI01-AREA.
            02  TBL-SEIHO-TOUKEI01-REC  OCCURS  50. 
            COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
                                    BY         //TBL-SEIHO-TOUKEI01//.
+           03  TBL-SEIHO-TOUKEI01-HKNCOMBIINF-AREA.
+               05  TBL-SEIHO-TOUKEI01-HKNCOMBI-G   OCCURS  10.
+                   07  TBL-SEIHO-TOUKEI01-HKNNUMHC
+                                   PIC X(03).
+                   07  TBL-SEIHO-TOUKEI01-KOHNUMHCINF    OCCURS  4.
+                       09  TBL-SEIHO-TOUKEI01-KOHNUMHC
+                                   PIC X(03).
+                       09  TBL-SEIHO-TOUKEI01-KOHIDHC
+                                   PIC 9(10).
            02  TBL-SEIHO-TOUKEI01-OCC  OCCURS  50.
                03  TBL-SEIHO-TOUKEI01-PRTFLG
                                    PIC 9(01).
@@ -383,8 +421,11 @@
       *    患者番号構成管理情報
            COPY    "CPSK1009.INC".
       *     
-           COPY    "CPSK2005.INC".
-           COPY    "CPSK200501.INC".
+           COPY    "CPSK2005.INC"  REPLACING   //SYS-2005//
+                                   BY          //S-25//.
+           COPY    "CPSK200501.INC"
+                                   REPLACING   //SYS-200501//
+                                   BY          //S-2501//.
       *
       *    診療会計
        01  SRYACCT-REC.
@@ -585,57 +626,57 @@
            END-IF
       *
       *    レセプト編集区分情報
-           INITIALIZE                      SYS-2005-REC
-           MOVE    "2005"              TO  SYS-2005-KANRICD
-           MOVE    "*"                 TO  SYS-2005-KBNCD
-           MOVE    WRK-PARA-STSRYYM    TO  SYS-2005-STYUKYMD (1:6)
-           MOVE    "01"                TO  SYS-2005-STYUKYMD (7:2)
-           MOVE    SYS-2005-STYUKYMD   TO  SYS-2005-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
-           MOVE    SYS-2005-REC        TO  MCPDATA-REC
+           INITIALIZE                      S-25-REC
+           MOVE    "2005"              TO  S-25-KANRICD
+           MOVE    "*"                 TO  S-25-KBNCD
+           MOVE    WRK-PARA-STSRYYM    TO  S-25-STYUKYMD (1:6)
+           MOVE    "01"                TO  S-25-STYUKYMD (7:2)
+           MOVE    S-25-STYUKYMD       TO  S-25-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  S-25-HOSPNUM
+           MOVE    S-25-REC            TO  MCPDATA-REC
            PERFORM 910-SYSKANRI-INV-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-2005-REC
+               MOVE    MCPDATA-REC         TO  S-25-REC
            ELSE    
-               MOVE    SPACE               TO  SYS-2005-REC
+               MOVE    SPACE               TO  S-25-REC
            END-IF
-           IF      SYS-2005-RJNGNBKKBN =   SPACE
-               MOVE    ZERO                TO  SYS-2005-RJNGNBKKBN
+           IF      S-25-RJNGNBKKBN     =   SPACE
+               MOVE    ZERO                TO  S-25-RJNGNBKKBN
            END-IF
-           IF      SYS-2005-BYOMEIHENKBN1   =   SPACE
-               MOVE    ZERO             TO  SYS-2005-BYOMEIHENKBN1
+           IF      S-25-BYOMEIHENKBN1  =   SPACE
+               MOVE    ZERO                TO  S-25-BYOMEIHENKBN1
            END-IF
-           IF      SYS-2005-TENKIHENKBN    =   SPACE
-               MOVE    ZERO             TO  SYS-2005-TENKIHENKBN
+           IF      S-25-TENKIHENKBN    =   SPACE
+               MOVE    ZERO                TO  S-25-TENKIHENKBN
            END-IF
       *         
-           INITIALIZE                      SYS-200501-REC
-           MOVE    "2005"              TO  SYS-200501-KANRICD
-           MOVE    "01"                TO  SYS-200501-KBNCD
-           MOVE    WRK-PARA-STSRYYM    TO  SYS-200501-STYUKYMD (1:6)
-           MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
-           MOVE    SYS-2005-STYUKYMD   TO  SYS-200501-EDYUKYMD
-           MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
-           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           INITIALIZE                      S-2501-REC
+           MOVE    "2005"              TO  S-2501-KANRICD
+           MOVE    "01"                TO  S-2501-KBNCD
+           MOVE    WRK-PARA-STSRYYM    TO  S-2501-STYUKYMD (1:6)
+           MOVE    "01"                TO  S-2501-STYUKYMD (7:2)
+           MOVE    S-2501-STYUKYMD     TO  S-2501-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  S-2501-HOSPNUM
+           MOVE    S-2501-REC          TO  MCPDATA-REC
            PERFORM 910-SYSKANRI-INV-SEC
            IF      FLG-SYSKANRI     =   ZERO
-               MOVE    MCPDATA-REC      TO  SYS-200501-REC
+               MOVE    MCPDATA-REC      TO  S-2501-REC
            ELSE    
-               INITIALIZE                   SYS-200501-REC
+               INITIALIZE                   S-2501-REC
            END-IF
-           IF      SYS-200501-TENKIBYOMEI-KBN
+           IF      S-2501-TENKIBYOMEI-KBN
                                     =   SPACE
-               MOVE    ZERO             TO  SYS-200501-TENKIBYOMEI-KBN
+               MOVE    ZERO             TO  S-2501-TENKIBYOMEI-KBN
            END-IF
       *
-           DISPLAY "SYS-2005-BYOMEIHENKBN1    ="
-                                    SYS-2005-BYOMEIHENKBN1
-           DISPLAY "SYS-2005-RJNGNBKKBN       ="
-                                    SYS-2005-RJNGNBKKBN
-           DISPLAY "SYS-2005-TENKIHENKBN      ="
-                                    SYS-2005-TENKIHENKBN
-           DISPLAY "SYS-200501-TENKIBYOMEI-KBN="
-                                    SYS-200501-TENKIBYOMEI-KBN
+           DISPLAY "S-25-BYOMEIHENKBN1    ="
+                                    S-25-BYOMEIHENKBN1
+           DISPLAY "S-25-RJNGNBKKBN       ="
+                                    S-25-RJNGNBKKBN
+           DISPLAY "S-2501-TENKIBYOMEI-KBN="
+                                    S-2501-TENKIBYOMEI-KBN
+           DISPLAY "S-25-TENKIHENKBN      ="
+                                    S-25-TENKIHENKBN
       *
       *    期間
            IF      WRK-PARA-STSRYYM    =   WRK-PARA-EDSRYYM
@@ -668,8 +709,6 @@
            MOVE    HEAD-02             TO  HCMSL80-MOJI (3)
       *
            MOVE    4                   TO  CNT-LINE
-      *
-      *
            .
        100-INIT-EXT.
            EXIT.
@@ -1585,48 +1624,46 @@ grpsys         PERFORM 900-DBSELECT-SEC
            PERFORM 20012-KOHID-CHECK-SEC
       *
            IF      TOUKEI01-HKNNUM NOT =   SPACE
-      *            主保険情報 
-                   MOVE    PTHKN-HKNID     TO  TOUKEI01-HKNID
-                                               TOUKEI01-THKNID     (1)
-                   MOVE    PTHKN-TEKSTYMD  TO  TOUKEI01-TTEKSTYMD  (1)
-                   MOVE    PTHKN-TEKEDYMD  TO  TOUKEI01-TTEKEDYMD  (1)
-                   MOVE    PTHKN-HOJOKBN   TO  TOUKEI01-THOJOKBN   (1)
-                   IF      PTHKN-HKNNUM    =   "002"
-                       IF    ( WRK-SRYYM
-                                             <   WRK-CONS-SRYYM-200804 )
-                       OR    ( AGECHK-NENREI <=  74                    )  
-                           CONTINUE
-                       ELSE
-                           EVALUATE    PTHKN-HOJOKBN
-                               WHEN    "A"
-                               WHEN    "G"
-                               WHEN    "D"
-                                   MOVE    "1" TO  TOUKEI01-THOJOKBN (1)
-                               WHEN    "B"
-                               WHEN    "H"
-                               WHEN    "E"
-                                   MOVE    "2" TO  TOUKEI01-THOJOKBN (1)
-                               WHEN    "C"
-                               WHEN    "I"
-                               WHEN    "F"
-                                   MOVE    "3" TO  TOUKEI01-THOJOKBN (1)
-                           END-EVALUATE
-                       END-IF
+      *        主保険情報 
+               MOVE    PTHKN-HKNID     TO  TOUKEI01-HKNID
+                                           TOUKEI01-THKNID     (1)
+               MOVE    PTHKN-TEKSTYMD  TO  TOUKEI01-TTEKSTYMD  (1)
+               MOVE    PTHKN-TEKEDYMD  TO  TOUKEI01-TTEKEDYMD  (1)
+               MOVE    PTHKN-HOJOKBN   TO  TOUKEI01-THOJOKBN   (1)
+               IF      PTHKN-HKNNUM    =   "002"
+                   IF    ( WRK-SRYYM     <   WRK-CONS-SRYYM-200804 )
+                   OR    ( AGECHK-NENREI <=  74                    )  
+                       CONTINUE
+                   ELSE
+                       EVALUATE    PTHKN-HOJOKBN
+                           WHEN    "A"
+                           WHEN    "G"
+                           WHEN    "D"
+                               MOVE    "1" TO  TOUKEI01-THOJOKBN (1)
+                           WHEN    "B"
+                           WHEN    "H"
+                           WHEN    "E"
+                               MOVE    "2" TO  TOUKEI01-THOJOKBN (1)
+                           WHEN    "C"
+                           WHEN    "I"
+                           WHEN    "F"
+                               MOVE    "3" TO  TOUKEI01-THOJOKBN (1)
+                       END-EVALUATE
                    END-IF
-                   MOVE    PTHKN-HONKZKKBN TO  TOUKEI01-THONKZKKBN (1)
-      *            法別番号
-                   INITIALIZE                      HKNNUM-REC
-                   MOVE    WRK-PARA-HOSPNUM    TO  HKN-HOSPNUM
-                   MOVE    PTHKN-HKNNUM        TO  HKN-HKNNUM
-                   MOVE    ZERO                TO  HKN-PAYKBN   
-                   MOVE    WRK-SYMD            TO  HKN-TEKSTYMD
-                                                   HKN-TEKEDYMD
-                   MOVE    HKNNUM-REC          TO  MCPDATA-REC
-                   PERFORM 900-HKNNUM-CHK-SEC
-                   IF      FLG-HKNNUM          =   ZERO
-                       MOVE    HKN-HKNKOHSBTKBN
-                                               TO  TOUKEI01-HKNKOHSBTKBN
-                   END-IF
+               END-IF
+               MOVE    PTHKN-HONKZKKBN TO  TOUKEI01-THONKZKKBN (1)
+      *        法別番号
+               INITIALIZE                      HKNNUM-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  HKN-HOSPNUM
+               MOVE    PTHKN-HKNNUM        TO  HKN-HKNNUM
+               MOVE    ZERO                TO  HKN-PAYKBN   
+               MOVE    WRK-SYMD            TO  HKN-TEKSTYMD
+                                               HKN-TEKEDYMD
+               MOVE    HKNNUM-REC          TO  MCPDATA-REC
+               PERFORM 900-HKNNUM-CHK-SEC
+               IF      FLG-HKNNUM          =   ZERO
+                   MOVE    HKN-HKNKOHSBTKBN    TO  TOUKEI01-HKNKOHSBTKBN
+               END-IF
            END-IF
       *
       *    患者番号
@@ -1637,6 +1674,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
            CALL    "ORCSPTID"          USING   ORCSPTIDAREA
                                                SPA-AREA
            MOVE    SPTID-PTNUM     TO  TOUKEI01-PTNUM
+      *
+           DISPLAY "PTNUM="  TOUKEI01-PTNUM
       *
       *    年齢
            INITIALIZE                  ORCSAGECHKAREA
@@ -1656,6 +1695,14 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            MOVE    COMB-HKNCOMBINUM
                                    TO  TOUKEI01-HKNCOMBI   (1)
+           MOVE    COMB-HKNNUM     TO  TOUKEI01-HKNNUMHC   (1)
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL   IDX1    >       4
+               MOVE    COMB-KOHHKNNUM (IDX1)   TO
+                                           TOUKEI01-KOHNUMHC (1 IDX1)
+               MOVE    COMB-KOHID     (IDX1)   TO
+                                           TOUKEI01-KOHIDHC  (1 IDX1)
+           END-PERFORM
       *
            EVALUATE    WRK-DATAKBN
                WHEN    "2"
@@ -1743,6 +1790,15 @@ grpsys         PERFORM 900-DBSELECT-SEC
                IF      TOUKEI01-HKNCOMBI    (IDX)   =   ZERO
                    MOVE    COMB-HKNCOMBINUM    TO
                                        TOUKEI01-HKNCOMBI   (IDX)
+                   MOVE    COMB-HKNNUM         TO
+                                       TOUKEI01-HKNNUMHC   (IDX)
+                   PERFORM VARYING IDX1    FROM    1   BY  1
+                           UNTIL   IDX1    >       4
+                       MOVE    COMB-KOHHKNNUM (IDX1)   TO
+                                           TOUKEI01-KOHNUMHC (IDX IDX1)
+                       MOVE    COMB-KOHID     (IDX1)   TO
+                                           TOUKEI01-KOHIDHC  (IDX IDX1)
+                   END-PERFORM
                    MOVE    10                   TO  IDX
                ELSE
                    IF      COMB-HKNCOMBINUM    =
@@ -1928,11 +1984,11 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                            =   WRK-CONS-GENBAKU-HKNNUM )
                    AND   ( TOUKEI01-TRECESKYKBN(IDY)  =  "1"           )
                        IF      TOUKEI01-HKNNUM =   "060"   OR  "067"
-                           IF      SYS-2005-RJNGNBKKBN =   "1" OR  ZERO
+                           IF      S-25-RJNGNBKKBN =   "1" OR  ZERO
                                MOVE    "2" TO  TOUKEI01-TRECESKYKBN(IDY)
                            END-IF
                        ELSE                
-                           IF      SYS-2005-RJNGNBKKBN =   "2" OR  ZERO
+                           IF      S-25-RJNGNBKKBN =   "2" OR  ZERO
                                MOVE    "2" TO  TOUKEI01-TRECESKYKBN(IDY)
                            END-IF
                        END-IF
@@ -2211,7 +2267,12 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                            TBL-SEIHO-TOUKEI01-HKNCOMBI
                                                               (IDA 1)
                                                            TO
-                                               TOUKEI01-HKNCOMBI (IDB)
+                                               TOUKEI01-HKNCOMBI   (IDB)
+                                           MOVE
+                                           TBL-SEIHO-TOUKEI01-HKNCOMBI-G
+                                                              (IDA 1)
+                                                           TO
+                                               TOUKEI01-HKNCOMBI-G (IDB)
                                        END-IF
                                        IF      TOUKEI01-HKNCOMBI (IDB)
                                                    =
@@ -2486,6 +2547,15 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    IF      WRK-RECE02-HKNCOMBI (IDY)   =   ZERO
                        MOVE    TOUKEI01-HKNCOMBI (IDX) TO
                                                WRK-RECE02-HKNCOMBI (IDY)
+                       MOVE    TOUKEI01-HKNNUMHC (IDX)
+                                           TO  WRK-RECE02-HKNNUMHC (IDY)
+                       PERFORM VARYING IDY2    FROM    1   BY  1
+                               UNTIL   IDY2    >       4
+                           MOVE TOUKEI01-KOHNUMHC (IDX IDY2) TO
+                                           WRK-RECE02-KOHNUMHC(IDY IDY2)
+                           MOVE TOUKEI01-KOHIDHC  (IDX IDY2) TO
+                                           WRK-RECE02-KOHIDHC (IDY IDY2)
+                       END-PERFORM
                    END-IF
                    IF      TOUKEI01-HKNCOMBI (IDX)     =
                                            WRK-RECE02-HKNCOMBI (IDY)
@@ -2509,6 +2579,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    END-IF
                END-PERFORM
            END-PERFORM
+      *
            .
         20023-HENSYU-EXT.
            EXIT.
@@ -2549,6 +2620,10 @@ grpsys         PERFORM 900-DBSELECT-SEC
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       1000
                    OR      WRK-RECE631-SRYYMD (IDX) =   SPACE
+      *
+               DISPLAY "SRYYMD=" WRK-RECE631-SRYYMD (IDX)
+                             " " WRK-RECE631-BYOMEIHENFLG (IDX)
+      *
                ADD     1               TO  SUM-PTBYOMEI (1 3)
                                            SUM-PTBYOMEI (2 3)
                                            CNT-IN
@@ -2582,7 +2657,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
       *    診療科
            MOVE    ZERO                TO  FLG-CHK 
-           IF      SYS-2005-BYOMEIHENKBN1  =   ZERO
+           IF      S-25-BYOMEIHENKBN1  =   ZERO
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       20
                        OR      WRK-RECE02-SRYKA(IDX)   =   SPACE
@@ -2608,15 +2683,15 @@ grpsys         PERFORM 900-DBSELECT-SEC
            IF      PTBYO-HKNCOMBI     =   ZERO
                CONTINUE
            ELSE
-      *        第三者行為のみの場合は対象外
-               IF      WRK-RECE02-DAISAN-GAITO =   1
-                   GO  TO  200221-BYOMEI-WRITE-EXT
-               END-IF
+      ****     第三者行為のみの場合は対象外
+      ****     IF      WRK-RECE02-DAISAN-GAITO =   1
+      ****         GO  TO  200221-BYOMEI-WRITE-EXT
+      ****     END-IF
       *
                MOVE    ZERO            TO  IDZ  
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL   IDX     >       10
-                       OR      WRK-RECE02-HKNCOMBI (IDX)   =   ZERO 
+                       OR      WRK-RECE02-HKNCOMBI (IDX)   =   ZERO
                    IF      PTBYO-HKNCOMBI  =   WRK-RECE02-HKNCOMBI (IDX)
                        MOVE    IDX             TO  IDZ
                        MOVE    10              TO  IDX
@@ -2630,41 +2705,30 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    公費ＩＤ（第三者行為）
-           IF      WRK-RECE02-DAISAN-GAITO =   9
-               CONTINUE
-           ELSE
-      *        患者登録で第三者行為の登録なし以外のときにチェック
-               IF      PTBYO-KOHID         =   ZERO
-      *            第三者行為のみの場合は対象外
-                   IF      WRK-RECE02-DAISAN-GAITO =   1
-                       GO  TO  200221-BYOMEI-WRITE-EXT
-                   END-IF
-               ELSE 
-      *            第三者行為以外のみの場合は対象外
-                   IF      WRK-RECE02-DAISAN-GAITO =   0
-                       GO  TO  200221-BYOMEI-WRITE-EXT
-                   END-IF
-      *
-                   MOVE    ZERO            TO  IDZ
-                   PERFORM VARYING IDX     FROM    1   BY  1
-                           UNTIL   IDX     >       10
-                           OR      WRK-RECE02-HKNCOMBI (IDX)
-                                           =   ZERO 
-                       IF    ( WRK-RECE02-DAISANFLG     (IDX)
-                                               =   1           )
-                       AND   ( WRK-RECE02-DAISAN-SKYFLG (IDX)
-                                               =   1           )
-                       AND   ( WRK-RECE02-DAISAN-KOHID  (IDX)
-                                               =   PTBYO-KOHID )  
+           IF      PTBYO-KOHID     >   ZERO
+               MOVE    ZERO            TO  IDZ
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       10
+                       OR      WRK-RECE02-HKNCOMBI (IDX)
+                                       =   ZERO 
+                   PERFORM VARYING IDY     FROM    1   BY  1
+                           UNTIL   IDY     >       4
+                           OR      WRK-RECE02-KOHIDHC  (IDX IDY)
+                                           =       ZERO
+                       IF    ( WRK-RECE02-KOHNUMHC (IDX IDY)
+                                               =  "970"        )
+                       AND   ( WRK-RECE02-KOHIDHC  (IDX IDY)
+                                               =   PTBYO-KOHID )
                            MOVE    IDX             TO  IDZ
                            MOVE    10              TO  IDX
+                           MOVE    4               TO  IDY
                        END-IF
                    END-PERFORM
-                   IF      IDZ            >   ZERO
-                       CONTINUE
-                   ELSE
-                       GO  TO  200221-BYOMEI-WRITE-EXT
-                   END-IF
+               END-PERFORM
+               IF      IDZ            >   ZERO
+                   CONTINUE
+               ELSE
+                   GO  TO  200221-BYOMEI-WRITE-EXT
                END-IF
            END-IF
       *
@@ -2684,7 +2748,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    IF      PTBYO-TENKIKBN       =   SPACE
                        CONTINUE
                    ELSE
-                       IF    ( SYS-200501-TENKIBYOMEI-KBN
+                       IF    ( S-2501-TENKIBYOMEI-KBN
                                                    =   "0"  )
                        OR    ( PTBYO-REZEMM        =   ZERO )
                            IF      PTBYO-TENKIYMD(1:6) >=
@@ -2710,7 +2774,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                                        LNK-DAY6-AREA
                    MOVE    LNK-DAY6-KEISAN(1:6)
                                                TO  WRK-YM
-                   IF    ( SYS-200501-TENKIBYOMEI-KBN
+                   IF    ( S-2501-TENKIBYOMEI-KBN
                                                =   "0"   )
                    OR    ( PTBYO-TENKIKBN      =   SPACE )
                        IF      WRK-YM              >=  WRK-SRYYM
@@ -2726,7 +2790,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                OR    ( PTBYO-REZEMM        =   ZERO  )
                    CONTINUE
                ELSE
-                   IF      SYS-200501-TENKIBYOMEI-KBN
+                   IF      S-2501-TENKIBYOMEI-KBN
                                                =   "1"
                        IF      WRK-YM              >=  WRK-SRYYM
                            CONTINUE
@@ -2792,8 +2856,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       **       PTBYO-BYOMEI 
       *
       *    同一開始日・病名・転帰区分でまとめる
-           IF      SYS-2005-TENKIHENKBN
-                                       =   ZERO
+           IF      S-25-TENKIHENKBN    =   ZERO
                MOVE    SPACE           TO  PTBYO-TENKIYMD
            END-IF
            PERFORM VARYING IDX FROM    1   BY  1
