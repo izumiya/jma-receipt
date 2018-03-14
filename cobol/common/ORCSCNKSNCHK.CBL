@@ -27,6 +27,10 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *平成３０年４月改定対応
+      *  05.00.00    NACL-小豆沢  18/03/12  入院料と入院料加算のチェック
+      *                                     を入院料加算チェックマスタから
+      *                                     電子点数表マスタに変更
       *****************************************************************
       *
       *
@@ -53,6 +57,7 @@
            03  FLG-KSN                     PIC 9(01).
            03  FLG-SENTEI-SET              PIC 9(01).
            03  FLG-SENTEICDCHG             PIC 9(01).
+           03  FLG-ETENSU1                 PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -147,6 +152,10 @@
       *    入院料加算チェック
        01  NYUKSNCHK-REC.
            COPY   "CPNYUKSNCHK.INC".
+      *
+      *    電子点数表マスタ
+       01  ETENSU1-REC.
+           COPY   "CPETENSU1.INC".
       *
       *    選定療養費
        01  SENTEICDCHG-REC.
@@ -390,11 +399,13 @@
            PERFORM   900-CLOSE-SEC
       *
       *
-      *    入院料加算チェックテーブルによるチェック（入院基本料等加算）
+      *    入院料加算チェック（入院基本料等加算）
            IF    FLG-KSN      =     2
              PERFORM    VARYING   IDX1   FROM   1   BY   1
                       UNTIL     IDX1   >   31
-               IF   (ORCSCNKSN-DAY(IDX1)         NOT =   ZERO)  AND
+               IF    ORCSCNKSN-SRYYM          <=    "201803"
+      *          入院料加算チェックマスタによるチェック
+                 IF (ORCSCNKSN-DAY(IDX1)         NOT =   ZERO)  AND
                     (WRK-KHN-NYUKHNKSNKBN(IDX1)  NOT =   ZERO)  AND
                     (WRK-KSN-NYUKHNKSNKBN        NOT =   ZERO)
       *
@@ -426,6 +437,39 @@
                     MOVE    "tbl_nyuksnchk"         TO  MCP-TABLE
                     MOVE    "key"                   TO  MCP-PATHNAME
                     PERFORM   900-CLOSE-SEC
+                 END-IF
+               ELSE
+      *          平成３０年４月以降は電子点数表マスタによるチェック
+                 IF (ORCSCNKSN-DAY(IDX1)   NOT =   ZERO)   AND
+                    (WRK-NYUINKHN(IDX1)    NOT =   SPACE)
+      *
+                    INITIALIZE                 ETENSU1-REC
+                    MOVE    WRK-NYUINKHN (IDX1)
+                                           TO  ETENSU1-SRYCD
+                    MOVE    ORCSCNKSN-SRYCD
+                                           TO  ETENSU1-UPSRYCD
+                    MOVE    ORCSCNKSN-SRYYM
+                                           TO  ETENSU1-YUKOSTYMD(1:6)
+                    MOVE    "01"           TO  ETENSU1-YUKOSTYMD(7:2)
+                    MOVE    ETENSU1-YUKOSTYMD
+                                           TO  ETENSU1-YUKOEDYMD
+                    MOVE    "tbl_etensu_1" TO  MCP-TABLE
+                    MOVE    "key4"         TO  MCP-PATHNAME
+                    PERFORM 910-ETENSU1-SELECT-SEC
+                    MOVE    "tbl_etensu_1" TO MCP-TABLE
+                    MOVE    "key4"         TO  MCP-PATHNAME
+                    PERFORM 910-ETENSU1-READ-SEC
+                    DISPLAY "FLG-ETENSU1 = " FLG-ETENSU1
+                    IF      FLG-ETENSU1    NOT =   ZERO
+                      MOVE    6            TO  ORCSCNKSN-RC
+                      MOVE  "算定入院料では算定できない入院料加算です。"
+                                           TO      ORCSCNKSN-ERRMSG
+                    END-IF
+      *             電子点数表マスタクローズ
+                    MOVE    "tbl_etensu_1"          TO  MCP-TABLE
+                    MOVE    "key4"                  TO  MCP-PATHNAME
+                    PERFORM   900-CLOSE-SEC
+                 END-IF
                END-IF
              END-PERFORM
       *
@@ -790,6 +834,41 @@
       *
            .
        910-NYUKSNCHK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    電子点数表検索
+      *****************************************************************
+       910-ETENSU1-SELECT-SEC        SECTION.
+      *
+           MOVE    ETENSU1-REC            TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-ETENSU1
+           ELSE
+               MOVE    1                  TO  FLG-ETENSU1
+           END-IF
+      *
+           .
+       910-ETENSU1-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    電子点数表読込
+      *****************************************************************
+       910-ETENSU1-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  ETENSU1-REC
+               MOVE    ZERO               TO  FLG-ETENSU1
+           ELSE
+               INITIALIZE                     ETENSU1-REC
+               MOVE    1                  TO  FLG-ETENSU1
+           END-IF
+      *
+           .
+       910-ETENSU1-READ-EXT.
            EXIT.
       *
       *****************************************************************

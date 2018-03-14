@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/05/09  グループ診療対応
+      *平成３０年４月改定対応
+      *  05.00.00    NACL-小豆沢  18/03/07  短期滞在手術等基本料の判定変更
       *****************************************************************
       *
       *
@@ -1341,7 +1343,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
                    MOVE    ZERO                TO  FLG-TENSU
       *            短期滞在の判定用
-                   IF     TNS-NYUKHNKSNKBN =  226  OR  240
+                   IF    (TNS-CDKBN-KBN     =   "A")   AND
+                         (TNS-CDKBN-KBNNUM  =   400)   AND
+                         (TNS-CDKBN-KOUBAN  =   2  OR 3)
                        MOVE   "1"       TO  WRK-TANKI-KBN
                    END-IF
                ELSE
@@ -1384,7 +1388,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  TTNS-TENSU-REC
       *            短期滞在の判定用
-                   IF     TTNS-NYUKHNKSNKBN =  226  OR  240
+                   IF    (TTNS-CDKBN-KBN     =   "A")   AND
+                         (TTNS-CDKBN-KBNNUM  =   400)   AND
+                         (TTNS-CDKBN-KOUBAN  =   2  OR 3)
                        IF    TNS-SRYCD   =    TTNS-SRYCD
                           CONTINUE
                        ELSE

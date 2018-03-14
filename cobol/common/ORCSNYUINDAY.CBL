@@ -30,6 +30,8 @@
       *平静２０年４月改定対応
       *  04.02.00    NACL-小豆沢  08/03/05  短期滞在手術基本料３の入院追加
       *  04.02.00    NACL-小豆沢  08/06/02  救急搬送診療料の算定日を判定追加
+      *平成３０年４月改定対応
+      *  05.00.00    NACL-小豆沢  18/03/07  短期滞在手術等基本料の判定変更
       *****************************************************************
       *
       *
@@ -516,7 +518,9 @@
                   MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
                   MOVE    TNS-YUKOSTYMD   TO  TNS-YUKOEDYMD
                   PERFORM   910-TENSU-READ-SEC
-                  IF     TNS-NYUKHNKSNKBN  =  226  OR  240
+                  IF    (TNS-CDKBN-KBN     =   "A")   AND
+                        (TNS-CDKBN-KBNNUM  =   400)   AND
+                        (TNS-CDKBN-KOUBAN  =   2  OR 3)
                       CONTINUE
                   ELSE
                       PERFORM    VARYING IDX   FROM   1   BY  1

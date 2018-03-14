@@ -33,6 +33,8 @@
       *  05.00.00    NACL-¾®Æ¦Âô  17/08/23  ÆÃÄêÆþ±¡ÎÁ¤Î»»ÄêÍ×·ï³°¤Ç
       *                                     ÎÅÍÜÉÂÅïÆþ±¡ÎÁ»»ÄêÆü¤Ï¥³¥á
       *                                     ¥ó¥È½ÐÎÏ¤·¤Ê¤¤
+      *Ê¿À®£³£°Ç¯£´·î²þÄêÂÐ±þ
+      *  05.00.00    NACL-¾®Æ¦Âô  18/03/08  ÎÅÍÜÉÂÅïÆþ±¡ÎÁ¤ÎÈ½ÄêÊÑ¹¹
       *****************************************************************
       *
       *
@@ -916,7 +918,8 @@
                    PERFORM  910-DB-CLOSE-SEC
                END-IF
       *        Ê¿À®£²£¸Ç¯£´·î¤«¤é¤ÎÆþ±¡¥Á¥§¥Ã¥¯
-               IF     LNK-RYOCOM-SANTEIYM   >=  "201604"
+               IF   ( LNK-RYOCOM-SANTEIYM   >=  "201604" )   AND
+                    ( LNK-RYOCOM-SANTEIYM   <=  "201803" )
                    INITIALIZE                       TNS-TENSU-REC
                    MOVE   LNK-RYOCOM-SANTEIYM  TO  TNS-YUKOSTYMD (1:6)
                    MOVE   "01"                 TO  TNS-YUKOSTYMD (7:2)
@@ -1041,6 +1044,73 @@
                              WHEN   067
       *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë¡ÊÌë¶Ð»þ´ÖÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
                              WHEN   068
+                               PERFORM  VARYING   IDX1 FROM 1 BY 1
+                                 UNTIL  ( IDX1     >   31 )
+                                 IF  (NACCT-DAY(IDX1)    =   1)   AND
+                                     (WRK-GAIHAKU(IDX1)  =   SPACE) AND
+                                     (WRK-TOKUGAI(IDX1)  =   SPACE)
+                                      MOVE "1"  TO  LNK-RYOCOM-NYUINKBN
+                                                                (IDX1)
+                                      MOVE  1     TO  FLG-RYOYO-NYUIN
+                                 END-IF
+                               END-PERFORM
+                           END-EVALUATE
+                       END-IF
+                   END-IF
+      *
+                   MOVE    "tbl_tensu"   TO  MCP-TABLE
+                   MOVE    "key"         TO  MCP-PATHNAME
+                   PERFORM  910-DB-CLOSE-SEC
+               END-IF
+      *        Ê¿À®£³£°Ç¯£´·î¤«¤é¤ÎÆþ±¡¥Á¥§¥Ã¥¯
+               IF     LNK-RYOCOM-SANTEIYM   >=  "201804"
+                   INITIALIZE                       TNS-TENSU-REC
+                   MOVE   LNK-RYOCOM-SANTEIYM  TO  TNS-YUKOSTYMD (1:6)
+                   MOVE   "01"                 TO  TNS-YUKOSTYMD (7:2)
+                   MOVE   TNS-YUKOSTYMD        TO  TNS-YUKOEDYMD
+                   MOVE   LNK-RYOCOM-HOSPNUM   TO  TNS-HOSPNUM
+                   MOVE   NSRY-SRYCD(1)        TO  TNS-SRYCD
+                   MOVE   TNS-TENSU-REC        TO  MCPDATA-REC
+                   MOVE    "tbl_tensu"         TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE  "tbl_tensu"       TO  MCP-TABLE
+                       MOVE  "key"             TO  MCP-PATHNAME
+                       PERFORM 910-DBFETCH-SEC
+                       IF      MCP-RC          =   ZERO
+                           MOVE  MCPDATA-REC   TO  TNS-TENSU-REC
+      *                    Æþ±¡´ðËÜÎÁ²Ã»»¶èÊ¬¤«¤é¤ÎÈ½Äê
+                           EVALUATE TNS-CDKBN-KBNNUM    ALSO
+                                    TNS-CDKBN-KOUBAN
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+                             WHEN   101   ALSO   03
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á
+                             WHEN   109   ALSO   01
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â
+                             WHEN   109   ALSO   02
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã
+                             WHEN   109   ALSO   03
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä
+                             WHEN   109   ALSO   04
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å
+                             WHEN   109   ALSO   05
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+                             WHEN   109   ALSO   06
+      *                      ÎÅÍÜÉÂ¾²°Ê³°¡¦Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡
+                             WHEN   108   ALSO   13
+      *                      ÎÅÍÜÉÂÅïÆþ±¡ÎÁ£±
+                             WHEN   101   ALSO   01
+      *                      ÎÅÍÜÉÂÅïÆþ±¡ÎÁ£²
+                             WHEN   101   ALSO   02
+      *                      ÎÅÍÜÉÂÅïÆþ±¡ÎÁ£²¡Ê·Ð²áÁ¼ÃÖ£±¡Ë
+                             WHEN   101   ALSO   10
+      *                      ÎÅÍÜÉÂÅïÆþ±¡ÎÁ£²¡Ê·Ð²áÁ¼ÃÖ£²¡Ë
+                             WHEN   101   ALSO   11
+      *                      °ìÈÌÉÂÅï¡¦ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±
+                             WHEN   100   ALSO   14
+      *                      ÆÃÄê°ìÈÌÉÂÅï¡¦ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±
+                             WHEN   317   ALSO   08
                                PERFORM  VARYING   IDX1 FROM 1 BY 1
                                  UNTIL  ( IDX1     >   31 )
                                  IF  (NACCT-DAY(IDX1)    =   1)   AND
