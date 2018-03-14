@@ -227,6 +227,7 @@
            03  FLG-TEISEI           PIC 9(01).
       *H30.4
            03  FLG-NINPU-IN         PIC 9(01).
+           03  FLG-CHKT             PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -3095,41 +3096,53 @@
            IF      SPA-GAI-JIKANKBN    =   8
       *        £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                IF     (SPA-NENREI-YY       <   6  )
-                  AND (SPA-JIKANTOKU-NYU   =   1
-                                           OR  2  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "2"  )
                    MOVE    5               TO  SPA-GAI-JIKANKBN
                END-IF
       *H30.4
       *        Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
                IF     (SPA-NENREI-YY       >=  6  )
-                  AND (SPA-JIKANTOKU-NYU   =   1
-                                           OR  3  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "3" )
                   AND (SPA-NINPUKBN-ARI    =   1  )
                    MOVE    5               TO  SPA-GAI-JIKANKBN
                END-IF
       *H28.10
            ELSE
-      *H29.2
+      *H30.4
+      *        ¾®»ù²Ê¡¦»ºÉØ¿Í²ÊÆÃÎã»þ´Ö³°¶èÊ¬¤òÌë´Ö¡¦ÁáÄ«¤Ø
+               MOVE    ZERO                TO  FLG-CHKT
       *        £¶ºÐ°Ê¾å¤ÇÌë´Ö¡¦ÁáÄ«»»Äê²Ä
                IF     (SPA-NENREI-YY       >=  6  )
                 AND   (SPA-YAKANKBN        =   1  )
                 AND   (SPA-HOSPSBT         =   2   )
-      *H30.4
-      *            Ç¥ÉØ¤ÇÆÃÎã¤Ê¤·¤Î»þ
-                   IF   (SPA-NINPUKBN-ARI    =   1  )
-                    AND (SPA-JIKANTOKU-NYU   =   1
-                                              OR  3  )
-                       CONTINUE
-                   ELSE
+                   MOVE    1                   TO  FLG-CHKT
+      *            Ç¥ÉØ¤ÇÆÃÎã¤¢¤ê»þ
+                   IF   (SPA-NINPUKBN-ARI      =   1  )
+                    AND (SPA-JIKANTOKU-NYU     =   "1"
+                                                OR "3")
+                       MOVE    ZERO            TO  FLG-CHKT
+                   END-IF
+               END-IF
       *
-                       EVALUATE    WRK-HZN-JIKANKBN
+      *        £¶ºÐÌ¤Ëþ
+               IF     (SPA-NENREI-YY       <   6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2  )
+                AND   (SPA-JIKANTOKU-NYU   =   "3" )
+      *           £¶ºÐÌ¤Ëþ¤Ç»ºÉØ¿Í²ÊÆÃÎã¤Î¤ß
+                   MOVE    1                   TO  FLG-CHKT
+               END-IF
+      *
+               IF      FLG-CHKT        =   1
+                   EVALUATE    WRK-HZN-JIKANKBN
       *                ¾®»ùÆÃÎãÌë´Ö¡¦µÙÆü¡¦¿¼Ìë
                        WHEN    "5"
                        WHEN    "6"
                        WHEN    "7"
                            MOVE    8               TO  SPA-GAI-JIKANKBN
-                       END-EVALUATE
-                   END-IF
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -3460,16 +3473,33 @@
       *           ¿Ç»¡ÎÁºÆ»»Äê»þ¤ÏÉÕ¤±¤Ê¤¤
                   (FLG-JIKANKBN        =   ZERO )
       *        ¾®»ù²ÊÆÃÎã»þ´Ö³°¤Ï£¶ºÐÌ¤Ëþ
+      *        IF     (SPA-GAI-JIKANKBN    =   5
+      *                                    OR  6
+      *                                    OR  7  )  AND
+      *               (SPA-NENREI-YY       >=  6  )
+      *H30.4
+      *        ¾®»ù²Ê¡¦»ºÉØ¿Í²ÊÆÃÎã»þ´Ö³°
                IF     (SPA-GAI-JIKANKBN    =   5
                                            OR  6
-                                           OR  7  )  AND
-                      (SPA-NENREI-YY       >=  6  )
-      *H30.4
-      *        Ç¥ÉØ°Ê³°
-                AND   (SPA-NINPUKBN-ARI    =   ZERO )
-      *
-                   CONTINUE
+                                           OR  7  )
+                   MOVE    ZERO                TO  FLG-CHKT
+      *            £¶ºÐÌ¤Ëþ
+                   IF     (SPA-NENREI-YY       <   6  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "2" )
+                       MOVE    1               TO  FLG-CHKT
+                   END-IF
+      *            Ç¥ÉØ
+                   IF     (SPA-NENREI-YY       >=  6  )
+                      AND (SPA-NINPUKBN-ARI    =   1  )
+                      AND (SPA-JIKANTOKU-NYU   =   "1"
+                                               OR  "3" )
+                       MOVE    1               TO  FLG-CHKT
+                   END-IF
                ELSE
+                   MOVE    1                   TO  FLG-CHKT
+               END-IF
+               IF      FLG-CHKT            =   1
       *
                MOVE    SPA-GMN-INPUTCD (SPA-GMN-IDX)
                                            TO  WRK-INPUTCD

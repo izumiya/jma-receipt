@@ -184,6 +184,7 @@
       *
            03  FLG-CHKEND          PIC 9(01).
            03  FLG-NINPKSN         PIC 9(01).
+           03  FLG-CHKT            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1697,44 +1698,11 @@
             AND   (WRK-COM-TIMEFLG (IDX-Z) =   ZERO )
             AND   (WRK-COM-TIMEKSNKBN (IDX-Z)  NOT = ZERO )
             AND   (WRK-COM-KSNAUTO (IDX-Z) =   SPACE )
-      *        ¾®»ù²ÊÆÃÎã»þ´Ö³°¤Ï£¶ºÐÌ¤Ëþ
+      *H30.4
+      *        »þ´Ö³°¶èÊ¬ÊÑ´¹
                MOVE    SPA-GAI-JIKANKBN    TO  WRK-JIKANKBN
-               IF      WRK-JIKANKBN        =   8
-      *            £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
-                   IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "2"  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H30.4
-      *            Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
-                   IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "3"  )
-                      AND (SPA-NINPUKBN-ARI    =   1  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H29.2
-               ELSE
-      *        ¾®»ù²ÊÆÃÎã¤ò£¶ºÐ°Ê¾å¤ÏÌë´Ö¡¦ÁáÄ«¤Ø
-                   IF     (SPA-NENREI-YY       >=  6  )
-                    AND   (SPA-YAKANKBN        =   1  )
-                    AND   (SPA-HOSPSBT         =   2   )
-      *H30.4
-      *            Ç¥ÉØ¤ÇÆÃÎã¤Ê¤·¤Î»þ
-                     IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                              OR   "3"  )
-                         CONTINUE
-                     ELSE
-                       IF     (WRK-JIKANKBN        =   5
-                                                   OR  6
-                                                   OR  7  )
-                           MOVE    8           TO  WRK-JIKANKBN
-                       END-IF
-                     END-IF
-                   END-IF
-               END-IF
+               PERFORM 10011491-TIMEKSN-CNG-SEC
+      *
                IF     (WRK-JIKANKBN        =   5
                                            OR  6
                                            OR  7  )  AND
@@ -1816,6 +1784,64 @@
        1001149-TELSAISIN-SET-EXT.
            EXIT.
       *
+      *H30.4
+      *****************************************************************
+      *    »þ´Ö³°¶èÊ¬ÊÑ´¹½èÍý 
+      *****************************************************************
+       10011491-TIMEKSN-CNG-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKT
+      *
+      *    Ìë´Ö¡¦ÁáÄ«
+           IF      WRK-JIKANKBN        =   8
+      *        £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
+               IF     (SPA-NENREI-YY       <   6  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "2"  )
+                   MOVE    5               TO  WRK-JIKANKBN
+               END-IF
+      *        Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
+               IF     (SPA-NENREI-YY       >=  6  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "3"  )
+                  AND (SPA-NINPUKBN-ARI    =   1  )
+                   MOVE    5               TO  WRK-JIKANKBN
+               END-IF
+           ELSE
+      *        £¶ºÐ°Ê¾å¤ÇÌë´Ö¡¦ÁáÄ«»»Äê²Ä
+               IF     (SPA-NENREI-YY       >=  6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2   )
+                   MOVE    1                   TO  FLG-CHKT
+      *            Ç¥ÉØ¤ÇÆÃÎã¤¢¤ê»þ
+                   IF   (SPA-NINPUKBN-ARI      =   1  )
+                    AND (SPA-JIKANTOKU-NYU     =   "1"
+                                                OR "3")
+                       MOVE    ZERO            TO  FLG-CHKT
+                   END-IF
+               END-IF
+      *
+      *        £¶ºÐÌ¤Ëþ
+               IF     (SPA-NENREI-YY       <   6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2  )
+                AND   (SPA-JIKANTOKU-NYU   =   "3" )
+      *           £¶ºÐÌ¤Ëþ¤Ç»ºÉØ¿Í²ÊÆÃÎã¤Î¤ß
+                   MOVE    1                   TO  FLG-CHKT
+               END-IF
+      *
+               IF     (WRK-JIKANKBN        =   5
+                                           OR  6
+                                           OR  7  )  AND
+                      (FLG-CHKT            =   1  )
+                   MOVE    8           TO  WRK-JIKANKBN
+               END-IF
+           END-IF
+      *
+           .
+       10011491-TIMEKSN-CNG-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ÃÏ°èÊñ³ç¿ÇÎÅÎÁ¤Î»þ´Ö³°¼«Æ°È¯À¸ 
       *****************************************************************
@@ -1828,44 +1854,11 @@
             AND   (WRK-COM-TIMEFLG (IDX-Z) =   ZERO )
             AND   (WRK-COM-TIMEKSNKBN (IDX-Z)  NOT = ZERO )
             AND   (WRK-COM-KSNAUTO (IDX-Z) =   SPACE )
-      *        ¾®»ù²ÊÆÃÎã»þ´Ö³°¤Ï£¶ºÐÌ¤Ëþ
+      *H30.4
+      *        »þ´Ö³°¶èÊ¬ÊÑ´¹
                MOVE    SPA-GAI-JIKANKBN    TO  WRK-JIKANKBN
-               IF      WRK-JIKANKBN        =   8
-      *            £¶ºÐÌ¤Ëþ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
-                   IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "2"  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H30.4
-      *            Ç¥ÉØ¤Ï¾®»ù²ÊÆÃÎãÌë´Ö¤Ø
-                   IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "3"  )
-                      AND (SPA-NINPUKBN-ARI    =   1  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H29.2
-               ELSE
-      *        ¾®»ù²ÊÆÃÎã¤ò£¶ºÐ°Ê¾å¤ÏÌë´Ö¡¦ÁáÄ«¤Ø
-                   IF     (SPA-NENREI-YY       >=  6  )
-                    AND   (SPA-YAKANKBN        =   1  )
-                    AND   (SPA-HOSPSBT         =   2   )
-      *H30.4
-      *            Ç¥ÉØ¤ÇÆÃÎã¤Ê¤·¤Î»þ
-                     IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                              OR   "3"  )
-                         CONTINUE
-                     ELSE
-                       IF     (WRK-JIKANKBN        =   5
-                                                   OR  6
-                                                   OR  7  )
-                           MOVE    8           TO  WRK-JIKANKBN
-                       END-IF
-                     END-IF
-                   END-IF
-               END-IF
+               PERFORM 10011491-TIMEKSN-CNG-SEC
+      *
                IF     (WRK-JIKANKBN        =   5
                                            OR  6
                                            OR  7  )  AND
@@ -6118,6 +6111,12 @@
       *H25.4
            MOVE    ZERO                TO  FLG-SYOKAINASI
            MOVE    ZERO                TO  FLG-OUSIN
+      *
+      *H30.4
+      *    ºÞÆâ¤ÎÇ¥ÉØ²Ã»»¤ÎÈ½Äê
+           MOVE    SPACE               TO  WRK-ERRCD
+           PERFORM 10019-NINPKASAN-CHK-SEC
+           MOVE    WRK-ERRCD           TO  SPA-ERRCD
       *
       *    ¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
