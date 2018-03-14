@@ -68,6 +68,9 @@
            03  IDXM                    PIC 9(05).
            03  IDXR                    PIC 9(05).
       *
+       01  CNT-AREA.
+           03  CNT-INSERT              PIC 9(05).
+      *
        01  WRK-AREA.
            03  WRK-KJNYMD              PIC X(08).
            03  WRK-SRYCD.
@@ -90,6 +93,7 @@
            03  WRK-LOW-DAY-G.
                05  WRK-LOW-DAY         PIC  9(01)
                                        OCCURS   31.
+           03  WRK-MAXZAINUM           PIC 9(10).
       *
        01  TNACCT-AREA.
            03  TNACCT-KHN-OCC              OCCURS  50.
@@ -214,6 +218,7 @@
       *
            INITIALIZE                  IDX-AREA
                                        FLG-AREA
+                                       CNT-AREA
                                        WRK-AREA
                                        TNACCT-AREA
       *
@@ -703,9 +708,15 @@
       *****************************************************************
        2001-UPD-RYOYO-SEC         SECTION.
       *
-           PERFORM 20011-DEL-RYOYO-SEC
+           MOVE    ZERO            TO  CNT-INSERT
+      *
+           MOVE    PTINF-MAXZAINUM TO  WRK-MAXZAINUM
       *
            PERFORM 20011-INS-RYOYO-SEC
+      *
+           IF    ( CNT-INSERT      >   ZERO )
+               PERFORM 20011-DEL-RYOYO-SEC
+           END-IF
       *
            .
        2001-UPD-RYOYO-EXT.
@@ -721,14 +732,16 @@
       *
                MOVE    ZERO           TO   FLG-RYOYO
       *
-               PERFORM 200111-DEL-NYUINACT-SEC
-               IF    ( FLG-RYOYO      NOT  =    ZERO )
-                   MOVE    NYUINACCT-REC   TO  MCPDATA-REC
-                   MOVE    "tbl_nyuinacct" TO  MCP-TABLE
-                   MOVE    "key"           TO  MCP-PATHNAME
-                   PERFORM 910-DBDELETE-SEC
-                   IF    ( MCP-RC      NOT =   ZERO )
-                       MOVE    2           TO  SS011-RC
+               IF    ( NACCT-ZAINUM   <=   WRK-MAXZAINUM )
+                   PERFORM 200111-DEL-NYUINACT-SEC
+                   IF    ( FLG-RYOYO      NOT  =    ZERO )
+                       MOVE    NYUINACCT-REC   TO  MCPDATA-REC
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key"           TO  MCP-PATHNAME
+                       PERFORM 910-DBDELETE-SEC
+                       IF    ( MCP-RC      NOT =   ZERO )
+                           MOVE    2           TO  SS011-RC
+                       END-IF
                    END-IF
                END-IF
       *
@@ -943,6 +956,8 @@
                MOVE    4           TO  SS011-RC
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
+      *
+           COMPUTE CNT-INSERT = CNT-INSERT + 1
       *
            .
        200111-INS-NACCT-EXT.

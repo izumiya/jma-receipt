@@ -78,88 +78,98 @@ W24 {
       count int;
         item varchar(14)[5];
     };
-    frame3 {
-      label varchar(20);
+    nb1 {
+      pageno int;
       fixed9 {
         CHK_NYUKSN01 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN02 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN03 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN04 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN05 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN06 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN07 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN08 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN09 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN10 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN11 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN12 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN13 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN14 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN15 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN16 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN17 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN18 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN19 {
           isactive bool;
-          label varchar(1);
         };
         CHK_NYUKSN20 {
           isactive bool;
-          label varchar(1);
+        };
+        CHK_NYUKSN21 {
+          isactive bool;
+        };
+        CHK_NYUKSN22 {
+          isactive bool;
+        };
+        CHK_NYUKSN23 {
+          isactive bool;
+        };
+        CHK_NYUKSN24 {
+          isactive bool;
+        };
+        CHK_NYUKSN25 {
+          isactive bool;
+        };
+        CHK_NYUKSN26 {
+          isactive bool;
+        };
+        CHK_NYUKSN27 {
+          isactive bool;
+        };
+        CHK_NYUKSN28 {
+          isactive bool;
+        };
+        CHK_NYUKSN29 {
+          isactive bool;
+        };
+        CHK_NYUKSN30 {
+          isactive bool;
         };
         NYUKSNNM01 {
           textdata varchar(50);
@@ -221,6 +231,36 @@ W24 {
         NYUKSNNM20 {
           textdata varchar(50);
         };
+        NYUKSNNM21 {
+          textdata varchar(50);
+        };
+        NYUKSNNM22 {
+          textdata varchar(50);
+        };
+        NYUKSNNM23 {
+          textdata varchar(50);
+        };
+        NYUKSNNM24 {
+          textdata varchar(50);
+        };
+        NYUKSNNM25 {
+          textdata varchar(50);
+        };
+        NYUKSNNM26 {
+          textdata varchar(50);
+        };
+        NYUKSNNM27 {
+          textdata varchar(50);
+        };
+        NYUKSNNM28 {
+          textdata varchar(50);
+        };
+        NYUKSNNM29 {
+          textdata varchar(50);
+        };
+        NYUKSNNM30 {
+          textdata varchar(50);
+        };
         CMB_CHIIKIKSN {
           CHIIKIKSN {
             textdata varchar(28);
@@ -229,9 +269,9 @@ W24 {
             item varchar(28)[7];
         };
       };
-    };
-    frame4 {
-      label varchar(20);
+      LBLNYUKSN {
+          textdata varchar(20);
+      };
       fixed10 {
         SRYCD01 {
           textdata varchar(9);

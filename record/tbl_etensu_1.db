@@ -97,3 +97,19 @@ path	upd1	{
 		;
 	};
 };
+
+path	key4	{
+	DBSELECT	{
+		DECLARE tbl_etensu_1_key4_csr CURSOR FOR
+		SELECT a.SRYCD from tbl_etensu_1 AS a,tbl_etensu_4 AS b
+        WHERE  a.SRYCD       =  :SRYCD
+ 		AND    a.YUKOSTYMD  <=  :YUKOSTYMD
+		AND    a.YUKOEDYMD  >=  :YUKOEDYMD
+ 		AND    a.N_GROUP     =  b.N_GROUP
+ 		AND    b.SRYCD       =  :UPSRYCD
+ 		AND    b.YUKOSTYMD  <=  :YUKOSTYMD
+		AND    b.YUKOEDYMD  >=  :YUKOEDYMD
+ 		;
+	};
+};
+

@@ -83,6 +83,7 @@
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-N02-G.
                05  WRK-N02                 PIC 99.
+           03  WRK-HOSPSBT                 PIC 9(02).
       *
        01  CONST-AREA.
            03  CONST-NYUIN                 PIC X(02)   VALUE "01".
@@ -1013,8 +1014,14 @@
                                        TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( FLG-TENSU       =   ZERO )
-                   IF    ( TNS-HOSPSRYKBN  =   0 )
-                    OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                   EVALUATE    TNS-HOSPSRYKBN
+                   WHEN    3
+                       MOVE    0           TO  WRK-HOSPSBT
+                   WHEN    4
+                       MOVE    1           TO  WRK-HOSPSBT
+                   END-EVALUATE
+                   IF    ( WRK-HOSPSBT     =   0 )
+                    OR   ( WRK-HOSPSBT     =   SPA-HOSPSBT )
                        CONTINUE
                    ELSE
                        MOVE    1       TO  FLG-SKIP

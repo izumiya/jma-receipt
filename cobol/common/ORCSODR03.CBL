@@ -277,6 +277,7 @@
            IF    ( FLG-NYUINACCT           =   ZERO )
                MOVE    NACCT-SRYYM         TO  WRK-NACCTYM
                IF    ( SODR-ORDERID        =   NORDERID-GPTSTID )
+                AND  ( WRK-NACCTYM         <   SODR-SRYYMD (1:6))
                    IF    ( PTNYUINRRK-TAIINYMD =   "99999999" )
                        IF    ( WRK-NACCTYM <   WRK-LASTYM )
                            MOVE    1           TO  FLG-NACCT-NOT-FOUND
@@ -575,6 +576,7 @@
        20021-NACCT-CHK-SEC             SECTION.
       *
            IF    ( SODR-ORDERID        =   NORDERID-GPTSTID )
+            AND  ( WRK-NACCTYM         <   SODR-SRYYMD (1:6))
                IF    ( FLG-NACCT-NOT-FOUND NOT =   ZERO )
                    MOVE    "0076"      TO  ERRCD-ORDER
                END-IF
@@ -872,13 +874,13 @@
                    MOVE    NORDERID-GSENTID
                                    TO  SODRNACCT-ORDERID
                WHEN    "04"
-                   MOVE    NORDERID-TAIJUSHIN70ID
+                   MOVE    NORDERID-TAIJUSHIN40ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "05"
-                   MOVE    NORDERID-TAIJUSHIN30ID
+                   MOVE    NORDERID-TAIJUSHIN10ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "06"
-                   MOVE    NORDERID-TAIJUSHIN55ID
+                   MOVE    NORDERID-TAIJUSHIN20ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "07"
                    MOVE    NORDERID-TAIJUSHIN15ID

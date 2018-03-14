@@ -115,6 +115,8 @@
            03  WRK-TO                              PIC 9(05).
       *
        01  CONST-AREA.
+           03  CONST-H300331               PIC X(08) VALUE "20180331".
+           03  CONST-H300401               PIC X(08) VALUE "20180401".
            03  CONST-H280331               PIC X(08) VALUE "20160331".
            03  CONST-H280401               PIC X(08) VALUE "20160401".
            03  CONST-GMN-TANKI3-MAX        PIC 9(03) VALUE 25.
@@ -1076,6 +1078,10 @@
       *
            MOVE    CONST-H280401   TO  WRK-KAISEISTYMD
            MOVE    CONST-H280331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           MOVE    CONST-H300401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H300331   TO  WRK-KAISEIEDYMD
            PERFORM 8001-KAISEI-CHK-SEC
       *
            .
