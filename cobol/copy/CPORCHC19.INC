@@ -53,4 +53,8 @@
                        09  ORCHC19-SRYSURYO        PIC  9(05)V9(05).
                        09  ORCHC19-SRYKAISU        PIC  9(03).
                        09  ORCHC19-INPUTCOMENT     PIC  X(80).
+      *H30.4           ∆˛Œœ√Õ
+                       09  ORCHC19-INPUTCHI-G.
+                           11  ORCHC19-INPUTCHI    PIC  X(08)
+                                                        OCCURS  5.
       *

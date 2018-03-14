@@ -4458,6 +4458,10 @@
                            MOVE    SPA-WKSRY-INPUTCOMENT (IDX-W IDX-W2)
                                            TO  ORCHC19-INPUTCOMENT
                                                              (IDX1 IDX2)
+      *H30.4
+                           MOVE    SPA-WKSRY-INPUTCHI-G (IDX-W IDX-W2)
+                                           TO  ORCHC19-INPUTCHI-G
+                                                             (IDX1 IDX2)
                        END-IF
                        END-IF
                    END-PERFORM
