@@ -38,6 +38,11 @@
               05  FMSHOHO-SRYKANAME            PIC X(40).
       *       ページ編集(1:編集する）
               05  FMSHOHO-PAGE                 PIC X(1).
+      *H30.4
+      *       分割調剤　分割数
+              05  FMSHOHO-BUNKATU-MAX          PIC 9(1).
+      *       分割調剤　回目
+              05  FMSHOHO-BUNKATU-CNT          PIC 9(1).
       *
               05  FMSHOHO-PTINF.
                 07  FMSHOHO-PTNUM              PIC X(20).

@@ -13,6 +13,9 @@ fm_prescription {
 		Department_Code			varchar(02);
 		Department_Name			varchar(40);
 		EditPageNumber_Flg 		varchar(01);
+#--　分割調剤
+		Bunatu_Max	 		varchar(01);
+		Bunatu_Cnt	 		varchar(01);
 		Patient	{
 			ID	 				    varchar(20);
 			Name 				    varchar(50);

@@ -2790,6 +2790,12 @@
                    CONTINUE
                ELSE
                    MOVE    "0113"          TO  WRK-ERRCD
+                   IF      LNK-ORCSC-JIKANTOKU-NYU =   1
+                       MOVE    "0185"          TO  WRK-ERRCD
+                   END-IF
+                   IF      LNK-ORCSC-JIKANTOKU-NYU =   3
+                       MOVE    "0186"          TO  WRK-ERRCD
+                   END-IF
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    GO      TO      1002-KASAN-SET-EXT
                END-IF
@@ -5507,22 +5513,6 @@
                                MOVE    "0184"      TO  WRK-ERRCD
                                MOVE    "1"         TO  WRK-COM-CUR
                                                             (IDX-N)
-                           END-IF
-                       END-IF
-      **?????? 必要？
-      *                警告チェック
-                       IF     (SPA-NENREI-YY       <   16    )
-                        AND  ( WRK-ERRCD           =   SPACE )
-                        AND  ( WRK-COM-AUTOKBN(IDX-N)  =   SPACE )
-                           IF     (WRK-COM-KZMFLG (IDX-N)  =   SPACE )
-                              AND (LNK-ORCSC-KEI-IDX       =   ZERO  )
-                               MOVE    IDX-N       TO
-                                                   LNK-ORCSC-KEI-IDX
-                               MOVE    "KXXX"      TO  WRK-ERRCD
-                               MOVE    "1"         TO  WRK-COM-CUR
-                                                          (IDX-N)
-                               MOVE    "1"         TO  WRK-COM-KZMFLG
-                                                          (IDX-N)
                            END-IF
                        END-IF
                    END-IF

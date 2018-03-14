@@ -2078,6 +2078,14 @@
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  WRK-MEISYO
            END-IF
+      *H30.4
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081" )
+            AND   (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  WRK-MEISYO
+           END-IF
       *
            MOVE    WRK-MEISYO              TO  SPA-WKSRY-NAME
                                                    (SPA-WKSRY-MAX IDX-W)
@@ -4177,8 +4185,12 @@
            INITIALIZE                      ORCHC19AREA
            MOVE    "N"                 TO  ORCHC19-KBN
            MOVE    SPA-GMN-HKNCOMBINUM TO  SPA-HKNCOMBINUM
-           MOVE    "1"                 TO  SPA-DRCD(1:1)
-           MOVE    SPA-GMN-DRCD        TO  SPA-DRCD(2:4)
+           IF      SPA-GMN-DRCD        =   SPACE
+               MOVE    SPACE               TO  SPA-DRCD
+           ELSE
+               MOVE    "1"                 TO  SPA-DRCD(1:1)
+               MOVE    SPA-GMN-DRCD        TO  SPA-DRCD(2:4)
+           END-IF
            MOVE    SPA-PARA-SRYKA      TO  SPA-SRYKA
            PERFORM 41021-ORCHC19-HENSYU-SEC
       *
@@ -4274,8 +4286,10 @@
            MOVE    SPA-PARA-SRYKA      TO  SPA-SRYKA
       *
            MOVE    "N"                 TO  ORCSHCN30-KBN
-           MOVE    "1"                 TO  ORCSHCN30-DRCD(1:1)
-           MOVE    SPA-GMN-DRCD        TO  ORCSHCN30-DRCD(2:4)
+           IF      SPA-GMN-DRCD    NOT =   SPACE
+               MOVE    "1"                 TO  ORCSHCN30-DRCD(1:1)
+               MOVE    SPA-GMN-DRCD        TO  ORCSHCN30-DRCD(2:4)
+           END-IF
            MOVE    SPA-NAI-BTUNAME     TO  ORCSHCN30-BTUNAME
            MOVE    SPA-NAI-ROOMNO      TO  ORCSHCN30-ROOMNO
            MOVE    SPA-NAI-KOUFUYMD    TO  ORCSHCN30-SRYYMD
@@ -4353,6 +4367,9 @@
       *H28.11          用法コード数量
                        IF      SPA-PARA-SRYCD (IDX-W IDX-W2)(1:3)
                                                =   "001"
+      *H30.4
+                          OR  (SPA-PARA-SRYCD (IDX-W IDX-W2)(1:7)
+                                               =   "0992081"   )
                            MOVE    SPA-PARA-INPUTCHI-G (IDX-W IDX-W2)
                                            TO  ORCSHCN30-INPUTCHI-G
                                                              (IDX1 IDX2)

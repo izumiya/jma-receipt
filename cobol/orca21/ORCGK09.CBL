@@ -1850,8 +1850,8 @@
            .
        4101-JYURRK-HEN-EXT.
            EXIT.
-      *H29.3
       *
+      *H29.3
       *****************************************************************
       *     後発品変更可（処方）の対応処理
       *****************************************************************
@@ -2891,6 +2891,13 @@
                   (LNK-WKSRY-SRYCD   (IDX IDZ)(1:3)  =   "008" ))  AND
       *DDDDDDDDDD (LNK-WKSRY-INPUTNUM(IDX IDZ)    NOT =   ZERO OR
                   (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *H30.4
+      *    分割調剤など、内容設定
+           IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:7)  =   "0992081" )
+             AND  (LNK-WKSRY-INPUTCOMENT(IDX IDZ)  NOT =  SPACE  )
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  SPA-GMN-TMEISYO2(IDG)
            END-IF

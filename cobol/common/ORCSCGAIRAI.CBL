@@ -51,6 +51,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/08/22  ³°ÍÑÌôºÞ²ó¿ô¥Á¥§¥Ã¥¯ÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  14/09/XX  £È£²£¶Ç¯£±£°·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£°£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  18/03/XX  £È£³£°Ç¯£°£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -4009,6 +4010,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF     (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:1)  =  "8")
                       OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:3)  =  "008")
                       OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:3)  =  "001")
+      *H30.4
+                      OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:7)
+                                                         =   "0992081")
       *               ÆþÎÏ¤¬¤¢¤ì¤ÐºîÀ®
                        IF      (LNK-WKSRY-INPUTCHI-G (IDX IDX-SIN)
                                                        =  SPACE ) AND

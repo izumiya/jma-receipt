@@ -2142,6 +2142,8 @@
                            IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
                                                            OR  "22"
                                                            OR  "23" )
+                              AND (SPA-COM-ZAIEND (IDX - 1)
+                                                            =  SPACE )
                                MOVE    SPA-COM-SRYKBN(IDX - 1)
                                                      TO  SPA-COM-SRYKBN
                                                                   (IDX)

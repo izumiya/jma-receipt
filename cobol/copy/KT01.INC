@@ -112,3 +112,7 @@
               03  KT01-MODE2.
                 04  KT01-MODE2-STYLE   PIC X(20).
                 04  KT01-MODE2-VALUE   PIC X(10).
+              03  KT01-MODE3.
+                04  KT01-MODE3-STYLE   PIC X(20).
+                04  KT01-MODE3-VALUE   PIC X(10).
+

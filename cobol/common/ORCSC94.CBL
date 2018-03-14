@@ -318,6 +318,23 @@
                           INTO                 WRK-ATAI
                        END-STRING
                    END-IF
+      *H30.4
+                   IF    (SPA-COM-INPUTCD(IDX)(1:7)   =   "0992081")
+                    AND  (SPA-COM-INPUTCHI-G(IDX)  NOT =   SPACE  )
+                      MOVE    SPACE                TO  WRK-ATAI
+                      STRING 
+                          SPA-COM-ATAI1   (IDX)   DELIMITED   BY  SPACE
+                          " "                     DELIMITED   BY  SIZE
+                          SPA-COM-ATAI2   (IDX)   DELIMITED   BY  SPACE
+                          " "                     DELIMITED   BY  SIZE
+                          SPA-COM-ATAI3   (IDX)   DELIMITED   BY  SPACE
+                          " "                     DELIMITED   BY  SIZE
+                          SPA-COM-ATAI4   (IDX)   DELIMITED   BY  SPACE
+                          " "                     DELIMITED   BY  SIZE
+                          SPA-COM-ATAI5   (IDX)   DELIMITED   BY  SPACE
+                          INTO                 WRK-ATAI
+                       END-STRING
+                   END-IF
       *            コメント
                WHEN    "8"
                    IF      SPA-COM-INPUTCHI-G (IDX)    NOT =   SPACE

@@ -3434,6 +3434,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                   (SRY-INPUTNUM(IDZ)   NOT =   ZERO  )
                PERFORM 310122-KNJCOM-SET-SEC
            END-IF
+      *H30.4
+      *    コメントの時、内容設定
+           IF     (SRY-SRYCD  (IDZ)(1:7)   =   "0992081" )
+             AND  (SRY-INPUTNUM(IDZ)   NOT =   ZERO  )
+               PERFORM 310122-KNJCOM-SET-SEC
+           END-IF
       *
       *    数量（薬剤、器材のとき）
            IF    ((SRY-SRYCD  (IDZ)(1:1)   =   "6"  OR  "7" )
@@ -3637,6 +3643,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF    ((SRY-SRYCD  (IDZ)(1:1)   =   "8"   ) OR
                   (SRY-SRYCD  (IDZ)(1:3)   =   "008" )) AND
                   (SRY-INPUTNUM(IDZ)   NOT =   ZERO  )
+               PERFORM 310122-KNJCOM-SET-SEC
+           END-IF
+      *H30.4
+      *    コメントの時、内容設定
+           IF     (SRY-SRYCD  (IDZ)(1:7)   =   "0992081" )
+             AND  (SRY-INPUTNUM(IDZ)   NOT =   ZERO  )
                PERFORM 310122-KNJCOM-SET-SEC
            END-IF
       *

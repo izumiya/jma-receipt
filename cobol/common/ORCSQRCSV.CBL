@@ -40,6 +40,7 @@
       *  04.08.00    NACL-多々納  14/07/30  一時ディレクトリ対応
       *  04.08.00    NACL-多々納  16/03/XX  最低薬価テーブル対応
       *  04.08.00    NACL-多々納  16/04/XX  備考を２０へ
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
       *
@@ -585,7 +586,14 @@
                ADD     1                   TO  IDX-B2
                MOVE    SPACE               TO  TBL-QRCSV-AREA
                MOVE    "81"                TO  TBL-QRCSV-DATA (1)
-               MOVE    IDX-B2              TO  TBL-QRCSV-DATA (2)
+               MOVE    IDX-B2              TO  WRK-ZZZ
+               PERFORM 20011-SUJIHEN-SEC
+               MOVE    WRK-H-DATA          TO  TBL-QRCSV-DATA (2)
+      *        種別
+               IF      ORCSQRCSV-BIKOU-KBN (IDX-B)  NOT =   SPACE
+                   MOVE    ORCSQRCSV-BIKOU-KBN (IDX-B)
+                                           TO  TBL-QRCSV-DATA (3)
+               END-IF
                MOVE    ORCSQRCSV-BIKOU (IDX-B)
                                            TO  TBL-QRCSV-DATA (4)
                MOVE    4                   TO  TBL-MAX

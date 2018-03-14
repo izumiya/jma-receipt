@@ -2837,6 +2837,14 @@
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
+      *H30.4
+      *   分割調剤など,内容設定
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081")
+             AND  (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *
       *
       *    数量（薬剤、器材のとき）
            IF    ((LNK-WKSRY-SRYCD (IDX IDZ)(1:1)   =   "6"  OR  "7" )
@@ -2960,6 +2968,14 @@
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
+      *H30.4
+      *   分割調剤など,内容設定
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081")
+             AND  (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *
       *    後発医薬品再編集
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1

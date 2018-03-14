@@ -618,9 +618,9 @@
                WHEN    "0112"
                    MOVE    "小児科特例時間外区分は算定できません。"
                                        TO  SPA-ERRMSG
-      *        WHEN    "0113"
-      *            MOVE    "小児科特例時間外は算定できません。"
-      *                                TO  SPA-ERRMSG
+               WHEN    "0113"
+                   MOVE    "小児科特例時間外は算定できません。"
+                                       TO  SPA-ERRMSG
                WHEN    "0130"
                    STRING  "特定薬剤治療管理料が３月目以内です。"
                            "算定できません。"
@@ -2278,8 +2278,14 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-               WHEN    "0113"
+               WHEN    "0185"
                    STRING  "小児・産・産婦人科特例時間外は"
+                           "算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0186"
+                   STRING  "産・産婦人科特例時間外は"
                            "算定できません。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
@@ -2310,6 +2316,11 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0286"
+                   STRING  "分割調剤の内容がありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "K120"
                    STRING  "警告！"
@@ -2328,7 +2339,7 @@
       *
                WHEN    "K503"
                    STRING  "警告！術中脳灌流モニタリング加算の"
-                           "算定できる手術ではありません。"
+                           "算定できる手術の算定がありません。"
                                        DELIMITED   BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

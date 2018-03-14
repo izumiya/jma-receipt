@@ -51,6 +51,7 @@
       *  04.08.00    NACL-多々納  17/02/XX  在宅実績加算２削除対応
       *  04.08.00    NACL-多々納  17/03/XX  Ｈ２９年４月改正対応他
       *  04.08.00    NACL-多々納  17/05/XX  HAORI対応
+      *  04.08.00    NACL-多々納  17/03/XX  Ｈ３０年４月改正対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -371,6 +372,9 @@
       *H28.4
       *    時間外加算テーブル(H28.4分）
            COPY     "CMTIMEKSN2016.INC".
+      *H30.4
+      *    時間外加算テーブル(H30.4分）
+           COPY     "CMTIMEKSN2018.INC".
       *
       *H26.10
       * 向精神薬多剤投与減算コード
@@ -2093,6 +2097,7 @@
       *
       *H28.4 から
            IF      SPA-SRYYMD          >=  "20160401"
+                                 AND   <   "20180401"
       *        時間外加算検索
                SET     TBL-TIDX            TO  1
                SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
@@ -2104,6 +2109,34 @@
                    MOVE    TBL-TM-TIMKBN (TBL-TIDX)
                                            TO  WRK-TIME-KBN2
                END-SEARCH
+               GO      TO      310119-SYONIKA-CHK-EXT
+           END-IF
+      *H30.4 から
+           IF      SPA-SRYYMD          >=  "20180401"
+      *        時間外加算検索
+               SET     TBL-TIDX18            TO  1
+               SEARCH  TBL-TIMEKSN18-OCC     VARYING   TBL-TIDX18
+               AT  END
+                   MOVE    SPACE           TO  WRK-TIME-KBN2
+                WHEN   LNK-WKSRY-SRYCD (IDX IDY)
+                                           =   TBL-TM18-SRYCD
+                                                      (TBL-TIDX18)
+                   MOVE    TBL-TM18-TIMKBN (TBL-TIDX18)
+                                           TO  WRK-TIME-KBN2
+               END-SEARCH
+               IF      WRK-TIME-KBN2       =   SPACE
+      *            妊婦加算
+                   SET     TBL-NPIDX18         TO  1
+                   SEARCH  TBL-NINPUKSN18-OCC  VARYING   TBL-NPIDX18
+                   AT   END
+                       CONTINUE
+                    WHEN   LNK-WKSRY-SRYCD (IDX IDY)
+                                           =   TBL-NP18-SRYCD
+                                                      (TBL-NPIDX18)
+                       MOVE    TBL-NP18-TIMKBN (TBL-NPIDX18)
+                                           TO  WRK-TIME-KBN2
+                   END-SEARCH
+               END-IF
                GO      TO      310119-SYONIKA-CHK-EXT
            END-IF
       *
@@ -2616,6 +2649,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                        OR  "002"
                                                        OR  "099")
                        IF      SPA-COM-INPUTCD(IDX)(1:7)   =   "0992000"
+      *H30.4
+                                                           OR  "0992081"
                            CONTINUE
                        ELSE
                            MOVE    ZERO          TO  SPA-COM-SURYO(IDX)
@@ -2702,6 +2737,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *               用法コメント
                       OR  (SPA-COM-INPUTCD(IDX)(1:3) =   "001"  AND
                            SPA-COM-YCOMKBN (IDX)      =   "1"   )
+      *H30.4
+      *               分割調剤など
+                      OR  (SPA-COM-INPUTCD(IDX)(1:7)  =   "0992081" )
       *
                        ADD     1                   TO  WRK-MEINUM
                        MOVE    WRK-MEINUM          TO  WKSRY-INPUTNUM
@@ -2740,23 +2778,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                   (IDY)
                                END-IF
                            END-IF
-      ******************** IF     (SPA-COM-INPUTCD(IDX)(1:2) =   "83"
-      *                                                      OR  "84" )
-      *                       OR  (SPA-COM-INPUTCD(IDX)(1:4) =   "0083"
-      *                                                      OR  "0084")
-      *                        MOVE    SPA-GMN-MEISYO (IDX)
-      *                                           TO  WKSRY-INPUTCOMENT
-      *                                                           (IDY)
-      *                    ELSE
-      *                        MOVE    SPA-GMN-MEISYO-G (IDX)
-      *                                           TO  WKSRY-INPUTCOMENT
-      *                                                           (IDY)
-      ******************** END-IF
                        ELSE
                            IF     (SPA-COM-INPUTCD(IDX)(1:2) =   "83"
                                                              OR  "84")
                               OR  (SPA-COM-INPUTCD(IDX)(1:4) =   "0083"
                                                              OR  "0084")
+      *H30.4
+      *                     分割調剤など
+                              OR  (SPA-COM-INPUTCD(IDX)(1:7)
+                                                       =   "0992081")
                                MOVE    SPA-GMN-MEISYO(IDX)
                                                   TO  WKSRY-INPUTCOMENT
                                                                   (IDY)

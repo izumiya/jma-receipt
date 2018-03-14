@@ -1930,6 +1930,8 @@
                                                OR  "008" )
       *                ÍÑÎÌ³ä¹ç¡¦Ê´ºÕ
                    OR  (SRY-SRYCD (IDX)(1:5)   =   "09920")
+      *H30.4
+                   OR  (SRY-SRYCD (IDX)(1:7)   =   "0992081")
                    MOVE    1                   TO  FLG-OK
       *
                    ADD     1                   TO  IDY
@@ -2352,6 +2354,14 @@
            IF    ((LNK-WKSRY-SRYCD   (IDX IDZ)(1:1)  =   "8"   ) OR
                   (LNK-WKSRY-SRYCD   (IDX IDZ)(1:3)  =   "008" ))  AND
                   (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  WRK-MEISYO
+           END-IF
+      *H30.4
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081" )
+            AND   (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  SPA-GMN-TMEISYO2(IDG)
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)

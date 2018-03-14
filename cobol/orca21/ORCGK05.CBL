@@ -52,6 +52,7 @@
       *  04.08.00    NACL-多々納  15/09/XX  セットコード入力ＣＤ対応
       *  04.08.00    NACL-多々納  15/11/XX  残量廃棄システム設定対応
       *  04.08.00    NACL-多々納  15/12/XX  ＡＰＩ対応
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3253,7 +3254,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                               (SPA-COM-INPUTCD (SPA-GMN-IDX)(1:3)
                                                           =   "001" AND
                                SPA-COM-YCOMKBN (SPA-GMN-IDX)
-                                                          =   1    ))
+                                                          =   1    )
+      *H30.4             分割調剤など
+                         OR   (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:7)
+                                                   =   "0992081"  ) )
+      *
                            MOVE    "_"             TO  SPA-GMN-INPUTCD
                                                      (SPA-GMN-IDX)
                                                      (WRK-IN-IDX2:)
@@ -3531,6 +3536,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:3)
                                                =   "001" )
                  AND  (SPA-COM-YCOMKBN(SPA-GMN-IDX) =   1 )
+                   MOVE    1                   TO  FLG-IN1
+               END-IF
+      *H30.4   分割調剤など
+               IF     (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:7)
+                                               =   "0992081" )
                    MOVE    1                   TO  FLG-IN1
                END-IF
       *
@@ -6663,6 +6673,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "8" )  OR
                   (SPA-COM-INPUTCD(IDX)(1:3)   =   "008")
              OR   (SPA-COM-INPUTCD(IDX)(1:3)   =   "001")
+      *H30.4
+             OR   (SPA-COM-INPUTCD (IDX)(1:7)  =   "0992081")
       *        入力コメント
                IF      SPA-COM-INPUTCD (IDX)    =   "810000001"
                                                 OR  "008500000"
@@ -6680,6 +6692,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    OR     (SPA-COM-INPUTCD (IDX)(1:4)  =   "0086")
                    OR    ((SPA-COM-INPUTCD (IDX)(1:3)  =   "001" ) AND
                           (SPA-COM-INPUTCHI-G(IDX) NOT =   SPACE))
+      *H30.4
+                   OR    ((SPA-COM-INPUTCD (IDX)(1:7)  =   "0992081")
+                      AND (SPA-COM-INPUTCHI-G(IDX) NOT =   SPACE ))
                        MOVE    SPA-GMN-MEISYO(IDX)
                                                TO  ISET-COMMENT
                    END-IF

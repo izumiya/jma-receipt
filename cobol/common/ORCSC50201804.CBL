@@ -1700,24 +1700,6 @@
                    MOVE    "1"             TO  WRK-COM-CUR(IDX-Z)
                END-IF
            END-IF
-      *H30.4
-      *    術中脳灌流モニタリング加算チェック
-           IF     (SPA-ERRCD           =   SPACE )
-              AND (IDX-SYU2        NOT =   ZERO  )
-              AND (WRK-COM-HISINKSN (IDX-Z)
-                                       =   "3"   )
-      *        手技料の加算が４以外は警告
-               IF      WRK-COM-HISINKSN(IDX-SYU2)
-                                       NOT =   "4"
-                   IF     (WRK-COM-KZMFLG(IDX-Z)   =   SPACE)
-                     AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
-                       MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
-                       MOVE    "K503"          TO  SPA-ERRCD
-                       MOVE    "1"             TO  WRK-COM-KZMFLG
-                                                          (IDX-Z)
-                   END-IF
-               END-IF
-           END-IF
       *
       *    通則加算は通則加算対象外とする（告示１で判定）
            IF      (SPA-ERRCD                  =   SPACE )  AND
@@ -2558,6 +2540,7 @@
       *****************************************************************
        300-AUTO-SYORI-SEC                SECTION.
       *
+           .
        300-AUTO-SYORI-EXT.
            EXIT.
       *

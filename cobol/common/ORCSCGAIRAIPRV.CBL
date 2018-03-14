@@ -41,6 +41,7 @@
       *  04.08.00    NACL-多々納  13/01/11  診療回数テーブル１０対応
       *  04.08.00    NACL-多々納  14/05/27  一時ファイル変更
       *  04.08.00    NACL-多々納  15/03/XX  Ｈ２７年０４月改正対応
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年０４月改正対応
       *****************************************************************
       *
       *
@@ -3608,6 +3609,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF     (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:1)  =  "8")
                       OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:3)  =  "008")
                       OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:3)  =  "001")
+      *H30.4
+                      OR  (LNK-WKSRY-SRYCD (IDX IDX-SIN)(1:7)
+                                                         =   "0992081")
       *               入力があれば作成
                        IF      (LNK-WKSRY-INPUTCHI-G (IDX IDX-SIN)
                                                        =  SPACE ) AND
