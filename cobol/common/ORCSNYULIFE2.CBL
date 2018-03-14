@@ -63,6 +63,10 @@
       *                                     •≥°º•…»ΩƒÍƒ…≤√
       *  05.00.00    NACL-æÆ∆¶¬Ù  17/11/22  ¥µº‘«ØŒ£∂£≥∫–∞ ≤º§œ¿∏≥ËŒ≈Õ‹
       *                                     ¬–æ›≥∞§Œ•Í•ø°º•Û•≥°º•… ÷µ—
+      * ø¿Æ£≥£∞«Ø£¥∑Ó≤˛¿µ¬–±˛
+      *  05.00.00    NACL-æÆ∆¶¬Ù  18/02/27  ¿∏≥ËŒ≈Õ‹ø©ªˆ…È√¥≥€ —ππ¬–±˛
+      *                                     µÔΩª»Ò…È√¥≥€ —ππ¬–±˛
+      *  05.00.00    NACL-æÆ∆¶¬Ù  18/03/07  ¿∏≥ËŒ≈Õ‹§Œ∞ÂŒ≈≈Ÿ»ΩƒÍ —ππ
       *****************************************************************
       *
       *
@@ -321,6 +325,218 @@
       *
        01  TBL-H28-SEIKATSU-R     REDEFINES  TBL-H28-SEIKATSU-AREA.
            03   TBL-H28-SEISRYCD           PIC X(09)  OCCURS  103.
+      *
+      *
+      *     ø¿Æ£≥£∞«Ø≈Ÿ≤˛ƒÍ¿∏≥ËŒ≈Õ‹»ΩƒÍÕ—
+      *  ° ∞ÂŒ≈≈Ÿ§Œπ‚§§¿∏≥ËŒ≈Õ‹§ÚæÂ∞Ã§À§ﬁ§»§·§∆§§§Î§Œ§«°¢•«°º•ø§Œ ¬§”§À√Ì∞’§π§Î§≥§»°À
+      *  ° ∆√ Ã∆˛±°¥À‹Œ¡§œ∆√ Ã§ »ΩƒÍ§¨§¢§Î§≥§»§´§È•«°º•ø§Œ∫«∏Â§»§π§Î°À
+       01  TBL-H30-SEIKATSU-AREA.
+      *  ∞ÂŒ≈≈Ÿ§Œπ‚§§¿∏≥ËŒ≈Õ‹
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£±° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190208010".
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190208210".
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£≥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190208410".
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£¥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190208610".
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£µ° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190208810".
+      *    ≤Û…¸¥¸•Í•œ•”•Í•∆°º•∑•Á•Û…¬≈Ô∆˛±°Œ¡£∂° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190209010".
+      *    √ª¥¸¬⁄∫ﬂºÍΩ—¥À‹Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190125310".
+      *    Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡£¡° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124310".
+      *    Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡£¬° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124410".
+      *10  Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡£√° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124510".
+      *    Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°£¡° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190155410".
+      *    Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°£¬° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190155810".
+      *    Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°£√° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190156210".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£¡°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190123710".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£¬°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190123810".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£√°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190123910".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£ƒ°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124010".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£≈°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124110".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£∆°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190131710".
+      *20  Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£¡°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190132510".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£¬°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190132710".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£√°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190132910".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£ƒ°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190133110".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£≈°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190133310".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£∆°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190133510".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£¡°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190202610".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£¬°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190202810".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£√°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190203010".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£ƒ°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190203210".
+      *30  Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£≈°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190203410".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£∆°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190203610".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£¡°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190215210".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£¬°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190215410".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£√°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190215610".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£ƒ°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190215810".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£≈°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190216010".
+      *37  Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°¥À‹Œ¡£∆°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190216210".
+      *
+      *  ∞ÂŒ≈≈Ÿ§Œπ‚§Ø§ §§¿∏≥ËŒ≈Õ‹
+      *38  Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡£ƒ° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124610".
+      *    Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡£≈° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124710".
+      *40  Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°£ƒ° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190156610".
+      *    Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°£≈° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190157010".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£«°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190131910".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£»°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190132110".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±° ∆˛±°Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190132310".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£«°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190133710".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£»°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190133910".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190134110".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£«°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190203810".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£»°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190204010".
+      *50  Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°À
+           03   FILLER                     PIC X(09) VALUE "190204210".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£≤°¶ƒÃ¬ß£∏°À
+           03   FILLER                     PIC X(09) VALUE "190204410".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£«°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190216410".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£»°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190216610".
+      *    Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£≤° ∆˛±°Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À° ∑–≤·¡º√÷£±°À
+           03   FILLER                     PIC X(09) VALUE "190216810".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190178110".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190178310".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190178510".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190178910".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190179110".
+      *60  √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190179310".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190179710".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190179910".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190180110".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190180310".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190180710".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190181110".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190181310".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190181510".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190181710".
+      *70  √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190181910".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190182110".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190196010".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190196410".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190196810".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190196910".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190197010".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190197410".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190197510".
+      *    √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190197610".
+      *80  √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190197810".
+      *81  √ªºÍ£≥
+           03   FILLER                     PIC X(09) VALUE "190198010".
+      *82  √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£±° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190209210".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190209410".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190209610".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190209810".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£≥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190210010".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190210210".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£¥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190210410".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£¥° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190210610".
+      *90  √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£±° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190210810".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£±° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190211010".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190211210".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≤° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190211410".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£≥° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190211610".
+      *    √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£≥° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190211810".
+      *    √œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡£¥° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190212010".
+      *97  √œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡£¥° ¿∏≥ËŒ≈Õ‹°À° ∆√ƒÍ√œ∞Ë°À
+           03   FILLER                     PIC X(09) VALUE "190212210".
+      *
+      *98  Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡° ∆√ Ã∆˛±°¥À‹Œ¡°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124810".
+      *99  Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡° ∆√ Ã∆˛±°¥À‹Œ¡°À° ¿∏≥ËŒ≈Õ‹°À
+           03   FILLER                     PIC X(09) VALUE "190124210".
+      *
+       01  TBL-H30-SEIKATSU-R     REDEFINES  TBL-H30-SEIKATSU-AREA.
+           03   TBL-H30-SEISRYCD           PIC X(09)  OCCURS  99.
+      *
       *
       *    ∞Ïª˛ŒŒ∞Ë
        01  WRK-AREA.
@@ -732,8 +948,9 @@
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
-      *            °  ø¿Æ£≤£∏«Ø£¥∑Ó§´§È°À
-                     IF  LNK-NYULIFE2-SANTEIYM >=  "201604"
+      *             °  ø¿Æ£≤£∏«Ø£¥∑Ó§´§È ø¿Æ£≥£∞«Ø£≥∑Ó§ﬁ§«°À
+                     IF  (LNK-NYULIFE2-SANTEIYM >=  "201604")  AND
+                         (LNK-NYULIFE2-SANTEIYM <=  "201803")
       *                ¿∏≥ËŒ≈Õ‹§À≥∫≈ˆ§π§Î∆˛±°Œ¡§Ú»ΩƒÍ§∑°¢
       *                 ÷µ—√Õ§Œ¬–æ›∂Ë ¨§Ú¿ﬂƒÍ§π§Î
                        PERFORM    210-NYUINACT-GET-SEC
@@ -823,6 +1040,115 @@
       **                                 WRK-SANTEIYOUKENKBN(IDX1)
                                IF (IDX-SEI2       =  47 OR 50 OR
                                                      53 OR 56 OR 59) AND
+                                 ((SS008-MEDKBNDAY(IDX1) = "2" OR
+                                                           "3"))  AND
+                                  (WRK-SANTEIYOUKENKBN(IDX1) = "1")
+                                 MOVE   ZERO       TO   FLG-NANBYO
+                                 IF  LNK-SKJKEEP-KBN(IDX1)  =   "1"
+                                     MOVE  1    TO   FLG-NANBYO
+                                 END-IF
+                                 IF  FLG-NANBYO          =   1 
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                                 END-IF
+                               END-IF
+                            END-IF
+                          END-PERFORM
+                       END-IF
+                     END-IF
+      *
+      *             °  ø¿Æ£≥£∞«Ø£¥∑Ó§´§È°À
+                     IF  LNK-NYULIFE2-SANTEIYM >=  "201804"
+      *                ¿∏≥ËŒ≈Õ‹§À≥∫≈ˆ§π§Î∆˛±°Œ¡§Ú»ΩƒÍ§∑°¢
+      *                 ÷µ—√Õ§Œ¬–æ›∂Ë ¨§Ú¿ﬂƒÍ§π§Î
+                       PERFORM    210-NYUINACT-GET-SEC
+                       MOVE       ZERO        TO   FLG-SEI
+                                                   IDX-SEI2
+                       PERFORM    VARYING   IDX-SEI  FROM 1  BY  1
+                         UNTIL   (IDX-SEI   >  99)    OR
+                                 (FLG-SEI   =    1)
+                             IF  NSRY-SRYCD(1) = TBL-H30-SEISRYCD
+                                                        (IDX-SEI)
+                                 MOVE   1        TO   FLG-SEI
+                                 MOVE   IDX-SEI  TO   IDX-SEI2
+                             END-IF
+                       END-PERFORM
+                       IF   FLG-SEI    =    1
+                          PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                            IF     NACCT-DAY(IDX1)  NOT =  ZERO
+                               MOVE   "1"    TO   LNK-NYULIFE2-KBN(IDX1)
+                               MOVE    1     TO   FLG-OK
+      *                        …¬æı§Œƒ¯≈Ÿ°¢º£Œ≈§Œ∆‚Õ∆§Ú§∑§Ûº‡§∑§∆…∏Ω‡
+      *                        …È√¥≥€§Ú∑⁄∏∫§π§Î¥µº‘§Œ»ΩƒÍ° ∆˛±°Œ¡»Ω√«°À
+                               IF  (IDX-SEI2   >=   1 )   AND
+                                   (IDX-SEI2   <=   37)
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                               END-IF
+      *                        ∆Ò…¬∏¯»Ò§Œ»ΩƒÍƒ…≤√° ∞ ≤º∆˛±°Œ¡§ŒæÏπÁ§Œ§ﬂ°À
+      *                        °¶√œ∞Ë Ò≥Á•±•¢…¬≈Ô∆˛±°Œ¡
+      *                        °¶√œ∞Ë Ò≥Á•±•¢∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
+                               IF  (IDX-SEI2   >=   82)   AND
+                                   (IDX-SEI2   <=   97)
+      *                          ∆Ò…¬∏¯»Ò§Úª»Õ—§µ§Ï§∆§§§Î§´»ΩƒÍ
+                                 MOVE   ZERO       TO   FLG-NANBYO
+                                 IF  WRK-HKNCOMBI-DAY(IDX1) NOT =  ZERO
+                                     INITIALIZE            HKNCOMBI-REC
+                                     MOVE   LNK-NYULIFE2-HOSPNUM
+                                                   TO  COMB-HOSPNUM
+                                     MOVE   LNK-NYULIFE2-PTID 
+                                                   TO  COMB-PTID
+                                     MOVE   WRK-HKNCOMBI-DAY(IDX1)
+                                                   TO  COMB-HKNCOMBINUM
+                                     MOVE   "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                     MOVE    "key" TO  MCP-PATHNAME
+                                     PERFORM 910-HKNCOMBI-SELECT-SEC
+                                     IF   FLG-HKNCOMBI      =   ZERO
+                                       MOVE  "tbl_hkncombi"
+                                                   TO  MCP-TABLE
+                                       MOVE  "key"  TO  MCP-PATHNAME
+                                       PERFORM   910-HKNCOMBI-READ-SEC
+                                       IF  FLG-HKNCOMBI         =  ZERO
+                                         IF  (COMB-KOHHKNNUM(1) = "054")
+                                          OR (COMB-KOHHKNNUM(2) = "054")
+                                          OR (COMB-KOHHKNNUM(3) = "054")
+                                          OR (COMB-KOHHKNNUM(4) = "054")
+                                             MOVE  1    TO   FLG-NANBYO
+                                         END-IF
+                                       END-IF
+                                     END-IF
+      *                               ›∏±¡»πÁ§ª•Ø•Ì°º•∫
+                                     MOVE    "tbl_hkncombi"
+                                                        TO  MCP-TABLE
+                                     MOVE    "key"      TO  MCP-PATHNAME
+                                     PERFORM   900-CLOSE-SEC
+                                 END-IF
+      *
+                                 IF   FLG-NANBYO  =   1
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                                 END-IF
+                               END-IF
+      *                        …¬æı§Œƒ¯≈Ÿ°¢º£Œ≈§Œ∆‚Õ∆§Ú§∑§Ûº‡§∑§∆…∏Ω‡
+      *                        …È√¥≥€§Ú∑⁄∏∫§π§Î¥µº‘§Œ»ΩƒÍ° ∆√ Ã∆˛±°¥À‹Œ¡ªªƒÍª˛§Œ
+      *                                                    £¡£ƒ£Ã∆˛Œœ»Ω√«°À
+                               IF (IDX-SEI2   =  98  OR  99)    AND
+                                  (SS008-MEDKBNDAY(IDX1)  =  "2" OR
+                                                             "3" )
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE2-FTNKBN2(IDX1)
+                               END-IF
+      *                        ªªƒÍÕ◊∑Ô≥∞§«Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡§Œ£…§ÚªªƒÍª˛
+      *                        §œ∞ÂŒ≈∂Ë ¨§»∆Ò…¬∏¯»Ò§Œ•¿•÷•Î•¡•ß•√•Ø
+      **                         DISPLAY "IDX-SEI2 = " IDX-SEI2
+      **                         DISPLAY "IDX1 = " IDX1
+      **                         DISPLAY "WRK-SANTEIYOUKENKBN = "
+      **                                 WRK-SANTEIYOUKENKBN(IDX1)
+                               IF (IDX-SEI2       =  44 OR 47 OR
+                                                     50 OR 51 OR
+                                                     54) AND
                                  ((SS008-MEDKBNDAY(IDX1) = "2" OR
                                                            "3"))  AND
                                   (WRK-SANTEIYOUKENKBN(IDX1) = "1")
@@ -1310,6 +1636,25 @@
                                            LNK-NYULIFE2-SKJFTN-MONEY
                                                             (IDX1 IDX-T)
                               END-IF
+      *                        ø¿Æ£≥£∞«Ø≤˛¿µ
+                              IF    LNK-NYULIFE2-SANTEIYM
+                                                      >= "201804"
+                                  IF   LNK-NYULIFE2-SKJKBN(IDX1)  =  "1"
+                                       MOVE  "197005110"   TO
+                                             LNK-NYULIFE2-SKJFTN-SRYCD
+                                                            (IDX1 IDX-T)
+                                       MOVE   460      TO
+                                           LNK-NYULIFE2-SKJFTN-MONEY
+                                                            (IDX1 IDX-T)
+                                  ELSE
+                                       MOVE  "197005210"   TO
+                                             LNK-NYULIFE2-SKJFTN-SRYCD
+                                                            (IDX1 IDX-T)
+                                       MOVE   420      TO
+                                           LNK-NYULIFE2-SKJFTN-MONEY
+                                                            (IDX1 IDX-T)
+                                  END-IF
+                              END-IF
       *                       ∆Ò…¬≈˘ø¯§®√÷§≠¥µº‘§Œ√÷¥π
                               EVALUATE     LNK-SKJKEEP-KBN(IDX1)
                                   WHEN     "1"
@@ -1504,6 +1849,11 @@
                                         LNK-NYULIFE2-KANFTN-SRYCD(IDX1)
                         MOVE  200       TO
                                         LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+      *                  ø¿Æ£≥£∞«Ø≤˛¿µ°°∞ÂŒ≈∂Ë ¨£≤°¢£≥° £±∆¸£≥£∑£∞±ﬂ°À
+                        IF   LNK-NYULIFE2-SANTEIYM >=  "201804"
+                             MOVE  370       TO
+                                        LNK-NYULIFE2-KANFTN-MONEY(IDX1)
+                        END-IF
                     END-IF
       *             ∂≠≥¶¡ÿ¥µº‘§œ¥ƒ∂≠Œ≈Õ‹¥µº‘…È√¥Ãµ§∑§À√÷¥π§®
                     IF  LNK-SYOTOKU-KKSKBN(IDX1)   =   "1"
