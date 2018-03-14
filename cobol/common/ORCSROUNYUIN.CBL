@@ -7075,6 +7075,9 @@
            ADD     1          TO  IDX1
            MOVE  "190182690"  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
       *
+           ADD     1          TO  IDX1
+           MOVE  "190212670"  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
+      *
            .
       *
        210-CHUKSN-GET-EXT.
