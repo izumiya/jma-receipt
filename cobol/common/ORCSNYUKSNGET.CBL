@@ -1849,7 +1849,7 @@
                                               WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
       *                      一般病棟看護必要度評価加算（１３対１入院基本料）
-                             WHEN    "190131570"
+                             WHEN    "190134970"
       *                            一般病棟看護必要度評価加算（専門病院）
                                    IF  LNK-NYUKSNGET-NYUIN-SRYCD
                                                          = "190090310"
@@ -2059,7 +2059,7 @@
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
                                    END-IF
       *                      看護必要度加算１（１０対１入院基本料）
-                             WHEN    "190183070"
+                             WHEN    "190189170"
       *                         看護必要度加算１（特定機能病院）
                                 IF  LNK-NYUKSNGET-NYUIN-SRYCD
                                                        =  "190085910"
@@ -2075,7 +2075,7 @@
                                              WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
       *                      看護必要度加算２（１０対１入院基本料）
-                             WHEN    "190183170"
+                             WHEN    "190189270"
       *                         看護必要度加算２（特定機能病院）
                                 IF  LNK-NYUKSNGET-NYUIN-SRYCD
                                                        =  "190085910"
@@ -2091,7 +2091,7 @@
                                              WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
       *                      看護必要度加算３（１０対１入院基本料）
-                             WHEN    "190183270"
+                             WHEN    "190189370"
       *                         看護必要度加算３（特定機能病院）
                                 IF  LNK-NYUKSNGET-NYUIN-SRYCD
                                                        =  "190085910"
