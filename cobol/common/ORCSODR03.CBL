@@ -874,13 +874,13 @@
                    MOVE    NORDERID-GSENTID
                                    TO  SODRNACCT-ORDERID
                WHEN    "04"
-                   MOVE    NORDERID-TAIJUSHIN70ID
+                   MOVE    NORDERID-TAIJUSHIN40ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "05"
-                   MOVE    NORDERID-TAIJUSHIN30ID
+                   MOVE    NORDERID-TAIJUSHIN10ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "06"
-                   MOVE    NORDERID-TAIJUSHIN55ID
+                   MOVE    NORDERID-TAIJUSHIN20ID
                                    TO  SODRNACCT-ORDERID
                WHEN    "07"
                    MOVE    NORDERID-TAIJUSHIN15ID

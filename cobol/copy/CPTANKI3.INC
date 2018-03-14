@@ -29,25 +29,25 @@
                05  FILLER          PIC X(02)   VALUE "97".
                05  FILLER          PIC X(09)   VALUE "190177610".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（終夜睡眠ポリグラフィー１（携帯用装置））（生活療養）
                05  FILLER          PIC X(01)   VALUE "1".
                05  FILLER          PIC X(02)   VALUE "98".
                05  FILLER          PIC X(09)   VALUE "190177710".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（終夜睡眠ポリグラフィー２（多点感圧センサ））
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "99".
                05  FILLER          PIC X(09)   VALUE "190177810".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（終夜睡眠ポリグラフィー２（多点感圧センサ））（生活療養）
                05  FILLER          PIC X(01)   VALUE "1".
                05  FILLER          PIC X(02)   VALUE "9A".
                05  FILLER          PIC X(09)   VALUE "190177910".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（終夜睡眠ポリグラフィー３（１及び２以外））
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "9B".
@@ -89,13 +89,13 @@
                05  FILLER          PIC X(02)   VALUE "9H".
                05  FILLER          PIC X(09)   VALUE "190178610".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（腋臭症手術（皮膚有毛部切除術））（生活療養）
                05  FILLER          PIC X(01)   VALUE "1".
                05  FILLER          PIC X(02)   VALUE "9I".
                05  FILLER          PIC X(09)   VALUE "190178710".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（関節鏡下手根管開放手術）
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "9J".
@@ -174,7 +174,7 @@
                05  FILLER          PIC X(02)   VALUE "9P".
                05  FILLER          PIC X(09)   VALUE "190179410".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（水晶体再建術（眼内レンズ挿入しない場合））（生活療養）  
       *        20140401-20160331
       *        短手３（水晶体再建術（眼内レンズ挿入しない・片側））（生活療養）
@@ -183,21 +183,21 @@
                05  FILLER          PIC X(02)   VALUE "9Q".
                05  FILLER          PIC X(09)   VALUE "190179510".
                05  FILLER          PIC X(08)   VALUE "20140401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（水晶体再建術（眼内レンズ挿入しない・両側））
       *        20160401-99999999
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "B0".
                05  FILLER          PIC X(09)   VALUE "190196110".
                05  FILLER          PIC X(08)   VALUE "20160401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（水晶体再建術（眼内レンズ挿入しない・両側））（生活療養）
       *        20160401-99999999
                05  FILLER          PIC X(01)   VALUE "1".
                05  FILLER          PIC X(02)   VALUE "B1".
                05  FILLER          PIC X(09)   VALUE "190196210".
                05  FILLER          PIC X(08)   VALUE "20160401".
-               05  FILLER          PIC X(08)   VALUE "99999999".
+               05  FILLER          PIC X(08)   VALUE "20180331".
       *        短手３（乳腺腫瘍摘出術（長径５ｃｍ未満））
                05  FILLER          PIC X(01)   VALUE "0".
                05  FILLER          PIC X(02)   VALUE "9R".

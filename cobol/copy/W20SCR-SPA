@@ -104,240 +104,258 @@
                  11  SPA-GMN-W20-KNGHJOFL          PIC X(01).
                  11  SPA-GMN-W20-KNGHJOMEI         PIC X(38).
                09  SPA-GMN-W20-KSN-G.
-      *          ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
-                 11  SPA-GMN-W20-YKNKNGHJ-LBL PIC X(36).
-                 11  SPA-GMN-W20-YKNKNGHJ-G.
-                   13  SPA-GMN-W20-YKNKNGHJ     PIC X(01).
-                   13  SPA-GMN-W20-YKNKNGHJFL1  PIC X(01).
-                   13  SPA-GMN-W20-YKNKNGHJMEI  PIC X(28).
-      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
-                 11  SPA-GMN-W20-YKNKNG-A214-LBL     PIC X(36).
-                 11  SPA-GMN-W20-YKNKNG-A214-G.
-                   13  SPA-GMN-W20-YKNKNG-A214       PIC X(01).
-                   13  SPA-GMN-W20-YKNKNG-A214FL1    PIC X(01).
-                   13  SPA-GMN-W20-YKNKNG-A214MEI    PIC X(28).
-      *          ¥«∏Ó…¨Õ◊≈Ÿ≤√ªª£±° ∞Ï»Ã…¬≈Ô∆˛±°¥À‹Œ¡§Œ§‚§Œ§Ú¿ﬂƒÍ°À
+      *          £¡£±£∞£∞¥«∏Ó…¨Õ◊≈Ÿ≤√ªª£±° ∞Ï»Ã…¬≈Ô∆˛±°¥À‹Œ¡§Œ§‚§Œ§Ú¿ﬂƒÍ°À
                  11  SPA-GMN-W20-KNGHITU-LBL      PIC X(36).
                  11  SPA-GMN-W20-KNGHITU-G.
                    13  SPA-GMN-W20-KNGHITU        PIC X(01).
                    13  SPA-GMN-W20-KNGHITUFL1     PIC X(01).
                    13  SPA-GMN-W20-KNGHITUMEI     PIC X(28).
-      *          ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª≤√ªª
+      *          £¡£±£∞£∞∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª≤√ªª
                  11  SPA-GMN-W20-HYOUKA-LBL         PIC X(36).
                  11  SPA-GMN-W20-HYOUKA-G.
                    13  SPA-GMN-W20-HYOUKA           PIC X(01).
                    13  SPA-GMN-W20-HYOUKAFL1        PIC X(01).
                    13  SPA-GMN-W20-HYOUKAMEI        PIC X(28).
-      *          £¡£ƒ£Ã∞›ª˝∏˛æÂ≈˘¬Œ¿©≤√ªª
+      *          £¡£±£∞£∞£¡£ƒ£Ã∞›ª˝∏˛æÂ≈˘¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-ADLIJI-LBL         PIC X(36).
                  11  SPA-GMN-W20-ADLIJI-G.
                    13  SPA-GMN-W20-ADLIJI           PIC X(01).
                    13  SPA-GMN-W20-ADLIJIFL1        PIC X(01).
                    13  SPA-GMN-W20-ADLIJIMEI        PIC X(28).
-      *          ¿∫ø¿ ›∑Ú °ª„ªŒ«€√÷≤√ªª
-                 11  SPA-GMN-W20-SSNHKNFUKU-LBL     PIC X(36).
-                 11  SPA-GMN-W20-SSNHKNFUKU-G.
-                   13  SPA-GMN-W20-SSNHKNFUKU       PIC X(01).
-                   13  SPA-GMN-W20-SSNHKNFUKUFL1    PIC X(01).
-                   13  SPA-GMN-W20-SSNHKNFUKUMEI    PIC X(28).
-      *          ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
-                 11  SPA-GMN-W20-YKNKNKYU-LBL      PIC X(36).
-                 11  SPA-GMN-W20-YKNKNKYU-G.
-                   13  SPA-GMN-W20-YKNKNKYU        PIC X(01).
-                   13  SPA-GMN-W20-YKNKNKYUFL1     PIC X(01).
-                   13  SPA-GMN-W20-YKNKNKYUMEI     PIC X(28).
-      *           £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
-                 11  SPA-GMN-W20-DRTEK-LBL         PIC X(36).
-                 11  SPA-GMN-W20-DRTEK-G.
-                   13  SPA-GMN-W20-DRTEK           PIC X(01).
-                   13  SPA-GMN-W20-DRTEKFL1        PIC X(01).
-                   13  SPA-GMN-W20-DRTEKMEI        PIC X(28).
-      *          ∞Âª’«€√÷≈¨πÁ≤√ªª£≤
-                 11  SPA-GMN-W20-DRTEK2-LBL        PIC X(36).
-                 11  SPA-GMN-W20-DRTEK2-G.
-                   13  SPA-GMN-W20-DRTEK2          PIC X(01).
-                   13  SPA-GMN-W20-DRTEK2FL1       PIC X(01).
-                   13  SPA-GMN-W20-DRTEK2MEI       PIC X(28).
-      *          ¥«∏Ó«€√÷≈¨πÁ≤√ªª
-                 11  SPA-GMN-W20-HICHTEK-LBL       PIC X(36).
-                 11  SPA-GMN-W20-HICHTEK-G.
-                   13  SPA-GMN-W20-HICHTEK         PIC X(01).
-                   13  SPA-GMN-W20-HICHTEKFL1      PIC X(01).
-                   13  SPA-GMN-W20-HICHTEKMEI      PIC X(28).
-      *          ¥«∏Ó«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHICH1-LBL      PIC X(36).
-                 11  SPA-GMN-W20-SNRHICH1-G.
-                   13  SPA-GMN-W20-SNRHICH1        PIC X(01).
-                   13  SPA-GMN-W20-SNRHICH1FL1     PIC X(01).
-                   13  SPA-GMN-W20-SNRHICH1MEI     PIC X(28).
-      *          ¥«∏Ó«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHICH2-LBL      PIC X(36).
-                 11  SPA-GMN-W20-SNRHICH2-G.
-                   13  SPA-GMN-W20-SNRHICH2        PIC X(01).
-                   13  SPA-GMN-W20-SNRHICH2FL1     PIC X(01).
-                   13  SPA-GMN-W20-SNRHICH2MEI     PIC X(28).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHJO1-LBL       PIC X(36).
-                 11  SPA-GMN-W20-SNRHJO1-G.
-                   13  SPA-GMN-W20-SNRHJO1         PIC X(01).
-                   13  SPA-GMN-W20-SNRHJO1FL1      PIC X(01).
-                   13  SPA-GMN-W20-SNRHJO1MEI      PIC X(28).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHJO2-LBL       PIC X(36).
-                 11  SPA-GMN-W20-SNRHJO2-G.
-                   13  SPA-GMN-W20-SNRHJO2         PIC X(01).
-                   13  SPA-GMN-W20-SNRHJO2FL1      PIC X(01).
-                   13  SPA-GMN-W20-SNRHJO2MEI      PIC X(28).
-      *          ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
-                 11  SPA-GMN-W20-YKNHICH1-LBL      PIC X(36).
-                 11  SPA-GMN-W20-YKNHICH1-G.
-                   13  SPA-GMN-W20-YKNHICH1        PIC X(01).
-                   13  SPA-GMN-W20-YKNHICH1FL1     PIC X(01).
-                   13  SPA-GMN-W20-YKNHICH1MEI     PIC X(28).
-      *          ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
-                 11  SPA-GMN-W20-YKNHICH2-LBL      PIC X(36).
-                 11  SPA-GMN-W20-YKNHICH2-G.
-                   13  SPA-GMN-W20-YKNHICH2        PIC X(01).
-                   13  SPA-GMN-W20-YKNHICH2FL1     PIC X(01).
-                   13  SPA-GMN-W20-YKNHICH2MEI     PIC X(28).
-      *          ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
+      *          £¡£±£∞£±ÃÎ¥÷¥«∏Ó≤√ªª≤√ªª
+                 11  SPA-GMN-W20-H30YKNKNG-LBL     PIC X(36).
+                 11  SPA-GMN-W20-H30YKNKNG-G.
+                   13  SPA-GMN-W20-H30YKNKNG       PIC X(01).
+                   13  SPA-GMN-W20-H30YKNKNGFL1    PIC X(01).
+                   13  SPA-GMN-W20-H30YKNKNGMEI    PIC X(28).
+      *          £¡£±£∞£±∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
                  11  SPA-GMN-W20-ZTKFUKKI-LBL      PIC X(36).
                  11  SPA-GMN-W20-ZTKFUKKI-G.
                    13  SPA-GMN-W20-ZTKFUKKI        PIC X(01).
                    13  SPA-GMN-W20-ZTKFUKKIFL1     PIC X(01).
                    13  SPA-GMN-W20-ZTKFUKKIMEI     PIC X(28).
-      *          ±…Õ‹¥…Õ˝º¬ª‹≤√ªª
+      *          £¡£±£∞£≥¿∫ø¿ ›∑Ú °ª„ªŒ«€√÷≤√ªª
+                 11  SPA-GMN-W20-SSNHKNFUKU-LBL     PIC X(36).
+                 11  SPA-GMN-W20-SSNHKNFUKU-G.
+                   13  SPA-GMN-W20-SSNHKNFUKU       PIC X(01).
+                   13  SPA-GMN-W20-SSNHKNFUKUFL1    PIC X(01).
+                   13  SPA-GMN-W20-SSNHKNFUKUMEI    PIC X(28).
+      *          £¡£±£∞£∂¥«∏Ó ‰Ωı≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-GMN-W20-KNGHJO-A104-LBL       PIC X(36).
+                 11  SPA-GMN-W20-KNGHJO-A104-G.
+                   13  SPA-GMN-W20-KNGHJO-A104         PIC X(01).
+                   13  SPA-GMN-W20-KNGHJO-A104FL1      PIC X(01).
+                   13  SPA-GMN-W20-KNGHJO-A104MEI      PIC X(28).
+      *          £¡£±£∞£∂ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-GMN-W20-YKNKNG-A104-LBL       PIC X(36).
+                 11  SPA-GMN-W20-YKNKNG-A104-G.
+                   13  SPA-GMN-W20-YKNKNG-A104         PIC X(01).
+                   13  SPA-GMN-W20-YKNKNG-A104FL1      PIC X(01).
+                   13  SPA-GMN-W20-YKNKNG-A104MEI      PIC X(28).
+      *          £¡£±£∞£∏ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
+                 11  SPA-GMN-W20-YKNKNKYU-LBL      PIC X(36).
+                 11  SPA-GMN-W20-YKNKNKYU-G.
+                   13  SPA-GMN-W20-YKNKNKYU        PIC X(01).
+                   13  SPA-GMN-W20-YKNKNKYUFL1     PIC X(01).
+                   13  SPA-GMN-W20-YKNKNKYUMEI     PIC X(28).
+      *          £¡£±£∞£∏ £øÙ∞Âª’µ⁄§”¥«∏Ó«€√÷≈¨πÁ≤√ªª
+                 11  SPA-GMN-W20-DRTEK-LBL         PIC X(36).
+                 11  SPA-GMN-W20-DRTEK-G.
+                   13  SPA-GMN-W20-DRTEK           PIC X(01).
+                   13  SPA-GMN-W20-DRTEKFL1        PIC X(01).
+                   13  SPA-GMN-W20-DRTEKMEI        PIC X(28).
+      *          £¡£±£∞£∏∞Âª’«€√÷≈¨πÁ≤√ªª£≤
+                 11  SPA-GMN-W20-DRTEK2-LBL        PIC X(36).
+                 11  SPA-GMN-W20-DRTEK2-G.
+                   13  SPA-GMN-W20-DRTEK2          PIC X(01).
+                   13  SPA-GMN-W20-DRTEK2FL1       PIC X(01).
+                   13  SPA-GMN-W20-DRTEK2MEI       PIC X(28).
+      *          £¡£±£∞£∏¥«∏Ó«€√÷≈¨πÁ≤√ªª
+                 11  SPA-GMN-W20-HICHTEK-LBL       PIC X(36).
+                 11  SPA-GMN-W20-HICHTEK-G.
+                   13  SPA-GMN-W20-HICHTEK         PIC X(01).
+                   13  SPA-GMN-W20-HICHTEKFL1      PIC X(01).
+                   13  SPA-GMN-W20-HICHTEKMEI      PIC X(28).
+      *          £¡£±£∞£∏¥«∏Ó«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHICH1-LBL      PIC X(36).
+                 11  SPA-GMN-W20-SNRHICH1-G.
+                   13  SPA-GMN-W20-SNRHICH1        PIC X(01).
+                   13  SPA-GMN-W20-SNRHICH1FL1     PIC X(01).
+                   13  SPA-GMN-W20-SNRHICH1MEI     PIC X(28).
+      *          £¡£±£∞£∏¥«∏Ó«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHICH2-LBL      PIC X(36).
+                 11  SPA-GMN-W20-SNRHICH2-G.
+                   13  SPA-GMN-W20-SNRHICH2        PIC X(01).
+                   13  SPA-GMN-W20-SNRHICH2FL1     PIC X(01).
+                   13  SPA-GMN-W20-SNRHICH2MEI     PIC X(28).
+      *          £¡£±£∞£∏ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
+                 11  SPA-GMN-W20-YKNHICH1-LBL      PIC X(36).
+                 11  SPA-GMN-W20-YKNHICH1-G.
+                   13  SPA-GMN-W20-YKNHICH1        PIC X(01).
+                   13  SPA-GMN-W20-YKNHICH1FL1     PIC X(01).
+                   13  SPA-GMN-W20-YKNHICH1MEI     PIC X(28).
+      *          £¡£±£∞£∏ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
+                 11  SPA-GMN-W20-YKNHICH2-LBL      PIC X(36).
+                 11  SPA-GMN-W20-YKNHICH2-G.
+                   13  SPA-GMN-W20-YKNHICH2        PIC X(01).
+                   13  SPA-GMN-W20-YKNHICH2FL1     PIC X(01).
+                   13  SPA-GMN-W20-YKNHICH2MEI     PIC X(28).
+      *          £¡£±£∞£∏¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHJO1-LBL       PIC X(36).
+                 11  SPA-GMN-W20-SNRHJO1-G.
+                   13  SPA-GMN-W20-SNRHJO1         PIC X(01).
+                   13  SPA-GMN-W20-SNRHJO1FL1      PIC X(01).
+                   13  SPA-GMN-W20-SNRHJO1MEI      PIC X(28).
+      *          £¡£±£∞£∏¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHJO2-LBL       PIC X(36).
+                 11  SPA-GMN-W20-SNRHJO2-G.
+                   13  SPA-GMN-W20-SNRHJO2         PIC X(01).
+                   13  SPA-GMN-W20-SNRHJO2FL1      PIC X(01).
+                   13  SPA-GMN-W20-SNRHJO2MEI      PIC X(28).
+      *          £¡£±£∞£∏±…Õ‹¥…Õ˝º¬ª‹≤√ªª
                  11  SPA-GMN-W20-EIYO-LBL          PIC X(36).
                  11  SPA-GMN-W20-EIYO-G.
                    13  SPA-GMN-W20-EIYO            PIC X(01).
                    13  SPA-GMN-W20-EIYOFL1         PIC X(01).
                    13  SPA-GMN-W20-EIYOMEI         PIC X(28).
-      *          ¬Œ¿©∂Ø≤Ω≤√ªª
-                 11  SPA-GMN-W20-TAISEI-LBL        PIC X(36).
-                 11  SPA-GMN-W20-TAISEI-G.
-                   13  SPA-GMN-W20-TAISEI          PIC X(01).
-                   13  SPA-GMN-W20-TAISEIFL1       PIC X(01).
-                   13  SPA-GMN-W20-TAISEIMEI       PIC X(28).
-      *          ¥«∏Óø¶∞˜«€√÷≤√ªª
-                 11  SPA-GMN-W20-KNGSKHICH-LBL     PIC X(36).
-                 11  SPA-GMN-W20-KNGSKHICH-G.
-                   13  SPA-GMN-W20-KNGSKHICH       PIC X(01).
-                   13  SPA-GMN-W20-KNGSKHICHFL1    PIC X(01).
-                   13  SPA-GMN-W20-KNGSKHICHMEI    PIC X(28).
-      *          ¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
-                 11  SPA-GMN-W20-KNGHJSHICH-LBL    PIC X(36).
-                 11  SPA-GMN-W20-KNGHJSHICH-G.
-                   13  SPA-GMN-W20-KNGHJSHICH      PIC X(01).
-                   13  SPA-GMN-W20-KNGHJSHICHFL1   PIC X(01).
-                   13  SPA-GMN-W20-KNGHJSHICHMEI   PIC X(28).
-      *          ¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
-                 11  SPA-GMN-W20-SSNKYUDR-LBL      PIC X(36).
-                 11  SPA-GMN-W20-SSNKYUDR-G.
-                   13  SPA-GMN-W20-SSNKYUDR        PIC X(01).
-                   13  SPA-GMN-W20-SSNKYUDRFL1     PIC X(01).
-                   13  SPA-GMN-W20-SSNKYUDRMEI     PIC X(28).
-      *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
+      *          £¡£≤£∞£∑°›£≤∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-DRHJO-LBL         PIC X(36).
                  11  SPA-GMN-W20-DRHJO-G.
                    13  SPA-GMN-W20-DRHJO           PIC X(01).
                    13  SPA-GMN-W20-DRHJOFL1        PIC X(01).
                    13  SPA-GMN-W20-DRHJOMEI        PIC X(28).
-      *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª£≤
+      *          £¡£≤£∞£∑°›£≤∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª£≤
                  11  SPA-GMN-W20-DRHJO2-LBL        PIC X(36).
                  11  SPA-GMN-W20-DRHJO2-G.
                    13  SPA-GMN-W20-DRHJO2          PIC X(01).
                    13  SPA-GMN-W20-DRHJO2FL1       PIC X(01).
                    13  SPA-GMN-W20-DRHJO2MEI       PIC X(28).
-      *          µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
+      *          £¡£≤£∞£∑°º£≥µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-KYUKNGHJ-LBL      PIC X(36).
                  11  SPA-GMN-W20-KYUKNGHJ-G.
                    13  SPA-GMN-W20-KYUKNGHJ        PIC X(01).
                    13  SPA-GMN-W20-KYUKNGHJFL1     PIC X(01).
                    13  SPA-GMN-W20-KYUKNGHJMEI     PIC X(28).
-      *          ÃÎ¥÷µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
+      *          £¡£≤£∞£∑°º£≥ÃÎ¥÷µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-YKNKYUKNGHJ-LBL     PIC X(36).
                  11  SPA-GMN-W20-YKNKYUKNGHJ-G.
                    13  SPA-GMN-W20-YKNKYUKNGHJ       PIC X(01).
                    13  SPA-GMN-W20-YKNKYUKNGHJFL1    PIC X(01).
                    13  SPA-GMN-W20-YKNKYUKNGHJMEI    PIC X(28).
-      *          ÃÎ¥÷¥«∏Ó ‰Ωı¬Œ¿©≤√ªª° £¡£≤£∞£∑°›£≥°À
+      *          £¡£≤£∞£∑°›£≥ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-YKNKNG-A207-03-LBL PIC X(36).
                  11  SPA-GMN-W20-YKNKNG-A207-03-G.
                    13  SPA-GMN-W20-YKNKNG-A207-03     PIC X(01).
                    13  SPA-GMN-W20-YKNKNG-A207-03FL1  PIC X(01).
                    13  SPA-GMN-W20-YKNKNG-A207-03MEI  PIC X(28).
-      *          ¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+      *          £¡£≤£∞£∑°›£¥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
                  11  SPA-GMN-W20-KNGYKNHICHI-LBL     PIC X(36).
                  11  SPA-GMN-W20-KNGYKNHICHI-G.
                    13  SPA-GMN-W20-KNGYKNHICHI       PIC X(01).
                    13  SPA-GMN-W20-KNGYKNHICHIFL1    PIC X(01).
                    13  SPA-GMN-W20-KNGYKNHICHIMEI    PIC X(28).
-      *          ∆Ò…¬¥µº‘≈˘∆˛±°ø«Œ≈≤√ªª
+      *          £¡£≤£±£∞∆Ò…¬¥µº‘≈˘∆˛±°ø«Œ≈≤√ªª
                  11  SPA-GMN-W20-NANBYO-LBL        PIC X(36).
                  11  SPA-GMN-W20-NANBYO-G.
                    13  SPA-GMN-W20-NANBYO          PIC X(01).
                    13  SPA-GMN-W20-NANBYOFL1       PIC X(01).
                    13  SPA-GMN-W20-NANBYOMEI       PIC X(28).
-      *          ∆√ºÏº¿¥µ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
+      *          £¡£≤£±£±∆√ºÏº¿¥µ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
                  11  SPA-GMN-W20-TOKUSYU-LBL       PIC X(36).
                  11  SPA-GMN-W20-TOKUSYU-G.
                    13  SPA-GMN-W20-TOKUSYU         PIC X(01).
                    13  SPA-GMN-W20-TOKUSYUFL1      PIC X(01).
                    13  SPA-GMN-W20-TOKUSYUMEI      PIC X(28).
-      *          ¥«∏Ó«€√÷≤√ªª
+      *          £¡£≤£±£≥¥«∏Ó«€√÷≤√ªª
                  11  SPA-GMN-W20-HICH-LBL          PIC X(36).
                  11  SPA-GMN-W20-HICH-G.
                    13  SPA-GMN-W20-HICH            PIC X(01).
                    13  SPA-GMN-W20-HICHFL1         PIC X(01).
                    13  SPA-GMN-W20-HICHMEI         PIC X(28).
-      *          ÃÎ¥÷∂–Ã≥≈˘¥«∏Ó≤√ªª
+      *          £¡£≤£±£¥ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
+                 11  SPA-GMN-W20-YKNKNGHJ-LBL PIC X(36).
+                 11  SPA-GMN-W20-YKNKNGHJ-G.
+                   13  SPA-GMN-W20-YKNKNGHJ     PIC X(01).
+                   13  SPA-GMN-W20-YKNKNGHJFL1  PIC X(01).
+                   13  SPA-GMN-W20-YKNKNGHJMEI  PIC X(28).
+      *          £¡£≤£±£¥ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
+                 11  SPA-GMN-W20-YKNKNG-A214-LBL     PIC X(36).
+                 11  SPA-GMN-W20-YKNKNG-A214-G.
+                   13  SPA-GMN-W20-YKNKNG-A214       PIC X(01).
+                   13  SPA-GMN-W20-YKNKNG-A214FL1    PIC X(01).
+                   13  SPA-GMN-W20-YKNKNG-A214MEI    PIC X(28).
+      *          £¡£≤£±£µÃÎ¥÷∂–Ã≥≈˘¥«∏Ó≤√ªª
                  11  SPA-GMN-W20-YKNKNG-LBL        PIC X(36).
                  11  SPA-GMN-W20-YKNKNG-G.
                    13  SPA-GMN-W20-YKNKNG          PIC X(01).
                    13  SPA-GMN-W20-YKNKNGFL        PIC X(01).
                    13  SPA-GMN-W20-YKNKNGMEI       PIC X(28).
-      *          ¿∫ø¿≤ ±˛µﬁ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
+      *          £¡£≤£≤£∏¿∫ø¿≤ ±˛µﬁ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
                  11  SPA-GMN-W20-SEISIN-LBL        PIC X(36).
                  11  SPA-GMN-W20-SEISIN-G.
                    13  SPA-GMN-W20-SEISIN          PIC X(01).
                    13  SPA-GMN-W20-SEISINFL1       PIC X(01).
                    13  SPA-GMN-W20-SEISINMEI       PIC X(28).
-      *          ¿∫ø¿≤ √œ∞Ë∞‹π‘º¬ª‹≤√ªª
+      *          £¡£≤£≥£∞°›£≤¿∫ø¿≤ √œ∞Ë∞‹π‘º¬ª‹≤√ªª
                  11  SPA-GMN-W20-SEICHIIKI-LBL       PIC X(36).
                  11  SPA-GMN-W20-SEICHIIKI-G.
                    13  SPA-GMN-W20-SEICHIIKI         PIC X(01).
                    13  SPA-GMN-W20-SEICHIIKIFL1      PIC X(01).
                    13  SPA-GMN-W20-SEICHIIKIMEI      PIC X(28).
-      *          ª˘∆∏°¶ª◊Ω’¥¸¿∫ø¿≤ ∆˛±°∞ÂŒ≈¥…Õ˝≤√ªª
+      *          £¡£≤£≥£±ª˘∆∏°¶ª◊Ω’¥¸¿∫ø¿≤ ∆˛±°∞ÂŒ≈¥…Õ˝≤√ªª
                  11  SPA-GMN-W20-JIDO-LBL          PIC X(36).
                  11  SPA-GMN-W20-JIDO-G.
                    13  SPA-GMN-W20-JIDO            PIC X(01).
                    13  SPA-GMN-W20-JIDOFL1         PIC X(01).
                    13  SPA-GMN-W20-JIDOMEI         PIC X(28).
-      *          …¬≈ÔÃÙ∫ﬁ∂»Ã≥º¬ª‹≤√ªª
+      *          £¡£≤£¥£¥…¬≈ÔÃÙ∫ﬁ∂»Ã≥º¬ª‹≤√ªª
                  11  SPA-GMN-W20-BTUYKZ-LBL      PIC X(36).
                  11  SPA-GMN-W20-BTUYKZ-G.
                    13  SPA-GMN-W20-BTUYKZ        PIC X(01).
                    13  SPA-GMN-W20-BTUYKZFL1     PIC X(01).
                    13  SPA-GMN-W20-BTUYKZMEI     PIC X(28).
-      *          •◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
+      *          £¡£≤£¥£π¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
+                 11  SPA-GMN-W20-SSNKYUDR-LBL      PIC X(36).
+                 11  SPA-GMN-W20-SSNKYUDR-G.
+                   13  SPA-GMN-W20-SSNKYUDR        PIC X(01).
+                   13  SPA-GMN-W20-SSNKYUDRFL1     PIC X(01).
+                   13  SPA-GMN-W20-SSNKYUDRMEI     PIC X(28).
+      *          £¡£≥£∞£∑•◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
                  11  SPA-GMN-W20-HOIKU-LBL         PIC X(36).
                  11  SPA-GMN-W20-HOIKU-G.
                    13  SPA-GMN-W20-HOIKU           PIC X(01).
                    13  SPA-GMN-W20-HOIKUFL1        PIC X(01).
                    13  SPA-GMN-W20-HOIKUMEI        PIC X(28).
-      *          Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
-                 11  SPA-GMN-W20-JKAIFUKU-LBL      PIC X(36).
-                 11  SPA-GMN-W20-JKAIFUKU-G.
-                   13  SPA-GMN-W20-JKAIFUKU        PIC X(01).
-                   13  SPA-GMN-W20-JKAIFUKUFL1     PIC X(01).
-                   13  SPA-GMN-W20-JKAIFUKUMEI     PIC X(28).
-      *          µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
+      *          £¡£≥£∞£∏µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-KJTRIHA-LBL         PIC X(36).
                  11  SPA-GMN-W20-KJTRIHA-G.
                    13  SPA-GMN-W20-KJTRIHA           PIC X(01).
                    13  SPA-GMN-W20-KJTRIHAFL1        PIC X(01).
                    13  SPA-GMN-W20-KJTRIHAMEI        PIC X(28).
+      *          £¡£≥£∞£∏Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
+                 11  SPA-GMN-W20-JKAIFUKU-LBL      PIC X(36).
+                 11  SPA-GMN-W20-JKAIFUKU-G.
+                   13  SPA-GMN-W20-JKAIFUKU        PIC X(01).
+                   13  SPA-GMN-W20-JKAIFUKUFL1     PIC X(01).
+                   13  SPA-GMN-W20-JKAIFUKUMEI     PIC X(28).
+      *          £¡£≥£∞£∏¬Œ¿©∂Ø≤Ω≤√ªª
+                 11  SPA-GMN-W20-TAISEI-LBL        PIC X(36).
+                 11  SPA-GMN-W20-TAISEI-G.
+                   13  SPA-GMN-W20-TAISEI          PIC X(01).
+                   13  SPA-GMN-W20-TAISEIFL1       PIC X(01).
+                   13  SPA-GMN-W20-TAISEIMEI       PIC X(28).
+      *          £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜«€√÷≤√ªª
+                 11  SPA-GMN-W20-KNGSKHICH-LBL     PIC X(36).
+                 11  SPA-GMN-W20-KNGSKHICH-G.
+                   13  SPA-GMN-W20-KNGSKHICH       PIC X(01).
+                   13  SPA-GMN-W20-KNGSKHICHFL1    PIC X(01).
+                   13  SPA-GMN-W20-KNGSKHICHMEI    PIC X(28).
+      *          £¡£≥£∞£∏°›£≥¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
+                 11  SPA-GMN-W20-KNGHJSHICH-LBL    PIC X(36).
+                 11  SPA-GMN-W20-KNGHJSHICH-G.
+                   13  SPA-GMN-W20-KNGHJSHICH      PIC X(01).
+                   13  SPA-GMN-W20-KNGHJSHICHFL1   PIC X(01).
+                   13  SPA-GMN-W20-KNGHJSHICHMEI   PIC X(28).
       *          Ã§¥Ω‡° …¬≈Ô§À∑∏§Î¥Ω‡§ÚÀ˛§ø§µ§ §§æÏπÁ°À
                  11  SPA-GMN-W20-BTUMIKJN-LBL         PIC X(36).
                  11  SPA-GMN-W20-BTUMIKJN-G.
@@ -357,7 +375,7 @@
                    13  SPA-GMN-W20-KSNCOMMONFL1      PIC X(01).
                    13  SPA-GMN-W20-KSNCOMMONMEI      PIC X(28).
                09  SPA-GMN-W20-KSN-R   REDEFINES   SPA-GMN-W20-KSN-G.
-                 11  SPA-GMN-W20-KSN-OCC           OCCURS 42.
+                 11  SPA-GMN-W20-KSN-OCC           OCCURS 45.
                    13  SPA-GMN-W20-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W20-KSNCD-G.
                        15  SPA-GMN-W20-KSNCD           PIC X(01).
@@ -384,7 +402,7 @@
       *        ∆√ƒÍ∆˛±°Œ¡•≥•Û•‹
                09  SPA-GMN-W20-TOKNYUINLST-G.
                  11  SPA-GMN-W20-TOKNYUIN-MAX      PIC 9(03).
-                 11  SPA-GMN-W20-TOKNYUINLST-OCC   OCCURS  31.
+                 11  SPA-GMN-W20-TOKNYUINLST-OCC   OCCURS  51.
                    13  SPA-GMN-W20-TOKNYUINLST.
                        15  SPA-GMN-W20-TOKNYUINL    PIC X(02).
                        15  SPA-GMN-W20-TOKNYUINFL1  PIC X(01).
@@ -465,20 +483,6 @@
                    13  SPA-GMN-W20-KNGHJOFLL        PIC X(01).
                    13  SPA-GMN-W20-KNGHJOMEIL      PIC X(38).
                09  SPA-GMN-W20-KSNLST-G.
-      *          ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
-                 11  SPA-GMN-W20-YKNKNGHJLST-G.
-                   13  SPA-GMN-W20-YKNKNGHJ-MAX     PIC 9(03).
-                   13  SPA-GMN-W20-YKNKNGHJLST      OCCURS 10.
-                     15  SPA-GMN-W20-YKNKNGHJL      PIC X(01).
-                     15  SPA-GMN-W20-YKNKNGHJFLL    PIC X(01).
-                     15  SPA-GMN-W20-YKNKNGHJMEIL   PIC X(28).
-      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
-                 11  SPA-GMN-W20-YKNKNG-A214LST-G.
-                   13  SPA-GMN-W20-YKNKNG-A214-MAX     PIC 9(03).
-                   13  SPA-GMN-W20-YKNKNG-A214LST      OCCURS 10.
-                     15  SPA-GMN-W20-YKNKNG-A214L      PIC X(01).
-                     15  SPA-GMN-W20-YKNKNG-A214FLL    PIC X(01).
-                     15  SPA-GMN-W20-YKNKNG-A214MEIL   PIC X(28).
       *          ¥«∏Ó…¨Õ◊≈Ÿ≤√ªª£±° ∞Ï»Ã…¬≈Ô∆˛±°¥À‹Œ¡§Œ§‚§Œ§Ú¿ﬂƒÍ°À
                  11  SPA-GMN-W20-KNGHITULST-G.
                    13  SPA-GMN-W20-KNGHITU-MAX     PIC 9(03).
@@ -500,6 +504,20 @@
                      15  SPA-GMN-W20-ADLIJIL       PIC X(01).
                      15  SPA-GMN-W20-ADLIJIFLL     PIC X(01).
                      15  SPA-GMN-W20-ADLIJIMEIL    PIC X(28).
+      *          ÃÎ¥÷¥«∏Ó≤√ªª≤√ªª
+                 11  SPA-GMN-W20-H30YKNKNGLST-G.
+                   13  SPA-GMN-W20-H30YKNKNG-MAX     PIC 9(03).
+                   13  SPA-GMN-W20-H30YKNKNGLST      OCCURS 10.
+                     15  SPA-GMN-W20-H30YKNKNGL      PIC X(01).
+                     15  SPA-GMN-W20-H30YKNKNGFLL    PIC X(01).
+                     15  SPA-GMN-W20-H30YKNKNGMEIL   PIC X(28).
+      *          ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
+                 11  SPA-GMN-W20-ZTKFUKKILST-G.
+                   13  SPA-GMN-W20-ZTKFUKKI-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-ZTKFUKKILST     OCCURS 10.
+                     15  SPA-GMN-W20-ZTKFUKKIL     PIC X(01).
+                     15  SPA-GMN-W20-ZTKFUKKIFLL   PIC X(01).
+                     15  SPA-GMN-W20-ZTKFUKKIMEIL  PIC X(28).
       *          ¿∫ø¿ ›∑Ú °ª„ªŒ«€√÷≤√ªª
                  11  SPA-GMN-W20-SSNHKNFUKULST-G.
                    13  SPA-GMN-W20-SSNHKNFUKU-MAX   PIC 9(03).
@@ -507,6 +525,20 @@
                      15  SPA-GMN-W20-SSNHKNFUKUL    PIC X(01).
                      15  SPA-GMN-W20-SSNHKNFUKUFLL  PIC X(01).
                      15  SPA-GMN-W20-SSNHKNFUKUMEIL PIC X(28).
+      *          ¥«∏Ó ‰Ωı≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-GMN-W20-KNGHJO-A104LST-G.
+                   13  SPA-GMN-W20-KNGHJO-A104-MAX     PIC 9(03).
+                   13  SPA-GMN-W20-KNGHJO-A104LST      OCCURS 10.
+                     15  SPA-GMN-W20-KNGHJO-A104L      PIC X(01).
+                     15  SPA-GMN-W20-KNGHJO-A104FLL    PIC X(01).
+                     15  SPA-GMN-W20-KNGHJO-A104MEIL   PIC X(28).
+      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-GMN-W20-YKNKNG-A104LST-G.
+                   13  SPA-GMN-W20-YKNKNG-A104-MAX     PIC 9(03).
+                   13  SPA-GMN-W20-YKNKNG-A104LST      OCCURS 10.
+                     15  SPA-GMN-W20-YKNKNG-A104L      PIC X(01).
+                     15  SPA-GMN-W20-YKNKNG-A104FLL    PIC X(01).
+                     15  SPA-GMN-W20-YKNKNG-A104MEIL   PIC X(28).
       *          ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
                  11  SPA-GMN-W20-YKNKNKYULST-G.
                    13  SPA-GMN-W20-YKNKNKYU-MAX    PIC 9(03).
@@ -549,20 +581,6 @@
                      15  SPA-GMN-W20-SNRHICH2L     PIC X(01).
                      15  SPA-GMN-W20-SNRHICH2FLL   PIC X(01).
                      15  SPA-GMN-W20-SNRHICH2MEIL  PIC X(28).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHJO1LST-G.
-                   13  SPA-GMN-W20-SNRHJO1-MAX    PIC 9(03).
-                   13  SPA-GMN-W20-SNRHJO1LST     OCCURS 10.
-                     15  SPA-GMN-W20-SNRHJO1L     PIC X(01).
-                     15  SPA-GMN-W20-SNRHJO1FLL   PIC X(01).
-                     15  SPA-GMN-W20-SNRHJO1MEIL  PIC X(28).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
-                 11  SPA-GMN-W20-SNRHJO2LST-G.
-                   13  SPA-GMN-W20-SNRHJO2-MAX    PIC 9(03).
-                   13  SPA-GMN-W20-SNRHJO2LST     OCCURS 10.
-                     15  SPA-GMN-W20-SNRHJO2L     PIC X(01).
-                     15  SPA-GMN-W20-SNRHJO2FLL   PIC X(01).
-                     15  SPA-GMN-W20-SNRHJO2MEIL  PIC X(28).
       *          ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
                  11  SPA-GMN-W20-YKNHICH1LST-G.
                    13  SPA-GMN-W20-YKNHICH1-MAX    PIC 9(03).
@@ -577,13 +595,20 @@
                      15  SPA-GMN-W20-YKNHICH2L     PIC X(01).
                      15  SPA-GMN-W20-YKNHICH2FLL   PIC X(01).
                      15  SPA-GMN-W20-YKNHICH2MEIL  PIC X(28).
-      *          ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
-                 11  SPA-GMN-W20-ZTKFUKKILST-G.
-                   13  SPA-GMN-W20-ZTKFUKKI-MAX    PIC 9(03).
-                   13  SPA-GMN-W20-ZTKFUKKILST     OCCURS 10.
-                     15  SPA-GMN-W20-ZTKFUKKIL     PIC X(01).
-                     15  SPA-GMN-W20-ZTKFUKKIFLL   PIC X(01).
-                     15  SPA-GMN-W20-ZTKFUKKIMEIL  PIC X(28).
+      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHJO1LST-G.
+                   13  SPA-GMN-W20-SNRHJO1-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-SNRHJO1LST     OCCURS 10.
+                     15  SPA-GMN-W20-SNRHJO1L     PIC X(01).
+                     15  SPA-GMN-W20-SNRHJO1FLL   PIC X(01).
+                     15  SPA-GMN-W20-SNRHJO1MEIL  PIC X(28).
+      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
+                 11  SPA-GMN-W20-SNRHJO2LST-G.
+                   13  SPA-GMN-W20-SNRHJO2-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-SNRHJO2LST     OCCURS 10.
+                     15  SPA-GMN-W20-SNRHJO2L     PIC X(01).
+                     15  SPA-GMN-W20-SNRHJO2FLL   PIC X(01).
+                     15  SPA-GMN-W20-SNRHJO2MEIL  PIC X(28).
       *          ±…Õ‹¥…Õ˝º¬ª‹≤√ªª
                  11  SPA-GMN-W20-EIYOLST-G.
                    13  SPA-GMN-W20-EIYO-MAX        PIC 9(03).
@@ -591,34 +616,6 @@
                      15  SPA-GMN-W20-EIYOL         PIC X(01).
                      15  SPA-GMN-W20-EIYOFLL       PIC X(01).
                      15  SPA-GMN-W20-EIYOMEIL      PIC X(28).
-      *          ¬Œ¿©∂Ø≤Ω≤√ªª
-                 11  SPA-GMN-W20-TAISEILST-G.
-                   13  SPA-GMN-W20-TAISEI-MAX      PIC 9(03).
-                   13  SPA-GMN-W20-TAISEILST       OCCURS 10.
-                     15  SPA-GMN-W20-TAISEIL       PIC X(01).
-                     15  SPA-GMN-W20-TAISEIFLL     PIC X(01).
-                     15  SPA-GMN-W20-TAISEIMEIL    PIC X(28).
-      *          ¥«∏Óø¶∞˜«€√÷≤√ªª
-                 11  SPA-GMN-W20-KNGSKHICHLST-G.
-                   13  SPA-GMN-W20-KNGSKHICH-MAX   PIC 9(03).
-                   13  SPA-GMN-W20-KNGSKHICHLST    OCCURS 10.
-                     15  SPA-GMN-W20-KNGSKHICHL    PIC X(01).
-                     15  SPA-GMN-W20-KNGSKHICHFLL  PIC X(01).
-                     15  SPA-GMN-W20-KNGSKHICHMEIL PIC X(28).
-      *          ¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
-                 11  SPA-GMN-W20-KNGHJSHICHLST-G.
-                   13  SPA-GMN-W20-KNGHJSHICH-MAX   PIC 9(03).
-                   13  SPA-GMN-W20-KNGHJSHICHLST    OCCURS 10.
-                     15  SPA-GMN-W20-KNGHJSHICHL    PIC X(01).
-                     15  SPA-GMN-W20-KNGHJSHICHFLL  PIC X(01).
-                     15  SPA-GMN-W20-KNGHJSHICHMEIL PIC X(28).
-      *          ¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
-                 11  SPA-GMN-W20-SSNKYUDRLST-G.
-                   13  SPA-GMN-W20-SSNKYUDR-MAX    PIC 9(03).
-                   13  SPA-GMN-W20-SSNKYUDRLST     OCCURS 10.
-                     15  SPA-GMN-W20-SSNKYUDRL     PIC X(01).
-                     15  SPA-GMN-W20-SSNKYUDRFLL   PIC X(01).
-                     15  SPA-GMN-W20-SSNKYUDRMEIL  PIC X(28).
       *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-DRHJOLST-G.
                    13  SPA-GMN-W20-DRHJO-MAX       PIC 9(03).
@@ -682,6 +679,20 @@
                      15  SPA-GMN-W20-HICHL         PIC X(01).
                      15  SPA-GMN-W20-HICHFLL       PIC X(01).
                      15  SPA-GMN-W20-HICHMEIL      PIC X(28).
+      *          ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
+                 11  SPA-GMN-W20-YKNKNGHJLST-G.
+                   13  SPA-GMN-W20-YKNKNGHJ-MAX     PIC 9(03).
+                   13  SPA-GMN-W20-YKNKNGHJLST      OCCURS 10.
+                     15  SPA-GMN-W20-YKNKNGHJL      PIC X(01).
+                     15  SPA-GMN-W20-YKNKNGHJFLL    PIC X(01).
+                     15  SPA-GMN-W20-YKNKNGHJMEIL   PIC X(28).
+      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
+                 11  SPA-GMN-W20-YKNKNG-A214LST-G.
+                   13  SPA-GMN-W20-YKNKNG-A214-MAX     PIC 9(03).
+                   13  SPA-GMN-W20-YKNKNG-A214LST      OCCURS 10.
+                     15  SPA-GMN-W20-YKNKNG-A214L      PIC X(01).
+                     15  SPA-GMN-W20-YKNKNG-A214FLL    PIC X(01).
+                     15  SPA-GMN-W20-YKNKNG-A214MEIL   PIC X(28).
       *          ÃÎ¥÷∂–Ã≥≈˘¥«∏Ó≤√ªª
                  11  SPA-GMN-W20-YKNKNGLST-G.
                    13  SPA-GMN-W20-YKNKNG-MAX      PIC 9(03).
@@ -717,6 +728,13 @@
                      15  SPA-GMN-W20-BTUYKZL       PIC X(01).
                      15  SPA-GMN-W20-BTUYKZFLL     PIC X(01).
                      15  SPA-GMN-W20-BTUYKZMEIL    PIC X(28).
+      *          ¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
+                 11  SPA-GMN-W20-SSNKYUDRLST-G.
+                   13  SPA-GMN-W20-SSNKYUDR-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-SSNKYUDRLST     OCCURS 10.
+                     15  SPA-GMN-W20-SSNKYUDRL     PIC X(01).
+                     15  SPA-GMN-W20-SSNKYUDRFLL   PIC X(01).
+                     15  SPA-GMN-W20-SSNKYUDRMEIL  PIC X(28).
       *          •◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
                  11  SPA-GMN-W20-HOIKULST-G.
                    13  SPA-GMN-W20-HOIKU-MAX       PIC 9(03).
@@ -724,13 +742,6 @@
                      15  SPA-GMN-W20-HOIKUL        PIC X(01).
                      15  SPA-GMN-W20-HOIKUFLL      PIC X(01).
                      15  SPA-GMN-W20-HOIKUMEIL     PIC X(28).
-      *          Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
-                 11  SPA-GMN-W20-JKAIFUKULST-G.
-                   13  SPA-GMN-W20-JKAIFUKU-MAX    PIC 9(03).
-                   13  SPA-GMN-W20-JKAIFUKULST     OCCURS 10.
-                     15  SPA-GMN-W20-JKAIFUKUL     PIC X(01).
-                     15  SPA-GMN-W20-JKAIFUKUFLL   PIC X(01).
-                     15  SPA-GMN-W20-JKAIFUKUMEIL  PIC X(28).
       *          µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
                  11  SPA-GMN-W20-KJTRIHALST-G.
                    13  SPA-GMN-W20-KJTRIHA-MAX     PIC 9(03).
@@ -738,6 +749,34 @@
                      15  SPA-GMN-W20-KJTRIHAL      PIC X(01).
                      15  SPA-GMN-W20-KJTRIHAFLL    PIC X(01).
                      15  SPA-GMN-W20-KJTRIHAMEIL   PIC X(28).
+      *          Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
+                 11  SPA-GMN-W20-JKAIFUKULST-G.
+                   13  SPA-GMN-W20-JKAIFUKU-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-JKAIFUKULST     OCCURS 10.
+                     15  SPA-GMN-W20-JKAIFUKUL     PIC X(01).
+                     15  SPA-GMN-W20-JKAIFUKUFLL   PIC X(01).
+                     15  SPA-GMN-W20-JKAIFUKUMEIL  PIC X(28).
+      *          ¬Œ¿©∂Ø≤Ω≤√ªª
+                 11  SPA-GMN-W20-TAISEILST-G.
+                   13  SPA-GMN-W20-TAISEI-MAX      PIC 9(03).
+                   13  SPA-GMN-W20-TAISEILST       OCCURS 10.
+                     15  SPA-GMN-W20-TAISEIL       PIC X(01).
+                     15  SPA-GMN-W20-TAISEIFLL     PIC X(01).
+                     15  SPA-GMN-W20-TAISEIMEIL    PIC X(28).
+      *          ¥«∏Óø¶∞˜«€√÷≤√ªª
+                 11  SPA-GMN-W20-KNGSKHICHLST-G.
+                   13  SPA-GMN-W20-KNGSKHICH-MAX   PIC 9(03).
+                   13  SPA-GMN-W20-KNGSKHICHLST    OCCURS 10.
+                     15  SPA-GMN-W20-KNGSKHICHL    PIC X(01).
+                     15  SPA-GMN-W20-KNGSKHICHFLL  PIC X(01).
+                     15  SPA-GMN-W20-KNGSKHICHMEIL PIC X(28).
+      *          ¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
+                 11  SPA-GMN-W20-KNGHJSHICHLST-G.
+                   13  SPA-GMN-W20-KNGHJSHICH-MAX   PIC 9(03).
+                   13  SPA-GMN-W20-KNGHJSHICHLST    OCCURS 10.
+                     15  SPA-GMN-W20-KNGHJSHICHL    PIC X(01).
+                     15  SPA-GMN-W20-KNGHJSHICHFLL  PIC X(01).
+                     15  SPA-GMN-W20-KNGHJSHICHMEIL PIC X(28).
       *          Ã§¥Ω‡° …¬≈Ô§À∑∏§Î¥Ω‡§ÚÀ˛§ø§µ§ §§æÏπÁ°À
                  11  SPA-GMN-W20-BTUMIKJNLST-G.
                    13  SPA-GMN-W20-BTUMIKJN-MAX    PIC 9(03).
@@ -761,7 +800,7 @@
                      15  SPA-GMN-W20-KSNCOMMONMEIL      PIC X(28).
                09  SPA-GMN-W20-KSNLST-R    REDEFINES
                  SPA-GMN-W20-KSNLST-G.
-                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  42.
+                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  45.
                    13  SPA-GMN-W20-KSNLST-MAX      PIC 9(03).
                    13  SPA-GMN-W20-KSNLST          OCCURS  10.
                        15  SPA-GMN-W20-KSNCDL      PIC X(01).
@@ -841,12 +880,17 @@
                        13  SPA-NAI-W20-YKNTOKUBETSU PIC X(01).
       *                ¥«∏Óø¶∞˜øÙ≈˘∑–≤·¡º√÷
                        13  SPA-NAI-W20-KNGKEIKASOCHI PIC X(01).
+      *                ¥«∏Óø¶∞˜»ÊŒ®≤·¡º√÷∂Ë ¨
+                       13  SPA-NAI-W20-SYOKUINKBN2   PIC X(01).
+      *                Ω≈æ…¥µº‘≥‰πÁ∆√ Ã∆˛±°¥À‹Œ¡∂Ë ¨
+                       13  SPA-NAI-W20-JUUSHOUKNGKBN PIC X(01).
       *            ∆√ƒÍµ°«Ω…¬±°∆˛±°¥À‹Œ¡
                    11  SPA-NAI-W20-TOKHOSP         PIC 9(01).
       *        æÆµ¨≥ …¬≈Ô…¬æ≤øÙ≤√ªª•≥°º•…
                09  SPA-NAI-W20-SYOUBTUBRMCD        PIC X(09).
       *        ∆√ƒÍ∆˛±°Œ¡∂Ë ¨•≥°º•…
                09  SPA-NAI-W20-TOKNYUIN            PIC X(02).
+               09  SPA-NAI-W20-TOKSRYCD            PIC X(09).
              07  SPA-NAI-W20-CMB-DAT-AREA.
                09  SPA-NAI-W20-RECEDSPKBNLST-G.
                  11  SPA-NAI-W20-RECEDSPKBNLST     PIC X(02)
@@ -860,15 +904,11 @@
                          15  SPA-NAI-W20-YKNCHOKAL PIC X(01).
                          15  SPA-NAI-W20-YKNTOKUBETSUL PIC X(01).
                          15  SPA-NAI-W20-KNGKEIKASOCHIL PIC X(01).
+                         15  SPA-NAI-W20-SYOKUINKBN2L   PIC X(01).
+                         15  SPA-NAI-W20-JUUSHOUKNGKBNL PIC X(01).
       *
                      13  SPA-NAI-W20-TOKHOSPLST    PIC 9(01).
                09  SPA-NAI-W20-KSNINF-G.
-      *          ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
-                 11  SPA-NAI-W20-YKNKNGHJ-CD    PIC X(09).
-                 11  SPA-NAI-W20-YKNKNGHJ-IDX   PIC 9(03).
-      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
-                 11  SPA-NAI-W20-YKNKNG-A214-CD    PIC X(09).
-                 11  SPA-NAI-W20-YKNKNG-A214-IDX   PIC 9(03).
       *          ¥«∏Ó…¨Õ◊≈Ÿ≤√ªª£±° ∞Ï»Ã…¬≈Ô∆˛±°¥À‹Œ¡§Œ§‚§Œ§Ú¿ﬂƒÍ°À
                  11  SPA-NAI-W20-KNGHITU-CD    PIC X(09).
                  11  SPA-NAI-W20-KNGHITU-IDX   PIC 9(03).
@@ -878,9 +918,21 @@
       *          £¡£ƒ£Ã∞›ª˝∏˛æÂ≈˘¬Œ¿©≤√ªª
                  11  SPA-NAI-W20-ADLIJI-CD     PIC X(09).
                  11  SPA-NAI-W20-ADLIJI-IDX    PIC 9(03).
+      *          ÃÎ¥÷¥«∏Ó≤√ªª≤√ªª
+                 11  SPA-NAI-W20-H30YKNKNG-CD    PIC X(09).
+                 11  SPA-NAI-W20-H30YKNKNG-IDX   PIC 9(03).
+      *          ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
+                 11  SPA-NAI-W20-ZTKFUKKI-CD   PIC X(09).
+                 11  SPA-NAI-W20-ZTKFUKKI-IDX  PIC 9(03).
       *          ¿∫ø¿ ›∑Ú °ª„ªŒ«€√÷≤√ªª
                  11  SPA-NAI-W20-SSNHKNFUKU-CD  PIC X(09).
                  11  SPA-NAI-W20-SSNHKNFUKU-IDX PIC 9(03).
+      *          ¥«∏Ó ‰Ωı≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-NAI-W20-KNGHJO-A104-CD    PIC X(09).
+                 11  SPA-NAI-W20-KNGHJO-A104-IDX   PIC 9(03).
+      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
+                 11  SPA-NAI-W20-YKNKNG-A104-CD    PIC X(09).
+                 11  SPA-NAI-W20-YKNKNG-A104-IDX   PIC 9(03).
       *          ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
                  11  SPA-NAI-W20-YKNKNKYU-CD   PIC X(09).
                  11  SPA-NAI-W20-YKNKNKYU-IDX  PIC 9(03).
@@ -899,36 +951,21 @@
       *          ¥«∏Ó«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
                  11  SPA-NAI-W20-SNRHICH2-CD   PIC X(09).
                  11  SPA-NAI-W20-SNRHICH2-IDX  PIC 9(03).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
-                 11  SPA-NAI-W20-SNRHJO1-CD   PIC X(09).
-                 11  SPA-NAI-W20-SNRHJO1-IDX  PIC 9(03).
-      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
-                 11  SPA-NAI-W20-SNRHJO2-CD   PIC X(09).
-                 11  SPA-NAI-W20-SNRHJO2-IDX  PIC 9(03).
       *          ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
                  11  SPA-NAI-W20-YKNHICH1-CD   PIC X(09).
                  11  SPA-NAI-W20-YKNHICH1-IDX  PIC 9(03).
       *          ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
                  11  SPA-NAI-W20-YKNHICH2-CD   PIC X(09).
                  11  SPA-NAI-W20-YKNHICH2-IDX  PIC 9(03).
-      *          ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª
-                 11  SPA-NAI-W20-ZTKFUKKI-CD   PIC X(09).
-                 11  SPA-NAI-W20-ZTKFUKKI-IDX  PIC 9(03).
+      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£±° ø«Œ≈ΩÍ°À
+                 11  SPA-NAI-W20-SNRHJO1-CD   PIC X(09).
+                 11  SPA-NAI-W20-SNRHJO1-IDX  PIC 9(03).
+      *          ¥«∏Ó ‰Ωı«€√÷≤√ªª£≤° ø«Œ≈ΩÍ°À
+                 11  SPA-NAI-W20-SNRHJO2-CD   PIC X(09).
+                 11  SPA-NAI-W20-SNRHJO2-IDX  PIC 9(03).
       *          ±…Õ‹¥…Õ˝º¬ª‹≤√ªª
                  11  SPA-NAI-W20-EIYO-CD   PIC X(09).
                  11  SPA-NAI-W20-EIYO-IDX  PIC 9(03).
-      *          ¬Œ¿©∂Ø≤Ω≤√ªª
-                 11  SPA-NAI-W20-TAISEI-CD   PIC X(09).
-                 11  SPA-NAI-W20-TAISEI-IDX  PIC 9(03).
-      *          ¥«∏Óø¶∞˜«€√÷≤√ªª
-                 11  SPA-NAI-W20-KNGSKHICH-CD   PIC X(09).
-                 11  SPA-NAI-W20-KNGSKHICH-IDX  PIC 9(03).
-      *          ¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
-                 11  SPA-NAI-W20-KNGHJSHICH-CD   PIC X(09).
-                 11  SPA-NAI-W20-KNGHJSHICH-IDX  PIC 9(03).
-      *          ¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
-                 11  SPA-NAI-W20-SSNKYUDR-CD   PIC X(09).
-                 11  SPA-NAI-W20-SSNKYUDR-IDX  PIC 9(03).
       *          ∞Âª’ªˆÃ≥∫Ó∂» ‰Ωı¬Œ¿©≤√ªª
                  11  SPA-NAI-W20-DRHJO-CD      PIC X(09).
                  11  SPA-NAI-W20-DRHJO-IDX     PIC 9(03).
@@ -956,6 +993,12 @@
       *          ¥«∏Ó«€√÷≤√ªª
                  11  SPA-NAI-W20-HICH-CD       PIC X(09).
                  11  SPA-NAI-W20-HICH-IDX      PIC 9(03).
+      *          ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı¬Œ¿©≤√ªª
+                 11  SPA-NAI-W20-YKNKNGHJ-CD    PIC X(09).
+                 11  SPA-NAI-W20-YKNKNGHJ-IDX   PIC 9(03).
+      *          ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° ¥«∏Ó ‰Ωı≤√ªª°À
+                 11  SPA-NAI-W20-YKNKNG-A214-CD    PIC X(09).
+                 11  SPA-NAI-W20-YKNKNG-A214-IDX   PIC 9(03).
       *          ÃÎ¥÷∂–Ã≥≈˘¥«∏Ó≤√ªª
                  11  SPA-NAI-W20-YKNKNG-CD     PIC X(09).
                  11  SPA-NAI-W20-YKNKNG-IDX    PIC 9(03).
@@ -971,15 +1014,27 @@
       *          …¬≈ÔÃÙ∫ﬁ∂»Ã≥º¬ª‹≤√ªª
                  11  SPA-NAI-W20-BTUYKZ-CD     PIC X(09).
                  11  SPA-NAI-W20-BTUYKZ-IDX    PIC 9(03).
+      *          ¿∫ø¿≤ µﬁ¿≠¥¸∞Âª’«€√÷≤√ªª
+                 11  SPA-NAI-W20-SSNKYUDR-CD   PIC X(09).
+                 11  SPA-NAI-W20-SSNKYUDR-IDX  PIC 9(03).
       *          •◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
                  11  SPA-NAI-W20-HOIKU-CD      PIC X(09).
                  11  SPA-NAI-W20-HOIKU-IDX     PIC 9(03).
-      *          Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
-                 11  SPA-NAI-W20-JKAIFUKU-CD   PIC X(09).
-                 11  SPA-NAI-W20-JKAIFUKU-IDX  PIC 9(03).
       *          µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
                  11  SPA-NAI-W20-KJTRIHA-CD    PIC X(09).
                  11  SPA-NAI-W20-KJTRIHA-IDX   PIC 9(03).
+      *          Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
+                 11  SPA-NAI-W20-JKAIFUKU-CD   PIC X(09).
+                 11  SPA-NAI-W20-JKAIFUKU-IDX  PIC 9(03).
+      *          ¬Œ¿©∂Ø≤Ω≤√ªª
+                 11  SPA-NAI-W20-TAISEI-CD   PIC X(09).
+                 11  SPA-NAI-W20-TAISEI-IDX  PIC 9(03).
+      *          ¥«∏Óø¶∞˜«€√÷≤√ªª
+                 11  SPA-NAI-W20-KNGSKHICH-CD   PIC X(09).
+                 11  SPA-NAI-W20-KNGSKHICH-IDX  PIC 9(03).
+      *          ¥«∏Ó ‰Ωıº‘«€√÷≤√ªª
+                 11  SPA-NAI-W20-KNGHJSHICH-CD   PIC X(09).
+                 11  SPA-NAI-W20-KNGHJSHICH-IDX  PIC 9(03).
       *          Ã§¥Ω‡° …¬≈Ô§À∑∏§Î¥Ω‡§ÚÀ˛§ø§µ§ §§æÏπÁ°À
                  11  SPA-NAI-W20-BTUMIKJN-CD   PIC X(09).
                  11  SPA-NAI-W20-BTUMIKJN-IDX  PIC 9(03).
@@ -991,7 +1046,7 @@
                  11  SPA-NAI-W20-KSNCOMMON-IDX      PIC 9(03).
                09  SPA-NAI-W20-KSNINF-R  REDEFINES
                    SPA-NAI-W20-KSNINF-G.
-                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 42.
+                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 45.
                    13  SPA-NAI-W20-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W20-KSNINF-IDX      PIC 9(03).
       *      Õ˙ŒÚ•Í•π•»∆‚…ÙŒŒ∞Ë

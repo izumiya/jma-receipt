@@ -72,22 +72,20 @@
                                                BINARY.
                 05  W24-NACCT-GAIHAKU-ITM      PIC X(14)
                                                OCCURS  5.
-              04  W24-FRAME3.
-                05  W24-FRAME3-LABEL           PIC X(20).
+              04  W24-NOTEBOOK-AREA.
+                05  W24-NOTEBOOK-PAGENO        PIC S9(9)   BINARY.
                 05  W24-FIXED9.
-                  06 W24-CHK-NYUKSN-OCC        OCCURS 20.
+                  06 W24-CHK-NYUKSN-OCC        OCCURS 30.
                     07  W24-CHK-NYUKSN         PIC X(01).
-                    07  W24-CHK-LBL-NYUKSN     PIC X(01).
                   06  W24-NYUKSNMEI            PIC X(50)
-                                               OCCURS 20.
+                                               OCCURS 30.
                   06  W24-CMB-CHIIKIKSN.
                     07  W24-CHIIKIKSN          PIC X(28).
                     07  W24-CHIIKIKSN-CNT      PIC S9(9)
                                                BINARY.
                     07  W24-CHIIKIKSN-ITM      PIC X(28)
                                                OCCURS  7.
-              04  W24-FRAME4.
-                05  W24-FRAME4-LABEL           PIC X(20).
+                05  W24-LBLNYUKSN              PIC X(20).
                 05  W24-FIXED10.
                   06  W24-SRYCD                PIC X(09)
                                                OCCURS 10.

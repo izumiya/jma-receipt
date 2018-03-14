@@ -50,7 +50,7 @@ W20 {
         state int;
       };
       count int;
-        item varchar(43)[30];
+        item varchar(43)[50];
       state int;
     };
     CMB_SRYKA {

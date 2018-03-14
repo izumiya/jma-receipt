@@ -1054,9 +1054,13 @@
                05                      PIC X(04)   VALUE   "0000".
                05                      PIC X(80)   VALUE
                    "処理終了".
+      *-----------------------------------------------------------
+               05                      PIC X(04)   VALUE   "00  ".
+               05                      PIC X(80)   VALUE
+                   "処理終了".
       *
            03  NCLAIMERRCD-R   REDEFINES   NCLAIMERRCD-VAL.
-               05  NCLAIMERRCD-OCC     OCCURS  256.
+               05  NCLAIMERRCD-OCC     OCCURS  257.
                    07  NCLAIMERRCDL    PIC X(04).
                    07  NCLAIMERRCDLMEI PIC X(80).
-           03  NCLAIMERRCD-MAX         PIC 9(05)   VALUE   256.
+           03  NCLAIMERRCD-MAX         PIC 9(05)   VALUE   257.

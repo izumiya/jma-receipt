@@ -119,6 +119,7 @@
                                        BY          //TGAIHAKU//.
       *
        01  CONST-AREA.
+           03  CONST-H3004             PIC X(06)   VALUE "201804".
            03  CONST-H2804             PIC X(06)   VALUE "201604".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
            03  CONST-ASA               PIC 9(03)   VALUE 1.
@@ -431,7 +432,8 @@
                                    TO  WRK-PTSTATUS-N
            MOVE    WRK-PTSTATUS-N  TO  SNINF03-PTSTATUS-DATA (IDXA)
       *
-           IF    ( KEY-SRYYM       >=  CONST-H2804 )
+           EVALUATE    TRUE
+           WHEN  ( KEY-SRYYM       >=  CONST-H2804 )
                EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
                WHEN    ZERO
                    MOVE    "掐薄面"    TO  SNINF03-PTSTATUS-NAME (IDXA)
@@ -444,13 +446,13 @@
                    MOVE    "联年掐薄面の嘲邱"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    4
-                   MOVE    "戮板闻怠簇减壳４０◇负"
+                   MOVE    "戮板闻怠簇减壳４０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    5
-                   MOVE    "戮板闻怠簇减壳１０◇负"
+                   MOVE    "戮板闻怠簇减壳１０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    6
-                   MOVE    "戮板闻怠簇减壳２０◇负"
+                   MOVE    "戮板闻怠簇减壳２０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    8
                    MOVE    "泼年箕粗锣薄负换"
@@ -459,10 +461,27 @@
                    MOVE    "泼年退泣掐锣薄负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    13
-                   MOVE    "泼年退泣掐锣薄负换≤戮板闻怠簇减壳１０◇负"
+                   MOVE   "泼年退泣掐锣薄负换≤戮板闻怠簇减壳１０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                END-EVALUATE
-           ELSE
+      *
+               IF  ( KEY-SRYYM         >=  CONST-H3004 )
+                   EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
+                   WHEN    14
+                       MOVE    "戮板闻怠簇减壳５◇负换"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+                   WHEN    15
+                       MOVE    "戮板闻怠簇减壳３５◇负换"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+                   WHEN    16
+                       MOVE    "戮板闻怠簇减壳１５◇负换"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+                   WHEN    17
+                       MOVE "泼年退泣掐锣薄负换≤戮板闻怠簇减壳５◇负换"
+                                       TO  SNINF03-PTSTATUS-NAME (IDXA)
+                   END-EVALUATE
+               END-IF
+           WHEN    OTHER
                EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
                WHEN    ZERO
                    MOVE    "掐薄面"    TO  SNINF03-PTSTATUS-NAME (IDXA)
@@ -475,16 +494,16 @@
                    MOVE    "联年掐薄面の嘲邱"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    4
-                   MOVE    "戮板闻怠簇减壳７０◇负"
+                   MOVE    "戮板闻怠簇减壳７０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    5
-                   MOVE    "戮板闻怠簇减壳３０◇负"
+                   MOVE    "戮板闻怠簇减壳３０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    6
-                   MOVE    "戮板闻怠簇减壳５５◇负"
+                   MOVE    "戮板闻怠簇减壳５５◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    7
-                   MOVE    "戮板闻怠簇减壳１５◇负"
+                   MOVE    "戮板闻怠簇减壳１５◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    8
                    MOVE    "泼年箕粗锣薄负换"
@@ -493,10 +512,10 @@
                    MOVE    "泼年退泣掐锣薄负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                WHEN    13
-                   MOVE    "泼年退泣掐锣薄负换≤戮板闻怠簇减壳３０◇负"
+                   MOVE  "泼年退泣掐锣薄负换≤戮板闻怠簇减壳３０◇负换"
                                        TO  SNINF03-PTSTATUS-NAME (IDXA)
                END-EVALUATE
-           END-IF
+           END-EVALUATE
       *
            MOVE    "墨咯"              TO  SNINF03-SKJ-ASA-LBL   (IDXA)
            MOVE    TNACCT-DAY (CONST-ASA IDXD)

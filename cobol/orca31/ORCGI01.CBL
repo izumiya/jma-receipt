@@ -626,6 +626,7 @@
            03  WRK-TOKHIGAITO-G.
                05  WRK-TOKHIGAITO-CD       PIC X(09).
                05  WRK-TOKHIGAITO-NAME     PIC X(60).
+           03  WRK-HOSPSBT                 PIC 9(02).
       *
       *    ø«Œ≈ΩÍœ∑øÕ∞ÂŒ≈¥…Õ˝Œ¡° ≈æ≤ °¢≈æ≈Ô°À∑◊ªª•®•Í•¢
        01  TN-IDX                          PIC 9(02).
@@ -6509,8 +6510,15 @@
                MOVE    WRK-TOKNYUIN-SRYCD-X
                                        TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( TNS-HOSPSRYKBN  =   0 )
-                OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+               MOVE    TNS-HOSPSRYKBN  TO  WRK-HOSPSBT
+               EVALUATE    TNS-HOSPSRYKBN
+               WHEN    3
+                   MOVE    0           TO  WRK-HOSPSBT
+               WHEN    4
+                   MOVE    1           TO  WRK-HOSPSBT
+               END-EVALUATE
+               IF    ( WRK-HOSPSBT     =   0 )
+                OR   ( WRK-HOSPSBT     =   SPA-HOSPSBT )
                    CONTINUE
                ELSE
                    MOVE    1           TO  FLG-PASS

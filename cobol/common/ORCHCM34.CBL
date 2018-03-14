@@ -4080,16 +4080,6 @@
                        END-IF
                    END-IF
       *
-                   IF    ( SRY-SRYCD (IDX9)    =   "190108790"
-                                               OR  "190108890"
-                                               OR  "190109090"
-                                               OR  "190141590"
-                                               OR  "190142090"
-                                               OR  "190142190"
-                                               OR  "190142290" )
-                           MOVE    1       TO  FLG-TAJYUSHIN
-                   END-IF
-      *
                    IF    ( FLG-RSIJBI-AREA-HEN =   1 )
                        IF    ( RSIJBI-MAX      <   CONST-RSIJBI-MAX )
                            PERFORM 200111-RSIJBI-HEN-SEC

@@ -32,7 +32,7 @@
       *  °åÎÅµ¡´ØÆþ±¡¾ðÊó²èÌÌ£Ó£Ð£Á
          03  SPA-W24.
            05  SPA-W24-AREA.
-             07  SPA-GMN-W24-PAGE                      PIC 9(02).
+             07  SPA-GMN-W24-PAGENO                    PIC 9(02).
              07  SPA-GMN-W24-LINE                      PIC 9(02).
              07  SPA-GMN-W24-MAX                       PIC 9(04).
              07  SPA-GMN-W24-CUR                       PIC 9(03).
@@ -140,7 +140,7 @@
       *          Æþ±¡²Ã»»¾ðÊó
                  11  SPA-GMN-W24-FRAME3.
                    13  SPA-GMN-W24-NYUKSN-G.
-                     15 SPA-GMN-W24-NYUKSN-OCC         OCCURS 20.
+                     15 SPA-GMN-W24-NYUKSN-OCC         OCCURS 30.
                        17 SPA-GMN-W24-CHK-NYUKSN       PIC X(01).
                        17 SPA-GMN-W24-NYUKSNMEI        PIC X(50).
       *            ÃÏ°è²Ã»»
@@ -500,6 +500,6 @@
                  11  SPA-NAI-W24-SKJSRY-SRYCD-OCC      OCCURS  2.
                      13  SPA-NAI-W24-SKJSRY-SRYCD      PIC X(09).
                09  SPA-NAI-W24-NYUKSN-SRYCD-G.
-                 11  SPA-NAI-W24-NYUKSN-SRYCD-OCC      OCCURS  20.
+                 11  SPA-NAI-W24-NYUKSN-SRYCD-OCC      OCCURS  30.
                      13  SPA-NAI-W24-NYUKSN-SRYCD      PIC X(09).
       *

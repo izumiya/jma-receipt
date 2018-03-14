@@ -3239,51 +3239,8 @@
                            END-PERFORM
                        END-IF
       *
-                       PERFORM VARYING IDX-DAY FROM    1   BY  1
-                               UNTIL ( IDX-DAY >   31 )
-                                OR   ( SPA-ERRCD   NOT = SPACE )
+                       PERFORM 41011-NISSU-CHK-SEC
       *
-                           IF    ( SPA-GMN-DAY (IDX-DAY)
-                                                       = SPACE )
-                               MOVE    ZERO    TO  CNT-NISSU
-                           ELSE
-                               COMPUTE CNT-NISSU
-                                   =   CNT-NISSU   +   1
-                               IF    ( SPA-NAI-TZAINUM (IDX-LST)
-                                                       =   2020 )
-                                   IF    ( CNT-NISSU   >   14 )
-                                       IF    ( SPA-NAI-INPUT-MODE
-                                                           =   1 )
-                                           MOVE    "0101"  TO  SPA-ERRCD
-                                       ELSE
-                                           MOVE    "0102"  TO  SPA-ERRCD
-                                           MOVE    SPA-GMN-TNAME
-                                                               (IDX-LST)
-                                                           TO WRK-ERRMSG
-                                       END-IF
-                                   END-IF
-                               ELSE
-                                   IF    ( CNT-NISSU   >   7 )
-                                       IF    ( SPA-NAI-INPUT-MODE
-                                                       =   1 )
-                                           MOVE    "0103"  TO  SPA-ERRCD
-                                       ELSE
-                                           MOVE    "0104"  TO  SPA-ERRCD
-                                           MOVE    SPA-GMN-TNAME
-                                                               (IDX-LST)
-                                                           TO WRK-ERRMSG
-                                       END-IF
-                                   END-IF
-                               END-IF
-      *
-                               IF    ( SPA-ERRCD   NOT =   SPACE )
-                                   COMPUTE SPA-GMN-CUR
-                                       =   IDX-DAY +   100
-                               END-IF
-      *
-                           END-IF
-      *
-                       END-PERFORM
                    END-IF
                END-IF
       *
@@ -3291,6 +3248,66 @@
       *
            .
        4101-NISSU-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    日数制限チェック処理
+      *****************************************************************
+       41011-NISSU-CHK-SEC             SECTION.
+      *
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+                    OR   ( SPA-ERRCD   NOT = SPACE )
+      *
+               IF    ( SPA-GMN-DAY (IDX-DAY)   = SPACE )
+                   IF    ( SPA-NAI-INPUT-MODE  =   1 )
+                       MOVE    ZERO    TO  CNT-NISSU
+                   ELSE
+                       IF    ( SPA-GMN-TDAY (IDX-LST IDX-DAY)
+                                               =   ZERO )
+                           MOVE    ZERO    TO  CNT-NISSU
+                       ELSE
+                           COMPUTE CNT-NISSU
+                               =   CNT-NISSU   +   1
+      *
+                       END-IF
+                   END-IF
+               ELSE
+                   IF    ( FUNCTION NUMVAL (SPA-GMN-DAY (IDX-DAY))
+                                       >   ZERO )
+                       COMPUTE CNT-NISSU   =   CNT-NISSU   +   1
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-NAI-TZAINUM (IDX-LST)   =   2020 )
+                   IF    ( CNT-NISSU   >   14 )
+                       IF    ( SPA-NAI-INPUT-MODE  =   1 )
+                           MOVE    "0101"  TO  SPA-ERRCD
+                       ELSE
+                           MOVE    "0102"  TO  SPA-ERRCD
+                           MOVE    SPA-GMN-TNAME (IDX-LST)
+                                           TO WRK-ERRMSG
+                       END-IF
+                   END-IF
+               ELSE
+                   IF    ( CNT-NISSU   >   7 )
+                       IF    ( SPA-NAI-INPUT-MODE  =   1 )
+                           MOVE    "0103"  TO  SPA-ERRCD
+                       ELSE
+                           MOVE    "0104"  TO  SPA-ERRCD
+                           MOVE    SPA-GMN-TNAME (IDX-LST)
+                                           TO WRK-ERRMSG
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-ERRCD   NOT =   SPACE )
+                   COMPUTE SPA-GMN-CUR =   IDX-DAY +   100
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       41011-NISSU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    剤変更処理
