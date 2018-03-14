@@ -1086,7 +1086,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    END-EVALUATE
       *
            IF     (LNK-DBRVERSION (3:6)    =   "040800") AND
-                  (LNK-DBRVERSION (12:8)   <   "20180306")
+                  (LNK-DBRVERSION (12:8)   <   "20180315")
                PERFORM 900-TNSWK-V06-SET
            ELSE
                DISPLAY "version unmatch ! [ " LNK-DBRVERSION " ]"
