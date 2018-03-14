@@ -70,7 +70,10 @@
            03  FLG-SRYACCT                     PIC 9(01).
            03  FLG-PT-HDIST-DAY                PIC 9(01).
            03  FLG-SYUKA                       PIC 9(01).
-      * 
+           03  FLG-PTNYUINRRK                  PIC 9(01).
+           03  FLG-PTNYUINRRK22                PIC 9(01).
+           03  FLG-PTNYUINRRK23                PIC 9(01).
+      *
            03  FLG-LASTHKNID                   PIC 9(01).
            03  FLG-SEIHO                       PIC 9(01).
            03  FLG-WRITE                       PIC 9(01).
@@ -100,6 +103,7 @@
            03  IDZZ                            PIC 9(04).
            03  IDXD                            PIC 9(04).
            03  IDY2                            PIC 9(04).
+           03  IDW                             PIC 9(04).
       *
        01  KEY-AREA                            VALUE   LOW-VALUE.
            03  KEY-NEW.
@@ -113,9 +117,9 @@
        01  SUM-AREA.
            03  SUM-OCC-G                   OCCURS  2.
                05  SUM-OCC                 OCCURS  3.
-                   07  SUM-PTBYOMEI        PIC 9(08).
-                   07  SUM-PTBYOMEI-NG     PIC 9(08).
-                   07  SUM-PTBYOMEI-G      PIC 9(08).
+                   07  SUM-PTBYOMEI    PIC 9(08).
+                   07  SUM-PTBYOMEI-NG PIC 9(08).
+                   07  SUM-PTBYOMEI-G  PIC 9(08).
       *
       *    一時領域
        01  WRK-AREA.
@@ -156,6 +160,10 @@
            03  WRK-SRYYM               PIC X(06).
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
            03  WRK-WARI                PIC 9(3)V9(3).
+      *
+           03  WRK-SRYYMD.
+               05  WRK-SRYYYMM         PIC  9(06).
+               05  WRK-SRYDD           PIC  9(02).
       *
            03  ST-IDX                  PIC 9(03).
       *
@@ -204,6 +212,25 @@
                                    PIC X(03).
                        09  TOUKEI01-KOHIDHC
                                    PIC 9(10).
+      *診療回数テーブル
+           03  RECE61-DAY-AREA.
+               05  RECE61-DAY             PIC  9(03)
+                                               OCCURS   31.
+      *診療回数テーブル（入院基本料を算定していないとき）
+           03  RECE61-DAY-1-AREA.
+               05  RECE61-DAY-1           PIC  9(03)
+                                               OCCURS   31.
+      *入院料情報
+           03  RECE61-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE61-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE61-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE61-NYUINDAY-TBL.
+                   07  RECE61-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *     
       *    ワーク保険組合せ（入院会計用） 
        01  WRK-HKNCOMBI-TABLE.
@@ -227,6 +254,25 @@
                                    PIC 9(10).
                03  WRK-TOUKEI01-SYOKBN
                                    PIC X(01).
+      *診療回数テーブル
+           03  WRK-RECE61-DAY-AREA.
+               05  WRK-RECE61-DAY             PIC  9(03)
+                                               OCCURS   31.
+      *診療回数テーブル（入院基本料を算定していないとき）
+           03  WRK-RECE61-DAY-1-AREA.
+               05  WRK-RECE61-DAY-1           PIC  9(03)
+                                               OCCURS   31.
+      *入院料情報
+           03  WRK-RECE61-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  WRK-RECE61-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  WRK-RECE61-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  WRK-RECE61-NYUINDAY-TBL.
+                   07  WRK-RECE61-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *     
            02  WRK-TOUKEI01-SEIHO-OCC
                                    OCCURS  100.
@@ -285,7 +331,7 @@
       *
        01  WRK-RECE02-AREA. 
       **** 02  WRK-RECE02-REC      OCCURS  100. 
-           COPY    "CPRCF002.INC"  REPLACING  //RECE02//
+           COPY    "CPRCF062.INC"  REPLACING  //RECE62//
                                    BY         //WRK-RECE02//.
        01  WRK-RECE631-AREA.
            02  WRK-RECE631-REC      OCCURS  1000. 
@@ -470,6 +516,10 @@
       *    主科
        01  SYUKA-REC.
            COPY    "CPSYUKA.INC".
+      *
+      *    入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -659,24 +709,31 @@
            MOVE    SPA-HOSPNUM         TO  S-2501-HOSPNUM
            MOVE    S-2501-REC          TO  MCPDATA-REC
            PERFORM 910-SYSKANRI-INV-SEC
-           IF      FLG-SYSKANRI     =   ZERO
-               MOVE    MCPDATA-REC      TO  S-2501-REC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC     TO  S-2501-REC
            ELSE    
-               INITIALIZE                   S-2501-REC
+               INITIALIZE                  S-2501-REC
            END-IF
            IF      S-2501-TENKIBYOMEI-KBN
-                                    =   SPACE
-               MOVE    ZERO             TO  S-2501-TENKIBYOMEI-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO  S-2501-TENKIBYOMEI-KBN
+           END-IF
+           IF      S-2501-NYUTAIINREKI-NYU-KSIKBN
+                                   =   SPACE
+               MOVE    "0"             TO
+                                       S-2501-NYUTAIINREKI-NYU-KSIKBN
            END-IF
       *
-           DISPLAY "S-25-BYOMEIHENKBN1    ="
+           DISPLAY "BYOMEIHENKBN1    ="
                                     S-25-BYOMEIHENKBN1
-           DISPLAY "S-25-RJNGNBKKBN       ="
+           DISPLAY "RJNGNBKKBN       ="
                                     S-25-RJNGNBKKBN
-           DISPLAY "S-2501-TENKIBYOMEI-KBN="
+           DISPLAY "TENKIBYOMEI-KBN="
                                     S-2501-TENKIBYOMEI-KBN
-           DISPLAY "S-25-TENKIHENKBN      ="
+           DISPLAY "TENKIHENKBN      ="
                                     S-25-TENKIHENKBN
+           DISPLAY "NYUTAIINREKI-NYU-KSIKBN="
+                                    S-2501-NYUTAIINREKI-NYU-KSIKBN
       *
       *    期間
            IF      WRK-PARA-STSRYYM    =   WRK-PARA-EDSRYYM
@@ -803,9 +860,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    INITIALIZE                      SRYACCT-REC
                    MOVE    1                   TO  FLG-SRYACCT
                END-IF
-      * 
+      *
                PERFORM 2001-NYUINGAI-HENSYU-SEC
-                                   UNTIL   FLG-SRYACCT     =   1
+                                UNTIL   FLG-SRYACCT     =   1
       *
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
                MOVE    "key36"             TO  MCP-PATHNAME
@@ -878,9 +935,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            PERFORM 800-MISEIKYU-CHECK-SEC
       *
-      **     DISPLAY "SRYACCT PTID=" ACCT-PTID
-      **             " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
-      **             " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
+           DISPLAY "SRYACCT PTID=" ACCT-PTID
+                   " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
+                   " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
            IF   (  FLG-PTINF           =   ZERO 
                AND  PTINF-TSTPTNUMKBN   =   "1" )
@@ -998,9 +1055,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            PERFORM 800-MISEIKYU-CHECK-SEC
       *
-      **     DISPLAY "NYUINACCT PTID=" NACCT-PTID
-      **             " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
-      **             " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
+           DISPLAY "NYUINACCT PTID=" NACCT-PTID
+                   " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
+                   " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
            IF   (  FLG-PTINF           =   ZERO 
                AND  PTINF-TSTPTNUMKBN   =   "1" )
@@ -1705,6 +1762,24 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-PERFORM
       *
            EVALUATE    WRK-DATAKBN
+               WHEN    "1"
+                   PERFORM VARYING IDX3    FROM    1   BY  1
+                           UNTIL   IDX3    >       31
+                     IF  ( ( WRK-DAY (1 IDX3)      >   ZERO ) OR
+                           ( LNK-NYUINDAY-KBN (IDX3)
+                                                   =   "1"  ) ) AND
+                         (   WRK-DAY (2 IDX3)      >   ZERO   )
+                        MOVE   WRK-DAY(2 IDX3)     TO
+                                                   RECE61-DAY  (IDX3)
+                     END-IF
+                     IF    ( WRK-DAY (1 IDX3)      =   ZERO )
+                     AND   ( LNK-NYUINDAY-KBN(IDX3)
+                                               NOT =   "1"  )
+                     AND   ( WRK-DAY (2 IDX3)      >   ZERO )
+                        MOVE   WRK-DAY (2 IDX3)    TO
+                                                   RECE61-DAY-1 (IDX3)
+                     END-IF
+                   END-PERFORM
                WHEN    "2"
                    MOVE    ACCT-SRYKA      TO  TOUKEI01-SRYKA  (1)
            END-EVALUATE
@@ -2540,6 +2615,21 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       5
+                   OR      TOUKEI01-TTEKSTYMD (IDX)  =   SPACE
+               IF      WRK-RECE02-TEKSTYMD-X   =   SPACE
+                   MOVE    TOUKEI01-TTEKEDYMD (IDX)
+                                       TO  WRK-RECE02-TEKEDYMD-X
+               ELSE
+                   IF      WRK-RECE02-TEKEDYMD-X
+                                           <   TOUKEI01-TTEKEDYMD (IDX)
+                       MOVE    TOUKEI01-TTEKEDYMD (IDX)  
+                                               TO  WRK-RECE02-TEKEDYMD-X
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       10
                    OR      TOUKEI01-HKNCOMBI (IDX) =   ZERO
                PERFORM VARYING IDY FROM    1   BY  1
@@ -2555,6 +2645,27 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                            WRK-RECE02-KOHNUMHC(IDY IDY2)
                            MOVE TOUKEI01-KOHIDHC  (IDX IDY2) TO
                                            WRK-RECE02-KOHIDHC (IDY IDY2)
+                           IF    ( COMB-HKNNUM        =   SPACE )
+                           AND   ( COMB-KOH1HKNNUM    =   "020"
+                                                      OR  "030"
+                                                      OR  "053" )
+                               INITIALIZE                  PTKOHINF-REC
+                               MOVE    SPA-HOSPNUM     TO  PTKOH-HOSPNUM
+                               MOVE    TOUKEI01-PTID   TO  PTKOH-PTID
+                               MOVE    COMB-KOHID (1)  TO  PTKOH-KOHID
+                               MOVE    PTKOHINF-REC    TO  MCPDATA-REC
+                               PERFORM 900-PTKOHINF-READ-SEC
+                               IF      WRK-RECE02-TEKSTYMD-X   =   SPACE
+                                   MOVE    PTKOH-TEKEDYMD
+                                               TO  WRK-RECE02-TEKEDYMD-X
+                               ELSE
+                                   IF      WRK-RECE02-TEKEDYMD-X
+                                                   <   PTKOH-TEKEDYMD
+                                       MOVE    PTKOH-TEKEDYMD
+                                               TO  WRK-RECE02-TEKEDYMD-X
+                                   END-IF
+                               END-IF
+                           END-IF
                        END-PERFORM
                    END-IF
                    IF      TOUKEI01-HKNCOMBI (IDX)     =
@@ -2580,9 +2691,226 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-PERFORM
            END-PERFORM
       *
+      *    入退院履歴より情報取得
+           PERFORM 200231-PTNYUINRRK-SYORI-SEC
+      *
            .
         20023-HENSYU-EXT.
            EXIT.
+      * 
+      *****************************************************************
+      *    入退院履歴より情報取得処理
+      *****************************************************************
+       200231-PTNYUINRRK-SYORI-SEC                   SECTION.
+      *
+      *    診療月内の入退院情報
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    TOUKEI01-PTID       TO  PTNYUINRRK-PTID
+           MOVE    WRK-SRYYM           TO  PTNYUINRRK-NYUINYMD (1:6)
+           MOVE    "31"                TO  PTNYUINRRK-NYUINYMD (7:2)
+           MOVE    WRK-SRYYM           TO  PTNYUINRRK-TAIINYMD (1:6)
+           MOVE    "01"                TO  PTNYUINRRK-TAIINYMD (7:2)
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 900-PTNYUINRRK-KEY23-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTNYUINRRK23
+           END-IF
+           PERFORM                 UNTIL   FLG-PTNYUINRRK23    =   1
+             IF  (   PTNYUINRRK-TENNYUYMD (1:6)
+                                         >   WRK-SRYYM         )
+             OR  ( ( PTNYUINRRK-TENNYUYMD
+                                         >   WRK-RECE02-TEKEDYMD-X )
+                  AND
+                   ( WRK-RECE02-TEKEDYMD-X NOT =   SPACE           ) )
+                 CONTINUE
+             ELSE
+      *
+               IF      PTNYUINRRK-NYUINYMD (1:6)
+                                               <   WRK-SRYYM
+                   MOVE    1                   TO  IDX4
+               ELSE
+                   MOVE    PTNYUINRRK-NYUINYMD TO  WRK-SRYYMD
+                   MOVE    WRK-SRYDD           TO  IDX4
+               END-IF 
+               IF      PTNYUINRRK-TAIINYMD (1:6)
+                                               >   WRK-SRYYM
+                   MOVE    31                  TO  IDX5
+               ELSE
+                   MOVE    PTNYUINRRK-TAIINYMD TO  WRK-SRYYMD
+                   MOVE    WRK-SRYDD           TO  IDX5
+               END-IF
+      *        保険組合せのチェック
+      *       （会計に対象の組合せがないときは全て）
+               IF    ( RECE61-DAY-AREA     =   ALL "0" )
+                   PERFORM 2002311-PTNYUINRRK-HENSYU-SEC
+               ELSE
+                   PERFORM VARYING IDX FROM    IDX4    BY  1
+                           UNTIL   IDX >       IDX5
+                       IF    ( IDX             =   IDX4 )
+                       AND   ( LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDX)
+                                               =
+                                               PTNYUINRRK-HKNCOMBINUM )
+      *                    同日再入院のとき再入院分の保険組合せをチェック
+                           PERFORM VARYING IDY FROM    1   BY  1
+                                   UNTIL   IDY >       10
+                                   OR  WRK-RECE02-HKNCOMBI (IDY)
+                                                       =   ZERO
+                               IF     LNK-NYUINDAY-DOUJITSU-HKNCOMBI
+                                                               (IDX)
+                                           =   WRK-RECE02-HKNCOMBI (IDY)
+                                   PERFORM 2002311-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10              TO  IDY
+                                   MOVE   IDX5             TO  IDX
+                               END-IF
+                           END-PERFORM
+                       ELSE
+                           PERFORM VARYING IDY FROM    1   BY  1
+                                   UNTIL   IDY >       10
+                                   OR  WRK-RECE02-HKNCOMBI (IDY)
+                                               =       ZERO
+                               IF      RECE61-DAY (IDX)
+                                           =   WRK-RECE02-HKNCOMBI (IDY)
+                                   PERFORM 2002311-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10                  TO  IDY
+                                   MOVE   IDX5                 TO  IDX
+                               END-IF
+      *                        入院基本料を算定しない入退院歴の記載
+                               IF     S-2501-NYUTAIINREKI-NYU-KSIKBN
+                                               =   "1"
+                                 IF      RECE61-DAY-1 (IDX)
+                                           =   WRK-RECE02-HKNCOMBI (IDY)
+                                   PERFORM 2002311-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10                  TO  IDY
+                                   MOVE   IDX5                 TO  IDX
+                                 END-IF
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                   END-PERFORM
+               END-IF
+             END-IF
+      *
+             PERFORM 900-PTNYUINRRK-KEY23-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    診療科情報が未編集のとき
+           IF      WRK-RECE02-SRYKA (1)    =   SPACE
+               MOVE    WRK-RECE02-LASTSRYKA    TO  WRK-RECE02-SRYKA (1)
+           END-IF
+           .
+       200231-PTNYUINRRK-SYORI-EXT.
+           EXIT.
+      * 
+      *****************************************************************
+      *    入退院履歴情報編集処理
+      *****************************************************************
+       2002311-PTNYUINRRK-HENSYU-SEC           SECTION.
+      *
+      *    診療科情報のセット
+      *    退院日＜診療年月、転出日の前日＜診療年月のときはセットしない
+           IF    ( PTNYUINRRK-TENSTUYMD    =  PTNYUINRRK-TAIINYMD )
+           AND   ( PTNYUINRRK-TENNYUYMD    =  PTNYUINRRK-NYUINYMD )
+               IF      PTNYUINRRK-TAIINYMD (1:6)
+                                           >=  WRK-SRYYM
+                   PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                           =   WRK-RECE02-SRYKA (IDW)
+                       IF      WRK-RECE02-SRYKA (IDW)  =   SPACE  
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       10
+                                   OR      WRK-RECE02-HKNCOMBI (IDXX)
+                                                   =   ZERO
+                               IF      WRK-RECE02-HKNCOMBI (IDXX)  =
+                                               PTNYUINRRK-HKNCOMBINUM
+                                   MOVE    PTNYUINRRK-NYUINKA
+                                               TO  WRK-RECE02-SRYKA(IDW)
+                                   MOVE    10      TO  IDXX
+                               END-IF
+                           END-PERFORM
+                           MOVE    20          TO  IDW
+                       END-IF
+                   END-PERFORM
+               END-IF    
+           ELSE
+               IF      PTNYUINRRK-TENSTUYMD
+                                   NOT =   PTNYUINRRK-TAIINYMD
+                   INITIALIZE              STS-AREA-DAY
+                   INITIALIZE              LNK-DAY6-AREA
+                   MOVE    "61"            TO  LNK-DAY6-IRAI
+                   MOVE    PTNYUINRRK-TENSTUYMD
+                                           TO  LNK-DAY6-KIJUN
+                   MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                   MOVE    -1              TO  LNK-DAY6-ZOGEN
+                   CALL  "ORCSDAY"         USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+                   IF      LNK-DAY6-KEISAN (1:6)
+                                       >=  WRK-SRYYM
+                     PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                           =   WRK-RECE02-SRYKA (IDW)
+                       IF      WRK-RECE02-SRYKA (IDW)  =   SPACE  
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       10
+                                   OR      WRK-RECE02-HKNCOMBI (IDXX)
+                                                   =   ZERO
+                               IF      WRK-RECE02-HKNCOMBI (IDXX)  =
+                                               PTNYUINRRK-HKNCOMBINUM
+                                   MOVE    PTNYUINRRK-NYUINKA  
+                                               TO  WRK-RECE02-SRYKA(IDW)
+                                   MOVE    10      TO  IDXX
+                               END-IF
+                           END-PERFORM
+                           MOVE    20          TO  IDW
+                       END-IF
+                     END-PERFORM
+                   END-IF
+               END-IF
+               IF      PTNYUINRRK-TENNYUYMD
+                                   NOT =   PTNYUINRRK-NYUINYMD
+                   IF      PTNYUINRRK-TENNYUYMD (1:6)
+                                       <=  WRK-SRYYM
+                     PERFORM VARYING IDW FROM    1   BY  1
+                           UNTIL   IDW >       20
+                           OR      PTNYUINRRK-NYUINKA
+                                           =   WRK-RECE02-SRYKA (IDW)
+                       IF      WRK-RECE02-SRYKA (IDW)  =   SPACE  
+                           PERFORM VARYING IDXX    FROM    1   BY  1
+                                   UNTIL   IDXX    >       10
+                                   OR      WRK-RECE02-HKNCOMBI (IDXX)
+                                                   =   ZERO
+                               IF      WRK-RECE02-HKNCOMBI (IDXX)  =
+                                               PTNYUINRRK-HKNCOMBINUM
+                                   MOVE    PTNYUINRRK-NYUINKA  
+                                               TO  WRK-RECE02-SRYKA(IDW)
+                                   MOVE    10      TO  IDXX
+                               END-IF
+                           END-PERFORM
+                           MOVE    20          TO  IDW
+                       END-IF
+                     END-PERFORM
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    入院年月日・最終科
+           IF      WRK-RECE02-LASTSRYKA    =   SPACE
+               MOVE    PTNYUINRRK-NYUINKA  TO  WRK-RECE02-LASTSRYKA
+           END-IF
+           .
+       2002311-PTNYUINRRK-HENSYU-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    病名情報出力処理
@@ -3741,6 +4069,49 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
            .
        900-SYUKA-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴読込（ＫＥＹ２２）
+      *****************************************************************
+       900-PTNYUINRRK-KEY22-READ-SEC    SECTION.
+      *    
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key51"              TO  MCP-PATHNAME
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO                 TO  FLG-PTNYUINRRK22
+               MOVE    MCPDATA-REC          TO  PTNYUINRRK-REC
+               IF      PTNYUINRRK-JTIKBN    =   "5"
+                   IF      PTNYUINRRK-TAINRELKBN    =   "1"
+                       CONTINUE
+                   ELSE
+                       GO  TO  900-PTNYUINRRK-KEY22-READ-SEC
+                   END-IF
+               END-IF
+           ELSE
+               MOVE    1                    TO  FLG-PTNYUINRRK22
+           END-IF
+           .
+       900-PTNYUINRRK-KEY22-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴読込（ＫＥＹ２３）
+      *****************************************************************
+       900-PTNYUINRRK-KEY23-READ-SEC    SECTION.
+      *    
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key23"              TO  MCP-PATHNAME
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO                 TO  FLG-PTNYUINRRK23
+               MOVE    MCPDATA-REC          TO  PTNYUINRRK-REC
+           ELSE
+               MOVE    1                    TO  FLG-PTNYUINRRK23
+           END-IF
+           .
+       900-PTNYUINRRK-KEY23-READ-EXT.
            EXIT.
       *
       *****************************************************************
