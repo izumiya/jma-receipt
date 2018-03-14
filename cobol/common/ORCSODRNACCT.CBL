@@ -35,6 +35,10 @@
       *  03.05.00    NACL-太田    07/05/28  グループ診療対応
       *  04.03.00    NACL-小豆沢  08/08/11  特定入院料コード取得をサブプロに変更
       *  05.00.00    NACL-小豆沢  17/10/27  指定月分の入院会計作成処理追加
+      *  05.00.00    NACL-小豆沢  17/12/14  室料差額の処理追加
+      *平成３０年４月改正対応
+      *  05.00.00    NACL-小豆沢  18/03/05  療養病棟の読み替えコード追加
+      *  05.00.00    NACL-小豆沢  18/03/13  他医受診の追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -258,6 +262,9 @@
            03  WRK-CHK-SRYYMR      REDEFINES  WRK-CHK-SRYYM.
                05  WRK-CHK-SRYYR           PIC 9(04).
                05  WRK-CHK-SRYMR           PIC 9(02).
+      *
+      *    室料差額
+           03  WRK-ROOMSAGAKU              PIC 9(02).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -566,7 +573,11 @@
       *        0210:他医療機関１５％減
       *        0211:特定時間退院減算
       *        0212:特定曜日入退院減算
-      *        0213:特定曜日入退院減算＋他医療機関３０％減
+      *        0213:特定曜日入退院減算＋他医療機関１０％減
+      *        0214:他医療機関３５％減
+      *        0215:他医療機関１５％減
+      *        0216:他医療機関５％減
+      *        0217:特定曜日入退院減算＋他医療機関５％減
                WHEN    "0200"
                WHEN    "0207"
                WHEN    "0208"
@@ -575,6 +586,10 @@
                WHEN    "0211"
                WHEN    "0212"
                WHEN    "0213"
+               WHEN    "0214"
+               WHEN    "0215"
+               WHEN    "0216"
+               WHEN    "0217"
                    IF   SODRNACCT-ENDYMD   =   SPACE
                        PERFORM   4801-GENSAN-SEC
                    ELSE
@@ -604,6 +619,21 @@
                      ELSE
                          PERFORM   4801-SHOKUJI-SEC
                      END-IF
+                   END-IF
+      *
+      *       （指定月分の入院会計作成）
+               WHEN    "9901"
+                   CALL "coblog"  USING "nyuin-kaikei-sakusei"
+                   PERFORM   4801-NYUKAIKEI-MONTH-SEC
+           END-EVALUATE
+      *
+           EVALUATE    SODRNACCT-ORDERID(1:2)
+      *       （室料差額）
+               WHEN    "06"
+                   IF   SODRNACCT-ENDYMD   =   SPACE
+                       PERFORM   4801-ROOMSAGAKU-SEC
+                   ELSE
+                       PERFORM   4801-ROOMSAGAKU-KIKAN-SEC
                    END-IF
       *
       *       （指定月分の入院会計作成）
@@ -774,6 +804,13 @@
       *        ・療養病棟・一般病棟１０対１入院基本料
       *        ・療養病棟・一般病棟１３対１入院基本料
       *        ・療養病棟・一般病棟１５対１入院基本料
+      *        以下入院料を追加（平成３０年改正で対応）
+      *        ・療養病棟・急性期一般入院料２
+      *        ・療養病棟・急性期一般入院料３
+      *        ・療養病棟・急性期一般入院料４
+      *        ・療養病棟・急性期一般入院料５
+      *        ・療養病棟・急性期一般入院料６
+      *        ・療養病棟・地域一般入院料１
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -790,7 +827,14 @@
                                                 "190198110"   OR
                                                 "190198210"   OR
                                                 "190198310"   OR
-                                                "190198410"
+                                                "190198410"   OR
+      *                                         平成３０年改正対応
+                                                "190201910"   OR
+                                                "190202010"   OR
+                                                "190202110"   OR
+                                                "190202210"   OR
+                                                "190202310"   OR
+                                                "190202410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -1936,6 +1980,13 @@
       *        ・療養病棟・一般病棟１０対１入院基本料
       *        ・療養病棟・一般病棟１３対１入院基本料
       *        ・療養病棟・一般病棟１５対１入院基本料
+      *        以下入院料を追加（平成３０年改正で対応）
+      *        ・療養病棟・急性期一般入院料２
+      *        ・療養病棟・急性期一般入院料３
+      *        ・療養病棟・急性期一般入院料４
+      *        ・療養病棟・急性期一般入院料５
+      *        ・療養病棟・急性期一般入院料６
+      *        ・療養病棟・地域一般入院料１
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -1952,7 +2003,14 @@
                                                 "190198110"   OR
                                                 "190198210"   OR
                                                 "190198310"   OR
-                                                "190198410"
+                                                "190198410"   OR
+      *                                         平成３０年改正対応
+                                                "190201910"   OR
+                                                "190202010"   OR
+                                                "190202110"   OR
+                                                "190202210"   OR
+                                                "190202310"   OR
+                                                "190202410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -3264,6 +3322,13 @@
       *        ・療養病棟・一般病棟１０対１入院基本料
       *        ・療養病棟・一般病棟１３対１入院基本料
       *        ・療養病棟・一般病棟１５対１入院基本料
+      *        以下入院料を追加（平成３０年改正で対応）
+      *        ・療養病棟・急性期一般入院料２
+      *        ・療養病棟・急性期一般入院料３
+      *        ・療養病棟・急性期一般入院料４
+      *        ・療養病棟・急性期一般入院料５
+      *        ・療養病棟・急性期一般入院料６
+      *        ・療養病棟・地域一般入院料１
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -3280,7 +3345,14 @@
                                                 "190198110"   OR
                                                 "190198210"   OR
                                                 "190198310"   OR
-                                                "190198410"
+                                                "190198410"   OR
+      *                                         平成３０年改正対応
+                                                "190201910"   OR
+                                                "190202010"   OR
+                                                "190202110"   OR
+                                                "190202210"   OR
+                                                "190202310"   OR
+                                                "190202410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -4656,6 +4728,13 @@
       *        ・療養病棟・一般病棟１０対１入院基本料
       *        ・療養病棟・一般病棟１３対１入院基本料
       *        ・療養病棟・一般病棟１５対１入院基本料
+      *        以下入院料を追加（平成３０年改正で対応）
+      *        ・療養病棟・急性期一般入院料２
+      *        ・療養病棟・急性期一般入院料３
+      *        ・療養病棟・急性期一般入院料４
+      *        ・療養病棟・急性期一般入院料５
+      *        ・療養病棟・急性期一般入院料６
+      *        ・療養病棟・地域一般入院料１
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -4672,7 +4751,14 @@
                                                 "190198110"   OR
                                                 "190198210"   OR
                                                 "190198310"   OR
-                                                "190198410"
+                                                "190198410"   OR
+      *                                         平成３０年改正対応
+                                                "190201910"   OR
+                                                "190202010"   OR
+                                                "190202110"   OR
+                                                "190202210"   OR
+                                                "190202310"   OR
+                                                "190202410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -5803,7 +5889,11 @@
       *                0210:他医療機関１５％減
       *                0211:特定時間退院減算
       *                0212:特定曜日入退院減算
-      *                0213:特定曜日入退院減算＋他医療機関３０％減
+      *                0213:特定曜日入退院減算＋他医療機関１０％減
+      *                0214:他医療機関３５％減
+      *                0215:他医療機関１５％減
+      *                0216:他医療機関５％減
+      *                0217:特定曜日入退院減算＋他医療機関５％減
                        EVALUATE   SODRNACCT-ORDERID(3:2)
                            WHEN   "00"
                              MOVE   0    TO   NACCT-DAY(IDX)
@@ -5829,6 +5919,14 @@
                              MOVE   9    TO   NACCT-DAY(IDX)
                            WHEN   "13"
                              MOVE  13    TO   NACCT-DAY(IDX)
+                           WHEN   "14"
+                             MOVE  15    TO   NACCT-DAY(IDX)
+                           WHEN   "15"
+                             MOVE  16    TO   NACCT-DAY(IDX)
+                           WHEN   "16"
+                             MOVE  14    TO   NACCT-DAY(IDX)
+                           WHEN   "17"
+                             MOVE  17    TO   NACCT-DAY(IDX)
                        END-EVALUATE
                    END-PERFORM
       *
@@ -5912,7 +6010,11 @@
       *        0210:他医療機関１５％減
       *        0211:特定時間退院減算
       *        0212:特定曜日入退院減算
-      *        0213:特定曜日入退院減算＋他医療機関３０％減
+      *        0213:特定曜日入退院減算＋他医療機関１０％減
+      *        0214:他医療機関３５％減
+      *        0215:他医療機関１５％減
+      *        0216:他医療機関５％減
+      *        0217:特定曜日入退院減算＋他医療機関５％減
                EVALUATE   SODRNACCT-ORDERID(3:2)
                    WHEN   "00"
                      MOVE   0    TO   NACCT-DAY(IDX)
@@ -5930,6 +6032,14 @@
                      MOVE   9    TO   NACCT-DAY(IDX)
                    WHEN   "13"
                      MOVE  13    TO   NACCT-DAY(IDX)
+                   WHEN   "14"
+                     MOVE  15    TO   NACCT-DAY(IDX)
+                   WHEN   "15"
+                     MOVE  16    TO   NACCT-DAY(IDX)
+                   WHEN   "16"
+                     MOVE  14    TO   NACCT-DAY(IDX)
+                   WHEN   "17"
+                     MOVE  17    TO   NACCT-DAY(IDX)
                END-EVALUATE
       *
       *        オペーレータＩＤ
@@ -5955,6 +6065,350 @@
       *
            .
        4801-GENSAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    室料差額　会計テーブル編集処理
+      *****************************************************************
+       4801-ROOMSAGAKU-SEC         SECTION.
+      *
+      *    外泊のセット
+           IF      LNK-PTNYUINRRK-TAIINYMD =   "99999999"
+               PERFORM    4801-ROOMSAGAKU-1-SEC
+           ELSE
+               PERFORM    4801-ROOMSAGAKU-2-SEC
+           END-IF
+      *
+           .
+       4801-ROOMSAGAKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    室料差額　会計テーブル編集処理（入院中）
+      *****************************************************************
+       4801-ROOMSAGAKU-1-SEC         SECTION.
+      *
+      *    入院中患者の室料差額データ更新なので、入院会計が存在する会計データに
+      *    ついて全て更新を行う
+      *
+      *    外泊のセット
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "3"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               MOVE    SODRNACCT-STARTYMD  TO  WRK-STARTYMD
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+      *            開始日のセット
+                   IF      NACCT-SRYYM    =   SODRNACCT-STARTYMD(1:6)
+                       MOVE   WRK-STARTYMD-D   TO   START-IDX
+                   ELSE
+                       MOVE   1                TO   START-IDX
+                   END-IF
+      *            月末日を算定
+                   INITIALIZE                STS-AREA-DAY
+                   INITIALIZE                LNK-DAY7-AREA
+                   MOVE    "71"              TO  LNK-DAY7-IRAI
+                   MOVE   NACCT-SRYYM        TO  LNK-DAY7-YM
+                   CALL  "ORCSDAY"           USING STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                   MOVE   LNK-DAY7-KOYOMI    TO    WRK-GETSUMATSU-YMD
+      *            室料差額のセット
+                   PERFORM  VARYING IDX  FROM  START-IDX   BY 1
+                                UNTIL   IDX  >    WRK-GETSUMATSU-D
+                       IF   SODRNACCT-ORDERID(3:2)   =   "01"
+                            MOVE    LNK-PTNYUINRRK-RM-SAGAKU
+                                             TO  WRK-ROOMSAGAKU
+                            MOVE    WRK-ROOMSAGAKU
+                                             TO   NACCT-DAY(IDX)
+                       END-IF
+                       IF   SODRNACCT-ORDERID(3:2)   =   "02"
+                            MOVE    ZERO     TO   NACCT-DAY(IDX)
+                       END-IF
+                   END-PERFORM
+      *
+      *            オペーレータＩＤ
+                   MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *            更新年月日
+                   MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *            更新時間
+                   MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+                   MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+                   MOVE    "DBUPDATE"      TO   MCP-FUNC
+                   MOVE    "tbl_nyuinacct" TO   MCP-TABLE
+                   MOVE    "key"           TO   MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *            入院会計クローズ
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key17"             TO  MCP-PATHNAME
+                   PERFORM   910-DBCLOSECURSOR-SEC
+      *            次月の会計読み込み
+                   MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                   MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+                   IF      WRK-STARTYMD-M  =   12
+                      ADD     1      TO    WRK-STARTYMD-Y
+                      MOVE    1      TO    WRK-STARTYMD-M
+                   ELSE
+                      ADD     1      TO    WRK-STARTYMD-M
+                   END-IF
+                   MOVE    "3"                     TO  NACCT-ZAISKBKBN
+                   MOVE    WRK-STARTYMD-YM         TO  NACCT-SRYYM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT    =   ZERO
+                       MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                       MOVE    "key17"                 TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-READ-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       4801-ROOMSAGAKU-1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    室料差額　会計テーブル編集処理（退院済）
+      *****************************************************************
+       4801-ROOMSAGAKU-2-SEC         SECTION.
+      *
+      *    退院済患者の室料差額データ更新なので、退院日までの会計データについて
+      *    更新を行う
+      *
+      *    外泊のセット
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "3"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               MOVE    SODRNACCT-STARTYMD  TO  WRK-STARTYMD
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)  OR
+                      (NACCT-SRYYM    > LNK-PTNYUINRRK-TAIINYMD(1:6))
+      *            開始日のセット
+                   IF      NACCT-SRYYM      =  SODRNACCT-STARTYMD(1:6)
+                       MOVE   WRK-STARTYMD-D   TO   START-IDX
+                   ELSE
+                       MOVE   1                TO   START-IDX
+                   END-IF
+      *            月末日を算定
+                   INITIALIZE                STS-AREA-DAY
+                   INITIALIZE                LNK-DAY7-AREA
+                   MOVE    "71"              TO  LNK-DAY7-IRAI
+                   MOVE   NACCT-SRYYM        TO  LNK-DAY7-YM
+                   CALL  "ORCSDAY"           USING STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                   MOVE   LNK-DAY7-KOYOMI    TO    WRK-GETSUMATSU-YMD
+      *            退院月については退院日をセット
+                   IF   NACCT-SRYYM    =  LNK-PTNYUINRRK-TAIINYMD(1:6)
+                       MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                             TO    WRK-GETSUMATSU-YMD
+                   END-IF
+      *            室料差額のセット
+                   PERFORM  VARYING IDX  FROM  START-IDX   BY 1
+                                UNTIL   IDX  >    WRK-GETSUMATSU-D
+                       IF   SODRNACCT-ORDERID(3:2)   =   "01"
+                            MOVE    LNK-PTNYUINRRK-RM-SAGAKU
+                                             TO  WRK-ROOMSAGAKU
+                            MOVE    WRK-ROOMSAGAKU
+                                             TO   NACCT-DAY(IDX)
+                       END-IF
+                       IF   SODRNACCT-ORDERID(3:2)   =   "02"
+                            MOVE    ZERO     TO   NACCT-DAY(IDX)
+                       END-IF
+                   END-PERFORM
+      *
+      *            オペーレータＩＤ
+                   MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *            更新年月日
+                   MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *            更新時間
+                   MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+                   MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+                   MOVE    "DBUPDATE"      TO   MCP-FUNC
+                   MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *            入院会計クローズ
+                   MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE     "key17"                 TO  MCP-PATHNAME
+                   PERFORM   910-DBCLOSECURSOR-SEC
+      *            次月の会計読み込み
+                   MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                   MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+                   IF      WRK-STARTYMD-M  =   12
+                      ADD     1      TO    WRK-STARTYMD-Y
+                      MOVE    1      TO    WRK-STARTYMD-M
+                   ELSE
+                      ADD     1      TO    WRK-STARTYMD-M
+                   END-IF
+                   MOVE    "3"                     TO  NACCT-ZAISKBKBN
+                   MOVE    WRK-STARTYMD-YM         TO  NACCT-SRYYM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT    =   ZERO
+                       MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                       MOVE    "key17"                 TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-READ-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       4801-ROOMSAGAKU-2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    室料差額　会計テーブル編集処理（起算日−終了日の期間指定）
+      *****************************************************************
+       4801-ROOMSAGAKU-KIKAN-SEC         SECTION.
+      *
+      *    起算日−終了日の会計データについて更新を行う
+      *
+      *    室料差額のセット
+           INITIALIZE                          NYUINACCT-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    SODRNACCT-STARTYMD(1:6) TO  NACCT-SRYYM
+           MOVE    "3"                     TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE    "key17"                 TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT           =   ZERO
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM   910-NYUINACCT-READ-SEC
+               MOVE    SODRNACCT-STARTYMD  TO  WRK-STARTYMD
+               MOVE    SODRNACCT-ENDYMD    TO  WRK-ENDYMD
+               PERFORM   UNTIL   (FLG-NYUINACCT    =   1)  OR
+                                 (NACCT-SRYYM >
+                                     LNK-PTNYUINRRK-TAIINYMD(1:6))  OR
+                                 (NACCT-SRYYM >   WRK-ENDYMD(1:6))
+      *            開始日のセット
+                   IF      NACCT-SRYYM      =  SODRNACCT-STARTYMD(1:6)
+                       MOVE   WRK-STARTYMD-D   TO   START-IDX
+                   ELSE
+                       MOVE   1                TO   START-IDX
+                   END-IF
+      *            終了日のセット
+                   IF      NACCT-SRYYM      =  SODRNACCT-ENDYMD(1:6)
+                      MOVE   SODRNACCT-ENDYMD TO   WRK-GETSUMATSU-YMD
+      *               退院月については退院日が上限
+                      IF   NACCT-SRYYM   =  LNK-PTNYUINRRK-TAIINYMD(1:6)
+                          IF   WRK-GETSUMATSU-YMD  > 
+                                              LNK-PTNYUINRRK-TAIINYMD
+                             MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO    WRK-GETSUMATSU-YMD
+                          END-IF
+                      END-IF
+                   ELSE
+      *               月末日を算定
+                      INITIALIZE               STS-AREA-DAY
+                      INITIALIZE               LNK-DAY7-AREA
+                      MOVE    "71"             TO  LNK-DAY7-IRAI
+                      MOVE   NACCT-SRYYM       TO  LNK-DAY7-YM
+                      CALL  "ORCSDAY"          USING STS-AREA-DAY
+                                                     LNK-DAY7-AREA
+                      MOVE   LNK-DAY7-KOYOMI   TO    WRK-GETSUMATSU-YMD
+      *               退院月については退院日が上限
+                      IF   NACCT-SRYYM   =  LNK-PTNYUINRRK-TAIINYMD(1:6)
+                          MOVE    LNK-PTNYUINRRK-TAIINYMD
+                                               TO    WRK-GETSUMATSU-YMD
+                      END-IF
+                   END-IF
+      *
+      *            室料差額のセット
+                   PERFORM  VARYING IDX  FROM  START-IDX   BY 1
+                                UNTIL   IDX  >    WRK-GETSUMATSU-D
+                       IF   SODRNACCT-ORDERID(3:2)   =   "01"
+                            MOVE    LNK-PTNYUINRRK-RM-SAGAKU
+                                             TO  WRK-ROOMSAGAKU
+                            MOVE    WRK-ROOMSAGAKU
+                                             TO   NACCT-DAY(IDX)
+                       END-IF
+                       IF   SODRNACCT-ORDERID(3:2)   =   "02"
+                            MOVE    ZERO     TO   NACCT-DAY(IDX)
+                       END-IF
+                   END-PERFORM
+      *
+      *            オペーレータＩＤ
+                   MOVE   SODRNACCT-OPID   TO   NACCT-OPID
+      *            更新年月日
+                   MOVE   SODRNACCT-UPYMD  TO   NACCT-UPYMD
+      *            更新時間
+                   MOVE   SODRNACCT-UPHMS  TO   NACCT-UPHMS
+      *
+                   MOVE    NYUINACCT-REC   TO   MCPDATA-REC
+                   MOVE    "DBUPDATE"      TO   MCP-FUNC
+                   MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *            入院会計クローズ
+                   MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE     "key17"                 TO  MCP-PATHNAME
+                   PERFORM   910-DBCLOSECURSOR-SEC
+      *            次月の会計読み込み
+                   MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+                   MOVE    LNK-PTNYUINRRK-PTID     TO  NACCT-PTID
+                   IF      WRK-STARTYMD-M  =   12
+                      ADD     1      TO    WRK-STARTYMD-Y
+                      MOVE    1      TO    WRK-STARTYMD-M
+                   ELSE
+                      ADD     1      TO    WRK-STARTYMD-M
+                   END-IF
+                   MOVE    "3"                     TO  NACCT-ZAISKBKBN
+                   MOVE    WRK-STARTYMD-YM         TO  NACCT-SRYYM
+                   MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                   MOVE    "key17"                 TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT    =   ZERO
+                       MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+                       MOVE    "key17"                 TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-READ-SEC
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE     "tbl_nyuinacct"         TO  MCP-TABLE
+           MOVE     "key17"                 TO  MCP-PATHNAME
+           PERFORM   910-DBCLOSECURSOR-SEC
+      *
+           .
+       4801-ROOMSAGAKU-KIKAN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6650,6 +7104,13 @@
       *        ・療養病棟・一般病棟１０対１入院基本料
       *        ・療養病棟・一般病棟１３対１入院基本料
       *        ・療養病棟・一般病棟１５対１入院基本料
+      *        以下入院料を追加（平成３０年改正で対応）
+      *        ・療養病棟・急性期一般入院料２
+      *        ・療養病棟・急性期一般入院料３
+      *        ・療養病棟・急性期一般入院料４
+      *        ・療養病棟・急性期一般入院料５
+      *        ・療養病棟・急性期一般入院料６
+      *        ・療養病棟・地域一般入院料１
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -6666,7 +7127,14 @@
                                                 "190198110"   OR
                                                 "190198210"   OR
                                                 "190198310"   OR
-                                                "190198410"
+                                                "190198410"   OR
+      *                                         平成３０年改正対応
+                                                "190201910"   OR
+                                                "190202010"   OR
+                                                "190202110"   OR
+                                                "190202210"   OR
+                                                "190202310"   OR
+                                                "190202410"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )

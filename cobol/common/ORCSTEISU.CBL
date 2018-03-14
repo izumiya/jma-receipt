@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *平成３０年４月改定対応
+      *  05.00.00    NACL-小豆沢  18/03/08  療養病棟入院料の判定変更
       *****************************************************************
       *
       *
@@ -121,17 +123,21 @@
       *
       *    主処理
            IF    LNK-TEISU-RC      =    ZERO
-               IF  LNK-TEISU-SANTEIYM    >=   "201604"
-                   PERFORM    210-TEISU4-SEC
+               IF  LNK-TEISU-SANTEIYM    >=   "201804"
+                   PERFORM    210-TEISU5-SEC
                ELSE
-                   IF  LNK-TEISU-SANTEIYM    >=   "201404"
-                       PERFORM    210-TEISU3-SEC
+                   IF  LNK-TEISU-SANTEIYM    >=   "201604"
+                       PERFORM    210-TEISU4-SEC
                    ELSE
-                     IF  LNK-TEISU-SANTEIYM    >=   "201204"
-                         PERFORM    210-TEISU2-SEC
-                     ELSE
-                         PERFORM    200-TEISU1-SEC
-                     END-IF
+                       IF  LNK-TEISU-SANTEIYM    >=   "201404"
+                           PERFORM    210-TEISU3-SEC
+                       ELSE
+                         IF  LNK-TEISU-SANTEIYM    >=   "201204"
+                             PERFORM    210-TEISU2-SEC
+                         ELSE
+                             PERFORM    200-TEISU1-SEC
+                         END-IF
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -1563,6 +1569,273 @@
       *
            .
        210-TEISU4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    定数超過の診療コード判定取得（平成３０年４月以降）
+      *****************************************************************
+       210-TEISU5-SEC            SECTION.
+      *
+      *定数超過情報の取得（システム管理テーブルより）
+           MOVE    SPACE               TO  WRK-TEISUKBN
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "5000"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    LNK-TEISU-SANTEIYM
+                                       TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               IF  FLG-SYSKANRI     =      ZERO
+                   IF   SYS-5000-TEISUKBN  =  SPACE OR  "0"
+                       CONTINUE
+                   ELSE
+                       MOVE  SYS-5000-TEISUKBN  TO  WRK-TEISUKBN
+                       EVALUATE  LNK-TEISU-TOKUTEINYUIN-KBN
+                           WHEN  "0"
+                               INITIALIZE                TNS-TENSU-REC
+                               MOVE    LNK-TEISU-SANTEIYM
+                                                     TO  TNS-YUKOSTYMD
+                                                                 (1:6)
+                               MOVE    "01"    TO  TNS-YUKOSTYMD (7:2)
+                               MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                               MOVE    SPA-HOSPNUM   TO  TNS-HOSPNUM
+                               MOVE    LNK-TEISU-SANTEISRYCD
+                                                     TO  TNS-SRYCD
+                               MOVE    TNS-TENSU-REC TO  MCPDATA-REC
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM 910-DBSELECT-SEC
+                               IF      MCP-RC              =   ZERO
+                                   MOVE  "tbl_tensu" TO  MCP-TABLE
+                                   MOVE  "key"       TO  MCP-PATHNAME
+                                   PERFORM 910-DBFETCH-SEC
+                                   IF      MCP-RC     =  ZERO
+                                       MOVE  MCPDATA-REC
+                                                     TO  TNS-TENSU-REC
+                                       MOVE  ZERO    TO  FLG-TENSU
+                                   ELSE
+                                       INITIALIZE        TNS-TENSU-REC
+                                       MOVE    1     TO  FLG-TENSU
+                                   END-IF
+                               ELSE
+                                   INITIALIZE            TNS-TENSU-REC
+                                   MOVE    1         TO  FLG-TENSU
+                               END-IF
+      *
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM  910-DB-CLOSE-SEC
+      *
+      *                        コード表用番号からの判定に変更
+                               EVALUATE TNS-CDKBN-KBNNUM    ALSO
+                                        TNS-CDKBN-KOUBAN
+      *                            療養病棟入院基本料（特別入院基本料）
+                                   WHEN   101   ALSO   03
+      *                            有床診療所療養病床入院基本料Ａ
+                                   WHEN   109   ALSO   01
+      *                            有床診療所療養病床入院基本料Ｂ
+                                   WHEN   109   ALSO   02
+      *                            有床診療所療養病床入院基本料Ｃ
+                                   WHEN   109   ALSO   03
+      *                            有床診療所療養病床入院基本料Ｄ
+                                   WHEN   109   ALSO   04
+      *                            有床診療所療養病床入院基本料Ｅ
+                                   WHEN   109   ALSO   05
+      *                            有床診療所療養病床入院基本料（特別入院基本料）
+                                   WHEN   109   ALSO   06
+      *                            療養病床以外・有床診療所療養病床入院
+                                   WHEN   108   ALSO   13
+      *                            療養病棟入院料１
+                                   WHEN   101   ALSO   01
+      *                            療養病棟入院料２
+                                   WHEN   101   ALSO   02
+      *                            療養病棟入院料２（経過措置１）
+                                   WHEN   101   ALSO   10
+      *                            療養病棟入院料２（経過措置２）
+                                   WHEN   101   ALSO   11
+      *                            特定入院基本料（障害者施設等入院基本料）
+      *                            特定入院基本料（障害者施設等入院基本料）（夜勤時間超過減算）
+                                   WHEN   106   ALSO   08
+      *                            一般病棟・療養病棟入院基本料１
+                                   WHEN   100   ALSO   14
+      *                            特定一般病棟・療養病棟入院基本料１
+                                   WHEN   317   ALSO   08
+                                      MOVE   CONS-TEISU1  TO
+                                                LNK-TEISU-SRYCD(1)
+                                   WHEN   OTHER
+                                      MOVE   CONS-TEISU2  TO
+                                                LNK-TEISU-SRYCD(1)
+                               END-EVALUATE
+                           WHEN  "1"
+      *                        特定入院料の定数超過は平成２６年４月より廃止
+                               CONTINUE
+                       END-EVALUATE
+                       MOVE    LNK-TEISU-SANTEIYM   TO
+                                                LNK-TEISU-STARTYM(1)
+                       MOVE    SYS-5000-EDYUKYMD(1:6)   TO
+                                                LNK-TEISU-ENDYM(1)
+                   END-IF
+               ELSE
+                   MOVE  2     TO    LNK-TEISU-RC
+               END-IF
+           END-IF
+      *    システム管理クローズ
+           MOVE    "tbl_syskanri"          TO  MCP-TABLE
+           MOVE    "key10"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *定数超過情報の取得（システム管理テーブルより翌月分を取得）
+           MOVE    LNK-TEISU-SANTEIYM  
+                                       TO  WRK-SANTEIYM
+           IF      LNK-TEISU-SANTEIYM(5:2)  = "12"
+               ADD    1                TO  WRK-SANTEI-YY
+               MOVE   1                TO  WRK-SANTEI-MM
+           ELSE
+               ADD    1                TO  WRK-SANTEI-MM
+           END-IF
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "5000"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    WRK-SANTEIYM        TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               IF  FLG-SYSKANRI     =      ZERO
+                   IF   SYS-5000-TEISUKBN  =  SPACE OR "0"
+                       CONTINUE
+                   ELSE
+                       IF   WRK-TEISUKBN   =  SYS-5000-TEISUKBN
+                           CONTINUE
+                       ELSE
+                           EVALUATE  LNK-TEISU-TOKUTEINYUIN-KBN
+                             WHEN  "0"
+                               INITIALIZE                TNS-TENSU-REC
+                               MOVE    LNK-TEISU-SANTEIYM
+                                                     TO  TNS-YUKOSTYMD
+                                                                 (1:6)
+                               MOVE    "01"    TO  TNS-YUKOSTYMD (7:2)
+                               MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                               MOVE    SPA-HOSPNUM   TO  TNS-HOSPNUM
+                               MOVE    LNK-TEISU-SANTEISRYCD
+                                                     TO  TNS-SRYCD
+                               MOVE    TNS-TENSU-REC TO  MCPDATA-REC
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM 910-DBSELECT-SEC
+                               IF      MCP-RC              =   ZERO
+                                   MOVE  "tbl_tensu" TO  MCP-TABLE
+                                   MOVE  "key"       TO  MCP-PATHNAME
+                                   PERFORM 910-DBFETCH-SEC
+                                   IF      MCP-RC     =  ZERO
+                                       MOVE  MCPDATA-REC
+                                                     TO  TNS-TENSU-REC
+                                       MOVE  ZERO    TO  FLG-TENSU
+                                   ELSE
+                                       INITIALIZE        TNS-TENSU-REC
+                                       MOVE    1     TO  FLG-TENSU
+                                   END-IF
+                               ELSE
+                                   INITIALIZE            TNS-TENSU-REC
+                                   MOVE    1         TO  FLG-TENSU
+                               END-IF
+      *
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM  910-DB-CLOSE-SEC
+      *
+      *                        コード表用番号からの判定に変更
+                               EVALUATE TNS-CDKBN-KBNNUM    ALSO
+                                        TNS-CDKBN-KOUBAN
+      *                            療養病棟入院基本料（特別入院基本料）
+                                   WHEN   101   ALSO   03
+      *                            有床診療所療養病床入院基本料Ａ
+                                   WHEN   109   ALSO   01
+      *                            有床診療所療養病床入院基本料Ｂ
+                                   WHEN   109   ALSO   02
+      *                            有床診療所療養病床入院基本料Ｃ
+                                   WHEN   109   ALSO   03
+      *                            有床診療所療養病床入院基本料Ｄ
+                                   WHEN   109   ALSO   04
+      *                            有床診療所療養病床入院基本料Ｅ
+                                   WHEN   109   ALSO   05
+      *                            有床診療所療養病床入院基本料（特別入院基本料）
+                                   WHEN   109   ALSO   06
+      *                            療養病床以外・有床診療所療養病床入院
+                                   WHEN   108   ALSO   13
+      *                            療養病棟入院料１
+                                   WHEN   101   ALSO   01
+      *                            療養病棟入院料２
+                                   WHEN   101   ALSO   02
+      *                            療養病棟入院料２（経過措置１）
+                                   WHEN   101   ALSO   10
+      *                            療養病棟入院料２（経過措置２）
+                                   WHEN   101   ALSO   11
+      *                            特定入院基本料（障害者施設等入院基本料）
+      *                            特定入院基本料（障害者施設等入院基本料）（夜勤時間超過減算）
+                                   WHEN   106   ALSO   08
+      *                            一般病棟・療養病棟入院基本料１
+                                   WHEN   100   ALSO   14
+      *                            特定一般病棟・療養病棟入院基本料１
+                                   WHEN   317   ALSO   08
+                                      MOVE   CONS-TEISU1  TO
+                                                LNK-TEISU-SRYCD(1)
+                                   WHEN   OTHER
+                                      MOVE   CONS-TEISU2  TO
+                                                LNK-TEISU-SRYCD(1)
+                               END-EVALUATE
+                             WHEN  "1"
+      *                            特定入院料の定数超過は平成２６年４月より廃止
+                                   CONTINUE
+                           END-EVALUATE
+                           MOVE    WRK-SANTEIYM   TO
+                                                LNK-TEISU-STARTYM(2)
+                           MOVE    SYS-5000-EDYUKYMD(1:6)   TO
+                                                LNK-TEISU-ENDYM(2)
+                       END-IF
+                   END-IF
+               ELSE
+                   MOVE  2     TO    LNK-TEISU-RC
+               END-IF
+           END-IF
+      *    システム管理クローズ
+           MOVE    "tbl_syskanri"          TO  MCP-TABLE
+           MOVE    "key10"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           IF    (LNK-TEISU-SRYCD(1)    =   SPACE)   AND
+                 (LNK-TEISU-SRYCD(2)    =   SPACE)
+                 MOVE   3        TO  LNK-TEISU-RC
+           END-IF
+      *
+           .
+       210-TEISU5-EXT.
            EXIT.
       *
       *****************************************************************
