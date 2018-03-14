@@ -44,6 +44,16 @@
       * 03.05.00     NACL-小豆沢  07.07.27  療養病棟（病床）入院会計
       *                                     表示区分対応
       * 04.03.00     NACL-多々納  08/07/09  入院日１回の加算対応
+      *平成３０年４月改定対応
+      *  05.00.00    NACL-小豆沢  18/03/02  療養病棟入院基本料２の経過
+      *                                     措置追加（看護比率３０対１）
+      *  05.00.00    NACL-小豆沢  18/03/07  短期滞在手術等基本料の判定変更
+      *  05.00.00    NACL-小豆沢  18/03/08  栄養管理体制減算の特別入院基本料
+      *                                     判定変更
+      *  05.00.00    NACL-小豆沢  18/03/09  療養病棟入院料２（Ｉ）
+      *                                     措置追加２・通則８対応追加
+      *  05.00.00    NACL-小豆沢  18/03/09  看護補助加算（１５日以上３０日
+      *                                     以内）の算定対応
       *****************************************************************
       *
       *
@@ -1333,6 +1343,143 @@
                 END-EVALUATE
              END-IF
       *
+             IF      LNK-SCNYUACCT-STSRYYMD   >=   "20180401"
+                EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+      *         療養病棟入院料２（看護職員数等経過措置　経過措置１）
+                 WHEN      "190215110"
+                 WHEN      "190215310"
+                 WHEN      "190215510"
+                 WHEN      "190215710"
+                 WHEN      "190215910"
+                 WHEN      "190216110"
+                 WHEN      "190216310"
+                 WHEN      "190216510"
+                 WHEN      "190216710"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190215110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190215310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190215510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190215710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190215910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190216110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190216310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190216510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190216710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院料２（生活療養）（看護職員数等経過措置　経過措置１）
+                 WHEN      "190215210"
+                 WHEN      "190215410"
+                 WHEN      "190215610"
+                 WHEN      "190215810"
+                 WHEN      "190216010"
+                 WHEN      "190216210"
+                 WHEN      "190216410"
+                 WHEN      "190216610"
+                 WHEN      "190216810"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190215210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190215410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190215610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190215810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190216010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190216210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190216410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190216610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190216810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+                END-EVALUATE
+             END-IF
+      *
+             IF     (LNK-SCNYUACCT-STSRYYMD   >=   "20180401")   AND
+                    (SYS-5000-EIYOUKSNKBN     NOT  =  "1")
+                EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+      *         療養病棟入院料２（看護比率３０対１等経過措置　経過措置２）
+                 WHEN      "190202510"
+                 WHEN      "190202710"
+                 WHEN      "190202910"
+                 WHEN      "190203110"
+                 WHEN      "190203310"
+                 WHEN      "190203510"
+                 WHEN      "190203710"
+                 WHEN      "190203910"
+                 WHEN      "190204110"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190202510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190202710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190202910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190203110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190203310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190203510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190203710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190203910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190204110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院料２（生活療養）（看護比率３０対１等経過措置　経過措置２）
+                 WHEN      "190202610"
+                 WHEN      "190202810"
+                 WHEN      "190203010"
+                 WHEN      "190203210"
+                 WHEN      "190203410"
+                 WHEN      "190203610"
+                 WHEN      "190203810"
+                 WHEN      "190204010"
+                 WHEN      "190204210"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190202610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190202810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190203010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190203210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190203410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190203610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190203810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190204010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190204210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+                END-EVALUATE
+             END-IF
+      *
+             IF     (LNK-SCNYUACCT-STSRYYMD   >=   "20180401")   AND
+                    (SYS-5000-EIYOUKSNKBN     =    "1")
+                EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+      *         療養病棟入院料２（看護比率３０対１等経過措置　経過措置２）
+                 WHEN      "190202510"
+                 WHEN      "190202710"
+                 WHEN      "190202910"
+                 WHEN      "190203110"
+                 WHEN      "190203310"
+                 WHEN      "190203510"
+                 WHEN      "190203710"
+                 WHEN      "190203910"
+                 WHEN      "190204310"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190202510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190202710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190202910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190203110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190203310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190203510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190203710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190203910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190204310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         療養病棟入院料２（生活療養）（看護比率３０対１等経過措置　経過措置２）
+                 WHEN      "190202610"
+                 WHEN      "190202810"
+                 WHEN      "190203010"
+                 WHEN      "190203210"
+                 WHEN      "190203410"
+                 WHEN      "190203610"
+                 WHEN      "190203810"
+                 WHEN      "190204010"
+                 WHEN      "190204410"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190202610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190202810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190203010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190203210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190203410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190203610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190203810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190204010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190204410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+                END-EVALUATE
+             END-IF
+      *
              EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
       *        有床診療所療養病床入院基本料
                 WHEN      "190122010"
@@ -1482,13 +1629,14 @@
                  PERFORM 920-DBFETCH-SEC
                  IF      MCP-RC            =   ZERO
                      MOVE    MCPDATA-REC   TO  TNS-TENSU-REC
-                     IF   TNS-NYUKHNKSNKBN  =  226  OR
-                                               240
+                     IF    (TNS-CDKBN-KBN     =   "A")   AND
+                           (TNS-CDKBN-KBNNUM  =   400)   AND
+                           (TNS-CDKBN-KOUBAN  =   2  OR 3)
                          MOVE    1         TO  FLG-TANKI
-                         IF   TNS-NYUKHNKSNKBN  =  226
+                         IF   TNS-CDKBN-KOUBAN  =   2
                              MOVE    1         TO  FLG-TANKI2
                          END-IF
-                         IF   TNS-NYUKHNKSNKBN  =  240
+                         IF   TNS-CDKBN-KOUBAN  =   3
                              MOVE    1         TO  FLG-TANKI3
                          END-IF
                      END-IF
@@ -1994,8 +2142,11 @@
       *
       *            有床診療所在宅復帰機能強化加算（有床診療所入院基本料）
       *            は入院日１５日目以降に算定する
+      *            看護補助加算（障害者施設等入院基本料）の１５日以上算定
+      *            コードも同様とする（平成３０年改正で新設）
                    IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
-                                                      = "190190270"
+                                                      = "190190270" OR
+                                                        "190205670"
       **                DISPLAY "//////ZAITAKU-FUKKI/////////////////"
       **                DISPLAY "LNK-SCNYUACCT-NYUKHN-NISUU = "
       **                         LNK-SCNYUACCT-NYUKHN-NISUU
@@ -2200,7 +2351,8 @@
                                          TO   WRK-EIYOU-GENSANCD
                           END-IF
                         END-IF
-                        IF   WRK-STYMD(1:6)  >=   "201604"
+                        IF  (WRK-STYMD(1:6)  >=   "201604")   AND
+                            (WRK-STYMD(1:6)  <=   "201803")
                           IF  (TNS-SRYCD       =  "190121810"  OR
                                                   "190799510") OR
       *                      一般病棟特別入院基本料
@@ -2230,6 +2382,61 @@
       *                     結核病棟入院基本料（夜勤時間特別入院基本料）
                             ((TNS-CDKBN-KBNNUM  = 102)   AND
                              (TNS-CDKBN-KOUBAN  =   9))       OR
+      *                     精神病棟特別入院基本料
+      *                     精神病棟入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 103)   AND
+                             (TNS-CDKBN-KOUBAN  =   6))       OR
+      *                     精神病棟入院基本料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 103)   AND
+                             (TNS-CDKBN-KOUBAN  =  11))       OR
+      *                     障害者施設等入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 106)   AND
+                             (TNS-CDKBN-KOUBAN  =   5))       OR
+      *                     障害者施設等入院基本料（医療区分）（夜勤時間超過減算）
+      *                   （表用番号で判定不可の為、算定コードを直判定）
+                             (TNS-SRYCD       = "190198910"  OR
+                                                "190199010"  OR
+                                                "190199110"  OR
+                                                "190199210"  OR
+                                                "190199310"  OR
+                                                "190199410"  OR
+                                                "190199510"  OR
+                                                "190199610")
+                              CONTINUE
+                          ELSE
+                              MOVE   "190182590"
+                                         TO   WRK-EIYOU-GENSANCD
+                          END-IF
+                        END-IF
+                        IF   WRK-STYMD(1:6)  >=   "201804"
+      *                      一般病棟特別入院基本料
+                          IF ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =   4))       OR
+      *                      （選）一般病棟特別入院基本料
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =   5))       OR
+      *                      急性期一般入院料（月平均夜勤時間超過減算）
+      *                      地域一般入院料（月平均夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =   6))       OR
+      *                      急性期一般入院料（夜勤時間特別入院基本料）
+      *                      地域一般入院料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 100)   AND
+                             (TNS-CDKBN-KOUBAN  =  11))       OR
+      *                     療養病棟入院基本料（特別入院基本料）
+      *                     療養病棟入院基本料（特別入院基本料）（生活療養）
+                            ((TNS-CDKBN-KBNNUM  = 101)   AND
+                             (TNS-CDKBN-KOUBAN  =   3))       OR
+      *                     結核病棟特別入院基本料
+      *                     結核病棟入院基本料（夜勤時間超過減算）
+                            ((TNS-CDKBN-KBNNUM  = 102)   AND
+                             (TNS-CDKBN-KOUBAN  =   7))       OR
+      *                     結核病棟入院基本料（夜勤時間特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 102)   AND
+                             (TNS-CDKBN-KOUBAN  =   9))       OR
+      *                     結核病棟入院基本料（重症患者割合特別入院基本料）
+                            ((TNS-CDKBN-KBNNUM  = 102)   AND
+                             (TNS-CDKBN-KOUBAN  =  10))       OR
       *                     精神病棟特別入院基本料
       *                     精神病棟入院基本料（夜勤時間超過減算）
                             ((TNS-CDKBN-KBNNUM  = 103)   AND
@@ -4984,6 +5191,11 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF    TNS-SRYCD         =   "190182590"  OR
                                                "190182690"
                         MOVE    3          TO   TNS-TENSIKIBETU
+                   END-IF
+      *            看護補助加算（１５日以上３０日以内）（障害者施設等
+      *            入院基本料）は上限日数を３０日に変更
+                   IF    TNS-SRYCD         =   "190205670"
+                        MOVE    30         TO   TNS-JGNCNT
                    END-IF
                    MOVE    ZERO                TO  FLG-TENSU
                ELSE

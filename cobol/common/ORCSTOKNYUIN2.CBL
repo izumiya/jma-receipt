@@ -1500,8 +1500,10 @@
              END-EVALUATE
            END-IF
       *
-      *    ÆÃÄêÆþ±¡ÎÁ¥³¡¼¥É¤È»»Äê¾å¸ÂÆü¿ô¤Î¥»¥Ã¥È¡ÊÊ¿À®£²£¸Ç¯£´·î£±Æü°Ê¹ß¡Ë
-           IF     LNK-TOKNYUIN2-SANTEIYMD   >=   "20160401"
+      *    ÆÃÄêÆþ±¡ÎÁ¥³¡¼¥É¤È»»Äê¾å¸ÂÆü¿ô¤Î¥»¥Ã¥È
+      *    ¡ÊÊ¿À®£²£¸Ç¯£´·î£±Æü¤«¤éÊ¿À®£³£°Ç¯£³·î£³£±Æü¡Ë
+           IF    (LNK-TOKNYUIN2-SANTEIYMD   >=   "20160401")  AND
+                 (LNK-TOKNYUIN2-SANTEIYMD   <=   "20180331")
              EVALUATE    LNK-TOKNYUIN2-SET-SRYCD
       *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£±
               WHEN      "190024510"
@@ -1942,6 +1944,528 @@
       *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍý£²¡Ë
               WHEN      "190182410"
                   MOVE  "190182410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+             END-EVALUATE
+           END-IF
+      *
+      *    ÆÃÄêÆþ±¡ÎÁ¥³¡¼¥É¤È»»Äê¾å¸ÂÆü¿ô¤Î¥»¥Ã¥È¡ÊÊ¿À®£³£°Ç¯£´·î£±Æü°Ê¹ß¡Ë
+           IF     LNK-TOKNYUIN2-SANTEIYMD   >=   "20180401"
+             EVALUATE    LNK-TOKNYUIN2-SET-SRYCD
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£±
+              WHEN      "190024510"
+                  MOVE  "190024510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190128610"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190074510"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  14             TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£²
+              WHEN      "190024310"
+                  MOVE  "190024310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190128710"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190024410"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  14             TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£³¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
+              WHEN      "190138110"
+                  MOVE  "190138110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190138210"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190138310"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  14             TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£³¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+              WHEN      "190138410"
+                  MOVE  "190138410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190138510"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190138610"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  60             TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£´¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
+              WHEN      "190138710"
+                  MOVE  "190138710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190138810"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190138910"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  14             TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A300)µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+              WHEN      "190139010"
+                  MOVE  "190139010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  3              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190139110"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  7              TO  WRK-JGN-NISSU(2)
+                  MOVE  "190139210"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  14             TO  WRK-JGN-NISSU(3)
+                  MOVE  "190139310"    TO  WRK-TOKNYUIN2-SRYCD(4)
+                  MOVE  60             TO  WRK-JGN-NISSU(4)
+                  MOVE  4              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£±
+              WHEN      "190174410"
+                  MOVE  "190174410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190174510"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  14             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë
+              WHEN      "190174610"
+                  MOVE  "190174610"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190174710"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  14             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+              WHEN      "190174810"
+                  MOVE  "190174810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190174910"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£³
+              WHEN      "190116310"
+                  MOVE  "190116310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190116410"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  14             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£´¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë
+              WHEN      "190139810"
+                  MOVE  "190139810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190139910"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  14             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301)ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+              WHEN      "190140010"
+                  MOVE  "190140010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190140110"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301-2)¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ£±
+              WHEN      "190175010"
+                  MOVE  "190175010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301-2)¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ£²
+              WHEN      "190175110"
+                  MOVE  "190175110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301-2)¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ
+              WHEN      "190117310"
+                  MOVE  "190117310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301-3)Ç¾Â´Ãæ¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ
+              WHEN      "190120810"
+                  MOVE  "190120810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A301-4)¾®»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
+              WHEN      "190149910"
+                  MOVE  "190149910"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  7              TO  WRK-JGN-NISSU(1)
+                  MOVE  "190150010"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£±
+      **          ÂÎ½Å£±¡¤£µ£°£°¥°¥é¥à°Ê¾å¤Ç¡¤¸üÀ¸Ï«Æ¯Âç¿Ã¤¬Äê¤á¤ë¼À´µ
+      **          ¤ò¼çÉÂ¤È¤¹¤ë´µ¼Ô¤Ï£³£µÆü¸ÂÅÙ¤À¤¬¡¢¸½¾õ¤Ç¤ÏÈ½Äê¤Ç¤­¤Ê¤¤
+      **          °Ù¡¢Ì¤ÂÐ±þ
+              WHEN      "190024710"
+                  MOVE  "190024710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²
+      **          ÂÎ½Å£±¡¤£µ£°£°¥°¥é¥à°Ê¾å¤Ç¡¤¸üÀ¸Ï«Æ¯Âç¿Ã¤¬Äê¤á¤ë¼À´µ
+      **          ¤ò¼çÉÂ¤È¤¹¤ë´µ¼Ô¤Ï£³£µÆü¸ÂÅÙ¤À¤¬¡¢¸½¾õ¤Ç¤ÏÈ½Äê¤Ç¤­¤Ê¤¤
+      **          °Ù¡¢Ì¤ÂÐ±þ
+              WHEN      "190140410"
+                  MOVE  "190140410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡ÊÊìÂÎ¡¦ÂÛ»ù¡Ë
+              WHEN      "190066710"
+                  MOVE  "190066710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ê¿·À¸»ù¡Ë
+      **          ÂÎ½Å£±¡¤£µ£°£°¥°¥é¥à°Ê¾å¤Ç¡¤¸üÀ¸Ï«Æ¯Âç¿Ã¤¬Äê¤á¤ë¼À´µ
+      **          ¤ò¼çÉÂ¤È¤¹¤ë´µ¼Ô¤Ï£³£µÆü¸ÂÅÙ¤À¤¬¡¢¸½¾õ¤Ç¤ÏÈ½Äê¤Ç¤­¤Ê¤¤
+      **          °Ù¡¢Ì¤ÂÐ±þ
+              WHEN      "190066810"
+                  MOVE  "190066810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A303-2)¿·À¸»ù¼£ÎÅ²óÉü¼¼Æþ±¡°åÎÅ´ÉÍýÎÁ
+      **          ÂÎ½Å£±¡¤£µ£°£°¥°¥é¥à°Ê¾å¤Ç¡¤¸üÀ¸Ï«Æ¯Âç¿Ã¤¬Äê¤á¤ë¼À´µ
+      **          ¤ò¼çÉÂ¤È¤¹¤ë´µ¼Ô¤Ï£µ£°Æü¸ÂÅÙ¤À¤¬¡¢¸½¾õ¤Ç¤ÏÈ½Äê¤Ç¤­¤Ê¤¤
+      **          °Ù¡¢Ì¤ÂÐ±þ
+              WHEN      "190140510"
+                  MOVE  "190140510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  120        TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A305)°ìÎà´¶À÷¾É´µ¼ÔÆþ±¡°åÎÅ´ÉÍýÎÁ
+              WHEN      "190194310"
+                  MOVE  "190194310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190194410"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  1              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£±
+              WHEN      "190209110"
+                  MOVE  "190209110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£±¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190209210"
+                  MOVE  "190209210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£±
+              WHEN      "190209310"
+                  MOVE  "190209310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£±¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190209410"
+                  MOVE  "190209410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£²
+              WHEN      "190209510"
+                  MOVE  "190209510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£²¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190209610"
+                  MOVE  "190209610"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£²
+              WHEN      "190209710"
+                  MOVE  "190209710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£²¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190209810"
+                  MOVE  "190209810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£³
+              WHEN      "190209910"
+                  MOVE  "190209910"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£³¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190210010"
+                  MOVE  "190210010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£³
+              WHEN      "190210110"
+                  MOVE  "190210110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190210210"
+                  MOVE  "190210210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£´
+              WHEN      "190210310"
+                  MOVE  "190210310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£´¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190210410"
+                  MOVE  "190210410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£´
+              WHEN      "190210510"
+                  MOVE  "190210510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£´¡ÊÀ¸³èÎÅÍÜ¡Ë
+              WHEN      "190210610"
+                  MOVE  "190210610"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£±¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190210710"
+                  MOVE  "190210710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£±¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190210810"
+                  MOVE  "190210810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£±¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190210910"
+                  MOVE  "190210910"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£±¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211010"
+                  MOVE  "190211010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£²¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211110"
+                  MOVE  "190211110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£²¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211210"
+                  MOVE  "190211210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£²¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211310"
+                  MOVE  "190211310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£²¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211410"
+                  MOVE  "190211410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£³¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211510"
+                  MOVE  "190211510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£³¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211610"
+                  MOVE  "190211610"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£³¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211710"
+                  MOVE  "190211710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211810"
+                  MOVE  "190211810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£´¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190211910"
+                  MOVE  "190211910"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡£´¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190212010"
+                  MOVE  "190212010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£´¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190212110"
+                  MOVE  "190212110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A308-3)ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ£´¡ÊÀ¸³èÎÅÍÜ¡Ë¡ÊÆÃÄêÃÏ°è¡Ë
+              WHEN      "190212210"
+                  MOVE  "190212210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A310)´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ£±
+              WHEN      "190028910"
+                  MOVE  "190028910"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190150510"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  "190150610"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A310)´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ£²
+              WHEN      "190212710"
+                  MOVE  "190212710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190212810"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  "190212910"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£±
+              WHEN      "190121010"
+                  MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£²
+              WHEN      "190130010"
+                  MOVE  "190130010"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190130110"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
+              WHEN      "190121110"
+                  MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
+              WHEN      "190121210"
+                  MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A311-3)Àº¿À²ÊµßµÞ¡¦¹çÊ»¾ÉÆþ±¡ÎÁ
+              WHEN      "190130210"
+                  MOVE  "190130210"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190130310"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
+                  MOVE  2              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
+              WHEN      "190151610"
+                  MOVE  "190151610"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190739910"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
+              WHEN      "190151710"
+                  MOVE  "190151710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  MOVE  "190813410"    TO  WRK-TOKNYUIN2-SRYCD(2)
+                  MOVE  60             TO  WRK-JGN-NISSU(2)
+                  MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
+                  MOVE  3              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢£±¡Ë
+              WHEN      "190213310"
+                  MOVE  "190213310"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢£²¡Ë
+              WHEN      "190213410"
+                  MOVE  "190213410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢£³¡Ë
+              WHEN      "190213510"
+                  MOVE  "190213510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  60             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+                  MOVE  0              TO  FLG-ROOM
+      *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢£´¡Ë
+              WHEN      "190213610"
+                  MOVE  "190213610"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
                   MOVE  0              TO  FLG-ROOM
