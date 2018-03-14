@@ -1232,6 +1232,13 @@
       *        ¿∏≥ËŒ≈Õ‹ø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∂≠≥¶¡ÿ≥∫≈ˆ°À° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ƒ„£±°À
                05  WRK-CONS-HYOJYUN-FUTAN33
                                       PIC X(09)   VALUE   "197005010".
+      *         ø¿Æ£≥£∞«Ø£¥∑Ó≤˛ƒÍ§Œƒ…≤√ ¨
+      *        ¿∏≥ËŒ≈Õ‹° £±°Àø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN34
+                                      PIC X(09)   VALUE   "197005110".
+      *        ¿∏≥ËŒ≈Õ‹° £±°Àø©ªˆŒ≈Õ‹…∏Ω‡…È√¥≥€° ∞ÂŒ≈∂Ë ¨£≤°¶£≥°À° ∞Ï»Ã°À
+               05  WRK-CONS-HYOJYUN-FUTAN35
+                                      PIC X(09)   VALUE   "197005110".
       *
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.
       *
@@ -5096,7 +5103,9 @@
                                          OR  WRK-CONS-HYOJYUN-FUTAN30
                                          OR  WRK-CONS-HYOJYUN-FUTAN31
                                          OR  WRK-CONS-HYOJYUN-FUTAN32
-                                         OR  WRK-CONS-HYOJYUN-FUTAN33 )
+                                         OR  WRK-CONS-HYOJYUN-FUTAN33
+                                         OR  WRK-CONS-HYOJYUN-FUTAN34
+                                         OR  WRK-CONS-HYOJYUN-FUTAN35 )
                                    CONTINUE
                                ELSE
                                     IF    IDXZ       =  1

@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *平成３０年４月改正対応
+      *  05.00.00    NACL-小豆沢  18/02/27  入院時食事療養の金額変更対応
       *****************************************************************
       *
       *
@@ -4222,7 +4224,8 @@
                         END-EVALUATE
       *               入院時食事療養（２）（流動食）
                       WHEN  "197003210"
-                        EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                        IF   LNK-RNYURECEDEN-SANTEIYM   <=  "201803"
+                          EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
                             WHEN  1
       *                         労災（１．２倍）（食事療養）
                                 ADD     1     TO    IDX4
@@ -4256,7 +4259,44 @@
                                       LNK-RNYURECEDEN-SURYO(3 IDX2 IDX4)
                                 MOVE  1638     TO  
                                       LNK-RNYURECEDEN-TEN(3 IDX2 IDX4)
-                        END-EVALUATE
+                          END-EVALUATE
+                        ELSE
+                          EVALUATE  WRK-SKJ7-RYOYO-RYU-SU(IDX1)
+                            WHEN  1
+      *                         労災（１．２倍）（食事療養）
+                                ADD     1     TO    IDX4
+                                MOVE   "RI"   TO
+                                    LNK-RNYURECEDEN-RECSKB(3 IDX2 IDX4)
+                                MOVE   "101970010"  TO
+                                    LNK-RNYURECEDEN-SRYCD(3 IDX2 IDX4)
+                                MOVE      WRK-SKJ7-RYOYO-RYU-SU(IDX1) TO
+                                      LNK-RNYURECEDEN-SURYO(3 IDX2 IDX4)
+                                MOVE   552     TO  
+                                      LNK-RNYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  2
+      *                         労災（１．２倍）（食事療養）
+                                ADD     1     TO    IDX4
+                                MOVE   "RI"   TO
+                                    LNK-RNYURECEDEN-RECSKB(3 IDX2 IDX4)
+                                MOVE   "101970010"  TO
+                                    LNK-RNYURECEDEN-SRYCD(3 IDX2 IDX4)
+                                MOVE      WRK-SKJ7-RYOYO-RYU-SU(IDX1) TO
+                                      LNK-RNYURECEDEN-SURYO(3 IDX2 IDX4)
+                                MOVE  1104     TO  
+                                      LNK-RNYURECEDEN-TEN(3 IDX2 IDX4)
+                            WHEN  3
+      *                         労災（１．２倍）（食事療養）
+                                ADD     1     TO    IDX4
+                                MOVE   "RI"   TO
+                                    LNK-RNYURECEDEN-RECSKB(3 IDX2 IDX4)
+                                MOVE   "101970010"  TO
+                                    LNK-RNYURECEDEN-SRYCD(3 IDX2 IDX4)
+                                MOVE      WRK-SKJ7-RYOYO-RYU-SU(IDX1) TO
+                                      LNK-RNYURECEDEN-SURYO(3 IDX2 IDX4)
+                                MOVE  1656     TO  
+                                      LNK-RNYURECEDEN-TEN(3 IDX2 IDX4)
+                          END-EVALUATE
+                        END-IF
                     END-EVALUATE
                     MOVE  WRK-SKJ7-KAISU(IDX1)  TO
                                 LNK-RNYURECEDEN-KAISU(3 IDX2 IDX4)
