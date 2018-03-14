@@ -27,6 +27,11 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *平成３０年４月改定対応
+      *  00.00.00    NACL-小豆沢  18/03/01  急性期一般入院料の新設
+      *                                     地域一般入院料の新設
+      *                                     療養病棟入院基本料２は平成
+      *                                     ３０年３月まで
       *****************************************************************
       *
       *
@@ -121,7 +126,11 @@
       *
                IF    SYS-5001-YKNCHOKAKBN  =   "1"
                    IF    LNK-YAKINGEN-SRYCD    NOT  =  SPACE
-                       PERFORM    200-CDCHG-SEC
+                       IF  LNK-YAKINGEN-SANTEIYM       >=   "201804"
+                           PERFORM    201-CDCHG-SEC
+                       ELSE
+                           PERFORM    200-CDCHG-SEC
+                       END-IF
                    END-IF
       *
                END-IF
@@ -138,7 +147,7 @@
            .
       *
       *****************************************************************
-      *    コード置き換え（夜勤超過減算）  平成２６年４月から
+      *    コード置き換え（夜勤超過減算）平成２６年４月から平成３０年３月まで
       *****************************************************************
        200-CDCHG-SEC                    SECTION.
       *
@@ -288,6 +297,123 @@
            .
       *
        200-CDCHG-EXT.
+           .
+      *
+      *****************************************************************
+      *    コード置き換え（夜勤超過減算） 平成３０年４月から
+      *****************************************************************
+       201-CDCHG-SEC                    SECTION.
+      *
+           EVALUATE    LNK-YAKINGEN-SRYCD
+      *        急性期一般入院料１
+               WHEN    "190117710"
+                  MOVE "190131310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料２
+               WHEN    "190199710"
+                  MOVE "190200310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料３
+               WHEN    "190199810"
+                  MOVE "190200410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料４
+               WHEN    "190199910"
+                  MOVE "190200510" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料５
+               WHEN    "190200010"
+                  MOVE "190200610" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料６
+               WHEN    "190200110"
+                  MOVE "190200710" TO  LNK-YAKINGEN-CHGSRYCD
+      *        急性期一般入院料７
+               WHEN    "190077410"
+                  MOVE "190131410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        地域一般入院料１
+               WHEN    "190200210"
+                  MOVE "190200810" TO  LNK-YAKINGEN-CHGSRYCD
+      *        地域一般入院料２
+               WHEN    "190077510"
+                  MOVE "190165810" TO  LNK-YAKINGEN-CHGSRYCD
+      *        地域一般入院料３
+               WHEN    "190077610"
+                  MOVE "190165910" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟７対１入院基本料
+               WHEN    "190117910"
+                  MOVE "190134310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟１０対１入院基本料
+               WHEN    "190081710"
+                  MOVE "190134410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟１３対１入院基本料
+               WHEN    "190081810"
+                  MOVE "190168110" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟１５対１入院基本料
+               WHEN    "190081910"
+                  MOVE "190168210" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟１８対１入院基本料
+               WHEN    "190082010"
+                  MOVE "190168310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        結核病棟２０対１入院基本料
+               WHEN    "190082110"
+                  MOVE "190168410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        精神病棟１０対１入院基本料
+               WHEN    "190083610"
+                  MOVE "190134610" TO  LNK-YAKINGEN-CHGSRYCD
+      *        精神病棟１３対１入院基本料
+               WHEN    "190134510"
+                  MOVE "190168510" TO  LNK-YAKINGEN-CHGSRYCD
+      *        精神病棟１５対１入院基本料
+               WHEN    "190083810"
+                  MOVE "190168610" TO  LNK-YAKINGEN-CHGSRYCD
+      *        精神病棟１８対１入院基本料
+               WHEN    "190083910"
+                  MOVE "190168710" TO  LNK-YAKINGEN-CHGSRYCD
+      *        精神病棟２０対１入院基本料
+               WHEN    "190084010"
+                  MOVE "190168810" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等７対１入院基本料
+               WHEN    "190126310"
+                  MOVE "190169210" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１０対１入院基本料
+               WHEN    "190093710"
+                  MOVE "190169310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１３対１入院基本料
+               WHEN    "190093810"
+                  MOVE "190169410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１５対１入院基本料
+               WHEN    "190093910"
+                  MOVE "190169510" TO  LNK-YAKINGEN-CHGSRYCD
+      *        特定入院基本料（障害者施設等入院基本料）
+               WHEN    "190161210"
+                  MOVE "190161310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等７対１入院基本料（医療区分２）
+               WHEN    "190189410"
+                  MOVE "190198910" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等７対１入院基本料（医療区分１）
+               WHEN    "190189510"
+                  MOVE "190199010" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１０対１入院基本料（医療区分２）
+               WHEN    "190189610"
+                  MOVE "190199110" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１０対１入院基本料（医療区分１）
+               WHEN    "190189710"
+                  MOVE "190199210" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１３対１入院基本料（医療区分２）
+               WHEN    "190189810"
+                  MOVE "190199310" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１３対１入院基本料（医療区分１）
+               WHEN    "190189910"
+                  MOVE "190199410" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１５対１入院基本料（医療区分２）
+               WHEN    "190190010"
+                  MOVE "190199510" TO  LNK-YAKINGEN-CHGSRYCD
+      *        障害者施設等１５対１入院基本料（医療区分１）
+               WHEN    "190190110"
+                  MOVE "190199610" TO  LNK-YAKINGEN-CHGSRYCD
+               WHEN    OTHER
+                       CONTINUE
+           END-EVALUATE
+      *
+           .
+      *
+       201-CDCHG-EXT.
            .
       *
       *****************************************************************
