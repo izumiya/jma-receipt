@@ -26,7 +26,7 @@ if [ -s "${FILELIST}" ]; then
 #  zip ${ZIP_FILE} -j ${FILELIST}
   zip ${ZIP_FILE} -j -@<  ${FILELIST} 
   ${MONBLOB} -dir ${LDDIRECTORY} -import ${ZIP_FILE} > ${ID_FILE}
-  rm  -f $(cat ${FILELIST}) ${ZIP_FILE} ${FILELIST}
+  rm  -f $1  ${ZIP_FILE} $(cat ${FILELIST}) ${FILELIST}
 fi
 exit
 
