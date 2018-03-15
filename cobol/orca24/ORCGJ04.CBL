@@ -3451,6 +3451,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    1                   TO  FLG-IN1
                END-IF
       *
+      *H30.4   分割調剤など
+               IF     (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:7)
+                                               =   "0992081" )
+                   MOVE    1                   TO  FLG-IN1
+               END-IF
+      *
                IF      FLG-IN1             =   1
                    MOVE    "2"             TO  SPA-COM-IN2 (SPA-GMN-IDX)
                    MOVE    "1"             TO  SPA-COM-IN3 (SPA-GMN-IDX)
@@ -5792,6 +5798,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *             用法コメント
                     OR   ((SPA-COM-INPUTCD(IDX1)(1:3)  =   "001" )  AND
                           (SPA-COM-YCOMKBN(IDX1)       =   1     ))
+      *H30.4
+                    OR    (SPA-COM-INPUTCD(IDX1)(1:7)  =   "0992081")
                        MOVE    SPA-COM-INPUTCHI-G(IDX1)
                                            TO  ORCSCZAICHK-INPUTCHI-G
                                                              (IDX-ATO)
@@ -6332,6 +6340,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *     用法コメント
             OR   ((SPA-COM-INPUTCD(IDX)(1:3)   =   "001" )  AND
                   (SPA-COM-YCOMKBN(IDX)        =   1     ))
+      *H30.4
+            OR    (SPA-COM-INPUTCD(IDX)(1:7)  =   "0992081")
+      *
                IF      (SPA-COM-INPUTCD(IDX)(1:4)  =   "0085"
                                                    OR  "0086" ) AND
                        (SPA-GMN-MEISYO (IDX)   =   SPA-COM-NAME (IDX))

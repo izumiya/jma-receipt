@@ -624,5 +624,9 @@ KT01 {
       style varchar(20);
       label varchar(4);
     };
+    MODE3 {
+      style varchar(20);
+      textdata varchar(10);
+    };
   };
 };

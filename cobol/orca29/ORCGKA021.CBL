@@ -673,6 +673,12 @@
                MOVE    SPA-PARA-INPUTCOMENT(IDX IDZ)
                                            TO  SPA-KA021-TMEISYO2(IDG)
            END-IF
+      *H30.4
+           IF     (SPA-PARA-SRYCD   (IDX IDZ)(1:7)  =   "0992081")
+             AND  (SPA-PARA-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    SPA-PARA-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-KA021-TMEISYO2(IDG)
+           END-IF
       *
       *    用量割合再編集
            IF     (SPA-PARA-SRYCD(IDX IDZ)(1:7)  =   "0992000")  AND
@@ -705,6 +711,15 @@
                PERFORM 310121-SURYO-HEN-SEC
                MOVE    WRK-SURYO-J         TO  SPA-KA021-TSURYOU (IDG)
                MOVE    TNS-TANINAME        TO  SPA-KA021-TTANI1  (IDG)
+           END-IF
+      *
+      *H28.5
+           IF     (SPA-PARA-SRYCD (IDX IDZ)(1:1)   =   "6")
+             AND  (SPA-PARA-INPUTCOMENT (IDX IDZ)
+                                               NOT =   SPACE)
+      *        一般名表示
+               MOVE    SPA-PARA-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-KA021-TMEISYO2(IDG)
            END-IF
       *
       *    交付日期間外の点数マスタ判定

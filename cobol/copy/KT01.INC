@@ -109,3 +109,6 @@
                 05  KT01-BDAY-STATE  PIC S9(9)   BINARY.
                 05  KT01-BDAY-STYLE  PIC X(20).
                 05  KT01-BDAY-LABEL  PIC X(4).
+              03  KT01-MODE3.
+                04  KT01-MODE3-STYLE   PIC X(20).
+                04  KT01-MODE3-VALUE   PIC X(10).

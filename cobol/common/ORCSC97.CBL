@@ -1220,7 +1220,8 @@
                IF     ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84"  ) OR
                        (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084") OR
                        (SPA-COM-INPUTCD(GMN-IDX)(1:3)   =   "001"  AND
-                        SPA-COM-YCOMKBN(GMN-IDX)        =   1    ))
+                        SPA-COM-YCOMKBN(GMN-IDX)        =   1    )
+                   OR  (SPA-COM-INPUTCD(GMN-IDX)(1:7)   =   "0992081"))
                   AND ( WRK-MCNT2          >   ZERO )
                    CONTINUE
                ELSE
@@ -1340,8 +1341,10 @@
       *    入力値があるものの、行削除（コメント）
       *        入力値がないもの
            IF     ((SPA-COM-INPUTCD(GMN-IDX)(1:2)   =   "84") OR
-                   (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084"))  AND
-                  ( WRK-MCNT2         >   ZERO )
+                   (SPA-COM-INPUTCD(GMN-IDX)(1:4)   =   "0084") OR
+      *H30.4
+                   (SPA-COM-INPUTCD(GMN-IDX)(1:7)   =   "0992081"))
+             AND  ( WRK-MCNT2         >   ZERO )
                IF     ((WRK-MCNT2              >   ZERO )  AND
                        (WRK-MOJI2(1:WRK-MCNT2) NOT =   ZERO ))
                  OR   ((WRK-MCNT3              >   ZERO )  AND

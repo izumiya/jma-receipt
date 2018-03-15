@@ -83,9 +83,15 @@
                    CALL    "ORCHCM19V02"       USING   SPA-AREA
                                                        ORCHC19AREA
       *
-               WHEN   (SPA-SRYYMD          >=  "20160401" )
+               WHEN   (SPA-SRYYMD          >=  "20160401" )  AND
+                      (SPA-SRYYMD          <   "20180401" )
       *        Ê¿À®£²£¸Ç¯£´·î¤«¤é
                    CALL    "ORCHCM19V03"       USING   SPA-AREA
+                                                       ORCHC19AREA
+      *
+               WHEN   (SPA-SRYYMD          >=  "20180401" )
+      *        Ê¿À®£³£°Ç¯£´·î¤«¤é
+                   CALL    "ORCHCM19V04"       USING   SPA-AREA
                                                        ORCHC19AREA
            END-EVALUATE
       *

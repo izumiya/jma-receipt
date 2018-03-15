@@ -26,6 +26,7 @@
       *  04.06.00    NACL-多々納  12/03/01  一般コード追加（H24.4）
       *  04.06.00    NACL-多々納  12/09/27  医師・麻薬施用コード等追加
       *  04.07.00    NACL-多々納  15/01/21  ＣＳＶデータ名等追加
+      *  04.08.00    NACL-多々納  18/03/XX  備考種別追加
       ************************************************************
       *
        01  ORCSQRCSVAREA.
@@ -85,6 +86,8 @@
            03  ORCSQRCSV-BIKOU-AREA.
                05  ORCSQRCSV-BIKOU-TBL       OCCURS   20.
                    07  ORCSQRCSV-BIKOU       PIC X(100).
+      *            備考 種別
+                   07  ORCSQRCSV-BIKOU-KBN   PIC X(02).
       *
       *    ＱＲ用剤毎の内容
            03  ORCSQRCSV-NAIYOU-AREA.

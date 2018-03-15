@@ -114,6 +114,7 @@
       *  04.08.00    NACL-Â¿¡¹Ç¼  15/03/XX  £È£²£·Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/03/XX  £È£²£¸Ç¯£´·î²þÀµÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  16/06/XX  Ãæ¿´ÀÅÌ®¡Ê¿¢Æþ·¿¥«¥Æ¡¼¥Æ¥ë¡ËÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  18/03/XX  £È£³£°Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1763,6 +1764,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *H27.4
                    MOVE    ZERO            TO  SPA-TEIGEN30-CHK
                    MOVE    ZERO            TO  SPA-TEIGEN30-OK
+      *H30.4
+                   MOVE    ZERO            TO  SPA-FUANCHK-CHK
+                   MOVE    ZERO            TO  SPA-FUANCHK-OK
       *
                    MOVE    ZERO            TO  SPA-CHOKITOFLG-CHK
                    MOVE    ZERO            TO  SPA-CHOZAI-CHK
@@ -8249,6 +8253,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                               (SPA-COM-YCOMKBN(SPA-GMN-IDX) =   1 ) AND
                               (SPA-COM-SURFLG (SPA-GMN-IDX)
                                                        =   SPACE ))
+      *H30.4             Ê¬³äÄ´ºÞ¤Ê¤É
+                         OR  ((SPA-COM-INPUTCD(SPA-GMN-IDX)(1:7)
+                                                   =   "0992081" ) AND
+                              (SPA-COM-SURFLG (SPA-GMN-IDX)
+                                                       =   SPACE ))
       *
                            MOVE    "_"             TO  SPA-GMN-INPUTCD
                                                      (SPA-GMN-IDX)
@@ -8575,6 +8584,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:3)
                                                =   "001" )
                  AND  (SPA-COM-YCOMKBN(SPA-GMN-IDX) =   1 )
+                   MOVE    1                   TO  FLG-IN1
+               END-IF
+      *H30.4   Ê¬³äÄ´ºÞ¤Ê¤É
+               IF     (SPA-COM-INPUTCD(SPA-GMN-IDX)(1:7)
+                                               =   "0992081" )
                    MOVE    1                   TO  FLG-IN1
                END-IF
       *

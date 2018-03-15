@@ -1927,6 +1927,15 @@
                MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
                                            TO  WRK-MEISYO
            END-IF
+      *H30.4
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081" )
+            AND   (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  WRK-MEISYO
+           END-IF
+      *
       *
            MOVE    WRK-MEISYO              TO  SPA-WKSRY-NAME
                                                    (SPA-WKSRY-MAX IDX-W)
@@ -4021,6 +4030,10 @@
                                                              (IDX1 IDX2)
                            MOVE    SPA-PARA-INPUTCOMENT (IDX-W IDX-W2)
                                            TO  ORCHC19-INPUTCOMENT
+                                                             (IDX1 IDX2)
+      *H30.4
+                           MOVE    SPA-PARA-INPUTCHI-G (IDX-W IDX-W2)
+                                           TO  ORCHC19-INPUTCHI-G
                                                              (IDX1 IDX2)
                        END-IF
                    END-IF

@@ -36,6 +36,7 @@
       *  04.08.00    NACL-多々納  14/05/28  一時ファイル変更
       *  04.08.00    NACL-多々納  16/03/XX  Ｈ２８年４月改正対応
       *  04.08.00    NACL-多々納  16/12/08  病名レセ非表示対応
+      *  04.08.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
       *
@@ -2086,6 +2087,8 @@
                WHEN    "2"
                    MOVE    "女"                TO  SPA-SEX
            END-EVALUATE
+      *H30.4
+           MOVE    PTINF-SEX           TO  SPA-NAI-SEX
       *
            MOVE    PTINF-BIRTHDAY      TO  SPA-BIRTHDAY
            MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
@@ -2252,6 +2255,8 @@
       *
            MOVE    ZERO                TO  SPA-NNCHIH-ARI
            MOVE    ZERO                TO  SPA-SYOUNI-ARI
+      *H30.4
+           MOVE    ZERO                TO  SPA-NINPUKBN-ARI
       *
            INITIALIZE                  PTCONF-REC
            MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
@@ -2282,6 +2287,13 @@
                    IF      PTCONF-CDATA(1:1)   =   "1"
                        MOVE    1               TO  SPA-SYOUNI-ARI
                    END-IF
+      *H30.4
+               WHEN    "NINPUKBN"
+      *            妊婦設定
+                   IF      PTCONF-CDATA(1:1)   =   "1"
+                       MOVE    1               TO  SPA-NINPUKBN-ARI
+                   END-IF
+      *
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -2303,6 +2315,7 @@
       *H28.10
            MOVE    SPACE               TO  SPA-GMN-YOUKAIGO
            MOVE    SPACE               TO  WRK-KAIGOMEI
+      *
       *    患者介護保険情報
            INITIALIZE                  PTCARE-NINTEI-REC
            MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM

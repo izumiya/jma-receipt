@@ -184,6 +184,7 @@
       *
            03  FLG-CHKEND          PIC 9(01).
            03  FLG-NINPKSN         PIC 9(01).
+           03  FLG-CHKT            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1697,44 +1698,11 @@
             AND   (WRK-COM-TIMEFLG (IDX-Z) =   ZERO )
             AND   (WRK-COM-TIMEKSNKBN (IDX-Z)  NOT = ZERO )
             AND   (WRK-COM-KSNAUTO (IDX-Z) =   SPACE )
-      *        小児科特例時間外は６歳未満
+      *H30.4
+      *        時間外区分変換
                MOVE    SPA-GAI-JIKANKBN    TO  WRK-JIKANKBN
-               IF      WRK-JIKANKBN        =   8
-      *            ６歳未満は小児科特例夜間へ
-                   IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "2"  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H30.4
-      *            妊婦は小児科特例夜間へ
-                   IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "3"  )
-                      AND (SPA-NINPUKBN-ARI    =   1  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H29.2
-               ELSE
-      *        小児科特例を６歳以上は夜間・早朝へ
-                   IF     (SPA-NENREI-YY       >=  6  )
-                    AND   (SPA-YAKANKBN        =   1  )
-                    AND   (SPA-HOSPSBT         =   2   )
-      *H30.4
-      *            妊婦で特例なしの時
-                     IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                              OR   "3"  )
-                         CONTINUE
-                     ELSE
-                       IF     (WRK-JIKANKBN        =   5
-                                                   OR  6
-                                                   OR  7  )
-                           MOVE    8           TO  WRK-JIKANKBN
-                       END-IF
-                     END-IF
-                   END-IF
-               END-IF
+               PERFORM 10011491-TIMEKSN-CNG-SEC
+      *
                IF     (WRK-JIKANKBN        =   5
                                            OR  6
                                            OR  7  )  AND
@@ -1816,6 +1784,64 @@
        1001149-TELSAISIN-SET-EXT.
            EXIT.
       *
+      *H30.4
+      *****************************************************************
+      *    時間外区分変換処理 
+      *****************************************************************
+       10011491-TIMEKSN-CNG-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKT
+      *
+      *    夜間・早朝
+           IF      WRK-JIKANKBN        =   8
+      *        ６歳未満は小児科特例夜間へ
+               IF     (SPA-NENREI-YY       <   6  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "2"  )
+                   MOVE    5               TO  WRK-JIKANKBN
+               END-IF
+      *        妊婦は小児科特例夜間へ
+               IF     (SPA-NENREI-YY       >=  6  )
+                  AND (SPA-JIKANTOKU-NYU   =   "1"
+                                           OR  "3"  )
+                  AND (SPA-NINPUKBN-ARI    =   1  )
+                   MOVE    5               TO  WRK-JIKANKBN
+               END-IF
+           ELSE
+      *        ６歳以上で夜間・早朝算定可
+               IF     (SPA-NENREI-YY       >=  6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2   )
+                   MOVE    1                   TO  FLG-CHKT
+      *            妊婦で特例あり時
+                   IF   (SPA-NINPUKBN-ARI      =   1  )
+                    AND (SPA-JIKANTOKU-NYU     =   "1"
+                                                OR "3")
+                       MOVE    ZERO            TO  FLG-CHKT
+                   END-IF
+               END-IF
+      *
+      *        ６歳未満
+               IF     (SPA-NENREI-YY       <   6  )
+                AND   (SPA-YAKANKBN        =   1  )
+                AND   (SPA-HOSPSBT         =   2  )
+                AND   (SPA-JIKANTOKU-NYU   =   "3" )
+      *           ６歳未満で産婦人科特例のみ
+                   MOVE    1                   TO  FLG-CHKT
+               END-IF
+      *
+               IF     (WRK-JIKANKBN        =   5
+                                           OR  6
+                                           OR  7  )  AND
+                      (FLG-CHKT            =   1  )
+                   MOVE    8           TO  WRK-JIKANKBN
+               END-IF
+           END-IF
+      *
+           .
+       10011491-TIMEKSN-CNG-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    地域包括診療料の時間外自動発生 
       *****************************************************************
@@ -1828,44 +1854,11 @@
             AND   (WRK-COM-TIMEFLG (IDX-Z) =   ZERO )
             AND   (WRK-COM-TIMEKSNKBN (IDX-Z)  NOT = ZERO )
             AND   (WRK-COM-KSNAUTO (IDX-Z) =   SPACE )
-      *        小児科特例時間外は６歳未満
+      *H30.4
+      *        時間外区分変換
                MOVE    SPA-GAI-JIKANKBN    TO  WRK-JIKANKBN
-               IF      WRK-JIKANKBN        =   8
-      *            ６歳未満は小児科特例夜間へ
-                   IF     (SPA-NENREI-YY       <   6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "2"  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H30.4
-      *            妊婦は小児科特例夜間へ
-                   IF     (SPA-NENREI-YY       >=  6  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                               OR  "3"  )
-                      AND (SPA-NINPUKBN-ARI    =   1  )
-                       MOVE    5               TO  WRK-JIKANKBN
-                   END-IF
-      *H29.2
-               ELSE
-      *        小児科特例を６歳以上は夜間・早朝へ
-                   IF     (SPA-NENREI-YY       >=  6  )
-                    AND   (SPA-YAKANKBN        =   1  )
-                    AND   (SPA-HOSPSBT         =   2   )
-      *H30.4
-      *            妊婦で特例なしの時
-                     IF   (SPA-NINPUKBN-ARI    =   1  )
-                      AND (SPA-JIKANTOKU-NYU   =   "1"
-                                              OR   "3"  )
-                         CONTINUE
-                     ELSE
-                       IF     (WRK-JIKANKBN        =   5
-                                                   OR  6
-                                                   OR  7  )
-                           MOVE    8           TO  WRK-JIKANKBN
-                       END-IF
-                     END-IF
-                   END-IF
-               END-IF
+               PERFORM 10011491-TIMEKSN-CNG-SEC
+      *
                IF     (WRK-JIKANKBN        =   5
                                            OR  6
                                            OR  7  )  AND
@@ -2790,6 +2783,12 @@
                    CONTINUE
                ELSE
                    MOVE    "0113"          TO  WRK-ERRCD
+                   IF      LNK-ORCSC-JIKANTOKU-NYU =   1
+                       MOVE    "0185"          TO  WRK-ERRCD
+                   END-IF
+                   IF      LNK-ORCSC-JIKANTOKU-NYU =   3
+                       MOVE    "0186"          TO  WRK-ERRCD
+                   END-IF
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    GO      TO      1002-KASAN-SET-EXT
                END-IF
@@ -5509,22 +5508,6 @@
                                                             (IDX-N)
                            END-IF
                        END-IF
-      **?????? 必要？
-      *                警告チェック
-                       IF     (SPA-NENREI-YY       <   16    )
-                        AND  ( WRK-ERRCD           =   SPACE )
-                        AND  ( WRK-COM-AUTOKBN(IDX-N)  =   SPACE )
-                           IF     (WRK-COM-KZMFLG (IDX-N)  =   SPACE )
-                              AND (LNK-ORCSC-KEI-IDX       =   ZERO  )
-                               MOVE    IDX-N       TO
-                                                   LNK-ORCSC-KEI-IDX
-                               MOVE    "KXXX"      TO  WRK-ERRCD
-                               MOVE    "1"         TO  WRK-COM-CUR
-                                                          (IDX-N)
-                               MOVE    "1"         TO  WRK-COM-KZMFLG
-                                                          (IDX-N)
-                           END-IF
-                       END-IF
                    END-IF
                END-IF
            END-PERFORM
@@ -6056,7 +6039,6 @@
       *        GO      TO      200-ALL-SYORI-EXT
       *    END-IF
       *
-      *
       *    重複チェック
            IF     (LNK-ORCSC-PG        =   "K02" )
       *       外来のみ
@@ -6128,6 +6110,14 @@
       *H25.4
            MOVE    ZERO                TO  FLG-SYOKAINASI
            MOVE    ZERO                TO  FLG-OUSIN
+      *
+      *H30.4
+      *    全体の妊婦加算の判定
+           IF      LNK-ORCSC-PG        =   "K02"
+               MOVE    SPACE               TO  WRK-ERRCD
+               PERFORM 10019-NINPKASAN-CHK-SEC
+               MOVE    WRK-ERRCD           TO  SPA-ERRCD
+           END-IF
       *
       *    診察料チェック
            PERFORM VARYING     IDX-Z   FROM    1   BY  1

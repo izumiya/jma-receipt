@@ -31,6 +31,7 @@
       *  04.08.00    NACL-多々納  14/05/29  一時ファイル変更
       *  04.07.00    NACL-多々納  14/09/XX  Ｈ２６年１０月改正対応
       *  04.07.00    NACL-多々納  15/03/XX  Ｈ２７年４月改正対応
+      *  04.08.00    NACL-多々納  17/07/XX  心身療法２０未満加算等削除対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -311,6 +312,17 @@
            03  WRK-TENSUKEI-9          PIC S9(08).
            03  WRK-TENSUKEI-G          PIC S9(08).
            03  WRK-TENSUKEI-K          PIC S9(08).
+      *H29.2
+      *    在医総管判定
+           03  WRK-ZS-GRP                  PIC X(02).
+           03  WRK-ZS-KBN                  PIC X(01).
+           03  WRK-ZS-KBN2                 PIC X(01).
+      *
+           03  FLG-CHKAUTO                 PIC 9(01).
+           03  FLG-CHKEND                  PIC 9(01).
+           03  IDXZ                        PIC 9(04).
+           03  WRK-ZKS-GRP             PIC X(02).
+           03  WRK-ZKS-KBN             PIC X(01).
       *
       *TEST
       *    収納集計点数内容
@@ -361,6 +373,12 @@
        01  CONS-SPGEN-SRYCD        PIC X(09)   VALUE    "630010007".
       * 湿布薬（減）
        01  CONS-SPCM-SRYCD         PIC X(09)   VALUE    "820000047".
+      *
+      *
+      *H29.7
+      *    在宅時医療総合管理料コードテーブル（H28.4分)
+           COPY     "CMZISOTBL2016.INC".
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -879,6 +897,46 @@
                        PERFORM 10025-HAIKI-CHKI-SEC
                    END-IF
       *
+      *H29.7
+      *            精神通院の２０歳加算の自動発生なし
+                   IF     (SPA-SRYYMD              >=  "20140401")
+                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
+                       IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           MOVE    SPACE          TO  SPA-COM-AUTOKBN
+                                                             (IDX-1)
+                       END-IF
+                       IF      (SPA-COM-DATAKBN(IDX-1) =  "1"   )
+                           MOVE    "1"            TO  SPA-COM-KSNAUTO
+                                                             (IDX-1)
+                       END-IF
+                   END-IF
+      *H29.7
+      *            心身療法の２０歳加算の自動発生なし(H29/7から）
+                   IF     (SPA-SRYYMD              >=  "20170701")
+                      AND (ORCSCWKSRY-SYORIFLG      =   ZERO    )
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "004")
+                       IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           AND (SPA-COM-DATAKBN(IDX-1) =  "2"   )
+                           MOVE    SPACE          TO  SPA-COM-AUTOKBN
+                                                             (IDX-1)
+                       END-IF
+                       IF      (SPA-COM-DATAKBN(IDX-1) =  "1"   )
+                           MOVE    "1"            TO  SPA-COM-KSNAUTO
+                                                             (IDX-1)
+                       END-IF
+                   END-IF
+      *            在宅加算２の訂正時自動発生対応
+                   IF     (SPA-SRYYMD              >=  "20160401")
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "C"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
+                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+                       PERFORM 10026-ZAITAKU-AUTO-SEC
+                   END-IF
+      *H29.7
+      *
       *            回数の入力（外来のみ）
                    IF     (SPA-NYUGAIKBN       =   "2" )  AND
                           (SPA-COM-KAIFLG (IDX-1)  =   "1" )
@@ -1101,6 +1159,83 @@
            .
        10025-HAIKI-CHKI-EXT.
            EXIT.
+      *
+      *!
+      *H29.7
+      *****************************************************************
+      *    （在支診等以外）の加算処理
+      *****************************************************************
+       10026-ZAITAKU-AUTO-SEC              SECTION.
+      *
+      *    在宅時医学総合管理料等判定（在医総管・特医総管）
+           SET     TBL-ZSIDX           TO  1
+           SEARCH  TBL-ZISOSIN-OCC     VARYING   TBL-ZSIDX
+              AT   END
+                   MOVE    SPACE                   TO  WRK-ZS-KBN
+                   MOVE    SPACE                   TO  WRK-ZS-KBN2
+                   MOVE    SPACE                   TO  WRK-ZS-GRP
+               WHEN   (TBL-ZS-SRYCD (TBL-ZSIDX)
+                                           =   SPA-COM-INPUTCD (IDX-1)) 
+                   MOVE    TBL-ZS-GRP (TBL-ZSIDX)  TO  WRK-ZS-GRP
+                   MOVE    TBL-ZS-KBN (TBL-ZSIDX)  TO  WRK-ZS-KBN
+                   MOVE    TBL-ZS-KBN2(TBL-ZSIDX)  TO  WRK-ZS-KBN2
+           END-SEARCH
+      *
+           IF     (WRK-ZS-GRP(1:1)        =   "0"
+                                          OR  "1" )
+      *
+               MOVE    ZERO              TO  FLG-CHKEND
+               MOVE    ZERO              TO  FLG-CHKAUTO
+               PERFORM VARYING     IDX   FROM    IDX-1   BY  1
+                       UNTIL      (IDX   >   SPA-MAX-LINE )
+                           OR   ((SPA-COM-INPUTCD(IDX) =   SPACE) AND
+                                 (SPA-GMN-INPUTCD(IDX) =   SPACE))
+                           OR   ( FLG-CHKEND           =    1   )
+                   IF     (SPA-COM-INPUTCD(IDX)(1:1)   =   "1"  )
+                      AND (SPA-COM-AUTOKBN(IDX)        =   "2"  )
+      *                在宅実績加算のチェック
+                       PERFORM 330811-ZISOKSN-CHK-SEC
+      *                在宅実績加算が自動発生分
+                       IF     (WRK-ZKS-GRP(1:1)    =   "0"
+                                                   OR  "1"    )
+                           MOVE    1               TO  FLG-CHKAUTO
+                       END-IF
+                   END-IF
+                   IF      SPA-COM-ZAIEND (IDX)     =   "1"
+                       MOVE    1                    TO  FLG-CHKEND
+                   END-IF
+               END-PERFORM
+               IF      FLG-CHKAUTO        =   1
+                   CONTINUE
+               ELSE
+      *            在宅実績加算が自動発生でない時自動発生なしとする
+                   MOVE    "1"             TO  SPA-COM-KSNAUTO(IDX-1)
+               END-IF
+           END-IF
+           .
+       10026-ZAITAKU-AUTO-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅実績加算処理
+      *****************************************************************
+       330811-ZISOKSN-CHK-SEC         SECTION.
+      *
+           SET     TBL-ZKSIDX          TO  1
+           SEARCH  TBL-ZISOKSN-OCC     VARYING   TBL-ZKSIDX
+              AT   END
+                   MOVE    SPACE                   TO  WRK-ZKS-KBN
+                   MOVE    SPACE                   TO  WRK-ZKS-GRP
+              WHEN   (TBL-ZKS-SRYCD (TBL-ZKSIDX)
+                                       =   SPA-COM-INPUTCD
+                                                        (IDX))
+                   MOVE    TBL-ZKS-GRP (TBL-ZKSIDX) TO  WRK-ZKS-GRP
+                   MOVE    TBL-ZKS-KBN (TBL-ZKSIDX) TO  WRK-ZKS-KBN
+           END-SEARCH
+           .
+       330811-ZISOKSN-CHK-EXT.
+           EXIT.
+      *!
       *
       *****************************************************************
       *    剤毎に剤点数を編集処理
@@ -2660,6 +2795,8 @@
       *               用法コメント
                       OR  (SPA-COM-INPUTCD(IDX)(1:3) =   "001"  AND
                            SPA-COM-YCOMKBN(IDX)      =   1     )
+      *H30.4
+                      OR  (SPA-COM-INPUTCD(IDX)(1:7) =   "0992081")
       *
                        ADD     1                   TO  WRK-MEINUM
                        MOVE    WRK-MEINUM          TO  WKSRY-INPUTNUM
@@ -2703,6 +2840,9 @@
                                                              OR  "84")
                               OR  (SPA-COM-INPUTCD(IDX)(1:4) =   "0083"
                                                              OR  "0084")
+      *H30.4
+                              OR  (SPA-COM-INPUTCD(IDX)(1:7)
+                                                       =   "0992081")
                                MOVE    SPA-GMN-MEISYO(IDX)
                                                   TO  WKSRY-INPUTCOMENT
                                                                   (IDY)
