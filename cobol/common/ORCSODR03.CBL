@@ -894,6 +894,18 @@
                WHEN    "13"
                    MOVE    NORDERID-YOBI2GENID
                                    TO  SODRNACCT-ORDERID
+               WHEN    "14"
+                   MOVE    NORDERID-H30TAIJUSHIN5ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "15"
+                   MOVE    NORDERID-H30TAIJUSHIN35ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "16"
+                   MOVE    NORDERID-H30TAIJUSHIN15ID
+                                   TO  SODRNACCT-ORDERID
+               WHEN    "17"
+                   MOVE    NORDERID-H30YOBIGENID
+                                   TO  SODRNACCT-ORDERID
                WHEN    "99"
                    MOVE    NORDERID-GCANCELID
                                    TO  SODRNACCT-ORDERID
