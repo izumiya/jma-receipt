@@ -101,24 +101,24 @@
            03  WRK-GAIHAKUKBN-G.
                05  WRK-GAIHAKUKBN      PIC 9(02).
       *
-       01  REG-AREA.
-           03  REG-SAVEREQ             PIC X(01).
-           03  REG-NYUINYMD            PIC X(08).
-           03  REG-ORDERID             PIC X(04).
-           03  REG-SAGAKU              PIC X(07).
-           03  REG-SAGAKUCD            PIC X(02).
-           03  REG-SRYYMD              PIC X(08).
-           03  REG-ENDYMD              PIC X(08).
-           03  REG-GAIHAKUKBN          PIC X(02).
-           03  REG-SKJ-AREA.
-               05  REG-SKJ-OCC         OCCURS 3.
-                   07  REG-SKJTIME     PIC X(02).
-                   07  REG-SKJTYPE     PIC X(01).
-                   07  REG-NISSU       PIC X(50).
-           03  REG-ERR-MAX             PIC 9(03).
-           03  REG-ERR-OCC             OCCURS  10.
-               05  REG-ERRCD           PIC X(04).
-               03  REG-ERRMSG          PIC X(100).
+       01  API-AREA.
+           03  API-SAVEREQ             PIC X(01).
+           03  API-NYUINYMD            PIC X(08).
+           03  API-ORDERID             PIC X(04).
+           03  API-SAGAKU              PIC X(07).
+           03  API-SAGAKUCD            PIC X(02).
+           03  API-SRYYMD              PIC X(08).
+           03  API-ENDYMD              PIC X(08).
+           03  API-GAIHAKUKBN          PIC X(02).
+           03  API-SKJ-AREA.
+               05  API-SKJ-OCC         OCCURS 3.
+                   07  API-SKJTIME     PIC X(02).
+                   07  API-SKJTYPE     PIC X(01).
+                   07  API-NISSU       PIC X(50).
+           03  API-ERR-MAX             PIC 9(03).
+           03  API-ERR-OCC             OCCURS  10.
+               05  API-ERRCD           PIC X(04).
+               03  API-ERRMSG          PIC X(100).
       *
        01  CONST-AREA.
            03  CONST-H300401           PIC X(08)   VALUE "20180401".
@@ -259,17 +259,17 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
-           INITIALIZE                  REG-AREA
+           INITIALIZE                  API-AREA
            INITIALIZE                  SPA-AREA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
       *
       *    主処理
-           IF    ( REG-ERR-MAX         =   ZERO )
+           IF    ( API-ERR-MAX         =   ZERO )
                PERFORM 200-MAIN-SEC
            ELSE
-               IF    ( REG-SAVEREQ     =   "1" )
+               IF    ( API-SAVEREQ     =   "1" )
                    PERFORM 290-ORDER-INSERT-SEC
                END-IF
            END-IF
@@ -354,16 +354,16 @@
            EVALUATE    HSACCTMREQ-REQNUM
            WHEN    "2"
                PERFORM 1001-GAIHAKU-SEC
-               MOVE    NORDERID-GPTSTID    TO  REG-ORDERID
+               MOVE    NORDERID-GPTSTID    TO  API-ORDERID
            WHEN    "3"
                PERFORM 1001-SAGAKU-SEC
-               MOVE    NORDERID-SAGAKUID   TO  REG-ORDERID
+               MOVE    NORDERID-SAGAKUID   TO  API-ORDERID
            WHEN    "4"
                PERFORM 1001-SHOKUJI-SEC
-               MOVE    NORDERID-FOODID     TO  REG-ORDERID
+               MOVE    NORDERID-FOODID     TO  API-ORDERID
            WHEN    "9"
                PERFORM 1001-CRENACCT-SEC
-               MOVE    NORDERID-CRENACCTID TO  REG-ORDERID
+               MOVE    NORDERID-CRENACCTID TO  API-ORDERID
            WHEN    OTHER
                MOVE    "8003"          TO  WRK-ERRCD
                PERFORM 990-ERROR-EDIT-SEC
@@ -379,7 +379,7 @@
        1001-INIT-CHECK-SEC         SECTION.
       *
            MOVE    HSACCTMREQ-SAVEREQ
-                                       TO  REG-SAVEREQ
+                                       TO  API-SAVEREQ
       *
            PERFORM 10011-SRYYMD-CHECK-SEC
       *
@@ -401,11 +401,11 @@
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL ( IDX2    >   3 )
                MOVE    HSACCTMREQ-SKJTIME (IDX2)
-                                           TO  REG-SKJTIME (IDX2)
+                                           TO  API-SKJTIME (IDX2)
                MOVE    HSACCTMREQ-SKJTYPE (IDX2)
-                                           TO  REG-SKJTYPE (IDX2)
+                                           TO  API-SKJTYPE (IDX2)
                MOVE    HSACCTMREQ-NISSU  (IDX2)
-                                           TO  REG-NISSU (IDX2)
+                                           TO  API-NISSU (IDX2)
            END-PERFORM
       *
            .
@@ -445,7 +445,7 @@
        1001-CRENACCT-SEC            SECTION.
       *
            MOVE    HSACCTMREQ-SAVEREQ
-                                       TO  REG-SAVEREQ
+                                       TO  API-SAVEREQ
       *
            PERFORM 10011-PTNUM-CHECK-SEC
       *
@@ -471,9 +471,9 @@
                    MOVE    "8001"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD    TO  REG-NYUINYMD
+                   MOVE    WRK-SYMD    TO  API-NYUINYMD
                    IF    ( HSACCTMREQ-REQNUM   =   "9" )
-                       MOVE    WRK-SYMD    TO  REG-SRYYMD
+                       MOVE    WRK-SYMD    TO  API-SRYYMD
                    END-IF
                END-IF
       *
@@ -534,7 +534,7 @@
        10011-SRYYMD-CHECK-SEC          SECTION.
       *
            IF    ( HSACCTMREQ-SRYYMD =   SPACE )
-               MOVE    SMCNDATE-YMD    TO  REG-SRYYMD
+               MOVE    SMCNDATE-YMD    TO  API-SRYYMD
            ELSE
                MOVE    HSACCTMREQ-SRYYMD
                                        TO  WRK-DATE
@@ -544,7 +544,7 @@
                    MOVE    "8009"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD    TO  REG-SRYYMD
+                   MOVE    WRK-SYMD    TO  API-SRYYMD
                END-IF
            END-IF
       *
@@ -597,8 +597,7 @@
            IF    ( FLG-ORCSNUM         =   ZERO )
       *
                EVALUATE    TRUE
-               WHEN  ( HSACCTMREQ-SRYYMD
-                                      >=   CONST-H300401 )
+               WHEN  ( API-SRYYMD       >=   CONST-H300401 )
                    EVALUATE    WRK-SNUM-OUTNUM
                    WHEN    0   THRU    6
                    WHEN    8   THRU    9
@@ -608,8 +607,7 @@
                    WHEN    OTHER
                        MOVE    "8011"  TO  WRK-ERRCD
                    END-EVALUATE
-               WHEN  ( HSACCTMREQ-SRYYMD
-                                      >=   CONST-H280401 )
+               WHEN  ( API-SRYYMD      >=   CONST-H280401 )
                    IF    ( WRK-SNUM-OUTNUM =   ZERO OR 1 OR 2  OR 3 OR 4
                                             OR 5 OR 6  OR 8
                                             OR 9 OR 13 OR 99 )
@@ -632,7 +630,7 @@
       *
            IF    ( WRK-ERRCD           =   SPACE )
                MOVE    WRK-SNUM-OUTNUM TO  WRK-GAIHAKUKBN
-               MOVE    WRK-GAIHAKUKBN-G TO REG-GAIHAKUKBN
+               MOVE    WRK-GAIHAKUKBN-G TO API-GAIHAKUKBN
            ELSE
                PERFORM 990-ERROR-EDIT-SEC
            END-IF
@@ -645,9 +643,9 @@
       *****************************************************************
        10011-SAGAKU-CHECK-SEC          SECTION.
       *
-           MOVE    SPACE           TO  REG-SAGAKUCD
+           MOVE    SPACE           TO  API-SAGAKUCD
            MOVE    HSACCTMREQ-SAGAKU
-                                   TO  REG-SAGAKU
+                                   TO  API-SAGAKU
       *
            IF    ( HSACCTMREQ-SAGAKU   =   SPACE )
                MOVE    "0024"      TO  WRK-ERRCD
@@ -657,26 +655,26 @@
                PERFORM 800-ORCSNUM-SEC
                IF    ( FLG-ORCSNUM =   ZERO )
                    IF    ( WRK-SNUM-OUTNUM =   ZERO )
-                       MOVE    "00"    TO  REG-SAGAKUCD
+                       MOVE    "00"    TO  API-SAGAKUCD
                    END-IF
                ELSE
                    MOVE    "0024"      TO  WRK-ERRCD
                END-IF
       *
                IF    ( WRK-ERRCD       =   SPACE )
-                AND  ( REG-SAGAKUCD    =   SPACE )
+                AND  ( API-SAGAKUCD    =   SPACE )
                    INITIALIZE              SYSKANRI-REC
                    MOVE    "5113"      TO  SYS-KANRICD
-                   MOVE    REG-SRYYMD  TO  SYS-STYUKYMD
+                   MOVE    API-SRYYMD  TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
                    PERFORM 900-SYSKANRI-KEY2-SEL-SEC
                    MOVE    SYSKANRI-REC TO SYS-5113-REC
                    PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
-                            OR   ( REG-SAGAKUCD    NOT =   SPACE )
+                            OR   ( API-SAGAKUCD    NOT =   SPACE )
                        IF    ( WRK-SNUM-OUTNUM
                                    =   SYS-5113-BRM-SAGAKU-NM )
                            MOVE    SYS-5113-KBNCD
-                                       TO  REG-SAGAKUCD
+                                       TO  API-SAGAKUCD
                        END-IF
       *
                        PERFORM 900-SYSKANRI-KEY2-FET-SEC
@@ -691,7 +689,7 @@
            END-IF
       *
            IF    ( WRK-ERRCD       =   SPACE )
-               IF    ( REG-SAGAKUCD    =   SPACE )
+               IF    ( API-SAGAKUCD    =   SPACE )
                    MOVE     "8047" TO  WRK-ERRCD
                END-IF
            END-IF
@@ -710,7 +708,7 @@
       *****************************************************************
        10011-ENDYMD-CHECK-SEC          SECTION.
       *
-           MOVE    SPACE           TO  REG-ENDYMD
+           MOVE    SPACE           TO  API-ENDYMD
       *
            IF    ( HSACCTMREQ-ENDYMD   NOT =   SPACE )
                MOVE    HSACCTMREQ-ENDYMD
@@ -721,8 +719,8 @@
                    MOVE    "8013"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD    TO  REG-ENDYMD
-                   IF    ( REG-SRYYMD (1:6)    NOT =   REG-ENDYMD (1:6))
+                   MOVE    WRK-SYMD    TO  API-ENDYMD
+                   IF    ( API-SRYYMD (1:6)    NOT =   API-ENDYMD (1:6))
                        MOVE    "8014"  TO  WRK-ERRCD
                        PERFORM 990-ERROR-EDIT-SEC
                    END-IF
@@ -764,10 +762,10 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    REG-ORDERID         TO  SODR-ORDERID
+           MOVE    API-SRYYMD          TO  SODR-SRYYMD
+           MOVE    API-ORDERID         TO  SODR-ORDERID
       *
-           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+           MOVE    API-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -802,10 +800,10 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    REG-ORDERID         TO  SODR-ORDERID
+           MOVE    API-SRYYMD          TO  SODR-SRYYMD
+           MOVE    API-ORDERID         TO  SODR-ORDERID
       *
-           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+           MOVE    API-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -840,10 +838,10 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    REG-ORDERID         TO  SODR-ORDERID
+           MOVE    API-SRYYMD          TO  SODR-SRYYMD
+           MOVE    API-ORDERID         TO  SODR-ORDERID
       *
-           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+           MOVE    API-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -885,10 +883,10 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    REG-ORDERID         TO  SODR-ORDERID
+           MOVE    API-SRYYMD          TO  SODR-SRYYMD
+           MOVE    API-ORDERID         TO  SODR-ORDERID
       *
-           MOVE    REG-SRYYMD          TO  SPA-SRYYMD
+           MOVE    API-SRYYMD          TO  SPA-SRYYMD
       *
            MOVE    ZERO                TO  IDX-ITM
       *
@@ -920,7 +918,7 @@
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
            MOVE    NCLAIMID-SKJTIMEJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-SKJTIME (IDX2)  TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    API-SKJTIME (IDX2)  TO  LNK-ODRITEM-ITEM (IDX-ITM)
       *
            .
        2300-SKJTIME-SET-EXT.
@@ -932,7 +930,7 @@
       *
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
            MOVE    NCLAIMID-SKJTYPEJMA TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-SKJTYPE (IDX2)  TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    API-SKJTYPE (IDX2)  TO  LNK-ODRITEM-ITEM (IDX-ITM)
       *
            .
        2300-SKJTYPE-SET-EXT.
@@ -944,7 +942,7 @@
       *
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
            MOVE    NCLAIMID-NISSUJMA   TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-NISSU (IDX2)    TO  LNK-ODRITEM-MEMO (IDX-ITM)
+           MOVE    API-NISSU (IDX2)    TO  LNK-ODRITEM-MEMO (IDX-ITM)
       *
            .
        2300-NISSU-SET-EXT.
@@ -958,7 +956,7 @@
       *
            MOVE    NCLAIMID-GAIHAKUKBNJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-GAIHAKUKBN      TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    API-GAIHAKUKBN      TO  LNK-ODRITEM-ITEM (IDX-ITM)
       *
            .
        2300-GAIHAKUKBN-SET-EXT.
@@ -972,7 +970,7 @@
       *
            MOVE    NCLAIMID-ENDYMDJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-ENDYMD          TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    API-ENDYMD          TO  LNK-ODRITEM-ITEM (IDX-ITM)
       *
            .
        2300-ENDYMD-SET-EXT.
@@ -985,8 +983,8 @@
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
       *
            MOVE    NCLAIMID-SAGAKUJMA  TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-SAGAKUCD        TO  LNK-ODRITEM-ITEM (IDX-ITM)
-           MOVE    REG-SAGAKU          TO  LNK-ODRITEM-MEMO (IDX-ITM)
+           MOVE    API-SAGAKUCD        TO  LNK-ODRITEM-ITEM (IDX-ITM)
+           MOVE    API-SAGAKU          TO  LNK-ODRITEM-MEMO (IDX-ITM)
       *
            .
        2300-SAGAKU-SET-EXT.
@@ -1004,7 +1002,7 @@
            MOVE    SPA-PTID            TO  SODR-PTID
            MOVE    SMCNDATE-YMD        TO  SODR-UKEYMD
            MOVE    SMCNDATE-HMS        TO  SODR-UKEHMS
-           IF    ( REG-SAVEREQ         =   "1" )
+           IF    ( API-SAVEREQ         =   "1" )
                MOVE    "0"             TO  SODR-PROCKBN
            ELSE
                MOVE    "2"             TO  SODR-PROCKBN
@@ -1067,7 +1065,7 @@
        2001-RESPONSE-EDIT-SEC          SECTION.
       *
            INITIALIZE                  SNINF03-AREA
-           MOVE    REG-SRYYMD(1:6) TO  SNINF03-IN-SRYYM
+           MOVE    API-SRYYMD(1:6) TO  SNINF03-IN-SRYYM
            CALL    "ORCSNINF03"    USING
                                    SNINF03-AREA
                                    SPA-AREA
@@ -1229,13 +1227,13 @@
            MOVE    "1"                 TO  ORDER-NYUGAIKBN
            MOVE    SPA-PTNUM           TO  ORDER-PTNUM
            MOVE    SPA-PTID            TO  ORDER-PTID
-           MOVE    REG-SRYYMD          TO  ORDER-SRYYMD
+           MOVE    API-SRYYMD          TO  ORDER-SRYYMD
            MOVE    SMCNDATE-YMD        TO  ORDER-UKEYMD
            MOVE    SMCNDATE-HMS        TO  ORDER-UKEHMS
-           MOVE    REG-ORDERID         TO  ORDER-ORDERID
+           MOVE    API-ORDERID         TO  ORDER-ORDERID
       *
-           MOVE    REG-ERRCD (1)       TO  ORDER-ERRCD1
-      *    MOVE    REG-ERRCD (2)       TO  ORDER-ERRCD2
+           MOVE    API-ERRCD (1)       TO  ORDER-ERRCD1
+      *    MOVE    API-ERRCD (2)       TO  ORDER-ERRCD2
       *
            MOVE    1                   TO  ORDER-STATUS
       *
@@ -1268,15 +1266,15 @@
            PERFORM 800-TIME-SEC
            MOVE    WRK-TIME            TO  HSACCTMRES-INFORMATION-TIME
       *
-           IF    ( REG-ERR-MAX         =   ZERO )
-               MOVE    1               TO  REG-ERR-MAX
-               MOVE    "00"            TO  REG-ERRCD (1)
+           IF    ( API-ERR-MAX         =   ZERO )
+               MOVE    1               TO  API-ERR-MAX
+               MOVE    "00"            TO  API-ERRCD (1)
            END-IF
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   REG-ERR-MAX )
+                   UNTIL ( IDX1    >   API-ERR-MAX )
       *
-               MOVE    REG-ERRCD  (IDX1)
+               MOVE    API-ERRCD  (IDX1)
                                        TO  WRK-ERRCD
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD   TO  HSACCTMRES-API-RESULT    (IDX1)
@@ -1702,7 +1700,7 @@
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    REG-NYUINYMD        TO  PTNYUINRRK-NYUINYMD
+           MOVE    API-NYUINYMD        TO  PTNYUINRRK-NYUINYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    "key39"              TO  MCP-PATHNAME
@@ -1732,7 +1730,7 @@
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    REG-SRYYMD          TO  PTNYUINRRK-TENNYUYMD
+           MOVE    API-SRYYMD          TO  PTNYUINRRK-TENNYUYMD
                                            PTNYUINRRK-TENSTUYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
@@ -1921,16 +1919,16 @@
       *****************************************************************
        990-ERROR-EDIT-SEC              SECTION.
       *
-           IF    ( REG-ERR-MAX     <   CONST-ERR-MAX )
+           IF    ( API-ERR-MAX     <   CONST-ERR-MAX )
       *
                PERFORM VARYING IDX8    FROM    1   BY  1
                        UNTIL ( IDX8    >   CONST-ERR-MAX )
-                        OR   ( REG-ERRCD  (IDX8)
+                        OR   ( API-ERRCD  (IDX8)
                                        =   WRK-ERRCD )
       *
-                   IF    ( REG-ERRCD  (IDX8)   =   SPACE )
-                       MOVE    WRK-ERRCD       TO  REG-ERRCD  (IDX8)
-                       MOVE    IDX8            TO  REG-ERR-MAX
+                   IF    ( API-ERRCD  (IDX8)   =   SPACE )
+                       MOVE    WRK-ERRCD       TO  API-ERRCD  (IDX8)
+                       MOVE    IDX8            TO  API-ERR-MAX
                        MOVE    CONST-ERR-MAX   TO  IDX8
                    END-IF
       *
@@ -1971,9 +1969,9 @@
            MOVE    WRK-TIME            TO  HSACCTMRES-INFORMATION-TIME
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   REG-ERR-MAX )
+                   UNTIL ( IDX1    >   API-ERR-MAX )
       *
-               MOVE    REG-ERRCD  (IDX1)
+               MOVE    API-ERRCD  (IDX1)
                                        TO  WRK-ERRCD
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD   TO  HSACCTMRES-API-RESULT    (IDX1)
