@@ -4024,6 +4024,12 @@
                END-IF
            END-PERFORM
       *
+      *    GINGEE対応
+           IF      PARA-API-DATA        =   "1"
+      *        ＡＰＩ送信時、印刷なし
+               GO      TO      2100-SYOHOU-SYORI-EXT
+           END-IF
+      *
       *    分割の時、分割指示印刷
            IF      WRK-BUNKATU-MAX     >   1
       *        印刷処理
@@ -6215,7 +6221,8 @@
                MOVE    SYS-1002-POST(4:4)  TO  ORCSQRCSV-HOSPPOST(5:4)
            END-IF
       *    医療機関電話
-           MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
+      **** MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
+           MOVE    WRK-HOSPTEL         TO  ORCSQRCSV-HOSPTEL
       *    診療科
            MOVE    SYS-1005-RECESRYKA  TO  ORCSQRCSV-RECESRYKA
            MOVE    SYS-1005-SRYKANAME  TO  ORCSQRCSV-SRYKANAME
@@ -6352,6 +6359,9 @@
       *    医療機関電話
       **** MOVE    SYS-1002-TEL        TO  FMSHOHO-HOSP-TEL
            MOVE    WRK-HOSPTEL         TO  FMSHOHO-HOSP-TEL
+      *H30.4
+      *    医療機関FAX
+           MOVE    SYS-1002-FAX        TO  FMSHOHO-HOSP-FAX
       *    ドクターコード
            MOVE    WRK-DRCD            TO  FMSHOHO-DR-CODE 
       *    医師情報
