@@ -857,6 +857,8 @@
       *****************************************************************
        21011-ORCSODRNACCT-CALL-SEC     SECTION.
       *
+           DISPLAY "NORDERID-GPTSTID=" NORDERID-GPTSTID
+      *
            INITIALIZE                  SODRNACCT-AREA
            EVALUATE    SODR-ORDERID
            WHEN    NORDERID-GPTSTID
