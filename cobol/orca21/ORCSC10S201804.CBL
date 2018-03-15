@@ -444,6 +444,8 @@
            03  WRK-TIME-KBN3           PIC X(01).
            03  WRK-TIME-TIMKBN         PIC X(01).
       *
+           03  WRK-IDX-INS             PIC 9(04).
+      *
       *    ¿Ç»¡ÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-SINSATU-AREA.
       *    ½é¿ÇÎÁ
@@ -3781,6 +3783,9 @@
       *
       *    ÄÉ²Ã¶¦ÄÌ½èÍý
            MOVE    ZERO                TO  WRK-IDX-IN
+           IF      WRK-IDX-INS         >   ZERO
+               MOVE    WRK-IDX-INS         TO  WRK-IDX-IN
+           END-IF
            PERFORM 33041-SRYCD-ADD-SEC
            .
        33021-KYOUKAKSN-ADD-EXT.
@@ -5296,6 +5301,7 @@
       *
            MOVE    ZERO                TO  WRK-IDX-IN
            MOVE    ZERO                TO  WRK-IDX-IN2
+           MOVE    ZERO                TO  WRK-IDX-INS
            MOVE    ZERO                TO  WRK-ZAITAKU
            MOVE    ZERO                TO  WRK-ZAITAKU-IDX
       *****MOVE    ZERO                TO  WRK-GAIRAI-IDX
@@ -5318,6 +5324,12 @@
                    WHEN    "113019910" 
                    WHEN    "113020010" 
                        MOVE    IDX                 TO  WRK-IDX-IN
+      *H30.4
+      *            µ¡Ç½¶¯²½²Ã»»¡Ê½é¿Ç¡Ë
+                   WHEN    "111013770" 
+                   WHEN    "113028870" 
+                   WHEN    "113028970" 
+                       MOVE    IDX                 TO  WRK-IDX-INS
       *
       *            À¸³è½¬´·ÉÂ»ØÆ³´ÉÍýÎÁ
                    WHEN    "113003910"

@@ -415,6 +415,7 @@
                05  WRK-HOSPADRS1       PIC X(40).
                05  WRK-HOSPADRS2       PIC X(40).
            03  WRK-HOSPTEL             PIC X(15).
+           03  WRK-HOSPFAX             PIC X(15).
       *H28.4
       *    »ÄÎÌ³ÎÇ§»Ø¼¨ 
            03  WRK-ZANSIJI-G.
@@ -2883,6 +2884,7 @@
            MOVE    SYS-1001-HOSPNAME   TO  WRK-HOSPNAME
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
+           MOVE    SYS-1002-FAX        TO  WRK-HOSPFAX
       *    °åÎÅµ¡´ØÊÔ½¸¾ðÊó
            PERFORM 900-SYS1900-SYORI-SEC
       *
@@ -5221,8 +5223,7 @@
       *    °åÎÅµ¡´Ø£Ô£Å£Ì
            MOVE    WRK-HOSPTEL         TO  HC02ZA5-HOSPTEL
       *
-           MOVE    SYS-1002-FAX        TO  HC02ZA5-HOSPFAX
-      *
+           MOVE    WRK-HOSPFAX        TO  HC02ZA5-HOSPFAX
       *
       *    Ä¢É¼°õºþ³«»Ï½èÍý
            PERFORM 400-SYOKI-PRINT-SEC
@@ -5237,7 +5238,6 @@
             MOVE   "HC01.sh"           TO  MKPRT-ID
             MOVE   "HC02ZA5.red"       TO  MKPRT-DIA
             MOVE   SPACE               TO  MKPRT-DEF
-            MOVE   "pdf"               TO  MKPRT-TYPE
             MOVE   ASGNPARA            TO  MKPRT-DAT
             MOVE   SYS-1031-PRTNM(2)   TO  MKPRT-PRTNM
       *     Âà±¡»þ±¡³°½èÊý¤»¤ó¡ÊÆþ±¡¡Ë
@@ -6126,6 +6126,7 @@
                MOVE    SYS-1902-ADRS1      TO  WRK-HOSPADRS1
                MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
                MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
+               MOVE    SYS-1902-FAX        TO  WRK-HOSPFAX
            END-IF
            .
       *

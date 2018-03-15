@@ -2834,6 +2834,13 @@
                                            TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
       *
+      *H30.4
+           IF     (LNK-WKSRY-SRYCD   (IDX IDZ)(1:7)  =   "0992081") AND
+                  (LNK-WKSRY-INPUTCOMENT(IDX IDZ) NOT =  SPACE )
+               MOVE    LNK-WKSRY-INPUTCOMENT(IDX IDZ)
+                                           TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *
       *    ·×
            MOVE    LNK-WKSRY-JIHIMONEY(IDX IDZ)
                                        TO  WRK-KEI

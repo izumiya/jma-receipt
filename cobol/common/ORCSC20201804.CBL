@@ -4508,6 +4508,8 @@
                                                    OR  "3339950N1"
                                                    OR  "3339950Q1"
                                                    OR  "3339950R1"
+                                                   OR  "2649865N1"
+                                                   OR  "2649865Q1"
                    ADD     1                   TO  WRK-HIFU-YAK
                    IF      IDX-HIFU            =   ZERO
                        MOVE    IDX             TO  IDX-HIFU

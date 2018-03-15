@@ -2324,7 +2324,7 @@
       *
                WHEN    "K120"
                    STRING  "警告！"
-                           "皮膚保湿薬の入力があります。"
+                           "血行促進・皮膚保湿剤の入力があります。"
                            "確認して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG

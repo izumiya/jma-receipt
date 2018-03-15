@@ -6039,7 +6039,6 @@
       *        GO      TO      200-ALL-SYORI-EXT
       *    END-IF
       *
-      *
       *    重複チェック
            IF     (LNK-ORCSC-PG        =   "K02" )
       *       外来のみ
@@ -6113,10 +6112,12 @@
            MOVE    ZERO                TO  FLG-OUSIN
       *
       *H30.4
-      *    剤内の妊婦加算の判定
-           MOVE    SPACE               TO  WRK-ERRCD
-           PERFORM 10019-NINPKASAN-CHK-SEC
-           MOVE    WRK-ERRCD           TO  SPA-ERRCD
+      *    全体の妊婦加算の判定
+           IF      LNK-ORCSC-PG        =   "K02"
+               MOVE    SPACE               TO  WRK-ERRCD
+               PERFORM 10019-NINPKASAN-CHK-SEC
+               MOVE    WRK-ERRCD           TO  SPA-ERRCD
+           END-IF
       *
       *    診察料チェック
            PERFORM VARYING     IDX-Z   FROM    1   BY  1

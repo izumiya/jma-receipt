@@ -6497,7 +6497,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-COM-GENTEN  (IDX)   =   "1"
                    MOVE    2                   TO  WRK-ZAIKBN
                END-IF
-      *TEST
+      *
       *H28.9
       *        »ý»²Ìô
                IF      SPA-COM-JISANYAKU(IDX)  =   "1"
@@ -6506,7 +6506,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-COM-JISANYAKU(IDX)  =   "2"
                    MOVE    4                   TO  WRK-ZAIKBN
                END-IF
-      *TEST
+      *
            END-IF
       *****IF      SPA-COM-KEIFLG (IDX)    =   "1" OR  "2"
       *        MOVE    SPA-COM-KEI  (IDX)      TO  SRY-JIHIMONEY
