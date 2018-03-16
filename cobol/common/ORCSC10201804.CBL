@@ -1060,6 +1060,11 @@
                WHEN    (SPA-NNCHKT-ARI      =   1 )
                    OR  (SPA-NNCHKT-ARI2     =   1 )
                    PERFORM 100113-NNCHKT-CHK-SEC
+      *H30.4
+      *        オンライン診療料
+               WHEN    (SPA-ONLINE-ARI      =   1 )
+                   OR  (SPA-ONLINE-ARI2     =   1 )
+                   PERFORM 100113-ONLINE-CHK-SEC
       *
           END-EVALUATE
       *
@@ -1400,6 +1405,37 @@
            EXIT.
       *H28.4
       *
+      *
+      *H30.4
+      *****************************************************************
+      *    オンライン診療料のチェック処理
+      *****************************************************************
+       100113-ONLINE-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-DEL
+      *
+           EVALUATE    WRK-COM-INPUTCD(IDX-Z)
+               WHEN    "112023210"
+                   GO     TO      100113-ONLINE-CHK-EXT
+           END-EVALUATE
+      *
+           IF     (WRK-ERRCD           =   SPACE  )
+           AND    (SPA-ONLINE-ARI      =   1      )
+      *        再診料を削除する
+               IF     (WRK-COM-SRYKBN (IDX-Z)  =   "12"
+                                               OR  "11" )
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+      *        削除
+               IF      FLG-DEL             =   1
+                   INITIALIZE              WRK-GMN-TBLREC(IDX-Z)
+                   INITIALIZE              WRK-COM-TBLREC(IDX-Z)
+               END-IF
+           END-IF
+           .
+       100113-ONLINE-CHK-EXT.
+           EXIT.
+      *H24.4
       *
       *****************************************************************
       *    診察料の決定処理

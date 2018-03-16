@@ -228,6 +228,7 @@
       *H30.4
            03  FLG-NINPU-IN         PIC 9(01).
            03  FLG-CHKT             PIC 9(01).
+           03  FLG-ONLINE           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -585,6 +586,9 @@
       *H30.4 廃止
       *    処方せん無交付加算（施医総管）（C002-00)
       *****03  CONS-C0022-KSN      PIC X(09)   VALUE   "114039170".
+      *
+      *    オンライン診療料（A001-00)
+           03  CONS-ONLINE01       PIC X(09)   VALUE   "112023210".
       *
       *    労災診察料テーブル
        01  TBL-RSI-SINSATU-AREA.
@@ -1505,6 +1509,9 @@
       *    認知症地域包括診療料の算定区分
            MOVE    ZERO                TO  SPA-NNCHKT-ARI
            MOVE    ZERO                TO  SPA-NNCHKT-ARI2
+      *    オンライン診療料
+           MOVE    ZERO                TO  SPA-ONLINE-ARI
+           MOVE    ZERO                TO  SPA-ONLINE-ARI2
       *
       *    包括まとめ入力対象外
            IF      SPA-HKNCOMBINUM     =   "9999"
@@ -1836,6 +1843,12 @@
                WHEN    CONS-NNCHIHKT2
                    IF      SANTEI-MSANTEICNT   >   ZERO
                        MOVE    1                   TO  SPA-NNCHKT-ARI2
+                   END-IF
+      *H30.4
+      *        オンライン診療料
+               WHEN    CONS-ONLINE01
+                   IF      SANTEI-MSANTEICNT   >   ZERO
+                       MOVE    1                   TO  SPA-ONLINE-ARI2
                    END-IF
       *履歴作成なし
       ***      処方せん無交付加算（在宅時医）（C002-00)
@@ -3311,6 +3324,8 @@
                  OR   (SPA-CHKHKT-ARI2     =   1      )
       *H28.4   認知症地域包括
                  OR   (SPA-NNCHKT-ARI2     =   1      )
+      *H30.4   オンライン診療料
+                 OR   (SPA-ONLINE-ARI2     =   1      )
                    MOVE    "099120001"         TO  WRK-SRYCD
                END-IF
            END-IF
@@ -3322,6 +3337,11 @@
            IF      SPA-PTTOKK-KBN  NOT =   SPACE
                GO      TO      2002-KNH-SYOSIN-SET-EXT
            END-IF
+      *H30.4   オンライン診療料
+           IF      SPA-ONLINE-ARI2     =   1
+               GO      TO      2002-KNH-SYOSIN-SET-EXT
+           END-IF
+      *
       *H24.4
       *    外来リハビリ診察料等算定
            IF     (SPA-KOURESRY-ARI2   =   2   OR  3)
@@ -3462,6 +3482,11 @@
       *    地域包括診療料算定時算定でダミーの時
            IF    ((SPA-CHKHKT-ARI2     =   1      )  OR
                   (SPA-NNCHKT-ARI2     =   1      ))
+            AND   (WRK-SRYCD (1:3)     =   "099"  )
+               GO      TO      3301-SYOSIN-SYORI-EXT
+           END-IF
+      *H30.4   オンライン診療料
+           IF     (SPA-ONLINE-ARI2     =   1      )
             AND   (WRK-SRYCD (1:3)     =   "099"  )
                GO      TO      3301-SYOSIN-SYORI-EXT
            END-IF
@@ -5692,7 +5717,7 @@
            MOVE    ZERO                TO  SPA-CHKHKT-ARI
            MOVE    ZERO                TO  SPA-NNCHKT-ARI
            MOVE    ZERO                TO  SPA-SYONIKKR-ARI
-      *H40.4
+      *H30.4
            MOVE    ZERO                TO  SPA-NINPUKBN-IN
            MOVE    ZERO                TO  SPA-ONLINE-ARI
       *
@@ -5809,6 +5834,9 @@
                        MOVE    "0"             TO  SPA-INGAIKBN
                        MOVE    1               TO  SPA-SYONIKKR-ARI
       *
+      *            オンライン診療料
+                   WHEN    CONS-ONLINE01
+                       MOVE    1               TO  SPA-ONLINE-ARI
                END-EVALUATE
       *        在宅療養指導料の判定
                IF     (SPA-COM-INPUTCD (IDX)(1:3)  =   "114") AND
@@ -6395,6 +6423,13 @@
                MOVE    1                   TO  FLG-SYONIKA-CHK
                MOVE    "9"                 TO  WRK-SYONIKA-KBN
            END-IF
+      *
+      *H30.4 追加のコード
+           IF      SPA-COM-INPUTCD (IDX)   =   "113028870"
+      *        機能強化加算（初診）
+               MOVE    1                   TO  FLG-SYONIKA-CHK
+               MOVE    "9"                 TO  WRK-SYONIKA-KBN
+           END-IF
            .
        50192-SYONIKASRYCD-CHK-EXT.
            EXIT.
@@ -6832,6 +6867,11 @@
            IF     (FLG-SINSATU-ARI     =   ZERO )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
+      *    オンライン診察料は変更をおこなわない
+           IF      FLG-ONLINE          =   1
+               MOVE    ZERO                TO  FLG-HENKAN
+           END-IF
+      *
            MOVE    ZERO                TO  FLG-DOUJI-HEN2
       *    同日再診ですでに診察がある時
            IF     (WRK-KBN3            =   "D"  )  AND
@@ -6942,6 +6982,7 @@
            MOVE    ZERO                TO  FLG-TAKA
            MOVE    ZERO                TO  FLG-ARI
            MOVE    ZERO                TO  IDX-TEL
+           MOVE    ZERO                TO  FLG-ONLINE
            MOVE    SPACE               TO  WRK-KBN4
            MOVE    SPACE               TO  WRK-ETCKBN
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -7029,6 +7070,10 @@
                    WHEN    "830000021"
                    WHEN    "099999902"
                        MOVE    1               TO  FLG-TAKA
+      *H30.4
+      *            オンライン診療料
+                   WHEN    CONS-ONLINE01
+                       MOVE    1               TO  FLG-ONLINE
                END-EVALUATE
       *        外来管理加算
                IF      SPA-COM-INPUTCD (IDX)   =   TBLG-SRYCD
