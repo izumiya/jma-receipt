@@ -497,6 +497,10 @@
            03  WRK-B-MAX               PIC X(04).
            03  WRK-B-CNT               PIC X(04).
       *
+           03  WRK-GOKKAISU            PIC 9(05).
+           03  WRK-BUNK-HEN            PIC X(80).
+           03  WRK-BUNK-SU             PIC X(06).
+      *
       *H28.8
       * gingee API
        01  WRK-API-AREA.
@@ -606,6 +610,7 @@
                    07  WRK-ALL-SRYKBN            PIC X(02).
                    07  WRK-ALL-SRYSYUKBN         PIC X(03).
                    07  WRK-ALL-KAISU             PIC 9(05).
+                   07  WRK-ALL-GOKKAISU          PIC 9(05).
                    07  WRK-ALL-ZAINUM            PIC 9(08).
       *
       *    剤内容テーブル(WRK-SRYACT-GRP-AREAと同じ）
@@ -3917,6 +3922,9 @@
                        MOVE    WRK-BUNKATU (IDXP)
                                                TO  WRK-ALL-KAISU
                                                       (IDXP   IDX-ALL)
+                       MOVE    WRK-KAISU
+                                               TO  WRK-ALL-GOKKAISU
+                                                      (IDXP   IDX-ALL)
                        MOVE    WRK-ZAINUM      TO  WRK-ALL-ZAINUM
                                                       (IDXP   IDX-ALL)
       *
@@ -4095,6 +4103,19 @@
                                            TO  WRK-SRY-MAX
                MOVE    WRK-ALL-KAISU     (IDXP IDX-ALL)
                                            TO  WRK-KAISU
+      *
+               IF     (WRK-ALL-KAISU (IDXP IDX-ALL)
+                                           =   WRK-ALL-GOKKAISU
+                                                    (IDXP IDX-ALL))
+                   OR (WRK-ALL-GOKKAISU(IDXP IDX-ALL)
+                                           =   ZERO   )
+      *            分割なし
+                   MOVE    ZERO            TO  WRK-GOKKAISU
+               ELSE
+      *            分割あり
+                   MOVE    WRK-ALL-GOKKAISU(IDXP IDX-ALL)
+                                           TO  WRK-GOKKAISU
+               END-IF
                MOVE    WRK-ALL-ZAINUM    (IDXP IDX-ALL)
                                            TO  WRK-ZAINUM
       *        処方せん対象
@@ -4270,6 +4291,11 @@
            INSPECT WRK-FIL21    (IDX-S)    REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-K3       (IDX-S)    REPLACING  ALL "  "  BY  "　"
            INSPECT WRK-MEISYOU2 (IDX-S)    REPLACING  ALL "  "  BY  "　"
+      * 
+      *    分割分
+           IF      WRK-GOKKAISU        >   ZERO
+               PERFORM 200291-BUNKATU-HEN-SEC
+           END-IF
       *
       *    帳票用編集処理
            PERFORM 20022-PRINT-HEN-SEC
@@ -4278,6 +4304,53 @@
       *
            .
        20029-SRYACT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    分割合計編集処理
+      *****************************************************************
+       200291-BUNKATU-HEN-SEC         SECTION.
+      *
+           MOVE    IDX-S               TO  IDX-SH
+           ADD     1                   TO  IDX-S
+      *    回数行で２０行以上の時
+           IF      IDX-S               >=  LINE-MAX
+               MOVE    IDX-SH              TO  IDX-S
+      *        帳票編集処理
+               PERFORM 20022-PRINT-HEN-SEC
+               MOVE    SPACE               TO  WRK-NAIYOU-AREA
+               MOVE    1                   TO  IDX-S
+           END-IF
+      *
+           MOVE    WRK-GOKKAISU        TO  WRK-ZZZ
+           PERFORM VARYING     IDXM    FROM    1   BY  1
+                   UNTIL       IDXM    >   3
+               IF      WRK-ZZZ(IDXM:1)     NOT =  SPACE
+                   MOVE    WRK-ZZZ(IDXM:)
+                                      TO  WRK-BUNK-SU
+                   MOVE    3          TO  IDXM
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SPACE              TO  WRK-BUNK-HEN
+           STRING  "（総投与日数　" 
+                   WRK-BUNK-SU        DELIMITED  BY  SPACE
+                   "日）"
+                                      DELIMITED  BY  SIZE
+                                      INTO    WRK-BUNK-HEN
+           END-STRING
+           MOVE    ZERO                TO  WRK-MOJISU
+           MOVE    WRK-BUNK-HEN        TO  WRK-MOJI
+           PERFORM 2009-HENKAN-SEC
+      *    文字数から編集開始位置決定
+           COMPUTE IDXM            =   82  -   KANACHK-MAX
+                                   +   1
+           MOVE    WRK-ZENKAKU-G(1:KANACHK-MAX)
+                                       TO  WRK-NAIYOU-Z (IDX-S)
+                                                  (IDXM:)
+           INSPECT WRK-NAIYOU-Z (IDX-S)    REPLACING  ALL "  "  BY  "　"
+           .
+       200291-BUNKATU-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4771,6 +4844,9 @@
            IF      IDX-QR2             =   ZERO
                ADD     1                   TO  IDX-QR1
                MOVE    WRK-KAISU           TO  ORCSQRCSV-KAISU (IDX-QR1)
+      *        分割総投与回数
+               MOVE    WRK-GOKKAISU        TO  ORCSQRCSV-GOKKAISU
+                                                              (IDX-QR1)
       *        剤型区分
                EVALUATE    WRK-SRYKBN
                    WHEN    "21"
@@ -6717,6 +6793,12 @@
                            MOVE    WRK-KAISU-G     TO  FMSHOHO-ZAIKAISU
                                                            (IDX-AP1)
                    END-EVALUATE
+      *            分割総投与日数
+                   IF      WRK-GOKKAISU    >   ZERO
+                       MOVE    WRK-GOKKAISU    TO  WRK-KAISU-9
+                       MOVE    WRK-KAISU-G     TO  FMSHOHO-GOKZAIKAISU
+                                                           (IDX-AP1)
+                   END-IF
                END-IF
       *        剤型区分
                MOVE    WRK-SRYKBN          TO  FMSHOHO-SRYKBN(IDX-AP1)
@@ -7212,8 +7294,8 @@
            MOVE    SPACE               TO  TENSUPLUS-REC
            INITIALIZE                      TENSUPLUS-REC
            MOVE    TNS-SRYCD           TO  TNSP-SRYCD
-      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
-      **   MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
+      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOSTYMD
+      *    MOVE    SPA-SRYYMD          TO  TNSP-YUKOEDYMD
            MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
            MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
       *

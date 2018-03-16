@@ -94,6 +94,8 @@
                05  ORCSQRCSV-NAIYOU-TBL       OCCURS   50.
                    07  ORCSQRCSV-ZAIKATA          PIC X(01).
                    07  ORCSQRCSV-KAISU            PIC 9(03).
+      *            Ê¬³äÁíÅêÍ¿Æü¿ô
+                   07  ORCSQRCSV-GOKKAISU         PIC 9(03).
                    07  ORCSQRCSV-NAIYOU-TBL       OCCURS   50.
                        09  ORCSQRCSV-SRYCD            PIC X(09).
                        09  ORCSQRCSV-TNS-NAME         PIC X(100).

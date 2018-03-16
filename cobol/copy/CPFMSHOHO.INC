@@ -115,6 +115,9 @@
               05  FMSHOHO-ZAI-AREA              OCCURS  50 TIMES.
                 07  FMSHOHO-SRYKBN              PIC X(2).
                 07  FMSHOHO-ZAIKAISU            PIC X(3).
+      *H30.4
+      *         分割総投与日数
+                07  FMSHOHO-GOKZAIKAISU         PIC X(3).
       *         日分、回分
                 07  FMSHOHO-ZAITANINAME         PIC X(04).
                 07  FMSHOHO-MEDICATION          OCCURS  50 TIMES.
