@@ -2410,26 +2410,6 @@
            END-IF
       *
       *
-      *    平成２６年改正で新設された入院料加算のチェック追加
-      *    以下の入院料加算については点数マスタに入院基本料加算区分がセット
-      *    されていない為、入院料加算チェックテーブルによる判定ができない
-      *    ことから、療養病棟入院基本料１の場合のみ算定可とする暫定対処を
-      *    追加する
-      *    こととする。
-      *    ・在宅復帰機能強化加算（療養病棟入院基本料）（平成２６年改正で追加）
-           IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190168070"
-               IF   ((WRK-BTU-CDKBN-KBNNUM   =    101)     AND
-                     (WRK-BTU-CDKBN-KOUBAN   =    1))      OR
-                    ((WRK-BTU-CDKBN-KBNNUM   =    100)     AND
-                     (WRK-BTU-CDKBN-KOUBAN   =    16))     OR
-                    ((WRK-BTU-CDKBN-KBNNUM   =    317)     AND
-                     (WRK-BTU-CDKBN-KOUBAN   =    11))
-                  CONTINUE
-               ELSE
-                  MOVE    1     TO    FLG-NYUKSN
-               END-IF
-           END-IF
-      *
       *    特定入院基本料（障害者施設等入院基本料）の、看護配置加算について
       *    強制的に算定不可とする
       *    （入院料加算チェックマスタでも対応するが、マスタ更新未実施時を考慮）
@@ -2586,6 +2566,42 @@
                MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
                MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
            END-IF
+      *
+      *    一般病棟・療養病棟入院料１のとき、
+      *    表用番号の置き換え（平成２６年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 100)   AND
+                  (TNS-CDKBN-KOUBAN  =  16)   AND
+                 ((TNS-YUKOSTYMD    >=  "20140401")   AND
+                  (TNS-YUKOSTYMD    <=  "20180331"))
+               MOVE   101           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   0             TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *    一般病棟・療養病棟入院料１のとき、
+      *    表用番号の置き換え（平成３０年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 100)   AND
+                  (TNS-CDKBN-KOUBAN  =  14)   AND
+                  (TNS-YUKOSTYMD    >=  "20180401")
+               MOVE   101           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   0             TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *    特定一般病棟・療養病棟入院料１のとき、
+      *    表用番号の置き換え（平成２６年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 317)   AND
+                  (TNS-CDKBN-KOUBAN  =  11)   AND
+                 ((TNS-YUKOSTYMD    >=  "20140401")   AND
+                  (TNS-YUKOSTYMD    <=  "20180331"))
+               MOVE   101           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   0             TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *    特定一般病棟・療養病棟入院料１のとき、
+      *    表用番号の置き換え（平成３０年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 317)   AND
+                  (TNS-CDKBN-KOUBAN  =   8)   AND
+                  (TNS-YUKOSTYMD    >=  "20180401")
+               MOVE   101           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   0             TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *
       *    特定一般病棟入院料（地域包括ケア１〜４）のとき、
       *    表用番号の置き換え（平成３０年改正）
            IF     (TNS-CDKBN-KBNNUM  = 317)   AND
