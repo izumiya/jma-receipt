@@ -31,6 +31,7 @@
       *  04.08.00    NACL-多々納  16/12/XX  院内・院外区分対応
       *  04.08.00    NACL-多々納  17/05/XX  包括検査数、単位コード対応
       *                                     フィルム分画数等対応
+      *  05.00.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -394,6 +395,8 @@
            IF     (LNK-WKSRY-SRYCD (IDX IDW)(1:1) =   "8")
              OR   (LNK-WKSRY-SRYCD (IDX IDW)(1:3) =   "008")
              OR   (LNK-WKSRY-SRYCD (IDX IDW)(1:3) =   "001")
+      *H30.4
+             OR   (LNK-WKSRY-SRYCD (IDX IDW)(1:7) =   "0992081")
       *        編集名称
                IF      LNK-WKSRY-INPUTCOMENT (IDX IDW) NOT =   SPACE
                    MOVE    LNK-WKSRY-INPUTCOMENT (IDX IDW) 
@@ -551,6 +554,8 @@
               OR  (LNK-WKSRY-SRYCD (IDX IDW)(1:4)  =   "0084")
       *       用法コメント
               OR  (LNK-WKSRY-SRYCD (IDX IDW)(1:3)  =   "001")
+      *H30.4
+             OR   (LNK-WKSRY-SRYCD (IDX IDW)(1:7) =   "0992081")
                PERFORM VARYING     IDX-A   FROM    1   BY  1
                        UNTIL      (IDX-A       >   5   )
                    IF      LNK-WKSRY-INPUTCHI (IDX IDW IDX-A)

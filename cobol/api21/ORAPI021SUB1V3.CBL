@@ -30,6 +30,7 @@
       *  04.08.00    NACL-多々納  15/11/XX  セット登録対応他
       *  04.08.00    NACL-多々納  17/05/XX  包括検査数、単位コード対応
       *                                     フィルム分画数等対応
+      *  05.00.00    NACL-多々納  18/03/XX  Ｈ３０年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -695,7 +696,10 @@
                   (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:4)
                                        =   "0084"  ) OR
                   (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
-                                       =   "001"   ))  AND
+                                       =   "001"   )
+      *H30.4
+              OR  (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:7)
+                                       =   "0992081"))  AND
                   (ORAPISUB01-ATAI-G  (IDY IDZ)
                                    NOT =   SPACE )
                PERFORM 200321-INPUTCHI-HEN-SEC
@@ -926,7 +930,9 @@
                        IF   ((TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:4)
                                                =   "0084"   )  OR
                              (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:3)
-                                               =   "001"    ))
+                                               =   "001"    )
+                          OR (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:7)
+                                               =   "0992081"))
                         AND  (SNUM-SYOSUU      >   0        )
                            MOVE    ORAPISUB01-ATAI(IDY IDZ IDX-I)
                                                TO  TBL-WKSRY-INPUTCHI
