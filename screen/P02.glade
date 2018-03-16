@@ -12508,7 +12508,7 @@
             <name>P028_CHKHKTBYO1</name>
             <x>616</x>
             <y>412</y>
-            <width>140</width>
+            <width>90</width>
             <height>24</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12538,7 +12538,7 @@
             <name>P028_CHKHKTBYO2</name>
             <x>708</x>
             <y>412</y>
-            <width>140</width>
+            <width>80</width>
             <height>24</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12568,7 +12568,7 @@
             <name>P028_CHKHKTBYO3</name>
             <x>792</x>
             <y>412</y>
-            <width>140</width>
+            <width>100</width>
             <height>24</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12598,7 +12598,7 @@
             <name>P028_CHKHKTBYO4</name>
             <x>900</x>
             <y>412</y>
-            <width>110</width>
+            <width>80</width>
             <height>24</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12961,7 +12961,7 @@
             <name>label56</name>
             <x>596</x>
             <y>549</y>
-            <width>24</width>
+            <width>32</width>
             <height>20</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -13006,7 +13006,7 @@
             <name>label57</name>
             <x>596</x>
             <y>573</y>
-            <width>24</width>
+            <width>32</width>
             <height>20</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -13077,7 +13077,7 @@
             <name>label58</name>
             <x>596</x>
             <y>597</y>
-            <width>24</width>
+            <width>32</width>
             <height>20</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
