@@ -2018,6 +2018,14 @@
                                                      OR "190212110"
       *                                  地域包括ケア入院医療管理料４（生活療養）（特定地域）
                                                      OR "190212210"
+      *                                  特定一般病棟入院料（地域包括ケア１）
+                                                     OR "190213310"
+      *                                  特定一般病棟入院料（地域包括ケア２）
+                                                     OR "190213410"
+      *                                  特定一般病棟入院料（地域包括ケア３）
+                                                     OR "190213510"
+      *                                  特定一般病棟入院料（地域包括ケア４）
+                                                     OR "190213610"
                                      ADD    1            TO  IDX8
                                      MOVE   SYS-5001-KSNCD(IDX7) TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
@@ -2578,6 +2586,14 @@
                MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
                MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
            END-IF
+      *    特定一般病棟入院料（地域包括ケア１〜４）のとき、
+      *    表用番号の置き換え（平成３０年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 317)   AND
+                  (TNS-CDKBN-KOUBAN  =  7)   AND
+                  (TNS-YUKOSTYMD    >=  "20180401")
+               MOVE   308           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   3             TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
       *
       *    特別入院料の判定
            EVALUATE   TNS-NYUKHNKBN
@@ -2821,8 +2837,8 @@
       *    平成３０年改正で新設の入院基本料等加算
       *    入院基本料等加算内の注の加算は上位の加算コードに読み替えて
       *    チェックを行う（注の加算は電子点数表にコードが存在しない為）
-      *    医療安全対策地域連携加算１（医療安全対策加算１の注加算）
            IF    LNK-NYUKSNGET-SANTEIYM      >=   "201804"
+      *        医療安全対策地域連携加算１（医療安全対策加算１の注加算）
                IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206670"
                   MOVE   "190120510"   TO  TNS-SRYCD
                END-IF
