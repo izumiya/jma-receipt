@@ -6426,6 +6426,7 @@
       *
       *H30.4 追加のコード
            IF      SPA-COM-INPUTCD (IDX)   =   "113028870"
+                                           OR  "113024670"
       *        機能強化加算（初診）
                MOVE    1                   TO  FLG-SYONIKA-CHK
                MOVE    "9"                 TO  WRK-SYONIKA-KBN
