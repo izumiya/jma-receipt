@@ -20,6 +20,8 @@
           03  I47-B10S-STATE    PIC S9(9)   BINARY.  
           03  I47-LBLINFO-STYLE PIC X(20).
           03  I47-LBLINFO   PIC X(80).
+          03  I47-LBLINFO2-STYLE PIC X(20).
+          03  I47-LBLINFO2 PIC X(80).
           03  I47-PTNUM.
             04  I47-VALUE   PIC X(20).
           03  I47-SRYYM.
@@ -40,6 +42,7 @@
             04  I47-VALUE   PIC X(50).
           03  I47-MEISYO.
             04  I47-VALUE   PIC X(200).
+          03  I47-DAY-AREA-STATE PIC S9(9)   BINARY.
           03  I47-DAYALL.
             04  I47-VALUE   PIC X(2).
           03  I47-DAY-G.

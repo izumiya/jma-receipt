@@ -42,7 +42,7 @@
                        09  HSPTEVALRES-TAIINYMD        PIC X(10).
                05  HSPTEVALRES-SRYYM                   PIC X(07).
                05  HSPTEVALRES-MEDKBN-AREA.
-                   07  HSPTEVALRES-MEDKBN-OCC          OCCURS  42.
+                   07  HSPTEVALRES-MEDKBN-OCC          OCCURS  50.
                        09  HSPTEVALRES-MEDKBN-LV       PIC X(1).
                        09  HSPTEVALRES-MEDKBN-ID       PIC X(2).
                        09  HSPTEVALRES-MEDKBN-NAME     PIC X(100).

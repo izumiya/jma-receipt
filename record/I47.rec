@@ -10,6 +10,10 @@ I47 {
       style varchar(20);
       textdata varchar(80);
     };
+    LBLINFO2 {
+      style varchar(20);
+      textdata varchar(80);
+    };
     PTNUM {
       textdata varchar(20);
     };
@@ -40,104 +44,109 @@ I47 {
     MEISYO {
       textdata varchar(200);
     };
-    DAYALL {
-      textdata varchar(2);
-    };
-    DAY01 {
-      textdata varchar(2);
-    };
-    DAY02 {
-      textdata varchar(2);
-    };
-    DAY03 {
-      textdata varchar(2);
-    };
-    DAY04 {
-      textdata varchar(2);
-    };
-    DAY05 {
-      textdata varchar(2);
-    };
-    DAY06 {
-      textdata varchar(2);
-    };
-    DAY07 {
-      textdata varchar(2);
-    };
-    DAY08 {
-      textdata varchar(2);
-    };
-    DAY09 {
-      textdata varchar(2);
-    };
-    DAY10 {
-      textdata varchar(2);
-    };
-    DAY11 {
-      textdata varchar(2);
-    };
-    DAY12 {
-      textdata varchar(2);
-    };
-    DAY13 {
-      textdata varchar(2);
-    };
-    DAY14 {
-      textdata varchar(2);
-    };
-    DAY15 {
-      textdata varchar(2);
-    };
-    DAY16 {
-      textdata varchar(2);
-    };
-    DAY17 {
-      textdata varchar(2);
-    };
-    DAY18 {
-      textdata varchar(2);
-    };
-    DAY19 {
-      textdata varchar(2);
-    };
-    DAY20 {
-      textdata varchar(2);
-    };
-    DAY21 {
-      textdata varchar(2);
-    };
-    DAY22 {
-      textdata varchar(2);
-    };
-    DAY23 {
-      textdata varchar(2);
-    };
-    DAY24 {
-      textdata varchar(2);
-    };
-    DAY25 {
-      textdata varchar(2);
-    };
-    DAY26 {
-      textdata varchar(2);
-    };
-    DAY27 {
-      textdata varchar(2);
-    };
-    DAY28 {
-      textdata varchar(2);
-    };
-    DAY29 {
-      textdata varchar(2);
-    };
-    DAY30 {
-      textdata varchar(2);
-    };
-    DAY31 {
-      textdata varchar(2);
-    };
-    GRPINPUT {
-      textdata varchar(50);
+    frame1{
+      state int;
+      fixed1{
+        DAYALL {
+          textdata varchar(2);
+        };
+        DAY01 {
+          textdata varchar(2);
+        };
+        DAY02 {
+          textdata varchar(2);
+        };
+        DAY03 {
+          textdata varchar(2);
+        };
+        DAY04 {
+          textdata varchar(2);
+        };
+        DAY05 {
+          textdata varchar(2);
+        };
+        DAY06 {
+          textdata varchar(2);
+        };
+        DAY07 {
+          textdata varchar(2);
+        };
+        DAY08 {
+          textdata varchar(2);
+        };
+        DAY09 {
+          textdata varchar(2);
+        };
+        DAY10 {
+          textdata varchar(2);
+        };
+        DAY11 {
+          textdata varchar(2);
+        };
+        DAY12 {
+          textdata varchar(2);
+        };
+        DAY13 {
+          textdata varchar(2);
+        };
+        DAY14 {
+          textdata varchar(2);
+        };
+        DAY15 {
+          textdata varchar(2);
+        };
+        DAY16 {
+          textdata varchar(2);
+        };
+        DAY17 {
+          textdata varchar(2);
+        };
+        DAY18 {
+          textdata varchar(2);
+        };
+        DAY19 {
+          textdata varchar(2);
+        };
+        DAY20 {
+          textdata varchar(2);
+        };
+        DAY21 {
+          textdata varchar(2);
+        };
+        DAY22 {
+          textdata varchar(2);
+        };
+        DAY23 {
+          textdata varchar(2);
+        };
+        DAY24 {
+          textdata varchar(2);
+        };
+        DAY25 {
+          textdata varchar(2);
+        };
+        DAY26 {
+          textdata varchar(2);
+        };
+        DAY27 {
+          textdata varchar(2);
+        };
+        DAY28 {
+          textdata varchar(2);
+        };
+        DAY29 {
+          textdata varchar(2);
+        };
+        DAY30 {
+          textdata varchar(2);
+        };
+        DAY31 {
+          textdata varchar(2);
+        };
+        GRPINPUT {
+          textdata varchar(50);
+        };
+      };
     };
     scrolledwindow1 {
       RYOLIST {

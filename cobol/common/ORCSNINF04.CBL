@@ -83,7 +83,6 @@
            03  WRK-ZAISKBKBN           PIC X(01).
            03  WRK-MEDKBN-ID-G.
                05  WRK-MEDKBN-ID       PIC 9(02).
-           03  WRK-MEDKBN-MAX          PIC 9(03).
            03  WRK-ADLTEN-G.
                05  WRK-ADLTEN          PIC 9(02).
            03  WRK-MEDKBN              PIC X(1).
@@ -105,7 +104,6 @@
       *
        01  CONST-AREA.
            03  CONST-H240401           PIC X(08) VALUE "20120401".
-           03  CONST-TMEDKBN-MAX       PIC 9(03) VALUE 42.
       *
       *****************************************************************
       *    •µ•÷•◊•ÌÕ—°°ŒŒ∞Ë
@@ -310,7 +308,7 @@
       *****************************************************************
        2001-MEDKBN-EDIT-SEC     SECTION.
       *
-           MOVE    ZERO                TO  WRK-MEDKBN-MAX
+           MOVE    ZERO                TO  SNINF04-MEDKBN-MAX
       *
            PERFORM VARYING IDXM    FROM    1    BY  1
                    UNTIL ( IDXM    >   HCN68S01-RYOLIST-MAX )
@@ -354,8 +352,8 @@
            END-PERFORM
       *
            IF    ( TDAY-DAY-G          NOT =   ZERO )
-               COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-               MOVE    WRK-MEDKBN-MAX  TO  IDXA
+               COMPUTE SNINF04-MEDKBN-MAX  =   SNINF04-MEDKBN-MAX  +   1
+               MOVE    SNINF04-MEDKBN-MAX  TO  IDXA
                MOVE    "1"         TO  SNINF04-MEDKBN-LV (IDXA)
                MOVE    "M1"        TO  SNINF04-MEDKBN-ID (IDXA)
                MOVE    "∞ÂŒ≈∂Ë ¨£≥°¶£≤§§§∫§Ï§‚£∞° ∞ÂŒ≈∂Ë ¨£±°À"
@@ -409,8 +407,8 @@
       *****************************************************************
        20011-MEDKBN-EDIT-SEC     SECTION.
       *
-           COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-           MOVE    WRK-MEDKBN-MAX  TO  IDXA
+           COMPUTE SNINF04-MEDKBN-MAX  =   SNINF04-MEDKBN-MAX  +   1
+           MOVE    SNINF04-MEDKBN-MAX  TO  IDXA
       *
            IF    ( HCN68S01-TMEDKBN (IDXM) =   "2" OR "3" )
                MOVE    HCN68S01-TMEDKBN (IDXM)
@@ -447,8 +445,8 @@
       *****************************************************************
        20011-MEDKBN-TUKI-HYOKA-EDIT-SEC     SECTION.
       *
-           COMPUTE WRK-MEDKBN-MAX  =   WRK-MEDKBN-MAX  +   1
-           MOVE    WRK-MEDKBN-MAX  TO  IDXA
+           COMPUTE SNINF04-MEDKBN-MAX  =   SNINF04-MEDKBN-MAX  +   1
+           MOVE    SNINF04-MEDKBN-MAX  TO  IDXA
       *
            EVALUATE    IDXM
            WHEN    1

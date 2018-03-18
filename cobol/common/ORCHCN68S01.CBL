@@ -81,7 +81,7 @@
       *
        01  MEDINF-AREA.
            03  MEDINF-MAX                  PIC 9(05).
-           03  MEDINF-OCC                  OCCURS       50.
+           03  MEDINF-OCC                  OCCURS       100.
                09  MEDINF-MEDKBN           PIC X(01).
                09  MEDINF-LIMIT            PIC 9(03).
                09  MEDINF-ALLKBN           PIC 9(01).
@@ -571,11 +571,12 @@
                                              TO WRK-TNS-SRYCD
                        MOVE  HCN68S01-SRYYMD TO WRK-TNS-KJNYMD
                        PERFORM 900-TENSU-KEY-SEL-SEC
-                       MOVE    TNS-NAME    TO MEDINF-NAME (IDXM)
-                       IF    ( MEDINF-NAME (IDXM)  =   SPACE )
+      * »ÃÄêÂÐ±þ
+      *                MOVE    TNS-NAME    TO MEDINF-NAME (IDXM)
+      *                IF    ( MEDINF-NAME (IDXM)  =   SPACE )
                            MOVE    MEDH20-MEIL (IDX0)
                                            TO MEDINF-NAME (IDXM)
-                       END-IF
+      *                END-IF
                        MOVE    MEDH20-ID   (IDX0)
                                            TO MEDINF-ID (IDXM)
                    END-IF

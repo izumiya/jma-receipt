@@ -26,7 +26,7 @@ xml_hsptevalv2res {
 			Name				varchar(100);
 			Evaluation_Month	varchar(1);
 			Evaluation_Daily		varchar(256);
-		}[42];
+		}[50];
 		ADL_Score	{
 			ID					varchar(1);
 			Name				varchar(100);

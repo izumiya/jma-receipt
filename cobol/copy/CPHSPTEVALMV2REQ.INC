@@ -30,7 +30,7 @@
                05  HSPTEVALMREQ-NYUINYMD         PIC X(10).
                05  HSPTEVALMREQ-SRYYMD           PIC X(10).
                05  HSPTEVALMREQ-MED-AREA.
-                   07  HSPTEVALMREQ-MED-OCC      OCCURS    42.
+                   07  HSPTEVALMREQ-MED-OCC      OCCURS    50.
                        09  HSPTEVALMREQ-MED-ID   PIC X(02).
                        09  HSPTEVALMREQ-MED-DATA PIC X(01).
                        09  HSPTEVALMREQ-MED-ALL  PIC X(80).

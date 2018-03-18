@@ -108,7 +108,7 @@
       *
        01  CONST-AREA.
            03  CONST-H240401           PIC X(08) VALUE "20120401".
-           03  CONST-TMEDKBN-MAX       PIC 9(03) VALUE 42.
+           03  CONST-TMEDKBN-MAX       PIC 9(03) VALUE 50.
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -445,7 +445,7 @@
            MOVE    SNINF04-SRYYM       TO HSPTEVALRES-SRYYM
       *
            PERFORM VARYING IDXA FROM 1 BY 1
-                   UNTIL ( IDXA >    CONST-TMEDKBN-MAX )
+                   UNTIL ( IDXA >    SNINF04-MEDKBN-MAX )
       *
                MOVE    SNINF04-MEDKBN-LV (IDXA)
                                        TO HSPTEVALRES-MEDKBN-LV (IDXA)

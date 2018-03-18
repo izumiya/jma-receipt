@@ -107,7 +107,7 @@
                05  ITEM-SRYDD              PIC 9(02).
            03  ITEM-MED-AREA.
                05  ITEM-MED-MAX            PIC 9(03).
-               05  ITEM-MED-OCC            OCCURS  42.
+               05  ITEM-MED-OCC            OCCURS  100.
                    07  ITEM-MED-ID         PIC X(02).
                    07  ITEM-MED-DATA       PIC X(01).
                    07  ITEM-MED-ALL        PIC X(80).
