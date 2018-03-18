@@ -74,7 +74,6 @@ utf8_shell_sources = \
 	monthly/teiki3.sh.in \
 	allways/ykjmst.sh.in \
 	allways/ORCBQ02.sh.in \
-	daily/online-reprint.sh.in \
 	monthly/prtdbdel.sh.in \
 	allways/ykjchk.sh.in \
 	allways/chkmst2.sh.in \
@@ -150,6 +149,7 @@ shell_sources = \
 	tools/run_receipt_mis_rou.sh.in \
 	allways/export_monblob.sh.in \
 	tools/run_jmamr_mis.sh.in \
+	daily/online-reprint.sh.in \
 
 ruby_sources = \
 	daily/print_parent2.rb.in \

@@ -52,6 +52,7 @@
            03  FLG-RYOYO               PIC 9(01).
            03  FLG-TARGET              PIC 9(01).
            03  FLG-PTNYUINRRK          PIC 9(01).
+           03  FLG-SS017               PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -67,6 +68,7 @@
            03  IDXK                    PIC 9(05).
            03  IDXM                    PIC 9(05).
            03  IDXR                    PIC 9(05).
+           03  IDXZ                    PIC 9(05).
       *
        01  CNT-AREA.
            03  CNT-INSERT              PIC 9(05).
@@ -94,6 +96,7 @@
                05  WRK-LOW-DAY         PIC  9(01)
                                        OCCURS   31.
            03  WRK-MAXZAINUM           PIC 9(10).
+           03  WRK-RYOYOCD             PIC X(9).
       *
        01  TNACCT-AREA.
            03  TNACCT-KHN-OCC              OCCURS  50.
@@ -138,6 +141,10 @@
       *
            COPY    "CPMEDKBN.INC".
       *
+       01  EIYOGEN-REC.
+           COPY    "CPNYUINACCT.INC"   REPLACING
+                                       //NACCT-//  BY  //EIYOGEN-//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -174,6 +181,9 @@
       *
       *    定数超過情報取得パラメタ
            COPY    "CPORCSTEISU.INC".
+      *
+      *    平成３０年４月療養病棟入院料２（経過措置２）対応
+           COPY    "CPORCSS017.INC".
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
@@ -214,7 +224,6 @@
       *    初期　処理
       *****************************************************************
        100-INIT-SEC                    SECTION.
-           DISPLAY "SS011-NYUUPDFLG=" SS011-NYUUPDFLG
       *
            INITIALIZE                  IDX-AREA
                                        FLG-AREA
@@ -388,8 +397,12 @@
       *
                PERFORM VARYING IDX-SRY FROM    1   BY  1
                        UNTIL ( IDX-SRY >   CONST-NSRYACT-MAX )
+                        OR   ( NSRY-SRYCD (IDX-SRY)
+                                               =   SPACE )
                         OR   ( FLG-RYOYO   NOT =   ZERO )
       *
+                   MOVE    NSRY-SRYCD (IDX-SRY)
+                                           TO   WRK-RYOYOCD
                    PERFORM 100111-RYOYOCD-CHK-SEC
                    IF    ( IDX-RYOYOCD NOT =   ZERO )
       *
@@ -418,38 +431,38 @@
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           DISPLAY "SS011-DAY->"
-                    SS011-DAY (1) ","
-                    SS011-DAY (2) ","
-                    SS011-DAY (3) ","
-                    SS011-DAY (4) ","
-                    SS011-DAY (5) ","
-                    SS011-DAY (6) ","
-                    SS011-DAY (7) ","
-                    SS011-DAY (8) ","
-                    SS011-DAY (9) ","
-                    SS011-DAY (10) ","
-                    SS011-DAY (11) ","
-                    SS011-DAY (12) ","
-                    SS011-DAY (13) ","
-                    SS011-DAY (14) ","
-                    SS011-DAY (15) ","
-                    SS011-DAY (16) ","
-                    SS011-DAY (17) ","
-                    SS011-DAY (18) ","
-                    SS011-DAY (19) ","
-                    SS011-DAY (20) ","
-                    SS011-DAY (21) ","
-                    SS011-DAY (22) ","
-                    SS011-DAY (23) ","
-                    SS011-DAY (24) ","
-                    SS011-DAY (25) ","
-                    SS011-DAY (26) ","
-                    SS011-DAY (27) ","
-                    SS011-DAY (28) ","
-                    SS011-DAY (29) ","
-                    SS011-DAY (30) ","
-                    SS011-DAY (31)
+      D    DISPLAY "SS011-DAY->"
+      D             SS011-DAY (1) ","
+      D             SS011-DAY (2) ","
+      D             SS011-DAY (3) ","
+      D             SS011-DAY (4) ","
+      D             SS011-DAY (5) ","
+      D             SS011-DAY (6) ","
+      D             SS011-DAY (7) ","
+      D             SS011-DAY (8) ","
+      D             SS011-DAY (9) ","
+      D             SS011-DAY (10) ","
+      D             SS011-DAY (11) ","
+      D             SS011-DAY (12) ","
+      D             SS011-DAY (13) ","
+      D             SS011-DAY (14) ","
+      D             SS011-DAY (15) ","
+      D             SS011-DAY (16) ","
+      D             SS011-DAY (17) ","
+      D             SS011-DAY (18) ","
+      D             SS011-DAY (19) ","
+      D             SS011-DAY (20) ","
+      D             SS011-DAY (21) ","
+      D             SS011-DAY (22) ","
+      D             SS011-DAY (23) ","
+      D             SS011-DAY (24) ","
+      D             SS011-DAY (25) ","
+      D             SS011-DAY (26) ","
+      D             SS011-DAY (27) ","
+      D             SS011-DAY (28) ","
+      D             SS011-DAY (29) ","
+      D             SS011-DAY (30) ","
+      D             SS011-DAY (31)
       *
            .
        10011-EDIT-RYOYO-DAY-EXT.
@@ -461,6 +474,16 @@
       *
            MOVE    ZERO            TO  IDX-KHN
                                        IDX-RYOYOCD
+           PERFORM VARYING IDXZ    FROM    1   BY  1
+                   UNTIL ( IDXZ    >   CONST-EXRYOYO-MAX )
+               IF    ( NSRY-SRYCD (IDX-SRY)
+                           =   CONST-EXRYOYO-UNDEFINED (IDXZ))
+                   MOVE    CONST-EXRYOYO-DEFINED (IDXZ)
+                                   TO   WRK-RYOYOCD
+                   MOVE    CONST-EXRYOYO-MAX
+                                   TO   IDXZ
+               END-IF
+           END-PERFORM
       *
            PERFORM VARYING IDXK    FROM    1   BY  1
                    UNTIL ( IDXK    >   CONST-RYOYOCD-KHN-MAX )
@@ -470,7 +493,7 @@
                    UNTIL ( IDXR    >   CONST-RYOYOCD-CD-MAX  )
                     OR   ( IDX-RYOYOCD NOT =   ZERO )
       *
-                   IF    ( NSRY-SRYCD (IDX-SRY)
+                   IF    ( WRK-RYOYOCD
                                    =   CONST-RYOYOCD (IDXK IDXR))
                        MOVE    IDXK    TO  IDX-KHN
                        MOVE    IDXR    TO  IDX-RYOYOCD
@@ -718,6 +741,19 @@
                PERFORM 20011-DEL-RYOYO-SEC
            END-IF
       *
+           DISPLAY "FLG-SS017=" FLG-SS017
+           IF    ( FLG-SS017       =     1 )
+               INITIALIZE                SS017-AREA
+               MOVE    SS011-PTID  TO    SS017-PTID
+               MOVE    WRK-KJNYMD  TO    SS017-SRYYMD
+               CALL    "ORCSS017"  USING SS017-AREA
+                                         SPA-AREA
+               IF    ( SS017-RC    NOT   =   ZERO )
+                   MOVE    6       TO    SS011-RC
+                   PERFORM 990-EXIT-PROGRAM-SEC
+               END-IF
+           END-IF
+      *
            .
        2001-UPD-RYOYO-EXT.
            EXIT.
@@ -768,7 +804,12 @@
       *
                PERFORM VARYING IDX-SRY FROM    1   BY  1
                        UNTIL ( IDX-SRY >   CONST-NSRYACT-MAX )
+                        OR   ( NSRY-SRYCD (IDX-SRY)
+                                               =   SPACE )
                         OR   ( FLG-RYOYO   NOT =   ZERO )
+      *
+                   MOVE    NSRY-SRYCD (IDX-SRY)
+                                           TO   WRK-RYOYOCD
       *
                    PERFORM 100111-RYOYOCD-CHK-SEC
                    IF    ( IDX-RYOYOCD NOT =   ZERO )
@@ -807,6 +848,11 @@
                    UNTIL ( IDXK    >   CONST-RYOYOCD-KHN-MAX )
       *
                IF    ( TNACCT-KHN-CNT (IDXK)   >   ZERO )
+      *
+                   IF    ( IDXK    =   35  OR 36 )
+                       MOVE    1       TO  FLG-SS017
+                   END-IF
+      *
                    INITIALIZE              WNACCT-AREA
                    PERFORM VARYING IDXR    FROM    1   BY  1
                        UNTIL ( IDXR    >   CONST-RYOYOCD-CD-MAX )
@@ -896,6 +942,21 @@
       *    療養病棟入院基本料入院診療会計・診療行為追加処理
       *****************************************************************
        200111-INS-NACCT-SEC            SECTION.
+      *
+           IF    ( SYS-5000-EIYOUKSNKBN    =   "1" )
+      *
+               PERFORM VARYING IDXZ    FROM    1   BY  1
+                       UNTIL ( IDXZ    >   CONST-EXRYOYO-MAX )
+                   IF    ( WRK-SRYCD
+                               =   CONST-EXRYOYO-DEFINED (IDXZ))
+                       MOVE    CONST-EXRYOYO-UNDEFINED (IDXZ)
+                                       TO   WRK-SRYCD
+                       MOVE    CONST-EXRYOYO-MAX
+                                       TO   IDXZ
+                   END-IF
+               END-PERFORM
+      *
+           END-IF
       *
            MOVE    WRK-SRYCD       TO  WRK-KHNCD
            MOVE    1               TO  WRK-MEISAISU

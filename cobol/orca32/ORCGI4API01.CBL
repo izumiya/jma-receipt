@@ -95,32 +95,32 @@
            03  WRK-SNUM-INX            PIC X(26).
            03  WRK-SNUM-OUTNUM         PIC 9(12).
       *
-       01  REG-AREA.
-           03  REG-SAVEREQ             PIC X(01).
-           03  REG-ORDERID             PIC X(04).
-           03  REG-NYUINYMD            PIC X(08).
-           03  REG-SRYYMD              PIC X(08).
-           03  REG-MED-AREA.
-               05  REG-MED-MAX         PIC 9(05).
-               05  REG-MED-OCC         OCCURS    41.
-                   07  REG-MED-ID      PIC X(02).
-                   07  REG-MED-DATA    PIC X(01).
-                   07  REG-MED-ALL     PIC X(80).
-           03  REG-ADL-AREA.
-               05  REG-ADL-MAX         PIC 9(05).
-               05  REG-ADL-OCC         OCCURS  4.
-                   07  REG-ADL-ID      PIC X(01).
-                   07  REG-ADL-TEN     PIC X(01).
-                   07  REG-ADL-ALL     PIC X(80).
-           03  REG-ERR-MAX             PIC 9(03).
-           03  REG-ERR-OCC             OCCURS  10.
-               05  REG-ERRCD           PIC X(04).
+       01  API-AREA.
+           03  API-SAVEREQ             PIC X(01).
+           03  API-ORDERID             PIC X(04).
+           03  API-NYUINYMD            PIC X(08).
+           03  API-SRYYMD              PIC X(08).
+           03  API-MED-AREA.
+               05  API-MED-MAX         PIC 9(05).
+               05  API-MED-OCC         OCCURS    100.
+                   07  API-MED-ID      PIC X(02).
+                   07  API-MED-DATA    PIC X(01).
+                   07  API-MED-ALL     PIC X(80).
+           03  API-ADL-AREA.
+               05  API-ADL-MAX         PIC 9(05).
+               05  API-ADL-OCC         OCCURS  4.
+                   07  API-ADL-ID      PIC X(01).
+                   07  API-ADL-TEN     PIC X(01).
+                   07  API-ADL-ALL     PIC X(80).
+           03  API-ERR-MAX             PIC 9(03).
+           03  API-ERR-OCC             OCCURS  10.
+               05  API-ERRCD           PIC X(04).
       *
        01  CONST-AREA.
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
            03  CONST-ERR-MAX           PIC 9(03)   VALUE 10.
            03  CONST-ODRITEM-MAX       PIC 9(05)   VALUE 30.
-           03  CONST-MED-MAX           PIC 9(03)   VALUE 42.
+           03  CONST-MED-MAX           PIC 9(03)   VALUE 50.
            03  CONST-ADL-MAX           PIC 9(03)   VALUE 4.
       *
            COPY    "COMMON-SPA"        REPLACING   //SPA-//
@@ -250,17 +250,17 @@
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
-           INITIALIZE                  REG-AREA
+           INITIALIZE                  API-AREA
            INITIALIZE                  SPA-AREA
       *
       *    初期処理
            PERFORM 100-INIT-SEC
       *
       *    主処理
-           IF    ( REG-ERR-MAX         =   ZERO )
+           IF    ( API-ERR-MAX         =   ZERO )
                PERFORM 200-MAIN-SEC
            ELSE
-               IF    ( REG-SAVEREQ     =   "1" )
+               IF    ( API-SAVEREQ     =   "1" )
                    PERFORM 290-ORDER-INSERT-SEC
                END-IF
            END-IF
@@ -344,7 +344,7 @@
       *
            PERFORM 1001-INIT-CHECK-SEC
       *
-           MOVE    NORDERID-PTEVALID   TO  REG-ORDERID
+           MOVE    NORDERID-PTEVALID   TO  API-ORDERID
       *
            .
        100-INIT-EXT.
@@ -356,7 +356,7 @@
        1001-INIT-CHECK-SEC         SECTION.
       *
            MOVE    HSPTEVALMREQ-SAVEREQ
-                                       TO  REG-SAVEREQ
+                                       TO  API-SAVEREQ
       *
            PERFORM 10011-SRYYMD-CHECK-SEC
       *
@@ -389,7 +389,7 @@
                    MOVE    "8001"     TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD   TO  REG-NYUINYMD
+                   MOVE    WRK-SYMD   TO  API-NYUINYMD
                END-IF
       *
            END-IF
@@ -435,7 +435,7 @@
        10011-SRYYMD-CHECK-SEC          SECTION.
       *
            IF    ( HSPTEVALMREQ-SRYYMD =   SPACE )
-               MOVE    SMCNDATE-YMD    TO  REG-SRYYMD
+               MOVE    SMCNDATE-YMD    TO  API-SRYYMD
            ELSE
                MOVE    HSPTEVALMREQ-SRYYMD
                                        TO  WRK-DATE
@@ -445,8 +445,8 @@
                    MOVE    "8009"      TO  WRK-ERRCD
                    PERFORM 990-ERROR-EDIT-SEC
                ELSE
-                   MOVE    WRK-SYMD    TO  REG-SRYYMD
-                   IF    ( REG-SRYYMD  <   CONST-H240401 )
+                   MOVE    WRK-SYMD    TO  API-SRYYMD
+                   IF    ( API-SRYYMD  <   CONST-H240401 )
                        MOVE    "8012"  TO  WRK-ERRCD
                        PERFORM 990-ERROR-EDIT-SEC
                    END-IF
@@ -494,21 +494,21 @@
       *****************************************************************
        10011-MEDINF-CHECK-SEC          SECTION.
       *
-           MOVE    ZERO            TO  REG-MED-MAX
+           MOVE    ZERO            TO  API-MED-MAX
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   CONST-MED-MAX )
       *
                IF    ( HSPTEVALMREQ-MED-ID (IDXA)  NOT =   SPACE )
       *
-                   COMPUTE REG-MED-MAX =   REG-MED-MAX +   1
+                   COMPUTE API-MED-MAX =   API-MED-MAX +   1
       *
                    MOVE    HSPTEVALMREQ-MED-ID (IDXA)
-                                   TO  REG-MED-ID (REG-MED-MAX)
+                                   TO  API-MED-ID (API-MED-MAX)
                    MOVE    HSPTEVALMREQ-MED-DATA (IDXA)
-                                   TO  REG-MED-DATA (REG-MED-MAX)
+                                   TO  API-MED-DATA (API-MED-MAX)
                    MOVE    HSPTEVALMREQ-MED-ALL (IDXA)
-                                   TO  REG-MED-ALL (REG-MED-MAX)
+                                   TO  API-MED-ALL (API-MED-MAX)
                END-IF
       *
            END-PERFORM
@@ -521,21 +521,21 @@
       *****************************************************************
        10011-ADLINF-CHECK-SEC          SECTION.
       *
-           MOVE    ZERO            TO  REG-ADL-MAX
+           MOVE    ZERO            TO  API-ADL-MAX
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   CONST-ADL-MAX )
       *
                IF    ( HSPTEVALMREQ-ADL-ID (IDXA)  NOT =   SPACE )
       *
-                   COMPUTE REG-ADL-MAX     =   REG-ADL-MAX +   1
+                   COMPUTE API-ADL-MAX     =   API-ADL-MAX +   1
       *
                    MOVE    HSPTEVALMREQ-ADL-ID (IDXA)
-                                   TO  REG-ADL-ID (REG-ADL-MAX)
+                                   TO  API-ADL-ID (API-ADL-MAX)
                    MOVE    HSPTEVALMREQ-ADL-TEN (IDXA)
-                                   TO  REG-ADL-TEN (REG-ADL-MAX)
+                                   TO  API-ADL-TEN (API-ADL-MAX)
                    MOVE    HSPTEVALMREQ-ADL-ALL (IDXA)
-                                   TO  REG-ADL-ALL (REG-ADL-MAX)
+                                   TO  API-ADL-ALL (API-ADL-MAX)
                END-IF
       *
            END-PERFORM
@@ -555,20 +555,20 @@
       *
            PERFORM 2300-SODR-COMMON-SET-SEC
       *
-           MOVE    REG-SRYYMD          TO  SODR-SRYYMD
-           MOVE    REG-ORDERID         TO  SODR-ORDERID
+           MOVE    API-SRYYMD          TO  SODR-SRYYMD
+           MOVE    API-ORDERID         TO  SODR-ORDERID
       *
            MOVE    ZERO                TO  IDX-ITM
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   REG-MED-MAX )
+                   UNTIL ( IDXA    >   API-MED-MAX )
       *
                PERFORM 2300-MEDINF-SET-SEC
       *
            END-PERFORM
       *
            PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   REG-ADL-MAX )
+                   UNTIL ( IDXA    >   API-ADL-MAX )
       *
                PERFORM 2300-ADLINF-SET-SEC
       *
@@ -603,22 +603,22 @@
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
            MOVE    NCLAIMID-MEDIDJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-MED-ID (IDXA)   TO  LNK-ODRITEM-ITEM   (IDX-ITM)
+           MOVE    API-MED-ID (IDXA)   TO  LNK-ODRITEM-ITEM   (IDX-ITM)
       *
-           IF    ( REG-MED-DATA (IDXA) NOT =   SPACE )
+           IF    ( API-MED-DATA (IDXA) NOT =   SPACE )
                PERFORM 2300-ODRITEM-COMMON-SET-SEC
                MOVE    NCLAIMID-MEDDATAJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-               MOVE    REG-MED-DATA (IDXA)
+               MOVE    API-MED-DATA (IDXA)
                                        TO  LNK-ODRITEM-ITEM   (IDX-ITM)
            END-IF
       *
       *
-           IF    ( REG-MED-ALL (IDXA)  NOT =   SPACE )
+           IF    ( API-MED-ALL (IDXA)  NOT =   SPACE )
                PERFORM 2300-ODRITEM-COMMON-SET-SEC
                MOVE    NCLAIMID-MEDALLJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-               MOVE    REG-MED-ALL (IDXA)
+               MOVE    API-MED-ALL (IDXA)
                                        TO  LNK-ODRITEM-MEMO   (IDX-ITM)
            END-IF
       *
@@ -633,21 +633,21 @@
            PERFORM 2300-ODRITEM-COMMON-SET-SEC
            MOVE    NCLAIMID-ADLIDJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-           MOVE    REG-ADL-ID (IDXA)   TO  LNK-ODRITEM-ITEM   (IDX-ITM)
+           MOVE    API-ADL-ID (IDXA)   TO  LNK-ODRITEM-ITEM   (IDX-ITM)
       *
-           IF    ( REG-ADL-TEN  (IDXA) NOT =   SPACE )
+           IF    ( API-ADL-TEN  (IDXA) NOT =   SPACE )
                PERFORM 2300-ODRITEM-COMMON-SET-SEC
                MOVE    NCLAIMID-ADLTENJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-               MOVE    REG-ADL-TEN  (IDXA)
+               MOVE    API-ADL-TEN  (IDXA)
                                        TO  LNK-ODRITEM-ITEM   (IDX-ITM)
            END-IF
       *
-           IF    ( REG-ADL-ALL (IDXA)  NOT =   SPACE )
+           IF    ( API-ADL-ALL (IDXA)  NOT =   SPACE )
                PERFORM 2300-ODRITEM-COMMON-SET-SEC
                MOVE    NCLAIMID-ADLALLJMA
                                        TO  LNK-ODRITEM-ITEMID (IDX-ITM)
-               MOVE    REG-ADL-ALL (IDXA)
+               MOVE    API-ADL-ALL (IDXA)
                                        TO  LNK-ODRITEM-MEMO   (IDX-ITM)
            END-IF
       *
@@ -667,7 +667,7 @@
            MOVE    SPA-PTID            TO  SODR-PTID
            MOVE    SMCNDATE-YMD        TO  SODR-UKEYMD
            MOVE    SMCNDATE-HMS        TO  SODR-UKEHMS
-           IF    ( REG-SAVEREQ         =   "1" )
+           IF    ( API-SAVEREQ         =   "1" )
                MOVE    "0"             TO  SODR-PROCKBN
            ELSE
                MOVE    "2"             TO  SODR-PROCKBN
@@ -734,8 +734,8 @@
       *
            MOVE    "1"             TO  HCN68S01-RANGE
            MOVE    SPA-PTID        TO  HCN68S01-PTID
-           MOVE    REG-SRYYMD(1:6) TO  HCN68S01-SRYYM
-           MOVE    REG-SRYYMD      TO  HCN68S01-SRYYMD
+           MOVE    API-SRYYMD(1:6) TO  HCN68S01-SRYYM
+           MOVE    API-SRYYMD      TO  HCN68S01-SRYYMD
            CALL    "ORCSNINF04"        USING 
                                        SNINF04-AREA
                                        HCN68S01-AREA
@@ -807,13 +807,13 @@
            MOVE    "1"                 TO  ORDER-NYUGAIKBN
            MOVE    SPA-PTNUM           TO  ORDER-PTNUM
            MOVE    SPA-PTID            TO  ORDER-PTID
-           MOVE    REG-SRYYMD          TO  ORDER-SRYYMD
+           MOVE    API-SRYYMD          TO  ORDER-SRYYMD
            MOVE    SMCNDATE-YMD        TO  ORDER-UKEYMD
            MOVE    SMCNDATE-HMS        TO  ORDER-UKEHMS
-           MOVE    REG-ORDERID         TO  ORDER-ORDERID
+           MOVE    API-ORDERID         TO  ORDER-ORDERID
       *
-           MOVE    REG-ERRCD (1)       TO  ORDER-ERRCD1
-      *    MOVE    REG-ERRCD (2)       TO  ORDER-ERRCD2
+           MOVE    API-ERRCD (1)       TO  ORDER-ERRCD1
+      *    MOVE    API-ERRCD (2)       TO  ORDER-ERRCD2
       *
            MOVE    1                   TO  ORDER-STATUS
       *
@@ -846,15 +846,15 @@
            PERFORM 800-TIME-SEC
            MOVE    WRK-TIME            TO  HSPTEVALMRES-INFORMATION-TIME
       *
-           IF    ( REG-ERR-MAX         =   ZERO )
-               MOVE    1               TO  REG-ERR-MAX
-               MOVE    "00"            TO  REG-ERRCD (1)
+           IF    ( API-ERR-MAX         =   ZERO )
+               MOVE    1               TO  API-ERR-MAX
+               MOVE    "00"            TO  API-ERRCD (1)
            END-IF
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   REG-ERR-MAX )
+                   UNTIL ( IDX1    >   API-ERR-MAX )
       *
-               MOVE    REG-ERRCD  (IDX1)
+               MOVE    API-ERRCD  (IDX1)
                                        TO  WRK-ERRCD
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD   TO  HSPTEVALMRES-API-RESULT    (IDX1)
@@ -1230,7 +1230,7 @@
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    REG-NYUINYMD        TO  PTNYUINRRK-NYUINYMD
+           MOVE    API-NYUINYMD        TO  PTNYUINRRK-NYUINYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    "key39"              TO  MCP-PATHNAME
@@ -1260,7 +1260,7 @@
            INITIALIZE                      PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
-           MOVE    REG-SRYYMD          TO  PTNYUINRRK-TENNYUYMD
+           MOVE    API-SRYYMD          TO  PTNYUINRRK-TENNYUYMD
                                            PTNYUINRRK-TENSTUYMD
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
@@ -1421,16 +1421,16 @@
       *****************************************************************
        990-ERROR-EDIT-SEC              SECTION.
       *
-           IF    ( REG-ERR-MAX     <   CONST-ERR-MAX )
+           IF    ( API-ERR-MAX     <   CONST-ERR-MAX )
       *
                PERFORM VARYING IDX8    FROM    1   BY  1
                        UNTIL ( IDX8    >   CONST-ERR-MAX )
-                        OR   ( REG-ERRCD  (IDX8)
+                        OR   ( API-ERRCD  (IDX8)
                                        =   WRK-ERRCD )
       *
-                   IF    ( REG-ERRCD  (IDX8)   =   SPACE )
-                       MOVE    WRK-ERRCD       TO  REG-ERRCD  (IDX8)
-                       MOVE    IDX8            TO  REG-ERR-MAX
+                   IF    ( API-ERRCD  (IDX8)   =   SPACE )
+                       MOVE    WRK-ERRCD       TO  API-ERRCD  (IDX8)
+                       MOVE    IDX8            TO  API-ERR-MAX
                        MOVE    CONST-ERR-MAX   TO  IDX8
                    END-IF
       *
@@ -1471,9 +1471,9 @@
            MOVE    WRK-TIME            TO  HSPTEVALMRES-INFORMATION-TIME
       *
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   REG-ERR-MAX )
+                   UNTIL ( IDX1    >   API-ERR-MAX )
       *
-               MOVE    REG-ERRCD  (IDX1)
+               MOVE    API-ERRCD  (IDX1)
                                        TO  WRK-ERRCD
                PERFORM 890-ERRCD-MSG-SEC
                MOVE    WRK-ERRCD   TO  HSPTEVALMRES-API-RESULT    (IDX1)

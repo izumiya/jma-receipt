@@ -33,7 +33,8 @@
                        09  SNINF04-TAIINYMD        PIC X(10).
                05  SNINF04-SRYYM                   PIC X(07).
                05  SNINF04-MEDKBN-AREA.
-                   07  SNINF04-MEDKBN-OCC          OCCURS  42.
+                   07  SNINF04-MEDKBN-MAX          PIC 9(03).
+                   07  SNINF04-MEDKBN-OCC          OCCURS  100.
                        09  SNINF04-MEDKBN-LV       PIC X(1).
                        09  SNINF04-MEDKBN-ID       PIC X(2).
                        09  SNINF04-MEDKBN-NAME     PIC X(100).

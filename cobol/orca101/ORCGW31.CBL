@@ -1020,7 +1020,9 @@
                    UNTIL ( IDX-CHK    >   SPA-GMN-MEDKBN-MAX )
                     OR   ( SPA-ERRCD  NOT =   SPACE )
       *
+               DISPLAY "A SEL " SPA-NAI-MEDKBN-ZAINUM (IDX-CHK)
                PERFORM 3101-SYS5014-SEL-SEC
+               DISPLAY "A RESULT " FLG-SYSKANRI
                IF    ( FLG-SYSKANRI    =   ZERO )
       *
                    MOVE    SMCNDATE-YMD    TO  SYS-5014-UPYMD
@@ -1030,6 +1032,7 @@
                    IF    ( SPA-W01-STYUKYMD
                                        >   SYS-5014-STYUKYMD )
                        MOVE    SYS-5014-REC    TO  SYSKANRI-REC
+                       MOVE    SYS-HOSPNUM     TO  SYSUP-HOSPNUM
                        MOVE    SYS-KANRICD     TO  SYSUP-KANRICD
                        MOVE    SYS-KBNCD       TO  SYSUP-KBNCD
                        MOVE    SYS-STYUKYMD    TO  SYSUP-STYUKYMD
@@ -1042,7 +1045,7 @@
                        MOVE    WRK-KEISANYMD   TO  SYS-EDYUKYMD
                        MOVE    SYSKANRI-REC    TO  MCPDATA-REC
                        MOVE    "tbl_syskanri"  TO  MCP-TABLE
-                       MOVE    "key"           TO  MCP-PATHNAME
+                       MOVE    "upd1"          TO  MCP-PATHNAME
                        PERFORM 910-DBUPDATE-SEC
                        IF    ( MCP-RC      NOT =   ZERO )
                            MOVE    "4008"      TO  SPA-ERRCD
@@ -1051,7 +1054,9 @@
       *
                    IF    ( SPA-ERRCD       =   SPACE )
       *
+               DISPLAY "B SEL " SPA-NAI-MEDKBN-ZAINUM (IDX-CHK)
                        PERFORM 48011-SYS5014-EDIT-SEC
+               DISPLAY "B RESULT " FLG-SYSKANRI
       *
                        IF    ( SPA-W01-STYUKYMD
                                            >   SYS-5014-STYUKYMD )
@@ -1068,10 +1073,12 @@
                            END-IF
                        ELSE
                            MOVE    SYS-5014-REC    TO  SYSKANRI-REC
+                           MOVE    SYS-HOSPNUM     TO  SYSUP-HOSPNUM
                            MOVE    SYS-KANRICD     TO  SYSUP-KANRICD
                            MOVE    SYS-KBNCD       TO  SYSUP-KBNCD
                            MOVE    SYS-STYUKYMD    TO  SYSUP-STYUKYMD
                            MOVE    SYS-EDYUKYMD    TO  SYSUP-EDYUKYMD
+      *
                            MOVE    SPA-W01-STYUKYMD TO SYS-STYUKYMD
                            MOVE    SPA-W01-EDYUKYMD TO SYS-EDYUKYMD
                            MOVE    SYSKANRI-REC    TO  MCPDATA-REC

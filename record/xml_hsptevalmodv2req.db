@@ -12,7 +12,7 @@ xml_hsptevalmodv2req {
 			ID				varchar(2);
 			Evaluation      varchar(1);
 			Evaluation_Daily	varchar(80);
-		}[42];
+		}[50];
 		ADL_Score	{
 			ID				varchar(1);
 			Evaluation      varchar(1);
