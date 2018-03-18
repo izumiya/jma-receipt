@@ -578,11 +578,12 @@ FORM_files = \
           HCM03V05.red \
           HCMG008.red \
           HCM78V01.red \
+	      HCN68H30.red \
+	      HCN69H30.red \
           HC02V04.red \
           HC02QV04.red \
           HCM19V04.red \
           HC02ZA5.red \
-
 
 all:   
 
