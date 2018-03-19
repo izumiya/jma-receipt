@@ -121,6 +121,7 @@
       *
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
+           03  CONST-H300401           PIC X(08)   VALUE "20180401".
            03  CONST-H280401           PIC X(08)   VALUE "20160401".
            03  CONST-H220401           PIC X(08)   VALUE "20100401".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
@@ -467,7 +468,7 @@
                  AND ( MEDH20-EDYMD (IDX-MED)
                                       >=   SPA-W01-STYUKYMD )
                  AND ( MEDH20-ID    (IDX-MED)
-                                      <    "90" )
+                                      <    "80" )
       *
                    COMPUTE IDX-CHK   = IDX-CHK + 1
                    MOVE    IDX-CHK     TO  SPA-GMN-MEDKBN-MAX
@@ -488,6 +489,15 @@
                    ELSE
                        MOVE    "F"     TO  SPA-GMN-CHK-MEDKBN (IDX-CHK)
                    END-IF
+      *
+                   IF    ( SPA-W01-STYUKYMD   >=   CONST-H300401 )
+                       IF    ( MEDH20-ZAINUM (IDX-MED)
+                                       =   2022 OR 2024 OR 2031 OR 2002
+                                        OR 2007 OR 2039 )
+                           MOVE    "T" TO  SPA-GMN-CHK-MEDKBN (IDX-CHK)
+                       END-IF
+                   END-IF
+      *
                END-IF
       *
            END-PERFORM
@@ -1350,6 +1360,14 @@
                IF    ( IDX-CHK         >   SPA-GMN-MEDKBN-MAX )
                    MOVE    WIDGET-INSENSITIVE
                                       TO  W31-CHK-MEDKBN-STATE (IDX-CHK)
+               END-IF
+               IF    ( SPA-W01-STYUKYMD   >=   CONST-H300401 )
+                   IF    ( SPA-NAI-MEDKBN-ZAINUM (IDX-CHK)
+                               =   2022 OR 2024 OR 2031 OR 2002
+                                OR 2007 OR 2039 )
+                       MOVE    WIDGET-INSENSITIVE
+                                      TO  W31-CHK-MEDKBN-STATE (IDX-CHK)
+                   END-IF
                END-IF
       *
            END-PERFORM

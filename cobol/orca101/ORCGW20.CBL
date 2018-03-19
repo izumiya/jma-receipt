@@ -3349,14 +3349,14 @@ NEW   *    夜間看護体制加算（障害者施設）
       *
            END-PERFORM
       *
-           IF    ( SPA-ERRCD           =   SPACE )
-               IF    ( SPA-GMN-W20-SBT =   CONST-KANSATU )
-                   CONTINUE
-               ELSE
+      *    IF    ( SPA-ERRCD           =   SPACE )
+      *        IF    ( SPA-GMN-W20-SBT =   CONST-KANSATU )
+      *            CONTINUE
+      *        ELSE
       *            入院加算情報チェック処理-施設基準チェック処理
-                   PERFORM 4901-SSTKIJUN-CHK-SEC
-               END-IF
-           END-IF
+      *            PERFORM 4901-SSTKIJUN-CHK-SEC
+      *        END-IF
+      *    END-IF
       *
            .
        4101-KASAN-CHK-EXT.

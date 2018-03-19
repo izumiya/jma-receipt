@@ -2407,10 +2407,10 @@
       *
            END-PERFORM
       *
-           IF    ( SPA-ERRCD   =   SPACE )
+      *    IF    ( SPA-ERRCD   =   SPACE )
       *        入院加算情報チェック処理-施設基準チェック処理
-               PERFORM 4901-SSTKIJUN-CHK-SEC
-           END-IF
+      *        PERFORM 4901-SSTKIJUN-CHK-SEC
+      *    END-IF
       *
            .
       *

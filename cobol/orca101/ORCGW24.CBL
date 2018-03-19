@@ -2471,10 +2471,10 @@
            END-IF
       *
       *    入院加算情報チェック処理-施設基準チェック処理
-           IF    ( SPA-ERRCD       =   SPACE )
-             AND ( FLG-END         =   ZERO  )
-               PERFORM 4101-SSTKIJUN-CHK-SEC
-           END-IF
+      *    IF    ( SPA-ERRCD       =   SPACE )
+      *      AND ( FLG-END         =   ZERO  )
+      *        PERFORM 4101-SSTKIJUN-CHK-SEC
+      *    END-IF
       *
       *    入院会計表示情報チェック処理
            PERFORM VARYING IDXZ    FROM    1   BY  1
