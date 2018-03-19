@@ -49,6 +49,7 @@
            03  FLG-NYUKSNCHK               PIC 9(01).
            03  FLG-NRRKSRH                 PIC 9(01).
            03  FLG-SYSKANRI                PIC 9(01).
+           03  FLG-ETENSU1                 PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
       *
        01  WRK-AREA.
@@ -56,33 +57,92 @@
            03  WRK-KHN-NYUKSNKBN           PIC X(03).
            03  WRK-KSN-NYUKSNKBN           PIC X(03).
            03  WRK-SRYCD                   PIC X(09).
+           03  WRK-KSNCD                   PIC X(09).
       *
        01  CONST-AREA.
+           03  CONST-H300401       PIC X(08)   VALUE   "20180401".
            03  CONST-H240401       PIC X(08)   VALUE   "20120401".
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
-               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   8.
+               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   12.
                05  CONST-KSNCD-VAL.
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°è°ìÈÌÆþ±¡´ðËÜÎÁ¡Ë
                    07  CONST-KSNCD-190142970
                                    PIC X(09)   VALUE   "190142970".
+                   07  FILLER      PIC X(08)   VALUE   "20120401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡Ë
                    07  CONST-KSNCD-190143370
                                    PIC X(09)   VALUE   "190143370".
+                   07  FILLER      PIC X(08)   VALUE   "20120401".
+                   07  FILLER      PIC X(08)   VALUE   "20180331".
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡Ë
                    07  CONST-KSNCD-190134270
                                    PIC X(09)   VALUE   "190134270".
-                   07  CONST-KSNCD-190116990
-                                   PIC X(09)   VALUE   "190116990".
+                   07  FILLER      PIC X(08)   VALUE   "20100401".
+                   07  FILLER      PIC X(08)   VALUE   "20180331".
+      *            µÞÀ­´ü´µ¼Ô»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
+                   07  CONST-KSNCD-190201770
+                                   PIC X(09)   VALUE   "190201770".
+                   07  FILLER      PIC X(08)   VALUE   "20180401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            ºßÂð´µ¼Ô»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
+                   07  CONST-KSNCD-190201870
+                                   PIC X(09)   VALUE   "190201870".
+                   07  FILLER      PIC X(08)   VALUE   "20180401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ¡Ë
                    07  CONST-KSNCD-190135470
                                    PIC X(09)   VALUE   "190135470".
+                   07  FILLER      PIC X(08)   VALUE   "20100401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡Ë
                    07  CONST-KSNCD-190135670
                                    PIC X(09)   VALUE   "190135670".
+                   07  FILLER      PIC X(08)   VALUE   "20100401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            êóáì´µ¼Ô´ÉÍý²Ã»»
+                   07  CONST-KSNCD-190116990
+                                   PIC X(09)   VALUE   "190116990".
+                   07  FILLER      PIC X(08)   VALUE   "20040401".
+                   07  FILLER      PIC X(08)   VALUE   "20120331".
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
                    07  CONST-KSNCD-190177170
                                    PIC X(09)   VALUE   "190177170".
+                   07  FILLER      PIC X(08)   VALUE   "20140401".
+                   07  FILLER      PIC X(08)   VALUE   "20180331".
+      *            µÞÀ­´ü´µ¼Ô»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
+                   07  CONST-KSNCD-190212370
+                                   PIC X(09)   VALUE   "190212370".
+                   07  FILLER      PIC X(08)   VALUE   "20180401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            ºßÂð´µ¼Ô»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
+                   07  CONST-KSNCD-190212470
+                                   PIC X(09)   VALUE   "190212470".
+                   07  FILLER      PIC X(08)   VALUE   "20180401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
+      *            µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë
                    07  CONST-KSNCD-190152470
                                    PIC X(09)   VALUE   "190152470".
+                   07  FILLER      PIC X(08)   VALUE   "20120401".
+                   07  FILLER      PIC X(08)   VALUE   "99999999".
                05  CONST-KSNCD-R REDEFINES CONST-KSNCD-VAL.
-                   07  CONST-KSNCD-OCC     OCCURS  8.
-                       09  CONST-KSNCD     PIC X(09).
+                   07  CONST-KSNCD-OCC     OCCURS  12.
+                       09  CONST-KSNCD                PIC X(09).
+                       09  CONST-KSNCD-YUKOSTYMD      PIC X(08).
+                       09  CONST-KSNCD-YUKOEDYMD      PIC X(08).
       *
+           COPY "CPTENSU.INC"  REPLACING   //TNS-//   BY //KHN-//
+                                           //TNSUP-// BY //KHNUP-//
+                                           //TNSXX-// BY //KHNXX-//.
+      *
+           COPY "CPTENSU.INC"  REPLACING   //TNS-//   BY //KSN-//
+                                           //TNSUP-// BY //KSNUP-//
+                                           //TNSXX-// BY //KSNXX-//.
+      *
+
+
+
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -94,6 +154,10 @@
       *    ÅÀ¿ô
            COPY    "CPTENSU.INC".
       *
+      *    ÅÅ»ÒÅÀ¿ôÉ½£±
+       01  ETENSU1-REC.
+           COPY    "CPETENSU1.INC".
+      *
       *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯
        01  NYUKSNCHK-REC.
            COPY    "CPNYUKSNCHK.INC".
@@ -101,6 +165,9 @@
       *    Æþ±¡ÍúÎò¾È²ñ
        01  NRRKSRH-REC.
            COPY    "CPNRRKSRH.INC".
+      *
+      *    Æþ±¡ÅÀ¿ô¥Þ¥¹¥¿ÉÕ²Ã¾ðÊó¥µ¥Ö
+           COPY    "CPORCSNTENSU.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -147,6 +214,8 @@
                                            CNT-AREA
                                            FLG-AREA
                                            WRK-AREA
+                                           KHN-TENSU-REC
+                                           KSN-TENSU-REC
       *
                                            SI01-JOKUSOUYMD
                                            SI01-JOKUSOUKBN
@@ -171,32 +240,7 @@
       *****************************************************************
        200-MAIN-SEC                        SECTION.
       *
-      *
            MOVE    ZERO                TO  CNT-KSNLST
-      *
-           PERFORM VARYING IDX-KSN     FROM    1   BY  1
-                   UNTIL ( IDX-KSN     >   CONST-KSNCD-MAX )
-      *
-               MOVE    CONST-KSNCD (IDX-KSN)
-                                       TO  WRK-SRYCD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               IF    ( FLG-TENSU       =   ZERO )
-                   IF    ( TNS-HOSPSRYKBN  =   0 )
-                    OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
-      *
-                       COMPUTE CNT-KSNLST
-                           =   CNT-KSNLST  +   1
-      *
-                       MOVE    CNT-KSNLST
-                                       TO  SI01-KSNLST-MAX
-                       MOVE    TNS-SRYCD
-                                       TO  SI01-KSNLST-SRYCD(CNT-KSNLST)
-                       MOVE    TNS-NAME
-                                       TO  SI01-KSNLST-NAME (CNT-KSNLST)
-                   END-IF
-               END-IF
-      *
-           END-PERFORM
       *
            MOVE    SPACE               TO  WRK-KSNNAME
                                            WRK-KHN-NYUKSNKBN
@@ -206,20 +250,196 @@
       *
            PERFORM VARYING IDX-KSN     FROM    1   BY  1
                    UNTIL ( IDX-KSN     >   CONST-KSNCD-MAX )
-                    OR   ( CNT-KSN     >=  CONST-GMN-KSN-MAX )
+      *
+               IF    ( SI01-SRYYMD >=  CONST-KSNCD-YUKOSTYMD (IDX-KSN))
+                AND  ( SI01-SRYYMD <=  CONST-KSNCD-YUKOEDYMD (IDX-KSN))
+      *
+                   MOVE    CONST-KSNCD (IDX-KSN)
+                                       TO  WRK-SRYCD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       =   ZERO )
+                       IF    ( TNS-HOSPSRYKBN  =   0 )
+                        OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+      *
+                           COMPUTE CNT-KSNLST
+                               =   CNT-KSNLST  +   1
+      *
+                           MOVE    CNT-KSNLST
+                                       TO  SI01-KSNLST-MAX
+                           MOVE    TNS-SRYCD
+                                       TO  SI01-KSNLST-SRYCD(CNT-KSNLST)
+                           MOVE    TNS-NAME
+                                       TO  SI01-KSNLST-NAME (CNT-KSNLST)
+                       END-IF
+                   END-IF
+      *
+                   IF   ( CNT-KSN      <   CONST-GMN-KSN-MAX )
+                       EVALUATE    TRUE
+                       WHEN  ( SI01-SRYYMD     >=  CONST-H300401 )
+                           PERFORM 2001-H30-KSN-CHK-SEC
+                       WHEN    OTHER
+                           PERFORM 2001-KSN-CHK-SEC
+                       END-EVALUATE
+                   END-IF
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+      *
+           .
+       200-MAIN-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       2001-H30-KSN-CHK-SEC            SECTION.
+      *
+           MOVE    1               TO  FLG-HIT
+      *
+           MOVE    CONST-KSNCD (IDX-KSN)
+                                   TO  WRK-SRYCD
+           PERFORM 900-TENSU-KEY-SEL-SEC
+           IF    ( FLG-TENSU       =   ZERO )
+               MOVE    TNS-TENSU-REC
+                                   TO  KSN-TENSU-REC
+           ELSE
+               MOVE     ZERO       TO  FLG-HIT
+           END-IF
+      *
+           IF    ( FLG-HIT         =   1 )
+               IF    ( TNS-HOSPSRYKBN  =   0 )
+                OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO    TO  FLG-HIT
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-HIT         =   1 )
+      *
+               PERFORM 2001-KHNCD-CHG-SEC
+      *
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    TNS-TENSU-REC   TO  KHN-TENSU-REC
+               INITIALIZE                  SNTENSU-AREA
+               MOVE    TNS-SRYCD       TO  SNTENSU-SRYCD
+               MOVE    SI01-SRYYMD     TO  SNTENSU-BASEYMD
+               CALL    "ORCSNTENSU"        USING
+                                           SNTENSU-AREA
+                                           TNS-TENSU-REC
+                                           SPA-AREA
+      *
+               IF    ( KSN-CDKBN-KBNNUM       >=   200 )
+                AND  ( KSN-CDKBN-KBNNUM       <=   299 )
+                   PERFORM 900-ETENSU1-KEY4-SEL-SEC
+                   IF    ( FLG-ETENSU1         =   ZERO )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO            TO  FLG-HIT
+                   END-IF
+               ELSE
+                   PERFORM 2001-H30-NYUKSN-CHK-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( FLG-HIT         =   1 )
+               COMPUTE CNT-KSN =   CNT-KSN +   1
+               MOVE    CNT-KSN     TO  SI01-KSN-MAX
+               MOVE    KSN-NAME    TO  SI01-KSN-NAME  (CNT-KSN)
+               MOVE    KSN-SRYCD   TO  SI01-KSN-SRYCD (CNT-KSN)
+           END-IF
+      *
+           .
+       2001-H30-KSN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÎÁ²Ã»»»»Äê²ÄÈÝ¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2001-H30-NYUKSN-CHK-SEC             SECTION.
+      *
+           DISPLAY SI01-SRYYMD " KHN:" KHN-SRYCD "/KSN:" KSN-SRYCD
+           EVALUATE    KSN-SRYCD
+           WHEN    CONST-KSNCD-190142970
+               IF    ( KHN-SRYCD           =   "190200210"
+                                            OR "190077510"
+                                            OR "190077610" )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190201770
+               IF    ( KHN-CDKBN-KBNNUM    =   101 )
+                AND  ( SNTENSU-KBNNUM      =   101 )
+      *!            CONTINUE
+                   MOVE    ZERO            TO  FLG-HIT
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190201870
+               IF    ( KHN-CDKBN-KBNNUM    =   101 )
+                AND  ( SNTENSU-KBNNUM      =   101 )
+                AND  ( SNTENSU-TOKUBETSUKBN =  SPACE )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190135470
+               IF    ( SNTENSU-KBNNUM      =   108 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190135670
+               IF    ( SNTENSU-KBNNUM      =   109 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190212370
+               IF    ( SNTENSU-KBNNUM       =   308 )
+                AND  ( SNTENSU-EDANUM       =   3 )
+      *!            CONTINUE
+                   MOVE    ZERO            TO  FLG-HIT
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190212470
+               IF    ( SNTENSU-KBNNUM       =   308 )
+                AND  ( SNTENSU-EDANUM       =   3 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           WHEN    CONST-KSNCD-190152470
+               IF    ( KHN-CDKBN-KBNNUM    =   317 )
+                AND  ( SNTENSU-KBNNUM      =   317 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO            TO  FLG-HIT
+               END-IF
+           END-EVALUATE
+      *
+           .
+       2001-H30-NYUKSN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       2001-KSN-CHK-SEC                SECTION.
       *
                MOVE    1               TO  FLG-HIT
       *
                MOVE    CONST-KSNCD (IDX-KSN)
                                        TO  WRK-SRYCD
+                                           WRK-KSNCD
       *
                MOVE    CONST-KSNCD (IDX-KSN)
                                        TO  WRK-SRYCD
                PERFORM 900-TENSU-KEY-SEL-SEC
                IF    ( FLG-TENSU       =   ZERO )
                    MOVE    TNS-NAME    TO  WRK-KSNNAME
-                   MOVE    TNS-NYUKHNKSNKBN
-                                       TO  WRK-KSN-NYUKSNKBN
                ELSE
                    MOVE     ZERO       TO  FLG-HIT
                END-IF
@@ -244,22 +464,7 @@
       *
                IF    ( FLG-HIT         =   1 )
       *
-                   EVALUATE    SI01-SNTNYUINCD
-                   WHEN    "099999950"
-                       MOVE    "190097010"         TO  WRK-SRYCD
-                   WHEN    "099999951"
-                       MOVE    "190097210"         TO  WRK-SRYCD
-                   WHEN    "099999952"
-                       MOVE    "190135110"         TO  WRK-SRYCD
-                   WHEN    "099999955"
-                       MOVE    "190169610"         TO  WRK-SRYCD
-                   WHEN    "099999956"
-                       MOVE    "190169910"         TO  WRK-SRYCD
-                   WHEN    "099999957"
-                       MOVE    "190170210"         TO  WRK-SRYCD
-                   WHEN    OTHER
-                       MOVE    SI01-SNTNYUINCD     TO  WRK-SRYCD
-                   END-EVALUATE
+                   PERFORM 2001-KHNCD-CHG-SEC
       *
                    PERFORM 900-TENSU-KEY-SEL-SEC
                    MOVE    TNS-NYUKHNKSNKBN        TO  WRK-KHN-NYUKSNKBN
@@ -292,12 +497,8 @@
                                        TO  SI01-KSN-SRYCD (CNT-KSN)
                END-IF
       *
-           END-PERFORM
-      *
            .
-      *
-           .
-       200-MAIN-EXT.
+       2001-KSN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    Æþ±¡ÎÁ²Ã»»»»Äê²ÄÈÝ¥Á¥§¥Ã¥¯
@@ -402,6 +603,7 @@
            .
        2001-RYOYO-CHK-EXT.
            EXIT.
+           .
       *****************************************************************
       *    êóáì´µ¼Ô´ÉÍý²Ã»»¥Á¥§¥Ã¥¯½èÍý
       *    SI01-JOKUSOUKBN  =  "1" OR "2"¡Êêóáì´µ¼Ô´ÉÍý²Ã»»»»ÄêºÑ¤ß¡Ë
@@ -426,9 +628,34 @@
        2001-JOKUSOU-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    Æþ±¡´ðËÜÎÁ¥³¡¼¥ÉÃÖ´¹½èÍý
+      *****************************************************************
+       2001-KHNCD-CHG-SEC                  SECTION.
+      *
+           EVALUATE    SI01-SNTNYUINCD
+           WHEN    "099999950"
+               MOVE    "190097010"         TO  WRK-SRYCD
+           WHEN    "099999951"
+               MOVE    "190097210"         TO  WRK-SRYCD
+           WHEN    "099999952"
+               MOVE    "190135110"         TO  WRK-SRYCD
+           WHEN    "099999955"
+               MOVE    "190169610"         TO  WRK-SRYCD
+           WHEN    "099999956"
+               MOVE    "190169910"         TO  WRK-SRYCD
+           WHEN    "099999957"
+               MOVE    "190170210"         TO  WRK-SRYCD
+           WHEN    OTHER
+               MOVE    SI01-SNTNYUINCD     TO  WRK-SRYCD
+           END-EVALUATE
+      *
+           .
+       2001-KHNCD-CHG-EXT.
+           EXIT.
+      *****************************************************************
       *    ½ªÎ»½èÍý
       *****************************************************************
-       300-END-SEC                        SECTION.
+       300-END-SEC                         SECTION.
       *
       *
            .
@@ -465,6 +692,36 @@
        900-TENSU-KEY-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    ÅÅ»ÒÅÀ¿ôÉ½£±¸¡º÷½èÍý
+      *****************************************************************
+       900-ETENSU1-KEY4-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ETENSU1
+      *
+           INITIALIZE                      ETENSU1-REC
+           MOVE    KHN-SRYCD           TO  ETENSU1-SRYCD
+           MOVE    KSN-SRYCD           TO  ETENSU1-UPSRYCD
+           MOVE    SI01-SRYYMD         TO  ETENSU1-YUKOSTYMD
+                                           ETENSU1-YUKOEDYMD
+           MOVE    ETENSU1-REC         TO  MCPDATA-REC
+           MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  ETENSU1-REC
+           ELSE
+               INITIALIZE                  ETENSU1-REC
+               MOVE    1               TO  FLG-ETENSU1
+           END-IF
+      *
+           MOVE    "tbl_etensu_1"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-ETENSU1-KEY4-SEL-EXT.
+           EXIT.
       *****************************************************************
       *    Æþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý(KEY)
       *****************************************************************
