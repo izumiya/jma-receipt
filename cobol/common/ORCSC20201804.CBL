@@ -142,6 +142,10 @@
       *    抗悪性腫瘍剤処方管理加算
            03  FLG-AKUSKSN1            PIC 9(01).
            03  FLG-AKUSKSN2            PIC 9(01).
+      *H30.4
+      *    向精神薬調整連携加算
+           03  FLG-RENKSN1            PIC 9(01).
+           03  FLG-RENKSN2            PIC 9(01).
       *
            03  FLG-CHOKIKSN            PIC 9(01).
       *    薬剤判定
@@ -262,6 +266,9 @@
            03  IDX-SYOHOUMD2       PIC 9(04).
            03  IDX-G2              PIC 9(04).
            03  IDX-SGEM            PIC 9(04).
+      *H30.4
+           03  IDX-R1              PIC 9(04).
+           03  IDX-R2              PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -683,8 +690,8 @@
       *H28.4
       * 湿布薬枚数制限解除
        01  CONS-SP70-SRYCD         PIC X(09)   VALUE    "099200201".
-      * 後発外来医薬品使用体制加算
       *H30.4
+      * 後発外来医薬品使用体制加算
        01  CONS-GEN-KSN1           PIC X(09)   VALUE    "120004370".
        01  CONS-GEN-KSN2           PIC X(09)   VALUE    "120004070".
        01  CONS-GEN-KSN3           PIC X(09)   VALUE    "120004170".
@@ -707,6 +714,11 @@
            03  CONS-NNCHIKSN1      PIC X(09)   VALUE   "112021870".
       *    認知症地域包括診療加算２
            03  CONS-NNCHIKSN2      PIC X(09)   VALUE   "112017570".
+      *
+      *    向精神薬調整連携加算（処方せん料）
+           03  CONS-CHOSEIKSN1     PIC X(09)   VALUE   "120004570".
+      *    向精神薬調整連携加算（処方料）
+           03  CONS-CHOSEIKSN2     PIC X(09)   VALUE   "120004470".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -3023,6 +3035,15 @@
       *            処方料減算（低紹介率）
                        MOVE    1                   TO  FLG-SGEM
                        MOVE    IDX                 TO  IDX-SGEM
+      *H30.3
+                   WHEN    CONS-CHOSEIKSN2
+      *            向精神薬調整連携加算（処方料）
+                       MOVE    1                   TO  FLG-RENKSN2
+                       MOVE    IDX                 TO  IDX-R2
+                   WHEN    CONS-CHOSEIKSN1
+      *            向精神薬調整連携加算（処方せん料）
+                       MOVE    1                   TO  FLG-RENKSN1
+                       MOVE    IDX                 TO  IDX-R1
                END-EVALUATE
       *#######
       *
@@ -3281,17 +3302,12 @@
                MOVE    ZERO            TO  SPA-PSY80-ARI(IDX-80)
            END-IF
       *!!
-      *!!
-      *???????????????????????????
       *H30.4
-      *???????????????????????????
       *    不安不眠薬入力あり
            IF    (ORCSPSYCHO-COUNT (1) >=  ZERO )
              OR  (ORCSPSYCHO-COUNT (2) >=  ZERO )
                MOVE    1               TO  WRK-FUANYAKU
            END-IF
-      *???????????????????????????
-      *???????????????????????????
            .
        30003-PSYCHO-CHK-EXT.
            EXIT.
@@ -3684,6 +3700,51 @@
                            MOVE    "1"             TO  WRK-COM-KZMFLG
                                                               (IDX-A2)
                            MOVE    IDX-A2          TO  LNK-ORCSC-KEI-IDX
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *
+      *H30.4
+      *    向精神薬調整連携加算（処方せん）は処方箋料があること
+           IF      FLG-RENKSN1         =   1
+               IF      FLG-SYOHOSENN       =   ZERO
+                   MOVE    "0245"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-R1)
+      *            処方料もない時、警告とする
+                   IF      FLG-SYOHORYO        =   ZERO
+                       MOVE    SPACE           TO  SPA-ERRCD
+                       MOVE    SPACE           TO  WRK-COM-CUR (IDX-R1)
+                       IF     (WRK-COM-KZMFLG (IDX-R1) =   SPACE) AND
+                              (LNK-ORCSC-KEI-IDX       =   ZERO )
+                           MOVE    "K245"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-R1)
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-R1)
+                           MOVE    IDX-R1          TO  LNK-ORCSC-KEI-IDX
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *    向精神薬調整連携加算（処方料）は処方料があること
+           IF      FLG-RENKSN2        =   1
+               IF      FLG-SYOHORYO        =   ZERO
+                   MOVE    "0246"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-R2)
+      *            処方せん料もない時、警告とする
+                   IF      FLG-SYOHOSENN        =   ZERO
+                       MOVE    SPACE           TO  SPA-ERRCD
+                       MOVE    SPACE           TO  WRK-COM-CUR (IDX-R2)
+                       IF     (WRK-COM-KZMFLG (IDX-R2) =   SPACE) AND
+                              (LNK-ORCSC-KEI-IDX       =   ZERO )
+                           MOVE    "K246"          TO  SPA-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-R2)
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-R2)
+                           MOVE    IDX-R2          TO  LNK-ORCSC-KEI-IDX
                        END-IF
                    END-IF
                END-IF

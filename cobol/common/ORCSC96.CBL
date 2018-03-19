@@ -3647,6 +3647,35 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H30.4 改正
+               WHEN    "0245"
+                   STRING  "処方せん料が算定されません。"
+                           "抗悪性腫瘍剤処方管理加算（処方せん料）は"
+                           "算定不可です"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K245"
+                   STRING  "警告！処方せん料を算定しません。"
+                           "抗悪性腫瘍剤処方管理加算（処方せん料）"
+                           "のみの算定"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0246"
+                   STRING  "処方料が算定されません。"
+                           "抗悪性腫瘍剤処方管理加算（処方料）は"
+                           "算定不可です"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K246"
+                   STRING  "警告！処方料を算定しません。"
+                           "抗悪性腫瘍剤処方管理加算（処方料）"
+                           "のみの算定です"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *H29.8
                WHEN    "1310"
                    STRING  "保険組合せの選択件数が上限を超えています。"
