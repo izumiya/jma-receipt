@@ -83,6 +83,7 @@
       *    カウント領域
        01  CNT-AREA.
            03  CNT-IN                          PIC 9(06).
+           03  CNT-PAGE                        PIC 9(06).
            03  CNT-LINE                        PIC 9(06).
       *
        01  INDEX-AREA.
@@ -3323,7 +3324,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    CNT-IN          TO  JOB-UPDCNT
+           MOVE    CNT-PAGE        TO  JOB-UPDCNT
            PERFORM 900-CALL-ORCSJOB-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
@@ -3338,6 +3339,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *    印刷処理
       *****************************************************************
        3001-LST-HENSYU-SEC            SECTION.
+      *
+           ADD     1                TO  CNT-PAGE
       *
            INITIALIZE                  ORCSPRTAREA
            MOVE    "INS"            TO  SPRT-MODE
