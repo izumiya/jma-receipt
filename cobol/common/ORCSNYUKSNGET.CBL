@@ -1756,6 +1756,23 @@
                                    MOVE   "190171770"  TO
                                              WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
+      *                      ÃÎ¥÷£∑£µ¬–£±¥«∏Ó ‰Ωı≤√ªª
+      *                      ° √œ∞Ë∞Ï»Ã∆˛±°Œ¡£±°¢£≤°À
+      *                      ° £±£≥¬–£±∆˛±°¥À‹Œ¡°À
+                             WHEN    "190191170"
+                                     IF LNK-NYUKSNGET-NYUIN-SRYCD =
+                                          "190200210"   OR
+                                          "190077510"   OR
+                                          "190090310"   OR
+                                          "190093810"   OR
+                                          "190081810"   OR
+                                          "190134510"   OR
+                                          "190086510"   OR
+                                          "190134710"
+                                         ADD    1            TO  IDX8
+                                         MOVE   "190191170"  TO
+                                              WRK-NYUKHNKSN-SRYCD(IDX8)
+                                     END-IF
       *                      ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª° Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±°À
                              WHEN    "190168070"
                                      MOVE    ZERO     TO  FLG-TENSU
