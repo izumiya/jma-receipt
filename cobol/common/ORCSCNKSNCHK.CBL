@@ -31,6 +31,9 @@
       *  05.00.00    NACL-小豆沢  18/03/12  入院料と入院料加算のチェック
       *                                     を入院料加算チェックマスタから
       *                                     電子点数表マスタに変更
+      *  05.00.00    NACL-小豆沢  18/03/19  入院基本料等加算の中で注の加算
+      *                                     は注加算通番ゼロの加算に読み替えて
+      *                                     チェックする
       *****************************************************************
       *
       *
@@ -75,6 +78,8 @@
            03  WRK-MM-9     REDEFINES   WRK-MM-X
                                            PIC 9(02).
            03  WRK-KSN-NYUKHNKSNKBN        PIC 9(03).
+           03  WRK-KSN-CHUKSNCD            PIC X(04).
+           03  WRK-KSN-CHUKSNTUBAN         PIC X(01).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-CHUKSNCD-XXX            PIC X(04).
       *
@@ -309,6 +314,8 @@
       *    入院料加算の入院基本加算区分を取得
            MOVE    ZERO                    TO  FLG-KSN
            MOVE    ZERO                    TO  WRK-KSN-NYUKHNKSNKBN
+           MOVE    SPACE                   TO  WRK-KSN-CHUKSNCD
+                                               WRK-KSN-CHUKSNTUBAN
            INITIALIZE                          TNS-TENSU-REC
            MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            MOVE    ORCSCNKSN-SRYCD         TO  TNS-SRYCD
@@ -339,6 +346,22 @@
       *        入院基本料等加算
                MOVE      2                 TO  FLG-KSN
                MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSN-NYUKHNKSNKBN
+               MOVE    TNS-CHUKSNCD        TO  WRK-KSN-CHUKSNCD
+               MOVE    TNS-CHUKSNTUBAN     TO  WRK-KSN-CHUKSNTUBAN
+               IF      WRK-KSN-CHUKSNTUBAN  NOT =  "0"
+      *          加算コードを注加算通番０のものに読み替える
+                 INITIALIZE                          TNS-TENSU-REC
+                 MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
+                 MOVE    WRK-KSN-CHUKSNCD        TO  TNS-CHUKSNCD
+                 MOVE    "0"                     TO  TNS-CHUKSNTUBAN
+                 MOVE    ORCSCNKSN-SRYYM         TO  TNS-YUKOSTYMD(1:6)
+                 MOVE    "01"                    TO  TNS-YUKOSTYMD(7:2)
+                 MOVE    TNS-YUKOSTYMD           TO  TNS-YUKOEDYMD
+                 PERFORM   910-TENSU-READ2-SEC
+                 IF        FLG-TENSU       =   ZERO
+                     MOVE  TNS-SRYCD       TO    ORCSCNKSN-SRYCD
+                 END-IF
+               END-IF
            END-IF
       *
       *    入院料の取得
@@ -902,6 +925,39 @@
       *
            .
        910-TENSU-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスター読込（key36）
+      *****************************************************************
+       910-TENSU-READ2-SEC         SECTION.
+      *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key36"             TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key36"             TO  MCP-PATHNAME
+               PERFORM   900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+                   MOVE    ZERO                TO  FLG-TENSU
+               ELSE
+                   MOVE    1                   TO  FLG-TENSU
+                   INITIALIZE                  TNS-TENSU-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-TENSU
+               INITIALIZE                  TNS-TENSU-REC
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key36"             TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       910-TENSU-READ2-EXT.
            EXIT.
       *
       *****************************************************************

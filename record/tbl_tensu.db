@@ -1675,6 +1675,20 @@ path	key35 	{
 	};
 };
 
+path	key36 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key36_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensu
+			WHERE HOSPNUM    =   :HOSPNUM
+			AND   CHUKSNCD   =   :CHUKSNCD
+			AND   CHUKSNTSUBAN =  :CHUKSNTSUBAN
+ 			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+			ORDER  BY  SRYCD
+		;
+	};
+};
 path	last_update1 	{
 	DBSELECT	{
 		DECLARE tbl_tensu_last_update1_csr CURSOR FOR
