@@ -14485,12 +14485,28 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算１が算定できます。"
+                           "ＯＫで自動算定します。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "0130"
                    STRING  "長期投薬加算が算定できます。"
                            "ＯＫで自動算定します。"
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算２が算定できます。"
+                           "ＯＫで自動算定します。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
       *!!!!
                WHEN    "0213"
                    STRING  "特定疾患処方管理加算が算定できます。"
@@ -14499,6 +14515,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算１が算定できます。"
+                            "ＯＫで自動算定します。"
+                            "（併用算定警告該当有）"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "0230"
                    STRING  "長期投薬加算が算定できます。"
                            "ＯＫで自動算定します。"
@@ -14506,6 +14531,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算２が算定できます。"
+                           "ＯＫで自動算定します。"
+                            "（併用算定警告該当有）"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
       *!!!!
                WHEN    "0114"
                    STRING  "厚生労働大臣が定める患者の再診４回目以降へ"
