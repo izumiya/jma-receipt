@@ -49,6 +49,8 @@
                05  ORCSQRCSV-HOSPADRS      PIC  X(100).
       *        医療機関電話番号
                05  ORCSQRCSV-HOSPTEL       PIC  X(13).
+      *        医療機関FAX
+               05  ORCSQRCSV-HOSPFAX       PIC  X(13).
       *        診療科
                05  ORCSQRCSV-RECESRYKA     PIC  X(02).
                05  ORCSQRCSV-SRYKANAME     PIC  X(40).
@@ -81,6 +83,11 @@
                05  ORCSQRCSV-BIKO-FTN      PIC  X(01).
       *        残薬確認指示
                05  ORCSQRCSV-ZANSIJI       PIC  X(01).
+      *H30.4
+      *        分割指示　回数
+               05  ORCSQRCSV-BUNKATU-MAX   PIC  9(01).
+      *        分割指示　回
+               05  ORCSQRCSV-BUNKATU-CNT   PIC  9(01).
       *
       *    備考内容
            03  ORCSQRCSV-BIKOU-AREA.

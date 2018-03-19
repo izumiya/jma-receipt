@@ -309,6 +309,11 @@
                                        OR  "2"   )
                MOVE    "JAHIS3"            TO  TBL-QRCSV-DATA (1)
            END-IF
+      *H30.4
+           IF     (SPA-SRYYMD          >=  "20180401" )
+               MOVE    "JAHIS5"            TO  TBL-QRCSV-DATA (1)
+           END-IF
+      *
            MOVE    1                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *    医療機関コード
@@ -333,6 +338,12 @@
                MOVE    "3"                 TO  TBL-QRCSV-DATA (1)
                MOVE    ORCSQRCSV-HOSPTEL   TO  TBL-QRCSV-DATA (2)
                MOVE    2                   TO  TBL-MAX
+      *H30.4
+      *        FAX
+               IF      SPA-SRYYMD          >=  "20180401"
+                   MOVE    ORCSQRCSV-HOSPFAX    TO  TBL-QRCSV-DATA (3)
+                   MOVE    3                    TO  TBL-MAX
+               END-IF
                PERFORM 400-DATAOUT-SEC
            END-IF
       *    診療科
@@ -576,6 +587,22 @@
                MOVE    2                   TO  TBL-MAX
                PERFORM 400-DATAOUT-SEC
            END-IF
+      *H30.4
+      *    分割指示レコード
+           IF     (SPA-SRYYMD              >=  "20180401" )
+             AND  (ORCSQRCSV-BUNKATU-MAX   >   1         )
+               MOVE    SPACE               TO  TBL-QRCSV-AREA
+               MOVE    "63"                TO  TBL-QRCSV-DATA (1)
+      *        分割回数
+               MOVE    ORCSQRCSV-BUNKATU-MAX
+                                           TO  TBL-QRCSV-DATA (2)
+      *        分割回
+               MOVE    ORCSQRCSV-BUNKATU-CNT
+                                           TO  TBL-QRCSV-DATA (3)
+               MOVE    3                   TO  TBL-MAX
+               PERFORM 400-DATAOUT-SEC
+           END-IF
+      *
       *    備考レコード
            MOVE    ZERO                TO  IDX-B2
            PERFORM VARYING     IDX-B   FROM    1   BY  1
@@ -842,6 +869,13 @@
                IF      FLG-SYORI           =   1
       *            剤型レコード
                    PERFORM 2001-RP101-SEC
+      *H30.4
+      *            分割指示数量レコード
+                   IF     (SPA-SRYYMD          >=  "20180401" )
+                     AND  (ORCSQRCSV-GOKKAISU(IDX) >   ZERO   )
+                       PERFORM 2001-RP102-SEC
+                   END-IF
+      *
       *            用法レコード
                    PERFORM 2002-RP111-SYORI-SEC
       *
@@ -906,12 +940,40 @@
            MOVE    ORCSQRCSV-ZAIKATA (IDX)
                                        TO  TBL-QRCSV-DATA (3)
            MOVE    ORCSQRCSV-KAISU (IDX)   TO  WRK-ZZZ
+      *H30.4
+      *    分割指示の時は、総量
+           IF     (SPA-SRYYMD          >=  "20180401" )
+             AND  (ORCSQRCSV-GOKKAISU(IDX) >   ZERO   )
+               MOVE    ORCSQRCSV-GOKKAISU (IDX)    TO  WRK-ZZZ
+           END-IF
+      *
            PERFORM 20011-SUJIHEN-SEC
            MOVE    WRK-H-DATA          TO  TBL-QRCSV-DATA (5)
            MOVE    5                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
            .
        2001-RP101-EXT.
+           EXIT.
+      *
+      *H30.4
+      *****************************************************************
+      *    分割指示数量レコード処理
+      *****************************************************************
+       2001-RP102-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  TBL-QRCSV-AREA
+           MOVE    "102"               TO  TBL-QRCSV-DATA (1)
+           MOVE    WRK-H-RP1           TO  TBL-QRCSV-DATA (2)
+           MOVE    ORCSQRCSV-KAISU (IDX)   TO  WRK-ZZZ
+           PERFORM 20011-SUJIHEN-SEC
+           MOVE    WRK-H-DATA          TO  TBL-QRCSV-DATA (3)
+           MOVE    ORCSQRCSV-GOKKAISU(IDX) TO  WRK-ZZZ
+           PERFORM 20011-SUJIHEN-SEC
+           MOVE    WRK-H-DATA          TO  TBL-QRCSV-DATA (4)
+           MOVE    4                   TO  TBL-MAX
+           PERFORM 400-DATAOUT-SEC
+           .
+       2001-RP102-EXT.
            EXIT.
       *
       *****************************************************************

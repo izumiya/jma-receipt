@@ -2918,6 +2918,7 @@
            MOVE    SYS-1002-ADRS       TO  WRK-HOSPADRS
            MOVE    SYS-1002-TEL        TO  WRK-HOSPTEL
            MOVE    SYS-1002-FAX        TO  WRK-HOSPFAX
+           MOVE    SYS-1002-POST       TO  WRK-HOSPPOST
       *    医療機関編集情報
            PERFORM 900-SYS1900-SYORI-SEC
       *
@@ -5917,13 +5918,16 @@
                                        INTO    ORCSQRCSV-HOSPADRS
            END-STRING
       *    医療機関郵便番号
-           IF      SYS-1002-POST       NUMERIC
-               MOVE    SYS-1002-POST(1:3)  TO  ORCSQRCSV-HOSPPOST(1:3)
+           IF      WRK-HOSPPOST        NUMERIC
+               MOVE    WRK-HOSPPOST(1:3)   TO  ORCSQRCSV-HOSPPOST(1:3)
                MOVE    "-"                 TO  ORCSQRCSV-HOSPPOST(4:1)
-               MOVE    SYS-1002-POST(4:4)  TO  ORCSQRCSV-HOSPPOST(5:4)
+               MOVE    WRK-HOSPPOST(4:4)   TO  ORCSQRCSV-HOSPPOST(5:4)
            END-IF
       *    医療機関電話
-           MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
+           MOVE    WRK-HOSPTEL         TO  ORCSQRCSV-HOSPTEL
+      *    医療機関FAX
+           MOVE    WRK-HOSPFAX         TO  ORCSQRCSV-HOSPFAX
+      *
       *    診療科
            MOVE    SYS-1005-RECESRYKA  TO  ORCSQRCSV-RECESRYKA
            MOVE    SYS-1005-SRYKANAME  TO  ORCSQRCSV-SRYKANAME
@@ -5991,6 +5995,12 @@
            IF      WRK-ZANSIJI2        =   "1"
                MOVE    "2"                 TO  ORCSQRCSV-ZANSIJI
            END-IF
+      *H30.4
+      *    分割指示
+           IF      WRK-BUNKATU-MAX     >   1
+               MOVE    WRK-BUNKATU-MAX     TO  ORCSQRCSV-BUNKATU-MAX
+               MOVE    WRK-BUNKATU-CNT     TO  ORCSQRCSV-BUNKATU-CNT
+           END-IF
       *    ファイル名組み立て項目
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
       *
@@ -6056,15 +6066,6 @@
            IF      WRK-BIKOU-CHIK  NOT =   SPACE
                ADD     1                   TO  IDX-QRB
                MOVE    WRK-BIKOU-CHIK      TO  ORCSQRCSV-BIKOU(IDX-QRB)
-           END-IF
-      *H30.4
-      *    分割指示
-           IF      WRK-BUNKATU-MAX     >   1
-               PERFORM 60021-BUNKATU-HEN-SEC
-               ADD     1                   TO  IDX-QRB
-               MOVE    "3"                 TO  ORCSQRCSV-BIKOU-KBN
-                                                            (IDX-QRB)
-               MOVE    WRK-BUNKATU-DATA    TO  ORCSQRCSV-BIKOU(IDX-QRB)
            END-IF
       *
       *    公費コメント
@@ -6159,29 +6160,6 @@
            .
        6002-QRBIKOU-HENSYU-EXT.
            EXIT.
-      *H30.4
-      *****************************************************************
-      *    分割指示編集処理
-      *****************************************************************
-       60021-BUNKATU-HEN-SEC           SECTION.
-      *
-           MOVE    SPACE               TO  WRK-BUNKATU-DATA
-      *
-           STRING  "分割指示に係る処方箋"
-                   WRK-BUNKATU-MAX      DELIMITED  BY  SPACE
-                   "分割の"
-                   WRK-BUNKATU-CNT      DELIMITED  BY  SPACE
-                   "回目"               DELIMITED  BY  SPACE
-                                        INTO  WRK-BUNKATU-DATA
-           END-STRING
-      *    全角変換
-           MOVE    WRK-BUNKATU-DATA    TO  WRK-MOJI
-           MOVE    50                  TO  WRK-MOJISU
-           PERFORM 2009-HENKAN-SEC
-           MOVE    WRK-ZENKAKU-G       TO  WRK-BUNKATU-DATA
-           .
-       60021-BUNKATU-HEN-EXT.
-           EXIT.
       *H27.1
       *****************************************************************
       *    ＣＳＶデータ出力処理
@@ -6207,14 +6185,16 @@
                                        INTO    ORCSQRCSV-HOSPADRS
            END-STRING
       *    医療機関郵便番号
-           IF      SYS-1002-POST       NUMERIC
-               MOVE    SYS-1002-POST(1:3)  TO  ORCSQRCSV-HOSPPOST(1:3)
+           IF      WRK-HOSPPOST        NUMERIC
+               MOVE    WRK-HOSPPOST(1:3)   TO  ORCSQRCSV-HOSPPOST(1:3)
                MOVE    "-"                 TO  ORCSQRCSV-HOSPPOST(4:1)
-               MOVE    SYS-1002-POST(4:4)  TO  ORCSQRCSV-HOSPPOST(5:4)
+               MOVE    WRK-HOSPPOST(4:4)   TO  ORCSQRCSV-HOSPPOST(5:4)
            END-IF
       *    医療機関電話
       **** MOVE    SYS-1002-TEL        TO  ORCSQRCSV-HOSPTEL
            MOVE    WRK-HOSPTEL         TO  ORCSQRCSV-HOSPTEL
+      *    医療機関FAX
+           MOVE    WRK-HOSPFAX         TO  ORCSQRCSV-HOSPFAX
       *    診療科
            MOVE    SYS-1005-RECESRYKA  TO  ORCSQRCSV-RECESRYKA
            MOVE    SYS-1005-SRYKANAME  TO  ORCSQRCSV-SRYKANAME
@@ -6275,6 +6255,12 @@
            END-IF
            IF      WRK-ZANSIJI2        =   "1"
                MOVE    "2"                 TO  ORCSQRCSV-ZANSIJI
+           END-IF
+      *H30.4
+      *    分割指示
+           IF      WRK-BUNKATU-MAX     >   1
+               MOVE    WRK-BUNKATU-MAX     TO  ORCSQRCSV-BUNKATU-MAX
+               MOVE    WRK-BUNKATU-CNT     TO  ORCSQRCSV-BUNKATU-CNT
            END-IF
       *    ファイル名組み立て項目
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV-SYSTIME
@@ -6371,6 +6357,7 @@
                MOVE    SYS-1902-ADRS2      TO  WRK-HOSPADRS2
                MOVE    SYS-1902-TEL        TO  WRK-HOSPTEL
                MOVE    SYS-1902-FAX        TO  WRK-HOSPFAX
+               MOVE    SYS-1902-POST       TO  WRK-HOSPPOST
            END-IF
            .
       *
