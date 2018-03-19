@@ -2611,12 +2611,30 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                       STRING  "処方料が算定されません。"
+                               "特定疾患処方管理加算２（処方料）"
+                               "は算定できません"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                       END-STRING
+                   END-IF
                WHEN    "1038"
                    STRING  "処方せん料が算定されません。"
                            "長期投薬加算（処方せん料）は算定できません"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                       STRING  "処方箋料が算定されません。"
+                               "特定疾患処方管理加算２（処方箋料）"
+                               "は算定できません"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                       END-STRING
+                   END-IF
       *VER.4.3.0 から警告追加
                WHEN    "K038"
                    STRING  "警告！処方せん料を算定しません。"
@@ -2625,12 +2643,30 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "警告！処方箋料を算定しません。"
+                           "特定疾患処方管理加算２（処方箋料）"
+                           "のみの算定となります"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+                   END-IF
                WHEN    "K037"
                    STRING  "警告！処方料を算定しません。"
                            "長期投薬加算（処方料）のみの算定となります"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "警告！処方料を算定しません。"
+                           "特定疾患処方管理加算２（処方料）"
+                           "のみの算定となります"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+                   END-IF
                WHEN    "1039"
                    STRING  "既に処方せん料が算定済みです。"
                            "調剤技術基本料は算定できません。"
@@ -2911,6 +2947,15 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "警告！既に特処加算１を算定済みです。"
+                           "特処加算２"
+                           "を算定する場合は削除して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+                   END-IF
                WHEN    "K021"
                    MOVE    "警告！２８日以上の投薬がありません。"
                                        TO  SPA-ERRMSG
@@ -3646,6 +3691,35 @@
                            "必要となる場合があります。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
+                   END-STRING
+      *H30.4 改正
+               WHEN    "0245"
+                   STRING  "処方せん料が算定されません。"
+                           "向精神薬調整連携加算（処方箋料）は"
+                           "算定不可です"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K245"
+                   STRING  "警告！処方せん料を算定しません。"
+                           "向精神薬調整連携加算（処方箋料）"
+                           "のみの算定"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0246"
+                   STRING  "処方料が算定されません。"
+                           "向精神薬調整連携加算（処方料）は"
+                           "算定不可です"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K246"
+                   STRING  "警告！処方料を算定しません。"
+                           "向精神薬調整連携加算（処方料）"
+                           "のみの算定です"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
                    END-STRING
       *H29.8
                WHEN    "1310"

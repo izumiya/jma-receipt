@@ -447,6 +447,8 @@
       *
            03  WRK-IDX-INS             PIC 9(04).
       *
+           03  WRK-SYO-SRYCD           PIC X(09).
+      *
       *    ø«ª°Œ¡•∆°º•÷•Î
        01  TBL-SINSATU-AREA.
       *    ΩÈø«Œ¡
@@ -639,6 +641,14 @@
        01  CONS-NNCHIHKT2          PIC X(09)  VALUE   "113018410".
        01  CONS-NNCHIHKT1          PIC X(09)  VALUE   "113025710".
       *
+      *H30.4
+      *    µ°«Ω∂Ø≤Ω≤√ªª° ΩÈø«°À° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
+       01  CONS-SYOUNICD1          PIC X(09)  VALUE   "113028870".
+      *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
+       01  CONS-SYOUNICD2          PIC X(09)  VALUE   "113024670".
+      *
+      *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘§´§´§Í§ƒ§±ø«Œ≈Œ¡°À
+       01  CONS-SYOKAKCD2          PIC X(09)  VALUE   "113027870".
       *
       *     ›∏± ÃªªƒÍÕ˙ŒÚ•∆°º•÷•Î
            COPY   "CMSANTEITBL.INC".
@@ -4121,6 +4131,15 @@
                    PERFORM 33021-KYOUKAKSN-ADD-SEC
                END-IF
            END-IF
+      *H30.4
+      *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
+           IF      SPA-GMN-IDX         >   ZERO
+               IF      WRK-SYO-SRYCD   NOT =   SPACE
+                   MOVE    WRK-SYO-SRYCD       TO  WRK-SRYCD
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
+               END-IF
+           END-IF
       *
            IF      SPA-GMN-IDX         >   ZERO
       *        Œ≈Õ‹√¥≈ˆºÍ≈ˆ° ÀÃ≥§∆ª°À
@@ -4281,6 +4300,15 @@
                IF      SPA-SYOSIN          =   1
       *            µ°«Ω∂Ø≤Ω≤√ªª
                    PERFORM 33021-KYOUKAKSN-ADD-SEC
+               END-IF
+           END-IF
+      *H30.4
+      *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
+           IF      SPA-GMN-IDX         >   ZERO
+               IF      WRK-SYO-SRYCD   NOT =   SPACE
+                   MOVE    WRK-SYO-SRYCD       TO  WRK-SRYCD
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
                END-IF
            END-IF
       *
@@ -6425,9 +6453,9 @@
            END-IF
       *
       *H30.4 ƒ…≤√§Œ•≥°º•…
-           IF      SPA-COM-INPUTCD (IDX)   =   "113028870"
-                                           OR  "113024670"
-      *        µ°«Ω∂Ø≤Ω≤√ªª° ΩÈø«°À
+           IF      SPA-COM-INPUTCD (IDX)   =   CONS-SYOUNICD1
+                                           OR  CONS-SYOUNICD2
+      *        µ°«Ω∂Ø≤Ω≤√ªª° ΩÈø«°À§ §…
                MOVE    1                   TO  FLG-SYONIKA-CHK
                MOVE    "9"                 TO  WRK-SYONIKA-KBN
            END-IF
@@ -7248,6 +7276,19 @@
       *        √Ê≈”Ω™Œª≈∏≥´§œ¥˚§ÀªªƒÍ∫—§ﬂ
                PERFORM 100-SANTEI-CHK-SEC
            END-IF
+      *H30.4
+      *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
+           MOVE    SPACE               TO  WRK-SYO-SRYCD
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
+                             ((HZN-COM-INPUTCD (IDX)   =   SPACE ) AND
+                              (HZN-GMN-INPUTCD (IDX)   =   SPACE ))
+                 IF     (HZN-COM-SRYKBN(IDX)     =   "13"  )
+                    AND (HZN-COM-INPUTCD(IDX)    =   CONS-SYOUNICD2
+                                                 OR  CONS-SYOKAKCD2)
+                     MOVE    HZN-COM-INPUTCD(IDX)    TO  WRK-SYO-SRYCD
+                 END-IF
+           END-PERFORM
       *
       *    ø«ª°Œ¡ ‘Ω∏
            PERFORM 200-SYOSIN-SET-SEC
