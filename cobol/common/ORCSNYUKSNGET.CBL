@@ -1756,6 +1756,41 @@
                                    MOVE   "190171770"  TO
                                              WRK-NYUKHNKSN-SRYCD(IDX8)
                                 END-IF
+      *                      ∫ﬂ¬…¸µ¢µ°«Ω∂Ø≤Ω≤√ªª° Œ≈Õ‹…¬≈Ô∆˛±°Œ¡£±°À
+                             WHEN    "190168070"
+                                     MOVE    ZERO     TO  FLG-TENSU
+                                     INITIALIZE           TNS-TENSU-REC
+                                     MOVE    LNK-NYUKSNGET-HOSPNUM
+                                                      TO  TNS-HOSPNUM
+                                     MOVE    LNK-NYUKSNGET-NYUIN-SRYCD
+                                                      TO  TNS-SRYCD
+                                     MOVE    LNK-NYUKSNGET-SANTEIYM
+                                                 TO  TNS-YUKOSTYMD(1:6)
+                                     MOVE    "01"     TO
+                                                     TNS-YUKOSTYMD(7:2)
+                                     MOVE    TNS-YUKOSTYMD
+                                                      TO  TNS-YUKOEDYMD
+                                     MOVE    "tbl_tensu"
+                                                      TO  MCP-TABLE
+                                     MOVE    "key"    TO  MCP-PATHNAME
+                                     PERFORM 910-TENSU-SELECT-SEC
+                                     MOVE    "tbl_tensu"
+                                                      TO  MCP-TABLE
+                                     MOVE    "key"    TO  MCP-PATHNAME
+                                     PERFORM 910-TENSU-READ-SEC
+                                     IF    FLG-TENSU    =   ZERO
+                                       IF ((TNS-CDKBN-KBNNUM = 101) AND
+                                           (TNS-CDKBN-KOUBAN = 1))  OR
+                                          ((TNS-CDKBN-KBNNUM = 317) AND
+                                           (TNS-CDKBN-KOUBAN = 8))
+                                         ADD    1            TO  IDX8
+                                         MOVE   "190168070"  TO
+                                              WRK-NYUKHNKSN-SRYCD(IDX8)
+                                       END-IF
+                                     END-IF
+                                     MOVE    "tbl_tensu"  TO  MCP-TABLE
+                                     MOVE    "key"     TO  MCP-PATHNAME
+                                     PERFORM 990-DBCLOSE-SEC
       *                      ÃÎ¥÷¥«∏Ó≤√ªª° Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡°À
       *                      ° ∆√ Ã∆˛±°¥À‹Œ¡≈˘§œΩ¸§Ø°À
                              WHEN    "190204570"
