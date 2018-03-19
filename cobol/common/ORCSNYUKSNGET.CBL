@@ -76,6 +76,8 @@
            03  WRK-KSN-NYUKSNKBN           PIC X(03).
            03  WRK-KSN-CDKBN-KBNNUM        PIC 9(03).
            03  WRK-KSN-CDKBN-KBNNUM-EDA    PIC 9(02).
+           03  WRK-KSN-CHUKSNCD            PIC X(04).
+           03  WRK-KSN-CHUKSNTUBAN         PIC X(01).
       *
            03  WRK-TOKUBETSU-NYUIN         PIC X(01).
       *
@@ -2461,17 +2463,6 @@
                END-IF
            END-IF
       *
-      *
-      *    特定入院基本料（障害者施設等入院基本料）の、看護配置加算について
-      *    強制的に算定不可とする
-      *    （入院料加算チェックマスタでも対応するが、マスタ更新未実施時を考慮）
-           IF      LNK-NYUKSNGET-NYUIN-SRYCD   = "190161210"  OR
-                                                 "190161310"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =   "190102070"
-                  MOVE    1     TO    FLG-NYUKSN
-               END-IF
-           END-IF
-      *
            .
       *
        4801-NYUKSN-CHK-EXT.
@@ -2871,55 +2862,54 @@
       *    コードを読み替えて加算チェックを行う。
       *  ・A207-3 夜間看護体制加算（夜間○○対１急性期看護補助体制加算の注加算）
       *           を夜間３０対１急性期看護補助体制加算のコードに読み替える
-           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190190770"
-                   MOVE   "190173010"  TO  TNS-SRYCD
-               END-IF
-           END-IF
+      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190190770"
+      **             MOVE   "190173010"  TO  TNS-SRYCD
+      **         END-IF
+      **     END-IF
       *  ・A214   夜間７５対１看護補助加算（看護補助加算の注加算）
       *           を看護補助加算１のコードに読み替える
-           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191170"
-                   MOVE   "190103770"  TO  TNS-SRYCD
-               END-IF
-           END-IF
+      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191170"
+      **             MOVE   "190103770"  TO  TNS-SRYCD
+      **         END-IF
+      **     END-IF
       *  ・A214   夜間看護体制加算（看護補助加算の注加算）
       *           を看護補助加算１のコードに読み替える
-           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191270"
-                   MOVE   "190103770"  TO  TNS-SRYCD
-               END-IF
-           END-IF
+      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191270"
+      **             MOVE   "190103770"  TO  TNS-SRYCD
+      **         END-IF
+      **     END-IF
       *
       *    平成２８年改正で新設された入院料加算ではないが点数マスタに
       *    入院基本料加算区分がセットされていない加算について、
       *    コードを読み替えて加算チェックを行う。
       *  ・A234-2 感染防止対策地域連携加算（感染防止対策加算の注加算）
       *           を感染防止対策加算１のコードに読み替える
-           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190147470"
-                   MOVE   "190147210"  TO  TNS-SRYCD
-               END-IF
-           END-IF
+      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190147470"
+      **             MOVE   "190147210"  TO  TNS-SRYCD
+      **         END-IF
+      **     END-IF
       *
       *    平成３０年改正で新設の入院基本料等加算
       *    入院基本料等加算内の注の加算は上位の加算コードに読み替えて
       *    チェックを行う（注の加算は電子点数表にコードが存在しない為）
-           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201804"
+      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201804"
       *        医療安全対策地域連携加算１（医療安全対策加算１の注加算）
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206670"
-                  MOVE   "190120510"   TO  TNS-SRYCD
-               END-IF
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206670"
+      **            MOVE   "190120510"   TO  TNS-SRYCD
+      **         END-IF
       *        医療安全対策地域連携加算２（医療安全対策加算２の注加算）
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206770"
-                  MOVE   "190136910"   TO  TNS-SRYCD
-               END-IF
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206770"
+      **            MOVE   "190136910"   TO  TNS-SRYCD
+      **         END-IF
       *        抗菌薬適正使用支援加算（感染防止対策加算１の注加算）
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206870"
-                  MOVE   "190147210"   TO  TNS-SRYCD
-               END-IF
-           END-IF
-      *
+      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206870"
+      **            MOVE   "190147210"   TO  TNS-SRYCD
+      **         END-IF
+      **     END-IF
       *
            MOVE    LNK-NYUKSNGET-SANTEIYM
                                    TO  TNS-YUKOSTYMD(1:6)
@@ -2948,8 +2938,50 @@
                GO  TO  48012-TENSU-SEL-EXT
            END-IF
       *
-           MOVE    TNS-NYUKHNKSNKBN
+      *
+      *    入院基本料等加算の中で注の加算となる場合は上位の加算に
+      *    読み替えを行う（これを行わないと電子点数表テーブルでチェック
+      *    できない）
+           MOVE    SPACE                     TO  WRK-KSN-CHUKSNCD
+                                                 WRK-KSN-CHUKSNTUBAN
+           IF   ((TNS-CDKBN-KBNNUM           >=  200)   AND
+                 (TNS-CDKBN-KBNNUM           <=  299))
+                 MOVE    TNS-CHUKSNCD        TO  WRK-KSN-CHUKSNCD
+                 MOVE    TNS-CHUKSNTUBAN     TO  WRK-KSN-CHUKSNTUBAN
+                 IF    WRK-KSN-CHUKSNTUBAN   NOT =  "0"
+                    INITIALIZE                  TNS-TENSU-REC
+                    MOVE    LNK-NYUKSNGET-HOSPNUM
+                                                TO  TNS-HOSPNUM
+                    MOVE    LNK-NYUKSNGET-SANTEIYM
+                                                TO  TNS-YUKOSTYMD(1:6)
+                    MOVE    "01"                TO  TNS-YUKOSTYMD(7:2)
+                    MOVE    TNS-YUKOSTYMD       TO  TNS-YUKOEDYMD
+                    MOVE    WRK-KSN-CHUKSNCD    TO  TNS-CHUKSNCD
+                    MOVE    "0"                 TO  TNS-CHUKSNTUBAN
+                    MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+                    MOVE    "tbl_tensu"         TO  MCP-TABLE
+                    MOVE    "key36"             TO  MCP-PATHNAME
+                    PERFORM 910-DBSELECT-SEC
+                    MOVE    "tbl_tensu"         TO  MCP-TABLE
+                    MOVE    "key36"             TO  MCP-PATHNAME
+                    PERFORM 910-DBFETCH-SEC
+                    IF    ( MCP-RC          =   ZERO )
+                        MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+                        DISPLAY "YOMIKAE AFTER TNS-SRYCD = " TNS-SRYCD
+                    END-IF
+      *
+                    MOVE    "tbl_tensu"         TO  MCP-TABLE
+                    MOVE    "key36"             TO  MCP-PATHNAME
+                    PERFORM 990-DBCLOSE-SEC
+                 END-IF
+           END-IF
+      *
+      *
+      *    平成３０年３月までは入院料加算チェックマスタを使用する
+           IF     LNK-NYUKSNGET-SANTEIYM   <=     "201803"
+               MOVE    TNS-NYUKHNKSNKBN
                                    TO  WRK-KSN-NYUKSNKBN
+           END-IF
       *
       *    入院料（Ａ１００番台）、特定入院料（Ａ３００番台）に含まれる
       *    注加算のみが判定対象となる
