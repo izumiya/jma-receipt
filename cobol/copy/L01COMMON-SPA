@@ -22,6 +22,7 @@
       *****************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  05.00.01    NACL-藤原    17/12/28  ＨＡＯＲＩ対応
       *****************************************************************
        01  SPA-L01KYOUTU.
       *
@@ -44,3 +45,14 @@
                05  SPA-LID1-FLG            PIC  X(02).
                05  SPA-L99-FLG             PIC  X(02).
       *
+           03  SPA-L01-JOB-PARAM.
+               05  SPA-L01-JOB-ORCA-UID    PIC X(36).
+               05  SPA-L01-JOB-KARTE-UID   PIC X(36).
+      *
+           03  SPA-L01-MONBLOB-PRINT-ID    PIC X(37).
+      *
+           03  SPA-L01-PUSHBA01-EVENT      PIC X(50).
+      *
+      *    エラー項目名称の位置
+           03  SPA-L01-PARAHYOJI-1         PIC 9(03).
+           03  SPA-L01-PARAHYOJI-2         PIC 9(03).

@@ -44,10 +44,7 @@
       *
        WORKING-STORAGE             SECTION.
       *
-           COPY    "CPRECEDAT1.INC"
-                                   REPLACING  //RECEDAT1PARA//
-                                   BY         //RECEERR//.
-           03  FILLER              PIC X(04)   VALUE   ".dat".
+           COPY    "CPRECEERR.INC".
       *
        01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
@@ -180,7 +177,7 @@
        200-MAIN-SEC                SECTION.
       *
            INITIALIZE                      SGETTEMP-AREA
-           MOVE    WRK-PARA-FILENM     TO   SGETTEMP-BASENAME
+           MOVE    WRK-PARA-FILENM     TO  SGETTEMP-BASENAME
            CALL    "ORCSGETTEMP"       USING   SGETTEMP-AREA
       *
            INITIALIZE                      MONBLOB

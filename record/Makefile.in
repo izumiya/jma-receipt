@@ -554,6 +554,7 @@ RECORD_files = \
     pusheventgetv2.rec \
         addressmasterlstv3.rec \
 	XG04.rec \
+	tempmedicaladdv3.rec \
 
 
 DEF_files = \
@@ -1074,6 +1075,8 @@ DB_files = \
         xml_address_masterlstv3res.db \
         xml_address_masterlst.db \
 	tbl_file_mis.db \
+	xml_temp_medical_addv3req.db \
+	xml_temp_medical_addv3res.db \
 
 
 shell.db: shell.db.in

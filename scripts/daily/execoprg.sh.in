@@ -34,6 +34,20 @@ fi
 #-------------------------------------------#
 ##
 
+ echo "window  ${MCP_WINDOW}"
+
+if  [ "${MCP_WINDOW}" == "tempmedicaladdv3" ]; then
+      mkdir -p  ${MCP_TEMPDIR}
+fi
+
+cleanup(){
+##      パラメータファイル削除
+        if  [ -e "${PARA_FILE_FULL}" ]; then
+            rm   ${PARA_FILE_FULL}
+        fi
+}
+trap cleanup EXIT
+
 
 RENNUM=0
 ERR_FILE_OLD=${15}

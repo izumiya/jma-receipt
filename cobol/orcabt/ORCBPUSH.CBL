@@ -226,7 +226,12 @@
       *
            MOVE    "CHK"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    1               TO  JOB-JOBID
+           EVALUATE    WRK-PARA-EVENT
+               WHEN    "temp_medical_add"
+                   MOVE    2               TO  JOB-JOBID
+               WHEN    OTHER
+                   MOVE    1               TO  JOB-JOBID
+           END-EVALUATE
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
            MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
@@ -261,6 +266,9 @@
                        PERFORM 801-DAYHEN01-SEC
                        MOVE    WRK-HEN-DATE
                                            TO  PUSHBA01-PERFORM-DATE
+                       MOVE    JOB-UPDCNT  TO  WRK-CNT
+                       MOVE    WRK-CNT-X   TO  PUSHBA01-OUTPUT-COUNT
+                   WHEN    "temp_medical_add"
                        MOVE    JOB-UPDCNT  TO  WRK-CNT
                        MOVE    WRK-CNT-X   TO  PUSHBA01-OUTPUT-COUNT
                END-EVALUATE
