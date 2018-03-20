@@ -160,6 +160,8 @@
       *平成３０年４月改正対応
       *  05.00.00    NACL-小豆沢  18/03/05  療養病棟の読み替えコード追加
       *  05.00.00    NACL-小豆沢  18/03/07  短期滞在手術等基本料の判定変更
+      *  05.00.00    NACL-小豆沢  18/03/20  在宅患者支援病床初期加算（地域包括ケア病棟入院料）
+      *                                     在宅患者支援病床初期加算（地域包括ケア病棟入院料）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -13455,6 +13457,14 @@
       *    扱いに含める
            PERFORM   210-YUUSHOUIPPAN-KSN-SEC
       *
+      *    退院日に在宅患者支援療養病床初期加算（療養病棟入院基本料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の扱いに含める
+           PERFORM   210-ZAITAKU-KSN1-SEC
+      *
+      *    退院日に在宅患者支援病床初期加算（地域包括ケア病棟入院料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の扱いに含める
+           PERFORM   210-ZAITAKU-KSN2-SEC
+      *
       *    特定入院料区分のセット
            IF      SPA-GMN-I01-TOKNYUIN-CD    =   SPACE
                MOVE     "0"     TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
@@ -14062,6 +14072,100 @@
       *
            .
        210-YUUSHOUIPPAN-KSN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅患者支援療養病床初期加算（療養病棟入院基本料）の算定有無チェック
+      *****************************************************************
+       210-ZAITAKU-KSN1-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  SPA-NAI-I01-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key60"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key60"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190201870"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key60"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-ZAITAKU-KSN1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    在宅患者支援病床初期加算（地域包括ケア病棟入院料）の算定有無チェック
+      *****************************************************************
+       210-ZAITAKU-KSN2-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           IF    FLG-IDOKAIKEI-CANCEL   =  0
+               MOVE  PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+           ELSE
+               MOVE  SPA-NAI-I01-MAEIDOYMD
+                                       TO  LNK-DAY6-KIJUN
+           END-IF
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key61"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key61"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+      **                   ADD    1      TO   IDX8
+                         MOVE   "190212470"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key61"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-ZAITAKU-KSN2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -16496,6 +16600,14 @@
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
            PERFORM   210-YUUSHOUIPPAN-KSN-SEC
+      *
+      *    異動日に在宅患者支援療養病床初期加算（療養病棟入院基本料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の扱いに含める
+           PERFORM   210-ZAITAKU-KSN1-SEC
+      *
+      *    異動日に在宅患者支援病床初期加算（地域包括ケア病棟入院料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の扱いに含める
+           PERFORM   210-ZAITAKU-KSN2-SEC
       *
            MOVE      ZERO         TO   FLG-IDOKAIKEI-CANCEL
       *
