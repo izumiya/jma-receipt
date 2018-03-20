@@ -2290,6 +2290,11 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0187"
+                   STRING  "妊婦加算の入力できる剤ではありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "0281"
                    STRING  "分割調剤は院外投薬で入力して下さい。"
