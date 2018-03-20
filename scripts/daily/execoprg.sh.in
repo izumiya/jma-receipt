@@ -41,7 +41,6 @@ if  [ "${MCP_WINDOW}" == "tempmedicaladdv3" ]; then
 fi
 
 cleanup(){
-##      パラメータファイル削除
         if  [ -e "${PARA_FILE_FULL}" ]; then
             rm   ${PARA_FILE_FULL}
         fi
