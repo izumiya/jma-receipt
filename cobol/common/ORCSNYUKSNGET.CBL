@@ -2007,6 +2007,8 @@
                              WHEN    "190176970"
       *                      看護補助者配置加算（地域包括ケア病棟入院料）
                              WHEN    "190177070"
+      *                      看護職員夜間配置加算（地域包括ケア病棟入院料）
+                             WHEN    "190212570"
                                    IF  LNK-NYUKSNGET-NYUIN-SRYCD
       *                                  地域包括ケア病棟入院料１
                                                      =  "190209110"
@@ -2080,6 +2082,50 @@
                                                      OR "190213510"
       *                                  特定一般病棟入院料（地域包括ケア４）
                                                      OR "190213610"
+                                     ADD    1            TO  IDX8
+                                     MOVE   SYS-5001-KSNCD(IDX7) TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
+      *                      認知症夜間対応加算（認知症治療病棟入院料）
+                             WHEN    "190151870"
+                                IF  LNK-NYUKSNGET-NYUIN-SRYCD
+      *                                    認知症治療病棟入院料１（３０日以内）
+                                                     = "190151610" OR
+      *                                    認知症治療病棟入院料１（３１日以上６０日以内）
+                                                       "190739910" OR
+      *                                    認知症治療病棟入院料１（６１日以上）
+                                                       "190740010" OR
+      *                                    認知症治療病棟入院料２（３０日以内）
+                                                       "190151710" OR
+      *                                    認知症治療病棟入院料２（３１日以上６０日以内）
+                                                       "190813410" OR
+      *                                    認知症治療病棟入院料２（６１日以上）
+                                                       "190813510"
+      *                                  ３０日以内の加算
+                                         ADD    1            TO  IDX8
+                                         MOVE   "190151870" TO
+                                              WRK-NYUKHNKSN-SRYCD(IDX8)
+      *                                  ３１日以上の加算
+                                         ADD    1            TO  IDX8
+                                         MOVE   "190213270" TO
+                                              WRK-NYUKHNKSN-SRYCD(IDX8)
+                                END-IF
+      *                      看護職員夜間配置加算（精神科救急入院料）
+                             WHEN    "190213070"
+                                   IF  LNK-NYUKSNGET-NYUIN-SRYCD
+      *                                  精神科救急入院料１
+                                                     =  "190121010"
+      *                                  精神科救急入院料２
+                                                     OR "190130010"
+                                     ADD    1            TO  IDX8
+                                     MOVE   SYS-5001-KSNCD(IDX7) TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
+      *                      看護職員夜間配置加算（精神科救急・合併症入院料）
+                             WHEN    "190213170"
+                                   IF  LNK-NYUKSNGET-NYUIN-SRYCD
+      *                                  精神科救急・合併症入院料
+                                                     =  "190130210"
                                      ADD    1            TO  IDX8
                                      MOVE   SYS-5001-KSNCD(IDX7) TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
