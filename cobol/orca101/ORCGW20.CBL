@@ -192,19 +192,22 @@
            03  WRK-REALCD                          PIC X(09).
            03  WRK-TOKHOSPSBT                      PIC X(02).
            03  WRK-KHNCD                           PIC X(09).
+           03  WRK-KSNNUM-G.
+               05  WRK-KSNNUMFL                    PIC X(03).
+               05  WRK-KSNNUM                      PIC 9(02).
       *
        01  WRK-ROW.
            03  WRK-BTULST-ROW                      PIC S9(9)   BINARY.
       *
        01  TKSN-AREA.
            03  TKSN-MAX                            PIC 9(03).
-           03  TKSN-OCC                            OCCURS  44.
+           03  TKSN-OCC                            OCCURS  48.
                05  TKSN-LBL                        PIC X(36).
                05  TKSN-IDX                        PIC 9(03).
                05  TKSN-SRYCD                      PIC X(09).
       *
        01  TGKSN-AREA.
-           03  TGKSN-OCC                           OCCURS  30.
+           03  TGKSN-OCC                           OCCURS  46.
                05  TGKSN-LBLKSN                    PIC X(36).
                05  TGKSN-CMB-KSN-G.
                    07  TGKSN-KSN                   PIC X(30).
@@ -223,6 +226,16 @@
       *
       *    ∏«ƒÍ√ÕŒŒ∞Ë
        01  CONST-AREA.
+           03  CONST-BTULST-MAX        PIC 9(03) VALUE 50.
+           03  CONST-RIREKILST-MAX     PIC 9(03) VALUE 20.
+           03  CONST-TOKNYUIN-MAX      PIC 9(03) VALUE 50.
+           03  CONST-SRYKA-MAX         PIC 9(03) VALUE 99.
+           03  CONST-SBT-MAX           PIC 9(03) VALUE 15.
+           03  CONST-YKNKNG-MAX        PIC 9(03) VALUE 10.
+           03  CONST-KHNRYO-MAX        PIC 9(03) VALUE 50.
+           03  CONST-SYOUBTUBRM-MAX    PIC 9(03) VALUE 16.
+           03  CONST-KSN-MAX           PIC 9(03) VALUE 48.
+           03  CONST-GKSN-MAX          PIC 9(03) VALUE 46.
            03  CONST-H30-AREA.
       *        ∞Ï»Ã…¬≈Ô∆˛±°¥À‹Œ¡§œ«—ªﬂ
       *        ¥«∏Ó…¨Õ◊≈Ÿ≤√ªª° ¿ÏÃÁ…¬±°°À
@@ -251,6 +264,14 @@
                05  CONST-H30-A207-04-R
                                REDEFINES CONST-H30-A207-04-VAL.
                    07  CONST-H30-A207-04   PIC X(09) OCCURS 4.
+      *        £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+               05  CONST-H30-A308-03C07     PIC X(09) VALUE "190212570".
+      *        £¡£≥£±£±¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+               05  CONST-H30-A311C05        PIC X(09) VALUE "190213070".
+      *        £¡£≥£±£±°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+               05  CONST-H30-A311-03C05     PIC X(09) VALUE "190213170".
+      *        £¡£≥£±£¥«ß√Œæ…ÃÎ¥÷¬–±˛≤√ªª
+               05  CONST-H30-A314C03        PIC X(09) VALUE "190151870".
            03  CONST-H28-AREA.
       *        ¥«∏Ó…¨Õ◊≈Ÿ≤√ªª° ∞Ï»Ã°À
                05  CONST-H28-A100C6-VAL.
@@ -503,16 +524,6 @@
                05                      PIC X(09) VALUE "188002470".
            03  CONST-SYOUBTUBRMCD-R    REDEFINES CONST-SYOUBTUBRMCD-VAL.
                05  CONST-SYOUBTUBRMCD  PIC X(09) OCCURS      16.
-           03  CONST-BTULST-MAX        PIC 9(03) VALUE 50.
-           03  CONST-RIREKILST-MAX     PIC 9(03) VALUE 20.
-           03  CONST-TOKNYUIN-MAX      PIC 9(03) VALUE 50.
-           03  CONST-SRYKA-MAX         PIC 9(03) VALUE 99.
-           03  CONST-SBT-MAX           PIC 9(03) VALUE 15.
-           03  CONST-YKNKNG-MAX        PIC 9(03) VALUE 10.
-           03  CONST-KHNRYO-MAX        PIC 9(03) VALUE 50.
-           03  CONST-SYOUBTUBRM-MAX    PIC 9(03) VALUE 16.
-           03  CONST-KSN-MAX           PIC 9(03) VALUE 44.
-           03  CONST-GKSN-MAX          PIC 9(03) VALUE 30.
            03  CONST-YKNKNGCD-VAL.
                05                      PIC X(09) VALUE "190109870".
                05                      PIC X(09) VALUE "190076070".
@@ -1526,6 +1537,22 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
       *
       *    µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
            PERFORM 3101-KJTRIHA-SET-SEC
+      *
+NEW   *    £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           MOVE    SPA-GMN-W20-KSNCOMMONLST-G
+                                   TO  SPA-GMN-W20-KYH-A308-03LST-G
+      *
+NEW   *    £¡£≥£±£±¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           MOVE    SPA-GMN-W20-KSNCOMMONLST-G
+                                   TO  SPA-GMN-W20-KYH-A311LST-G
+      *
+NEW   *    £¡£≥£±£±°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           MOVE    SPA-GMN-W20-KSNCOMMONLST-G
+                                   TO  SPA-GMN-W20-KYH-A311-03LST-G
+      *
+NEW   *    £¡£≥£±£¥«ß√Œæ…ÃÎ¥÷¬–±˛≤√ªª
+           MOVE    SPA-GMN-W20-KSNCOMMONLST-G
+                                   TO  SPA-GMN-W20-NYTLST-G
       *
       *    ø©∆≤≤√ªª
            PERFORM 3101-SYOKUDO-SET-SEC
@@ -3060,8 +3087,13 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
            EVALUATE    SPA-GMN-W20-KSN-PAGENO
            WHEN    0
                MOVE    1           TO  W20-KSN-PAGENO
+               MOVE    315         TO  SPA-GMN-W20-CUR
            WHEN    1
+               MOVE    2           TO  W20-KSN-PAGENO
+               MOVE    331         TO  SPA-GMN-W20-CUR
+           WHEN    2
                MOVE    0           TO  W20-KSN-PAGENO
+               MOVE    301         TO  SPA-GMN-W20-CUR
            END-EVALUATE
       *
            PERFORM 440-TAB-CHANGE-SEC
@@ -3079,15 +3111,14 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
            PERFORM 4101-GMN-SPA-SET-SEC
            PERFORM 4101-KASAN-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
-               IF    ( SPA-GMN-W20-CUR >=  9 )
-                AND  ( SPA-GMN-W20-CUR <= 25 )
-                   EVALUATE    TRUE
-                   WHEN    ( SPA-GMN-W20-CUR   = 24 OR 25 )
-                       MOVE    1   TO  W20-KSN-PAGENO
-                   WHEN    OTHER
-                       MOVE    0   TO  W20-KSN-PAGENO
-                   END-EVALUATE
-               END-IF
+               EVALUATE    SPA-GMN-W20-CUR
+               WHEN    301 THRU    314
+                   MOVE    0   TO  W20-KSN-PAGENO
+               WHEN    315 THRU    330
+                   MOVE    1   TO  W20-KSN-PAGENO
+               WHEN    331 THRU    346
+                   MOVE    2   TO  W20-KSN-PAGENO
+               END-EVALUATE
            END-IF
       *
            MOVE    W20-KSN-PAGENO  TO  SPA-GMN-W20-KSN-PAGENO
@@ -3204,6 +3235,11 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                    WHEN    15  THRU    30
                        COMPUTE IDX-GKSN  = IDX-GKSN  -  14
                        MOVE    W20-KSN-P02 (IDX-GKSN)
+                                   TO  SPA-GMN-W20-KSNCD-G
+                                                      (IDX-KSN)
+                   WHEN    31  THRU    46
+                       COMPUTE IDX-GKSN  = IDX-GKSN  -  30
+                       MOVE    W20-KSN-P03 (IDX-GKSN)
                                    TO  SPA-GMN-W20-KSNCD-G
                                                       (IDX-KSN)
                    END-EVALUATE
@@ -5956,6 +5992,40 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                PERFORM 420121-BTU-KSN-EDIT-SEC
            END-IF
       *
+      *    £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           IF    ( SPA-GMN-W20-KYH-A308-03  =   "2" )
+               MOVE    CONST-H30-A308-03C07 TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-KYH-A308-03-IDX
+                                           TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           IF    ( SPA-GMN-W20-KYH-A311     =   "2" )
+               MOVE    CONST-H30-A311C05   TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-KYH-A311-IDX
+                                           TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    £¡£≥£±£±°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+           IF    ( SPA-GMN-W20-KYH-A311-03     =   "2" )
+               MOVE    CONST-H30-A311-03C05
+                                           TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-KYH-A311-03-IDX
+                                           TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    £¡£≥£±£¥«ß√Œæ…ÃÎ¥÷¬–±˛≤√ªª
+           IF    ( SPA-GMN-W20-NYT    =   "2" )
+               MOVE    CONST-H30-A314C03
+                                           TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-NYT-IDX
+                                           TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
            .
        42017-H30-KSN-EDIT-EXT.
            EXIT.
@@ -7998,6 +8068,18 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
       *            ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª
                    WHEN    CONST-H30-A106C10
                        MOVE    "2"     TO  SPA-GMN-W20-YKNKNG-A104
+      *            £¡£≥£∞£∏°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+                   WHEN    CONST-H30-A308-03C07
+                       MOVE    "2"     TO  SPA-GMN-W20-KYH-A308-03
+      *            £¡£≥£±£±¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+                   WHEN    CONST-H30-A311C05
+                       MOVE    "2"     TO  SPA-GMN-W20-KYH-A311
+      *            £¡£≥£±£±°›£≥¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª
+                   WHEN    CONST-H30-A311-03C05
+                       MOVE    "2"     TO  SPA-GMN-W20-KYH-A311-03
+      *            £¡£≥£±£¥«ß√Œæ…ÃÎ¥÷¬–±˛≤√ªª
+                   WHEN    CONST-H30-A314C03
+                       MOVE    "2"     TO  SPA-GMN-W20-NYT
                    END-EVALUATE
                END-IF
       *
@@ -8968,7 +9050,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                                    TO  SPA-GMN-W20-YKNKNG-A207-03-LBL
                MOVE    CONST-H28-A207-03C03
                                        TO  SPA-NAI-W20-YKNKNG-A207-03-CD
-               MOVE    "¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª"
+               MOVE    "¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª° £¡£≤£∞£∑°›£¥°À"
                                        TO SPA-GMN-W20-KNGYKNHICHI-LBL
                MOVE    CONST-H30-A207-04 (1)
                                        TO  SPA-NAI-W20-KNGYKNHICHI-CD
@@ -9059,6 +9141,22 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                                        TO  SPA-GMN-W20-YKNKNG-A104-LBL
                MOVE    CONST-H30-A106C10
                                        TO  SPA-NAI-W20-YKNKNG-A104-CD
+               MOVE    "¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª° £¡£≥£∞£∏°›£≥°À"
+                                       TO  SPA-GMN-W20-KYH-A308-03-LBL
+               MOVE    CONST-H30-A308-03C07
+                                       TO  SPA-NAI-W20-KYH-A308-03-CD
+               MOVE    "¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª° £¡£≥£±£±°À"
+                                       TO  SPA-GMN-W20-KYH-A311-LBL
+               MOVE    CONST-H30-A311C05
+                                       TO  SPA-NAI-W20-KYH-A311-CD
+               MOVE    "¥«∏Óø¶∞˜ÃÎ¥÷«€√÷≤√ªª° £¡£≥£±£±°›£≥°À"
+                                       TO  SPA-GMN-W20-KYH-A311-03-LBL
+               MOVE    CONST-H30-A311-03C05
+                                       TO  SPA-NAI-W20-KYH-A311-03-CD
+               MOVE    "«ß√Œæ…ÃÎ¥÷¬–±˛≤√ªª"
+                                       TO  SPA-GMN-W20-NYT-LBL
+               MOVE    CONST-H30-A314C03
+                                       TO  SPA-NAI-W20-NYT-CD
            WHEN  ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H280401 )
       *
                MOVE    "¥«∏Ó…¨Õ◊≈Ÿ≤√ªª"
@@ -10109,7 +10207,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                                MOVE    "1010"          TO  SPA-ERRCD
                                COMPUTE SPA-GMN-W20-CUR
                                    =   SPA-NAI-W20-KSNINF-IDX (IDX-KSN)
-                                   +   9
+                                   +   300
                                MOVE    SPA-GMN-W20-KSN-LBL (IDX-KSN)
                                                TO  WRK-KSNMEI
                            END-IF
@@ -10143,7 +10241,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                        MOVE    "1011"  TO  SPA-ERRCD
                        COMPUTE SPA-GMN-W20-CUR
                            =   TKSN-IDX (IDX-KSN)
-                           +   9
+                           +   300
                        MOVE    TKSN-LBL (IDX-KSN)
                                        TO  WRK-KSNMEI
                    END-IF
@@ -10154,7 +10252,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                        MOVE    "1010"      TO  SPA-ERRCD
                        COMPUTE SPA-GMN-W20-CUR
                            =   TKSN-IDX (IDX-KSN)
-                           +   9
+                           +   300
                        MOVE    TKSN-LBL (IDX-KSN)
                                        TO  WRK-KSNMEI
                    END-IF
@@ -10220,8 +10318,6 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
       *****************************************************************
        410111-H28-SSTKIJUN-CHK-SEC      SECTION.
       *
-      D    DISPLAY "BF WRK-KSNCD = " WRK-KSNCD
-      *
            IF    ( SPA-NAI-W20-TOKSRYCD    NOT =   SPACE )
       *
                MOVE    SPA-NAI-W20-TOKSRYCD
@@ -10246,7 +10342,6 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                PERFORM 4101111-H28-SSTKIJUN-CHK-SEC
            END-IF
       *
-      D    DISPLAY "AF WRK-KSNCD = " WRK-KSNCD
            .
        410111-H28-SSTKIJUN-CHK-EXT.
            EXIT.
@@ -11822,12 +11917,24 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                                TO  W20-LBLKSN-P02     (IDXG )
                    MOVE    TGKSN-CMB-KSN-G (IDX-GKSN)
                                TO  W20-CMB-KSN-P02-OCC(IDXG )
+               WHEN    31  THRU    46
+      *
+                   COMPUTE IDXG    =   IDX-GKSN - 30
+      *
+                   MOVE    TGKSN-LBLKSN    (IDX-GKSN)
+                               TO  W20-LBLKSN-P03     (IDXG )
+                   MOVE    TGKSN-CMB-KSN-G (IDX-GKSN)
+                               TO  W20-CMB-KSN-P03-OCC(IDXG )
                END-EVALUATE
       *
            END-PERFORM
       *
            IF    ( W20-KSN-P02-CNT (1) =   ZERO )
                MOVE    WIDGET-INSENSITIVE  TO  W20-LBLKSNP02-STATE
+           END-IF
+      *
+           IF    ( W20-KSN-P03-CNT (1) =   ZERO )
+               MOVE    WIDGET-INSENSITIVE  TO  W20-LBLKSNP03-STATE
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
@@ -11876,6 +11983,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                                        W20-RYOYOKBN-STATE
                                        W20-RYOYOKBN-ITM-STATE
                                        W20-LBLKSNP02-STATE
+                                       W20-LBLKSNP03-STATE
                                        W20-BTUTYPE-STATE
                                        W20-BTUTYPE-ITM-STATE
                                        W20-BTUCD-STATE
@@ -12025,66 +12133,10 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                MOVE    "RECEDSPKBN"        TO  MCP-WIDGET
            WHEN    009
                MOVE    "KNGHJO"            TO  MCP-WIDGET
-           WHEN    010
-               MOVE    "KSN01"             TO  MCP-WIDGET
-           WHEN    011
-               MOVE    "KSN02"             TO  MCP-WIDGET
-           WHEN    012
-               MOVE    "KSN03"             TO  MCP-WIDGET
-           WHEN    013
-               MOVE    "KSN04"             TO  MCP-WIDGET
-           WHEN    014
-               MOVE    "KSN05"             TO  MCP-WIDGET
-           WHEN    015
-               MOVE    "KSN06"             TO  MCP-WIDGET
-           WHEN    016
-               MOVE    "KSN07"             TO  MCP-WIDGET
-           WHEN    017
-               MOVE    "KSN08"             TO  MCP-WIDGET
-           WHEN    018
-               MOVE    "KSN09"             TO  MCP-WIDGET
-           WHEN    019
-               MOVE    "KSN10"             TO  MCP-WIDGET
-           WHEN    020
-               MOVE    "KSN11"             TO  MCP-WIDGET
-           WHEN    021
-               MOVE    "KSN12"             TO  MCP-WIDGET
-           WHEN    022
-               MOVE    "KSN13"             TO  MCP-WIDGET
-           WHEN    023
-               MOVE    "KSN14"             TO  MCP-WIDGET
-           WHEN    024
-               MOVE    "KSN15"             TO  MCP-WIDGET
-           WHEN    025
-               MOVE    "KSN16"             TO  MCP-WIDGET
-           WHEN    026
-               MOVE    "KSN17"             TO  MCP-WIDGET
-           WHEN    027
-               MOVE    "KSN18"             TO  MCP-WIDGET
-           WHEN    028
-               MOVE    "KSN19"             TO  MCP-WIDGET
-           WHEN    029
-               MOVE    "KSN20"             TO  MCP-WIDGET
-           WHEN    030
-               MOVE    "KSN21"             TO  MCP-WIDGET
-           WHEN    031
-               MOVE    "KSN22"             TO  MCP-WIDGET
-           WHEN    032
-               MOVE    "KSN23"             TO  MCP-WIDGET
-           WHEN    033
-               MOVE    "KSN24"             TO  MCP-WIDGET
-           WHEN    034
-               MOVE    "KSN25"             TO  MCP-WIDGET
-           WHEN    035
-               MOVE    "KSN26"             TO  MCP-WIDGET
-           WHEN    036
-               MOVE    "KSN27"             TO  MCP-WIDGET
-           WHEN    037
-               MOVE    "KSN28"             TO  MCP-WIDGET
-           WHEN    038
-               MOVE    "KSN29"             TO  MCP-WIDGET
-           WHEN    039
-               MOVE    "KSN30"             TO  MCP-WIDGET
+           WHEN    301 THRU  346
+               MOVE    "KSN"               TO  WRK-KSNNUM-G
+               COMPUTE WRK-KSNNUM = SPA-GMN-W20-CUR - 300
+               MOVE    WRK-KSNNUM-G        TO  MCP-WIDGET
            WHEN    051
                MOVE    "YUKOSTYMD"         TO  MCP-WIDGET
            WHEN    052
@@ -12140,7 +12192,7 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
            IF    ( SPA-GMN-W20-CUR     =   9 )
                IF    ( W20-KNGHJO-STATE
                                        =   WIDGET-INSENSITIVE )
-                   MOVE    10          TO  SPA-GMN-W20-CUR
+                   MOVE    301         TO  SPA-GMN-W20-CUR
                END-IF
            END-IF
       *
@@ -12200,24 +12252,25 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
            IF    ( SPA-GMN-W20-CUR     =   9 )
                IF    ( W20-KNGHJO-STATE
                                        =   WIDGET-INSENSITIVE )
-                   MOVE    10          TO  SPA-GMN-W20-CUR
+                   MOVE    301         TO  SPA-GMN-W20-CUR
                END-IF
            END-IF
       *
            PERFORM VARYING IDX-GKSN    FROM    1   BY  1
                    UNTIL ( IDX-GKSN    >   CONST-GKSN-MAX )
       *
-               IF    ( SPA-GMN-W20-CUR =   IDX-GKSN + 9 )
+               IF    ( SPA-GMN-W20-CUR =   IDX-GKSN + 300 )
       *
                    IF    ( TGKSN-KSN-STATE (IDX-GKSN)
                                        =   WIDGET-INSENSITIVE )
-                       IF    ( IDX-GKSN    =   CONST-GKSN-MAX )
+                       IF    ( IDX-GKSN    =   14 OR 30 OR 46
+                                             OR CONST-GKSN-MAX )
                            COMPUTE SPA-GMN-W20-CUR
                                =   51
                        ELSE
                            COMPUTE SPA-GMN-W20-CUR
                                =   IDX-GKSN
-                               +   10
+                               +   301
                        END-IF
                    END-IF
                END-IF
@@ -12274,66 +12327,16 @@ NEW   *    ÃÎ¥÷¥«∏Ó¬Œ¿©≤√ªª° æ„≥≤º‘ª‹¿ﬂ°À
                    MOVE    024         TO  SPA-GMN-W20-CUR
                END-IF
            WHEN    "KNGHJO"
-               MOVE    010             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN01"
-               MOVE    011             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN02"
-               MOVE    012             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN03"
-               MOVE    013             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN04"
-               MOVE    014             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN05"
-               MOVE    015             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN06"
-               MOVE    016             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN07"
-               MOVE    017             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN08"
-               MOVE    018             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN09"
-               MOVE    019             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN10"
-               MOVE    020             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN11"
-               MOVE    021             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN12"
-               MOVE    022             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN13"
-               MOVE    023             TO  SPA-GMN-W20-CUR
+               MOVE    301             TO  SPA-GMN-W20-CUR
+           WHEN    "KSN01"    THRU "KSN13"
+           WHEN    "KSN15"    THRU "KSN29"
+           WHEN    "KSN31"    THRU "KSN45"
+               COMPUTE SPA-GMN-W20-CUR
+                   =   FUNCTION NUMVAL (WRK-MCP-WIDGET(4:2))
+                   +   301
            WHEN    "KSN14"
-               MOVE    024             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN15"
-               MOVE    025             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN16"
-               MOVE    026             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN17"
-               MOVE    027             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN18"
-               MOVE    028             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN19"
-               MOVE    029             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN20"
-               MOVE    030             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN21"
-               MOVE    031             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN22"
-               MOVE    032             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN23"
-               MOVE    033             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN24"
-               MOVE    034             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN25"
-               MOVE    035             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN26"
-               MOVE    036             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN27"
-               MOVE    037             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN28"
-               MOVE    038             TO  SPA-GMN-W20-CUR
-           WHEN    "KSN29"
-               MOVE    039             TO  SPA-GMN-W20-CUR
            WHEN    "KSN30"
+           WHEN    "KSN46"
                MOVE    051             TO  SPA-GMN-W20-CUR
            WHEN    "YUKOSTYMD"
                MOVE    052             TO  SPA-GMN-W20-CUR
