@@ -145,7 +145,7 @@ grpsys*
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
-           DISPLAY "ORCBJOB=" WRK-PARA-MODE "##"
+      D    DISPLAY "ORCBJOB=" WRK-PARA-MODE "##"
       *
       *
            INITIALIZE                  SGETTEMP-AREA
@@ -193,6 +193,13 @@ grpsys*
                MOVE    WRK-PARA-YOBI       TO  JOB-YOBI
       *
                PERFORM 900-CALL-ORCSJOB-SEC
+               IF    ( WRK-PARA-MODE       =   "CHK" )
+                AND  ( SJOBKANRI-RETURN    =   ZERO )
+                AND  ( JOB-ENDYMD          =   SPACE )
+                   MOVE    "処理が実行中です"
+                                       TO  WRK-MSTERR
+                   PERFORM 500-ERR-HENSYU-SEC
+               END-IF
            END-IF
       *
            .
@@ -233,6 +240,27 @@ grpsys*
       *
            .
        500-CAN-HENSYU-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラー出力処理
+      *****************************************************************
+       500-ERR-HENSYU-SEC                SECTION.
+      *
+           OPEN    INPUT   MSTERR-FILE
+           IF    ( STS-MSTERR          =   ZERO )
+               CLOSE   MSTERR-FILE
+           ELSE
+               OPEN    OUTPUT              MSTERR-FILE
+      *
+               MOVE    WRK-MSTERR      TO  MSTERR-REC
+               WRITE   MSTERR-REC
+               CLOSE   MSTERR-FILE
+           END-IF
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       500-ERR-HENSYU-EXT.
            EXIT.
       *****************************************************************
       *    終了処理
