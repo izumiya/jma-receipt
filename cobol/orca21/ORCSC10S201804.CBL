@@ -261,6 +261,7 @@
            03  IDX-R                PIC 9(02).
       *
            03  IDX-TEL                 PIC 9(04).
+           03  IDX-SYU                 PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -5925,8 +5926,8 @@
       *
                END-IF
       *H30.4
-      *        Ç¥ÉØ²Ã»»È½Äê
-                   PERFORM 6002-NINPUKBN-CHECK-SEC
+      ****     Ç¥ÉØ²Ã»»È½Äê
+      ***          PERFORM 6002-NINPUKBN-CHECK-SEC
              END-IF
            END-PERFORM
            IF      SPA-SYONIKA-ARI     =   ZERO
@@ -6028,6 +6029,9 @@
       *****************************************************************
        700-SANTEI-CHK-SEC              SECTION.
       *
+      *    Ç¥ÉØ²Ã»»È½Äê
+           PERFORM 7001-NINPU-CHK-SEC
+      *
       *    ¥¢¥Õ¥¿¡¼¥±¥¢ÂÐ¾Ý³°
            IF      SPA-RSI-HKNKBN      =   "3"
                GO      TO      700-SANTEI-CHK-EXT
@@ -6106,6 +6110,86 @@
            .
        700-SANTEI-CHK-EXT.
            EXIT.
+      *H30.4
+      *****************************************************************
+      *     Ç¥ÉØ²Ã»»È½Äê¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       7001-NINPU-CHK-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  SPA-NINPUKBN-IN
+           MOVE    ZERO                TO  IDX-SYU
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-MAX-LINE          )  OR
+                              (SPA-COM-INPUTCD(IDX) =   SPACE  AND
+                               SPA-GMN-INPUTCD(IDX) =   SPACE )
+                          OR  (SPA-ERRCD        NOT =   SPACE )
+             IF     (SPA-COM-HKNCOMBI (IDX)    NOT =   "9999" )
+      *          ¼£¸³
+                 OR (SPA-COM-CHIKENKBN (IDX)      =   "1")
+               IF      SPA-COM-INPUTCD (IDX)(1:1) =   "1"
+      *            Ç¥ÉØ²Ã»»È½Äê
+                   SET     TBL-NPIDX18         TO  1
+                   SEARCH  TBL-NINPUKSN18-OCC  VARYING   TBL-NPIDX18
+                       AT   END
+                           CONTINUE
+                       WHEN   (TBL-NP18-SRYCD (TBL-NPIDX18)
+                                           =   SPA-COM-INPUTCD (IDX))
+                           IF    (SPA-COM-SRYKBN (IDX)   =   "11"
+                                                         OR  "12"
+                                                         OR  "13" )
+                           AND   (IDX-SYU          >   ZERO   )
+                               MOVE    1           TO  SPA-NINPUKBN-IN
+                           ELSE
+                               MOVE    "0187"      TO  SPA-ERRCD
+                               MOVE    "1"         TO  SPA-COM-CUR
+                                                                (IDX)
+                           END-IF
+                   END-SEARCH
+      *            ¼êµ»ÎÁ
+                   IF     (SPA-COM-DATAKBN(IDX)    =   "1" )
+                       SET     TBL-IDX             TO  1
+                       SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
+                           AT  END
+                               CONTINUE
+                           WHEN   SPA-COM-INPUTCD (IDX)
+                                               =   TBL-SRYCD (TBL-IDX)
+                               MOVE    IDX                 TO  IDX-SYU
+                       END-SEARCH
+                       IF      IDX-SYU         =   ZERO
+      *                Ï«ºÒ¥³¡¼¥ÉÈ½Äê
+                       SET     TBL-RSI              TO  1
+                       SEARCH  TBL-RSI-SINSATU-OCC  VARYING   TBL-RSI
+                       AT  END
+                               CONTINUE
+                        WHEN   SPA-COM-INPUTCD (IDX)
+                                              =   TBLR-SRYCD (TBL-RSI)
+                               MOVE    IDX                 TO  IDX-SYU
+                       END-SEARCH
+      *
+                       END-IF
+                   END-IF
+               END-IF
+      *        Ç§ÃÎ¾É
+               EVALUATE    SPA-COM-INPUTCD (IDX)
+      *            ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                   WHEN    CONS-CHIKIHKT1
+                   WHEN    CONS-CHIKIHKT2
+                       MOVE    IDX                 TO  IDX-SYU
+      *            Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                   WHEN    CONS-NNCHIHKT1
+                   WHEN    CONS-NNCHIHKT2
+                       MOVE    IDX                 TO  IDX-SYU
+               END-EVALUATE
+             END-IF
+      *
+             IF     SPA-COM-ZAIEND (IDX)   =   "1"
+                 MOVE    ZERO              TO  IDX-SYU
+             END-IF
+           END-PERFORM
+           .
+       7001-NINPU-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ¾®»ù²Ê³°Íè¿ÇÎÅ²Ê¥Á¥§¥Ã¥¯½èÍý
@@ -6935,22 +7019,25 @@
                       (WRK-DAY-SINSATUCNT  =   ZERO        ))
       *
                    MOVE    FLG-SYOSIN2         TO  SPA-SYOSIN
+      *H30.4       ½é¿Ç¤Ë²Ã»»¤òÄÉ²Ã¤¹¤ë¤¿¤á¡¢ÂÐ¾Ý¤È¤¹¤ë
+      *                ½é¿ÇÎÁ¤òºÆÅÙÈ¯À¸
+      *!!!
       *            ÃæÅÓ½ªÎ»Ê¬
-                   IF     (SPA-WKSRY-KARTE-FLG =   1   )
-                       MOVE    ZERO                TO  FLG-HENKAN
-                   END-IF
+      *??          IF     (SPA-WKSRY-KARTE-FLG =   1   )
+      *                MOVE    ZERO                TO  FLG-HENKAN
+      **           END-IF
       *            £Ã£Ì£Á£É£Í¤«¤é
-                   IF     (SPA-WKSRY-KARTE-FLG NOT =   1   )
-                       IF      (SPA-SINSATU-FLG    =   "0" )
+      *            IF     (SPA-WKSRY-KARTE-FLG NOT =   1   )
+      *                IF      (SPA-SINSATU-FLG    =   "0" )
       *                    ½é¿ÇÎÁ¤Ï¼«Æ°È¯À¸¤·¤Ê¤¤
-                           MOVE    ZERO                TO  FLG-HENKAN
+      *                    MOVE    ZERO                TO  FLG-HENKAN
       *                    ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤¬»»Äê²ÄÇ½¤Ê»þ¤Ï¡¢ºÆÅÙ
-                           IF      FLG-SYONIKA-ARI     =   1
-                              OR   FLG-SYONIKKR-ARI    =   1
-                               MOVE    1               TO  FLG-HENKAN
-                           END-IF
-                       END-IF
-                   END-IF
+      *                    IF      FLG-SYONIKA-ARI     =   1
+      *                       OR   FLG-SYONIKKR-ARI    =   1
+      *                        MOVE    1               TO  FLG-HENKAN
+      *                    END-IF
+      *                END-IF
+      **           END-IF
                ELSE
                    MOVE    ZERO                TO  SPA-SYOSIN
                END-IF
@@ -6988,9 +7075,9 @@
       *!!!!
       *H30.4
       *    ÃæÅÓ½ªÎ»Ê¬¤Ï¡¢Ç¥ÉØ²Ã»»¥¯¥ê¥¢¡ÊÇ¥ÉØÀßÄê¤ÇÈ½Äê¡Ë
-           IF     (SPA-WKSRY-KARTE-FLG =   1   )
-               MOVE    ZERO                TO  FLG-NINPU-IN
-           END-IF
+      *    IF     (SPA-WKSRY-KARTE-FLG =   1   )
+      *        MOVE    ZERO                TO  FLG-NINPU-IN
+      *    END-IF
       *!!!!
       *
       *    ¿Ç»¡ÎÁÊÑ´¹
