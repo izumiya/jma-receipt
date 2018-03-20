@@ -359,7 +359,6 @@
       *****************************************************************
        2001-H30-NYUKSN-CHK-SEC             SECTION.
       *
-           DISPLAY SI01-SRYYMD " KHN:" KHN-SRYCD "/KSN:" KSN-SRYCD
            EVALUATE    KSN-SRYCD
            WHEN    CONST-KSNCD-190142970
                IF    ( KHN-SRYCD           =   "190200210"

@@ -356,6 +356,30 @@
                    13  SPA-GMN-W20-KNGHJSHICH      PIC X(01).
                    13  SPA-GMN-W20-KNGHJSHICHFL1   PIC X(01).
                    13  SPA-GMN-W20-KNGHJSHICHMEI   PIC X(28).
+      *          £Á£³£°£¸¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A308-03-LBL    PIC X(36).
+                 11  SPA-GMN-W20-KYH-A308-03-G.
+                   13  SPA-GMN-W20-KYH-A308-03      PIC X(01).
+                   13  SPA-GMN-W20-KYH-A308-03FL1   PIC X(01).
+                   13  SPA-GMN-W20-KYH-A308-03MEI   PIC X(28).
+      *          £Á£³£±£±´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A311-LBL    PIC X(36).
+                 11  SPA-GMN-W20-KYH-A311-G.
+                   13  SPA-GMN-W20-KYH-A311      PIC X(01).
+                   13  SPA-GMN-W20-KYH-A311FL1   PIC X(01).
+                   13  SPA-GMN-W20-KYH-A311MEI   PIC X(28).
+      *          £Á£³£±£±¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A311-03-LBL    PIC X(36).
+                 11  SPA-GMN-W20-KYH-A311-03-G.
+                   13  SPA-GMN-W20-KYH-A311-03      PIC X(01).
+                   13  SPA-GMN-W20-KYH-A311-03FL1   PIC X(01).
+                   13  SPA-GMN-W20-KYH-A311-03MEI   PIC X(28).
+      *          £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
+                 11  SPA-GMN-W20-NYT-LBL            PIC X(36).
+                 11  SPA-GMN-W20-NYT-G.
+                   13  SPA-GMN-W20-NYT              PIC X(01).
+                   13  SPA-GMN-W20-NYTFL1           PIC X(01).
+                   13  SPA-GMN-W20-NYTMEI           PIC X(28).
       *          Ì¤´ð½à¡ÊÉÂÅï¤Ë·¸¤ë´ð½à¤òËþ¤¿¤µ¤Ê¤¤¾ì¹ç¡Ë
                  11  SPA-GMN-W20-BTUMIKJN-LBL         PIC X(36).
                  11  SPA-GMN-W20-BTUMIKJN-G.
@@ -375,7 +399,7 @@
                    13  SPA-GMN-W20-KSNCOMMONFL1      PIC X(01).
                    13  SPA-GMN-W20-KSNCOMMONMEI      PIC X(28).
                09  SPA-GMN-W20-KSN-R   REDEFINES   SPA-GMN-W20-KSN-G.
-                 11  SPA-GMN-W20-KSN-OCC           OCCURS 45.
+                 11  SPA-GMN-W20-KSN-OCC           OCCURS 49.
                    13  SPA-GMN-W20-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W20-KSNCD-G.
                        15  SPA-GMN-W20-KSNCD           PIC X(01).
@@ -777,6 +801,35 @@
                      15  SPA-GMN-W20-KNGHJSHICHL    PIC X(01).
                      15  SPA-GMN-W20-KNGHJSHICHFLL  PIC X(01).
                      15  SPA-GMN-W20-KNGHJSHICHMEIL PIC X(28).
+      *          £Á£³£°£¸¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A308-03LST-G.
+                   13  SPA-GMN-W20-KYH-A308-03-MAX   PIC 9(03).
+                   13  SPA-GMN-W20-KYH-A308-03LST    OCCURS 10.
+                     15  SPA-GMN-W20-KYH-A308-03L    PIC X(01).
+                     15  SPA-GMN-W20-KYH-A308-03FLL  PIC X(01).
+                     15  SPA-GMN-W20-KYH-A308-03MEIL PIC X(28).
+      *          £Á£³£±£±´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A311LST-G.
+                   13  SPA-GMN-W20-KYH-A311-MAX      PIC 9(03).
+                   13  SPA-GMN-W20-KYH-A311LST       OCCURS 10.
+                     15  SPA-GMN-W20-KYH-A311L       PIC X(01).
+                     15  SPA-GMN-W20-KYH-A311FLL     PIC X(01).
+                     15  SPA-GMN-W20-KYH-A311MEIL    PIC X(28).
+      *          £Á£³£±£±¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-GMN-W20-KYH-A311-03LST-G.
+                   13  SPA-GMN-W20-KYH-A311-03-MAX   PIC 9(03).
+                   13  SPA-GMN-W20-KYH-A311-03LST    OCCURS 10.
+                     15  SPA-GMN-W20-KYH-A311-03L    PIC X(01).
+                     15  SPA-GMN-W20-KYH-A311-03FLL  PIC X(01).
+                     15  SPA-GMN-W20-KYH-A311-03MEIL PIC X(28).
+      *          £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
+                 11  SPA-GMN-W20-NYTLST-G.
+                   13  SPA-GMN-W20-NYT-MAX    PIC 9(03).
+                   13  SPA-GMN-W20-NYTLST     OCCURS 10.
+                     15  SPA-GMN-W20-NYTL     PIC X(01).
+                     15  SPA-GMN-W20-NYTFLL   PIC X(01).
+                     15  SPA-GMN-W20-NYTMEIL  PIC X(28).
+
       *          Ì¤´ð½à¡ÊÉÂÅï¤Ë·¸¤ë´ð½à¤òËþ¤¿¤µ¤Ê¤¤¾ì¹ç¡Ë
                  11  SPA-GMN-W20-BTUMIKJNLST-G.
                    13  SPA-GMN-W20-BTUMIKJN-MAX    PIC 9(03).
@@ -800,7 +853,7 @@
                      15  SPA-GMN-W20-KSNCOMMONMEIL      PIC X(28).
                09  SPA-GMN-W20-KSNLST-R    REDEFINES
                  SPA-GMN-W20-KSNLST-G.
-                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  45.
+                 11  SPA-GMN-W20-KSNLST-OCC        OCCURS  49.
                    13  SPA-GMN-W20-KSNLST-MAX      PIC 9(03).
                    13  SPA-GMN-W20-KSNLST          OCCURS  10.
                        15  SPA-GMN-W20-KSNCDL      PIC X(01).
@@ -1035,6 +1088,18 @@
       *          ´Ç¸îÊä½õ¼ÔÇÛÃÖ²Ã»»
                  11  SPA-NAI-W20-KNGHJSHICH-CD   PIC X(09).
                  11  SPA-NAI-W20-KNGHJSHICH-IDX  PIC 9(03).
+      *          £Á£³£°£¸¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-NAI-W20-KYH-A308-03-CD   PIC X(09).
+                 11  SPA-NAI-W20-KYH-A308-03-IDX  PIC 9(03).
+      *          £Á£³£±£±´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-NAI-W20-KYH-A311-CD   PIC X(09).
+                 11  SPA-NAI-W20-KYH-A311-IDX  PIC 9(03).
+      *          £Á£³£±£±¡Ý£³´Ç¸î¿¦°÷Ìë´ÖÇÛÃÖ²Ã»»
+                 11  SPA-NAI-W20-KYH-A311-03-CD   PIC X(09).
+                 11  SPA-NAI-W20-KYH-A311-03-IDX  PIC 9(03).
+      *          £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
+                 11  SPA-NAI-W20-NYT-CD        PIC X(09).
+                 11  SPA-NAI-W20-NYT-IDX       PIC 9(03).
       *          Ì¤´ð½à¡ÊÉÂÅï¤Ë·¸¤ë´ð½à¤òËþ¤¿¤µ¤Ê¤¤¾ì¹ç¡Ë
                  11  SPA-NAI-W20-BTUMIKJN-CD   PIC X(09).
                  11  SPA-NAI-W20-BTUMIKJN-IDX  PIC 9(03).
@@ -1046,7 +1111,7 @@
                  11  SPA-NAI-W20-KSNCOMMON-IDX      PIC 9(03).
                09  SPA-NAI-W20-KSNINF-R  REDEFINES
                    SPA-NAI-W20-KSNINF-G.
-                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 45.
+                 11  SPA-NAI-W20-KSNINF-OCC        OCCURS 49.
                    13  SPA-NAI-W20-KSNINF-CD       PIC X(09).
                    13  SPA-NAI-W20-KSNINF-IDX      PIC 9(03).
       *      ÍúÎò¥ê¥¹¥ÈÆâÉôÎÎ°è

@@ -1263,14 +1263,19 @@
                    MOVE    ITEM-TOKNYUIN-NYUIN
                                        TO  LNK-TOKNYUIN-NYUIN
                    MOVE    ITEM-BTUNUM TO  LNK-TOKNYUIN-BTUNUM
-                   MOVE    "1"         TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+                   IF    ( ITEM-TOKHIGAITOKBN  =   "1" )
+                       MOVE    "1"     TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+                   END-IF
                    MOVE    SODR-SRYYMD TO  LNK-TOKNYUIN-SANTEIYM
                    CALL    "ORCSTOKNYUIN"  USING
                                            ORCSTOKNYUIN-AREA
                                            SPA-AREA
                    IF    ( ITEM-TOKHIGAITOKBN  =   "0" OR "1" )
-                       IF    ( ITEM-TOKHIGAITOKBN  =   "1" )
-                           MOVE    LNK-TOKNYUIN-GAI-SRYCD
+                       IF    ( LNK-TOKNYUIN-GAI-SRYCD  =  SPACE )
+                           MOVE   LNK-TOKNYUIN-SRYCD
+                                           TO  ITEM-TOKNYUIN-SRYCD
+                       ELSE
+                           MOVE   LNK-TOKNYUIN-GAI-SRYCD
                                            TO  ITEM-TOKNYUIN-SRYCD
                        END-IF
                    ELSE
