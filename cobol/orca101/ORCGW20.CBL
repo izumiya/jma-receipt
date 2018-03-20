@@ -3093,7 +3093,7 @@ NEW   *    £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
                MOVE    331         TO  SPA-GMN-W20-CUR
            WHEN    2
                MOVE    0           TO  W20-KSN-PAGENO
-               MOVE    301         TO  SPA-GMN-W20-CUR
+               MOVE    9           TO  SPA-GMN-W20-CUR
            END-EVALUATE
       *
            PERFORM 440-TAB-CHANGE-SEC
@@ -3112,6 +3112,7 @@ NEW   *    £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
            PERFORM 4101-KASAN-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                EVALUATE    SPA-GMN-W20-CUR
+               WHEN    9
                WHEN    301 THRU    314
                    MOVE    0   TO  W20-KSN-PAGENO
                WHEN    315 THRU    330
@@ -12241,11 +12242,14 @@ NEW   *    £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
            IF    ( SPA-GMN-W20-CUR     =   60 )
                IF    ( W20-TBTUCD-STATE
                                        =   WIDGET-INSENSITIVE )
-                   IF    ( SPA-GMN-W20-KSN-PAGENO  =   ZERO )
+                   EVALUATE    SPA-GMN-W20-KSN-PAGENO
+                   WHEN    0
                        MOVE    009     TO  SPA-GMN-W20-CUR
-                   ELSE
-                       MOVE    024     TO  SPA-GMN-W20-CUR
-                   END-IF
+                   WHEN    1
+                       MOVE    315     TO  SPA-GMN-W20-CUR
+                   WHEN    2
+                       MOVE    331     TO  SPA-GMN-W20-CUR
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -12321,11 +12325,14 @@ NEW   *    £Á£³£±£´Ç§ÃÎ¾ÉÌë´ÖÂÐ±þ²Ã»»
            WHEN    "TBTUTYPE"
                MOVE    060             TO  SPA-GMN-W20-CUR
            WHEN    "TBTUCD"
-               IF    ( SPA-GMN-W20-KSN-PAGENO  =   ZERO )
-                   MOVE    009         TO  SPA-GMN-W20-CUR
-               ELSE
-                   MOVE    024         TO  SPA-GMN-W20-CUR
-               END-IF
+               EVALUATE    SPA-GMN-W20-KSN-PAGENO
+               WHEN    0
+                   MOVE    009     TO  SPA-GMN-W20-CUR
+               WHEN    1
+                   MOVE    315     TO  SPA-GMN-W20-CUR
+               WHEN    2
+                   MOVE    331     TO  SPA-GMN-W20-CUR
+               END-EVALUATE
            WHEN    "KNGHJO"
                MOVE    301             TO  SPA-GMN-W20-CUR
            WHEN    "KSN01"    THRU "KSN13"
