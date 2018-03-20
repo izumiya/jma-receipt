@@ -350,6 +350,15 @@
       *    客供空隆∈她拉拜积譬老３∈５箕粗笆惧∷
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140058610".
+      *    客供空隆∈她拉拜积譬老１∈４箕粗踏塔∷∈沸册良弥∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140059310".
+      *    客供空隆∈她拉拜积譬老１∈４箕粗笆惧５箕粗踏塔∷∈沸册良弥∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140059410".
+      *    客供空隆∈她拉拜积譬老１∈５箕粗笆惧∷∈沸册良弥∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140059510".
       *
       *
       *    费鲁瓷妄裁换∈办忍∷
@@ -372,7 +381,7 @@
       **** 03  TBL-DOUJI-OCC           OCCURS   24  INDEXED   TBL-IDX.
       *****03  TBL-DOUJI-OCC           OCCURS   34  INDEXED   TBL-IDX.
       *H30.4
-           03  TBL-DOUJI-OCC           OCCURS   43  INDEXED   TBL-IDX.
+           03  TBL-DOUJI-OCC           OCCURS   46  INDEXED   TBL-IDX.
                05  TBL-CODE                PIC X(03).
                05  TBL-CHK                 PIC X(01).
                05  TBL-SRYCD               PIC X(09).
@@ -380,7 +389,7 @@
       *01  TBL-MAX                     PIC 9(04)   VALUE   18.
       *01  TBL-MAX                     PIC 9(04)   VALUE   24.
       *01  TBL-MAX                     PIC 9(04)   VALUE   34.
-       01  TBL-MAX                     PIC 9(04)   VALUE   43.
+       01  TBL-MAX                     PIC 9(04)   VALUE   46.
       *
       *    瘦副侍换年旺悟テ〖ブル
            COPY   "CMSANTEITBL.INC".
