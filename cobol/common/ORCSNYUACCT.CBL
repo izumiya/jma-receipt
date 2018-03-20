@@ -54,6 +54,10 @@
       *                                     措置追加２・通則８対応追加
       *  05.00.00    NACL-小豆沢  18/03/09  看護補助加算（１５日以上３０日
       *                                     以内）の算定対応
+      *  05.00.00    NACL-小豆沢  18/03/20  在宅患者支援療養病床初期加算（療養病棟入院基本料）
+      *                                     在宅患者支援病床初期加算（地域包括ケア病棟入院料）
+      *  05.00.00    NACL-小豆沢  18/03/09  認知症夜間対応加算（認知症治療病棟入院料）
+      *                                   （３１日以上）の算定対応
       *****************************************************************
       *
       *
@@ -2257,6 +2261,70 @@
                       END-IF
                       MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
                       MOVE    15                  TO  LNK-DAY6-ZOGEN
+                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "1" OR "8"
+                          COMPUTE    LNK-DAY6-ZOGEN  =  LNK-DAY6-ZOGEN -
+                                           LNK-SCNYUACCT-NYUKHN-NISUU
+                      END-IF
+                      CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                          LNK-DAY6-AREA
+                      IF      STS-DAY-RC1         =   ZERO
+      **                    DISPLAY "LNK-DAY6-KEISAN = " LNK-DAY6-KEISAN
+      **                    DISPLAY "LNK-DAY6-KOYOMI = " LNK-DAY6-KOYOMI
+                          IF    WRK-STYMD    >=    LNK-DAY6-KOYOMI
+                               MOVE   WRK-STYMD   TO   WRK-KHN-STYMD
+                          ELSE
+                               MOVE   LNK-DAY6-KOYOMI
+                                                  TO  WRK-KHN-STYMD
+                          END-IF
+                      END-IF
+                     END-IF
+                   END-IF
+      *            認知症夜間対応加算（認知症治療病棟入院料）の３１日以上
+      *            の加算コード算定（平成３０年改正で新設）
+                   IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K)
+                                                      = "190213270"
+                     IF  LNK-SCNYUACCT-NYUKHN-NISUU  <  31
+      *               入院履歴を検索し入院日を取得
+                      INITIALIZE                    PTNYUINRRK-REC
+                      MOVE    SPA-HOSPNUM       TO  PTNYUINRRK-HOSPNUM
+                      MOVE    SPA-PTID          TO  PTNYUINRRK-PTID
+                      MOVE    WRK-STYMD         TO  PTNYUINRRK-TENNYUYMD
+                                                    PTNYUINRRK-TENSTUYMD
+                      MOVE    PTNYUINRRK-REC    TO  MCPDATA-REC
+                      MOVE    "tbl_ptnyuinrrk"  TO  MCP-TABLE
+                      MOVE    "key42"           TO  MCP-PATHNAME
+                      PERFORM 910-PTNYUINRRK-SELECT-SEC
+                      IF      FLG-PTNYUINRRK     =  ZERO
+                          MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+                          MOVE    "key42"            TO  MCP-PATHNAME
+                          PERFORM 910-PTNYUINRRK-FETCH-SEC
+      **                    DISPLAY "FLG-PTNYUINRRK  = " FLG-PTNYUINRRK
+                          IF      FLG-PTNYUINRRK  =   ZERO
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                            TO  WRK-SCNYUACCT-STSRYYMD
+                          END-IF
+                      END-IF
+                      MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+                      MOVE    "key42"             TO  MCP-PATHNAME
+                      PERFORM 990-DBCLOSE-SEC
+      *
+      *               Ｎ日後算定
+                      INITIALIZE                      STS-AREA-DAY
+                      INITIALIZE                      LNK-DAY6-AREA
+                      MOVE    "61"                TO  LNK-DAY6-IRAI
+                      IF    WRK-SCNYUACCT-STSRYYMD  NOT =   SPACE
+                          MOVE    WRK-SCNYUACCT-STSRYYMD
+                                            TO  LNK-DAY6-KIJUN
+                      ELSE
+                          MOVE    LNK-SCNYUACCT-STSRYYMD
+                                            TO  LNK-DAY6-KIJUN
+                      END-IF
+                      IF      LNK-SCNYUACCT-SYORI-KBN  =   "8"
+                          MOVE    WRK-STYMD
+                                            TO  LNK-DAY6-KIJUN
+                      END-IF
+                      MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                      MOVE    31                  TO  LNK-DAY6-ZOGEN
                       IF      LNK-SCNYUACCT-SYORI-KBN  =   "1" OR "8"
                           COMPUTE    LNK-DAY6-ZOGEN  =  LNK-DAY6-ZOGEN -
                                            LNK-SCNYUACCT-NYUKHN-NISUU
