@@ -367,11 +367,18 @@
                MOVE      1                 TO  FLG-KSN
            END-IF
       *
-           IF   ((TNS-CDKBN-KBNNUM         >=  200)   AND
+      *    平成３０年３月までは入院料加算チェックマスタを使用する
+           IF     ORCSCNKSN-SRYYM   <=     "201803"
+               MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSN-NYUKHNKSNKBN
+           END-IF
+      *
+           MOVE    SPACE                   TO  WRK-KSN-CHUKSNCD
+                                               WRK-KSN-CHUKSNTUBAN
+           IF     ORCSCNKSN-SRYYM          >=  "201804"
+             IF ((TNS-CDKBN-KBNNUM         >=  200)   AND
                  (TNS-CDKBN-KBNNUM         <=  299))  
       *        入院基本料等加算
                MOVE      2                 TO  FLG-KSN
-               MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSN-NYUKHNKSNKBN
                MOVE    TNS-CHUKSNCD        TO  WRK-KSN-CHUKSNCD
                MOVE    TNS-CHUKSNTUBAN     TO  WRK-KSN-CHUKSNTUBAN
                IF      WRK-KSN-CHUKSNTUBAN  NOT =  "0"
@@ -388,6 +395,7 @@
                      MOVE  TNS-SRYCD       TO    ORCSCNKSN-SRYCD
                  END-IF
                END-IF
+             END-IF
            END-IF
       *
       *    (A246)入退院支援加算はチェック対象外とする
