@@ -789,7 +789,7 @@
                        MOVE    IDZZ          TO  WRK-PARM-LINE (IDX)
                        MOVE    IDXX          TO  WRK-PARM-INDEX(IDX)
       *
-      *                パラメタＩＤのチェック
+      *                パラメタ種別のチェック
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >       WRK-CONS-PARA-MAX
                                OR      LSTREQ-PARM-NO (IDX IDY)
@@ -1044,11 +1044,11 @@
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E23"
-                       MOVE    "パラメタＩＤが未設定です。"
+                       MOVE    "パラメタ種別が未設定です。"
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E24"
-                       MOVE    "パラメタＩＤの設定に誤りがあります。"
+                       MOVE    "パラメタ種別の設定に誤りがあります。"
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E25"
@@ -1069,7 +1069,7 @@
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E29"
-                       MOVE    "登録してあるパラメタＩＤと異なります。"
+                       MOVE    "登録してあるパラメタ種別と異なります。"
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                END-EVALUATE
