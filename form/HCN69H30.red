@@ -21736,7 +21736,7 @@
       </dia:attribute>
     </dia:object>
   </dia:layer>
-  <dia:layer name="CLINIC" visible="false">
+  <dia:layer name="CLINIC" visible="true">
     <dia:group>
       <dia:group>
         <dia:object type="Standard - Box" version="0" id="O629">
