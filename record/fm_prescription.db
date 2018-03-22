@@ -83,9 +83,9 @@ fm_prescription {
 		Rp	{
 			Medical_Class		varchar(2);
 			Count				varchar(3);
+			Unit_Name			varchar(4);
 #--　分割総投与日数
 			Split_Total_Count	varchar(3);
-			Unit_Name			varchar(4);
 			Medication	{
 				Name				varchar(210);
 				Amount			varchar(12);
