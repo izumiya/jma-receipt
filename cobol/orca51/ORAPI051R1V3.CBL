@@ -1061,11 +1061,13 @@
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E27"
-                       MOVE    "プログラム名が重複しています。"
+                       MOVE
+                           "プログラム名が重複して設定してあります。"
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E28"
-                       MOVE    "パラメタ番号が重複しています。"
+                       MOVE
+                           "パラメタ番号が重複して設定してあります。"
                                                TO  LSTRES-ERROR-MSG
                                                (WRK-ERR-PROCESSING-MAX)
                    WHEN    "E29"
