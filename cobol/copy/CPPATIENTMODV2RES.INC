@@ -107,11 +107,6 @@
                 05  PTMODRES-COMMENT-1            PIC  X(200).
       *         コメント２
                 05  PTMODRES-COMMENT-2            PIC  X(200).
-      *H30.4
-      *         患者個別情報
-                05  PTMODRES-PTCONF-INFO.
-      *             妊婦設定
-                    07  PTMODRES-NINPUKBN             PIC X(05).
       *
       *         保険情報
                 05  PTMODRES-INSURANCE-INFO-G.
@@ -166,4 +161,9 @@
                         09  PTMODRES-INSURANCE-START-DATE    PIC X(10).
       *                 有効終了日
                         09  PTMODRES-INSURANCE-END-DATE      PIC X(10).
+      *H30.4
+      *         患者個別情報
+                05  PTMODRES-PTCONF-INFO.
+      *             妊婦設定
+                    07  PTMODRES-NINPUKBN             PIC X(05).
       *

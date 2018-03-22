@@ -48,11 +48,6 @@ xml_patientmodv2res {
 		Infection2		varchar(200);
 		Comment1		varchar(200);
 		Comment2		varchar(200);
-#---    Š³ÒŒÂ•Êî•ñ
-		Personally_Information	{
-#---            ”D•wİ’è
-        	    	Pregnant_Class		varchar(05);
-            	};
 		HealthInsurance_Information	{
 		Insurance_Combination_Number		varchar(4);
 		InsuranceProvider_Class			varchar(03);
@@ -80,6 +75,11 @@ xml_patientmodv2res {
                 	Certificate_ExpiredDate		varchar(10);
             	} [4];
         	} [20];
+#---    Š³ÒŒÂ•Êî•ñ
+		Personally_Information	{
+#---            ”D•wİ’è
+        	    	Pregnant_Class		varchar(05);
+            	};
     	};
    	};
 };
