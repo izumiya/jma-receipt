@@ -2943,6 +2943,28 @@
       **         END-IF
       **     END-IF
       *
+      *    平成３０年４月からの入院料加算チェック対応
+      *  （入院基本料等加算の中で更に注の加算となっているものを読み替え）
+      *  （注加算通番０で単純に読み替えができないものが対象）
+           IF    LNK-NYUKSNGET-SANTEIYM      >=   "201804"
+      *(A207-3)夜間３０対１急性期看護補助体制加算（急性期看護補助体制加算の注加算）
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190173010"
+                  MOVE   "190145710"   TO  TNS-SRYCD
+               END-IF
+      *(A207-3)夜間５０対１急性期看護補助体制加算（急性期看護補助体制加算の注加算）
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190145970"
+                  MOVE   "190145710"   TO  TNS-SRYCD
+               END-IF
+      *(A207-3)夜間１００対１急性期看護補助体制加算（急性期看護補助体制加算の注加算）
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190146070"
+                  MOVE   "190145710"   TO  TNS-SRYCD
+               END-IF
+      *(A207-3)夜間看護体制加算（急性期看護補助体制加算の注加算）
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190190770"
+                  MOVE   "190145710"   TO  TNS-SRYCD
+               END-IF
+           END-IF
+      *
            MOVE    LNK-NYUKSNGET-SANTEIYM
                                    TO  TNS-YUKOSTYMD(1:6)
            MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
