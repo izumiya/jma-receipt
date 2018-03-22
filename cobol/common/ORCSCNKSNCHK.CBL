@@ -319,6 +319,31 @@
            INITIALIZE                          TNS-TENSU-REC
            MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            MOVE    ORCSCNKSN-SRYCD         TO  TNS-SRYCD
+      *    Ê¿À®£³£°Ç¯£´·î¤«¤é¤ÎÆþ±¡ÎÁ²Ã»»¥Á¥§¥Ã¥¯ÂÐ±þ
+      *  ¡ÊÆþ±¡´ðËÜÎÁÅù²Ã»»¤ÎÃæ¤Ç¹¹¤ËÃí¤Î²Ã»»¤È¤Ê¤Ã¤Æ¤¤¤ë¤â¤Î¤òÆÉ¤ßÂØ¤¨¡Ë
+      *  ¡ÊÃí²Ã»»ÄÌÈÖ£°¤ÇÃ±½ã¤ËÆÉ¤ßÂØ¤¨¤¬¤Ç¤­¤Ê¤¤¤â¤Î¤¬ÂÐ¾Ý¡Ë
+           IF    ORCSCNKSN-SRYYM      >=   "201804"
+      *(A207-3)Ìë´Ö£³£°ÂÐ£±µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¡ÊµÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¤ÎÃí²Ã»»¡Ë
+               IF    ORCSCNKSN-SRYCD   =  "190173010"
+                  MOVE   "190145710"   TO  ORCSCNKSN-SRYCD
+                                           TNS-SRYCD
+               END-IF
+      *(A207-3)Ìë´Ö£µ£°ÂÐ£±µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¡ÊµÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¤ÎÃí²Ã»»¡Ë
+               IF    ORCSCNKSN-SRYCD   =  "190145970"
+                  MOVE   "190145710"   TO  ORCSCNKSN-SRYCD
+                                           TNS-SRYCD
+               END-IF
+      *(A207-3)Ìë´Ö£±£°£°ÂÐ£±µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¡ÊµÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¤ÎÃí²Ã»»¡Ë
+               IF    ORCSCNKSN-SRYCD   =  "190146070"
+                  MOVE   "190145710"   TO  ORCSCNKSN-SRYCD
+                                           TNS-SRYCD
+               END-IF
+      *(A207-3)Ìë´Ö´Ç¸îÂÎÀ©²Ã»»¡ÊµÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¤ÎÃí²Ã»»¡Ë
+               IF    ORCSCNKSN-SRYCD   =  "190190770"
+                  MOVE   "190145710"   TO  ORCSCNKSN-SRYCD
+                                           TNS-SRYCD
+               END-IF
+           END-IF
            MOVE    ORCSCNKSN-SRYYM         TO  TNS-YUKOSTYMD(1:6)
            MOVE    "01"                    TO  TNS-YUKOSTYMD(7:2)
            MOVE    TNS-YUKOSTYMD           TO  TNS-YUKOEDYMD
@@ -341,8 +366,9 @@
       *        Æþ±¡´ðËÜÎÁÅù²Ã»»
                MOVE      1                 TO  FLG-KSN
            END-IF
+      *
            IF   ((TNS-CDKBN-KBNNUM         >=  200)   AND
-                 (TNS-CDKBN-KBNNUM         <=  299))
+                 (TNS-CDKBN-KBNNUM         <=  299))  
       *        Æþ±¡´ðËÜÎÁÅù²Ã»»
                MOVE      2                 TO  FLG-KSN
                MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSN-NYUKHNKSNKBN
@@ -362,6 +388,13 @@
                      MOVE  TNS-SRYCD       TO    ORCSCNKSN-SRYCD
                  END-IF
                END-IF
+           END-IF
+      *
+      *    (A246)ÆþÂà±¡»Ù±ç²Ã»»¤Ï¥Á¥§¥Ã¥¯ÂÐ¾Ý³°¤È¤¹¤ë
+           IF   (TNS-CDKBN-KBN         =   "A")   AND
+                (TNS-CDKBN-KBNNUM      =   246)   AND
+                (TNS-CDKBN-KBNNUM-EDA  =   0)
+                 MOVE      ZERO                 TO  FLG-KSN
            END-IF
       *
       *    Æþ±¡ÎÁ¤Î¼èÆÀ
@@ -932,7 +965,6 @@
       *****************************************************************
        910-TENSU-READ2-SEC         SECTION.
       *
-           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key36"             TO  MCP-PATHNAME
            PERFORM   900-DBSELECT-SEC
