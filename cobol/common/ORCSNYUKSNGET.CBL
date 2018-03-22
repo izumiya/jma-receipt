@@ -2993,12 +2993,19 @@
            END-IF
       *
       *
+      *    平成３０年３月までは入院料加算チェックマスタを使用する
+           IF     LNK-NYUKSNGET-SANTEIYM   <=     "201803"
+               MOVE    TNS-NYUKHNKSNKBN
+                                   TO  WRK-KSN-NYUKSNKBN
+           END-IF
+      *
       *    入院基本料等加算の中で注の加算となる場合は上位の加算に
       *    読み替えを行う（これを行わないと電子点数表テーブルでチェック
       *    できない）
            MOVE    SPACE                     TO  WRK-KSN-CHUKSNCD
                                                  WRK-KSN-CHUKSNTUBAN
-           IF   ((TNS-CDKBN-KBNNUM           >=  200)   AND
+           IF     LNK-NYUKSNGET-SANTEIYM     >=     "201804"
+             IF ((TNS-CDKBN-KBNNUM           >=  200)   AND
                  (TNS-CDKBN-KBNNUM           <=  299))
                  MOVE    TNS-CHUKSNCD        TO  WRK-KSN-CHUKSNCD
                  MOVE    TNS-CHUKSNTUBAN     TO  WRK-KSN-CHUKSNTUBAN
@@ -3028,14 +3035,9 @@
                     MOVE    "key36"             TO  MCP-PATHNAME
                     PERFORM 990-DBCLOSE-SEC
                  END-IF
+             END-IF
            END-IF
       *
-      *
-      *    平成３０年３月までは入院料加算チェックマスタを使用する
-           IF     LNK-NYUKSNGET-SANTEIYM   <=     "201803"
-               MOVE    TNS-NYUKHNKSNKBN
-                                   TO  WRK-KSN-NYUKSNKBN
-           END-IF
       *
       *    入院料（Ａ１００番台）、特定入院料（Ａ３００番台）に含まれる
       *    注加算のみが判定対象となる
