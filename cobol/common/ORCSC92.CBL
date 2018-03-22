@@ -76,7 +76,7 @@
       *  04.07.00    NACL-多々納  14/04/25  施設基準チェック対応
       *  04.08.00    NACL-多々納  16/03/XX  平成２８年４月改正対応
       *  04.08.00    NACL-多々納  16/04/20  向精神薬区分追加対応
-      *  05.00.00    NACL-多々納  17/01/XX  点数マスタユーザ対応
+      *  04.08.00    NACL-多々納  18/03/XX  平成３０年４月改正対応
       *****************************************************************
       *
       *
@@ -355,7 +355,8 @@
       *
       *    施設規準テーブル
        01  WRK-TBL-SSTKIJUN-AREA.
-           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  8500.
+      **** 03  WRK-TBL-SSTKIJUN-OCC       OCCURS  8500.
+           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  9999.
                05  WRK-TBL-SSTKIJUN       PIC 9(01).
       *
       *   日本語数字
@@ -1739,7 +1740,8 @@
                    END-EVALUATE
       *H24.4
                PERFORM VARYING IDY         FROM    1   BY  1
-                       UNTIL   IDY         >       500
+                       UNTIL  (IDY         >       500)
+                           OR (IDX         >=      9999)
                    ADD     1               TO  IDX
                    MOVE    SYS-1006-SSTKIJUN  (IDY)
                                            TO  WRK-TBL-SSTKIJUN (IDX)
