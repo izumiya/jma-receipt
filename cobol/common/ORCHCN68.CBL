@@ -40,7 +40,7 @@
        WORKING-STORAGE             SECTION.
       *
        01  CONST-AREA.
-           03  CONST-H3004         PIC X(06)   VALUE   "201604".
+           03  CONST-H3004         PIC X(06)   VALUE   "201804".
            03  CONST-H2804         PIC X(06)   VALUE   "201604".
       *
       *****************************************************************
