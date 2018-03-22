@@ -1361,7 +1361,7 @@
                 MOVE   SYS-1034-PRTNM(12)  TO  MKPRT-PRTNM
             END-IF
       *---(04.03.00) LINE ADD START ------------------------------------
-            MOVE   "処方せん"          TO  MKPRT-INFO
+            MOVE   "処方箋"            TO  MKPRT-INFO
             CALL   "ORCSMKPRT1"        USING
                                        ORCSMKPRTAREA
                                        SPA-AREA
@@ -5430,7 +5430,7 @@
                   (SYS-1034-PRTNM(12)  NOT =   SPACE )
                 MOVE   SYS-1034-PRTNM(12)  TO  MKPRT-PRTNM
             END-IF
-            MOVE   "処方せん"          TO  MKPRT-INFO
+            MOVE   "処方箋"            TO  MKPRT-INFO
             CALL   "ORCSMKPRT1"        USING
                                        ORCSMKPRTAREA
                                        SPA-AREA
@@ -6845,7 +6845,7 @@
            INITIALIZE                      RPMAIN-AREA
            MOVE    "shohosen"          TO  RPMAIN-ID
            MOVE    PARA-API-CUSTOM-ID  TO  RPMAIN-CUSTOM-ID
-           MOVE    "処方せん"          TO  RPMAIN-TITLE
+           MOVE    "処方箋"            TO  RPMAIN-TITLE
            MOVE    "fm_prescription"
                                        TO  MCP-TABLE
            MOVE    FMSHOHO-DATA        TO  RPMAIN-DATA
