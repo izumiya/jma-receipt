@@ -142,20 +142,21 @@ class Jma_print
 
     item[:red_file] = red_file
 
-    item[:lp_name]  = report_info[30, 20].strip unless report_info[30, 20].strip.empty?
-    item[:offset_x] = report_info[50, 5].strip unless report_info[50, 5].strip.empty?
-    item[:offset_y] = report_info[55, 5].strip unless report_info[55, 5].strip.empty?
-    item[:site_program] = true if report_info[60, 1] == '2'
-    item[:print_order] = report_info[61, 1].strip
-    item[:out_dir] = format_dir(report_info[62, 165])
-    item[:tbl_key] = report_info[227, 8].strip
-    item[:seq] = report_info[235, 4].strip
-    item[:tbl_group] = report_info[239, 14].strip
-    item[:subseq] = report_info[253, 4].strip
-    item[:page] = report_info[257, 5].strip
-    item[:uuid] = report_info[262,36].strip
-    item[:data_type] = report_info[298,16].strip
-    item[:data] = report_info[314..-1].rstrip
+    item[:lp_name]  = "#{report_info[30, 20]}".strip unless "#{report_info[30, 20]}".strip.empty?
+    item[:offset_x] = "#{report_info[50, 5]}".strip unless "#{report_info[50, 5]}".strip.empty?
+    item[:offset_y] = "#{report_info[55, 5]}".strip unless "#{report_info[55, 5]}".strip.empty?
+    item[:site_program] = true if "#{report_info[60, 1]}" == '2'
+    item[:print_order] = "#{report_info[61, 1]}".strip
+    item[:out_dir] = format_dir("#{report_info[62, 165]}")
+    item[:tbl_key] = "#{report_info[227, 8]}".strip
+    item[:seq] = "#{report_info[235, 4]}".strip
+    item[:tbl_group] = "#{report_info[239, 14]}".strip
+    item[:subseq] = "#{report_info[253, 4]}".strip
+    item[:page] = "#{report_info[257, 5]}".strip
+    item[:uuid] = "#{report_info[262,36]}".strip
+    item[:data_type] = "#{report_info[298,16]}".strip
+    item[:data] = "#{report_info[314..-1]}".rstrip
+
 
     item[:offset]= "-x #{item[:offset_x]} -y #{item[:offset_y]}"
 
