@@ -151,7 +151,7 @@ class Jma_print
     item[:subseq] = report_info[253, 4].strip
     item[:page] = report_info[257, 5].strip
     item[:uuid] = report_info[262,36].strip
-    item[:data] = report_info[298..-1]
+    item[:data] = report_info[298..-1].to_s
 
     item[:offset]= "-x #{item[:offset_x]} -y #{item[:offset_y]}"
 
