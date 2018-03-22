@@ -2894,54 +2894,41 @@
       *    コードを読み替えて加算チェックを行う。
       *  ・A207-3 夜間看護体制加算（夜間○○対１急性期看護補助体制加算の注加算）
       *           を夜間３０対１急性期看護補助体制加算のコードに読み替える
-      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190190770"
-      **             MOVE   "190173010"  TO  TNS-SRYCD
-      **         END-IF
-      **     END-IF
+           IF   (LNK-NYUKSNGET-SANTEIYM      >=   "201604")   AND
+                (LNK-NYUKSNGET-SANTEIYM      <=   "201803")
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190190770"
+                   MOVE   "190173010"  TO  TNS-SRYCD
+               END-IF
+           END-IF
       *  ・A214   夜間７５対１看護補助加算（看護補助加算の注加算）
       *           を看護補助加算１のコードに読み替える
-      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191170"
-      **             MOVE   "190103770"  TO  TNS-SRYCD
-      **         END-IF
-      **     END-IF
+           IF   (LNK-NYUKSNGET-SANTEIYM      >=   "201604")   AND
+                (LNK-NYUKSNGET-SANTEIYM      <=   "201803")
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191170"
+                   MOVE   "190103770"  TO  TNS-SRYCD
+               END-IF
+           END-IF
       *  ・A214   夜間看護体制加算（看護補助加算の注加算）
       *           を看護補助加算１のコードに読み替える
-      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191270"
-      **             MOVE   "190103770"  TO  TNS-SRYCD
-      **         END-IF
-      **     END-IF
+           IF   (LNK-NYUKSNGET-SANTEIYM      >=   "201604")   AND
+                (LNK-NYUKSNGET-SANTEIYM      <=   "201803")
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190191270"
+                   MOVE   "190103770"  TO  TNS-SRYCD
+               END-IF
+           END-IF
       *
       *    平成２８年改正で新設された入院料加算ではないが点数マスタに
       *    入院基本料加算区分がセットされていない加算について、
       *    コードを読み替えて加算チェックを行う。
       *  ・A234-2 感染防止対策地域連携加算（感染防止対策加算の注加算）
       *           を感染防止対策加算１のコードに読み替える
-      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201604"
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190147470"
-      **             MOVE   "190147210"  TO  TNS-SRYCD
-      **         END-IF
-      **     END-IF
+           IF   (LNK-NYUKSNGET-SANTEIYM      >=   "201604")   AND
+                (LNK-NYUKSNGET-SANTEIYM      <=   "201803")
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190147470"
+                   MOVE   "190147210"  TO  TNS-SRYCD
+               END-IF
+           END-IF
       *
-      *    平成３０年改正で新設の入院基本料等加算
-      *    入院基本料等加算内の注の加算は上位の加算コードに読み替えて
-      *    チェックを行う（注の加算は電子点数表にコードが存在しない為）
-      **     IF    LNK-NYUKSNGET-SANTEIYM      >=   "201804"
-      *        医療安全対策地域連携加算１（医療安全対策加算１の注加算）
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206670"
-      **            MOVE   "190120510"   TO  TNS-SRYCD
-      **         END-IF
-      *        医療安全対策地域連携加算２（医療安全対策加算２の注加算）
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206770"
-      **            MOVE   "190136910"   TO  TNS-SRYCD
-      **         END-IF
-      *        抗菌薬適正使用支援加算（感染防止対策加算１の注加算）
-      **         IF    WRK-NYUKHNKSN-SRYCD(IDX8)  =  "190206870"
-      **            MOVE   "190147210"   TO  TNS-SRYCD
-      **         END-IF
-      **     END-IF
       *
       *    平成３０年４月からの入院料加算チェック対応
       *  （入院基本料等加算の中で更に注の加算となっているものを読み替え）
@@ -3056,6 +3043,9 @@
                MOVE    TNS-CDKBN-KBNNUM-EDA
                                         TO  WRK-KSN-CDKBN-KBNNUM-EDA
            END-IF
+           DISPLAY "48012-TENSU-SEL-EXT"
+           DISPLAY "LNK-NYUKSNGET-SANTEIYM = " LNK-NYUKSNGET-SANTEIYM
+           DISPLAY "TNS-SRYCD = " TNS-SRYCD
            .
       *
        48012-TENSU-SEL-EXT.
