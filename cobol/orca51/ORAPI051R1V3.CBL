@@ -1269,6 +1269,22 @@
                                                INTO    WRK-ERRMSG
                            END-STRING
                            GO  TO  2003-SYORI-02-EXT
+                       ELSE
+                           IF    ( JOB-ERRCD   =   SPACE               )
+                           OR    ( JOB-YOBI    =
+                                   "処理対象のデータがありませんでした")
+                               CONTINUE
+                           ELSE
+                               MOVE    "E30"       TO  WRK-ERRCD
+                               STRING  JOB-YOBI    DELIMITED  BY  SPACE
+                                       "【"        DELIMITED  BY  SIZE
+                                       JOB-SHELLMSG
+                                                   DELIMITED  BY  SPACE
+                                       "】"        DELIMITED  BY  SIZE
+                                                   INTO  WRK-ERRMSG
+                               END-STRING
+                               GO  TO  2003-SYORI-02-EXT
+                           END-IF
                        END-IF
                    ELSE
                        MOVE    "E40"           TO  WRK-ERRCD
@@ -1282,23 +1298,8 @@
            END-IF
       *
       *    ページ数返却
-           IF      WRK-JOB-UPDCNT  >   ZERO
-               MOVE    WRK-JOB-UPDCNT  TO  WRK-UPDCNT
-               MOVE    WRK-UPDCNT-X    TO  LSTRES-OUTPUT-COUNT
-           ELSE
-               IF      WRK-JOB-ERRCD   =   SPACE
-                   MOVE    WRK-JOB-UPDCNT  TO  WRK-UPDCNT
-                   MOVE    WRK-UPDCNT-X    TO  LSTRES-OUTPUT-COUNT
-               ELSE
-                   MOVE    "E30"           TO  WRK-ERRCD
-                   STRING  JOB-YOBI        DELIMITED  BY  SPACE
-                           "【"            DELIMITED  BY  SIZE
-                           JOB-SHELLMSG    DELIMITED  BY  SPACE
-                           "】"            DELIMITED  BY  SIZE
-                                           INTO  WRK-ERRMSG
-                   END-STRING
-               END-IF
-           END-IF
+           MOVE    WRK-JOB-UPDCNT      TO  WRK-UPDCNT
+           MOVE    WRK-UPDCNT-X        TO  LSTRES-OUTPUT-COUNT
            .
        2003-SYORI-02-EXT.
            EXIT.
