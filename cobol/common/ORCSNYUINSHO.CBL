@@ -105,6 +105,10 @@
            03  WRK-HKNCOMBI            PIC X(04).
            03  WRK-DRCD                PIC X(05).
            03  WRK-INPUTCOMENT         PIC X(80).
+      *
+           03  WRK-INPUTCHI-G.
+               05  WRK-INPUTCHI        PIC  X(08)  OCCURS  5.
+      *
            03  WRK-ZAIKAISU            PIC 9(05).
       *    同日再入院日
            03  WRK-DDAY                PIC 9(02).
@@ -132,6 +136,10 @@
                    07  TBL-SHO-SRYKAISU        PIC 9(03).
                    07  TBL-SHO-INPUTNUM        PIC 9(03).
                    07  TBL-SHO-INPUTCOMENT     PIC X(80).
+      *H30.4       入力値
+                   07  TBL-SHO-INPUTCHI-G.
+                       09  TBL-SHO-INPUTCHI    PIC  X(08)
+                                                    OCCURS  5.
            03  TBL-IDX                     PIC 9(04).
       *
       *    診療行為マスター
@@ -629,6 +637,9 @@
                        PERFORM 20031-PTCOM-SET-SEC
                        MOVE    WRK-INPUTCOMENT TO  TBL-SHO-INPUTCOMENT
                                                       (TBL-IDX IDX-T)
+      *H30.4           入力値
+                       MOVE    WRK-INPUTCHI-G  TO  TBL-SHO-INPUTCHI-G
+                                                      (TBL-IDX IDX-T)
                    END-IF
                END-PERFORM
            END-PERFORM
@@ -651,8 +662,10 @@
            PERFORM 950-PTCOM-READ-SEC
            IF      FLG-PTCOM           =   ZERO
                MOVE    PTCOM-INPUTCOMENT   TO  WRK-INPUTCOMENT
+               MOVE    PTCOM-INPUTCHI-AREA TO  WRK-INPUTCHI-G
            ELSE
                MOVE    SPACE               TO  WRK-INPUTCOMENT
+               MOVE    SPACE               TO  WRK-INPUTCHI-G
            END-IF
            .
        20031-PTCOM-SET-EXT.
@@ -708,6 +721,9 @@
                                                              (IDX1 IDX3)
                MOVE    TBL-SHO-INPUTCOMENT (TBL-IDX IDX-T)
                                            TO  ORCHC19-INPUTCOMENT
+                                                             (IDX1 IDX3)
+               MOVE    TBL-SHO-INPUTCHI-G (TBL-IDX IDX-T)
+                                           TO  ORCHC19-INPUTCHI-G
                                                              (IDX1 IDX3)
            END-PERFORM
            .

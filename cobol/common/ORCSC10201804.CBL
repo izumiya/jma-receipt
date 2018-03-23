@@ -185,6 +185,10 @@
            03  FLG-CHKEND          PIC 9(01).
            03  FLG-NINPKSN         PIC 9(01).
            03  FLG-CHKT            PIC 9(01).
+      *    µ¡Ç½¶¯²½²Ã»»
+           03  FLG-KYOUKACD        PIC 9(01).
+      *    ÌôºÞÅ¬Àµ»ÈÍÑÏ¢·È²Ã»»
+           03  FLG-YKZTEKICD       PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -584,10 +588,23 @@
            03  TBL-CHISRYCD3       PIC X(09)   VALUE   "112016170".
       *H26.4
       *    ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
-           03  TBL-CHKCARKSN       PIC X(09)   VALUE   "112017270".
+           03  TBL-CHKCARKSN1      PIC X(09)   VALUE   "112021770".
+           03  TBL-CHKCARKSN2      PIC X(09)   VALUE   "112017270".
       *H28.4
       *    Ç§ÃÎ¾ÉÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»
-           03  CONS-NNCHIKSN       PIC X(09)   VALUE   "112017570".
+           03  CONS-NNCHIKSN1      PIC X(09)   VALUE   "112021870".
+           03  CONS-NNCHIKSN2      PIC X(09)   VALUE   "112017570".
+      *
+      *H30.4
+      *    µ¡Ç½¶¯²½²Ã»»
+       01  CONS-KYOUKACD1          PIC X(09)   VALUE    "111013770".
+      *    µ¡Ç½¶¯²½²Ã»»¡Ê¾®»ù²Ê³°Íè¿ÇÎÅÎÁ¡Ë
+       01  CONS-KYOUKACD2          PIC X(09)   VALUE    "113028870".
+      *    µ¡Ç½¶¯²½²Ã»»¡Ê¾®»ù¤«¤«¤ê¤Ä¤±¡Ë
+       01  CONS-KYOUKACD3          PIC X(09)   VALUE    "113028970".
+      *    ÌôºÞÅ¬Àµ»ÈÍÑÏ¢·È²Ã»»¡ÊºÆ¿Ç¡Ë
+       01  CONS-YKZTEKICD          PIC X(09)   VALUE    "112021970".
+      *
       *
       *½èÊýäµÌµ¸òÉÕ²Ã»»¡Êºß°åÁí´É¡¦»Ü°åÁí´É¡Ë¡ÊC002-00)
        01  CONS-C0020-KSN      PIC X(09)   VALUE   "114034370".
@@ -1552,6 +1569,8 @@
                   OR  (FLG-CHIIKKBN        =   1  )
                   OR  (FLG-MEISAKBN        =   1  )
                   OR  (FLG-CHKCARKSN       =   1  )
+      *           ÌôºÞÅ¬Àµ»ÈÍÑÏ¢·È²Ã»»
+                  OR  (FLG-YKZTEKICD       =   1  )
                    PERFORM 1001149-GYODEL-SEC
                    GO    TO      100114-SYUGISYORI-CHK-EXT
                END-IF
@@ -1567,6 +1586,9 @@
                   OR  (FLG-MEISAKBN        =   1  )
                   OR  (FLG-CHKCARKSN       =   1  )
                   OR  (FLG-GAIRAI          =   1  )
+      *           ÌôºÞÅ¬Àµ»ÈÍÑÏ¢·È²Ã»»
+                  OR  (FLG-YKZTEKICD       =   1  )
+                  OR  (FLG-KYOUKACD        =   1  )
                    PERFORM 1001149-GYODEL-SEC
                    GO    TO      100114-SYUGISYORI-CHK-EXT
                END-IF
@@ -2172,6 +2194,8 @@
            MOVE    ZERO                TO  FLG-CHIIKKBN
            MOVE    ZERO                TO  FLG-MEISAKBN
            MOVE    ZERO                TO  FLG-CHKCARKSN
+           MOVE    ZERO                TO  FLG-KYOUKACD
+           MOVE    ZERO                TO  FLG-YKZTEKICD
            MOVE    SPACE               TO  WRK-KBN
       *    ³°Íè´ÉÍý²Ã»»
            IF      WRK-COM-INPUTCD(IDX-Z)  =   TBLG-SRYCD
@@ -2191,9 +2215,28 @@
            END-IF
       *H26.4
       *    ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»¡¦Ç§ÃÎ¾ÉÃÏ°èÊñ³ç²Ã»»
-           IF      WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHKCARKSN
-                                           OR  CONS-NNCHIKSN
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHKCARKSN1
+                                           OR  TBL-CHKCARKSN2
+                                           OR  CONS-NNCHIKSN1
+                                           OR  CONS-NNCHIKSN2
                MOVE    1                   TO  FLG-CHKCARKSN
+           END-IF
+      *H30.4
+      *    µ¡Ç½¶¯²½²Ã»»
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-KYOUKACD1
+               MOVE    1                   TO  FLG-KYOUKACD
+           END-IF
+      *    µ¡Ç½¶¯²½²Ã»»¡Ê¾®»ù²Ê³°Íè¿ÇÎÅÎÁ¡Ë
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-KYOUKACD2
+               MOVE    2                   TO  FLG-KYOUKACD
+           END-IF
+      *    µ¡Ç½¶¯²½²Ã»»¡Ê¾®»ù¤«¤«¤ê¤Ä¤±¡Ë
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-KYOUKACD3
+               MOVE    3                   TO  FLG-KYOUKACD
+           END-IF
+      *    ÌôºÞÅ¬Àµ»ÈÍÑÏ¢·È²Ã»»
+           IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-YKZTEKICD
+               MOVE    1                   TO  FLG-YKZTEKICD
            END-IF
       *
       *    £²£°£°¾²°Ê¾å¤Î¾ì¹ç¡¢¥¨¥é¡¼
@@ -6471,8 +6514,10 @@
       *!!!!
       *H26.4
       *        ±ý¿ÇÎÁ»»Äê»þ¤Ï¡¢ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»ºï½ü
-               IF      WRK-COM-INPUTCD (IDX-Z) =   TBL-CHKCARKSN
-                                               OR  CONS-NNCHIKSN
+               IF      WRK-COM-INPUTCD (IDX-Z) =   TBL-CHKCARKSN1
+                                               OR  TBL-CHKCARKSN2
+                                               OR  CONS-NNCHIKSN1
+                                               OR  CONS-NNCHIKSN2
                    IF      FLG-OUSIN           =   1
                       INITIALIZE              WRK-GMN-TBLREC(IDX-Z)
                       INITIALIZE              WRK-COM-TBLREC(IDX-Z)
