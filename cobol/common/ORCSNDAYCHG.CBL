@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 05.00.00     太田         2018/3/23 入力領域を拡張(54->100)
+      *                                     初期値は54で据え置く
       *****************************************************************
       *
       *
@@ -97,10 +99,10 @@
       *
        01  WRK-NYUMOJI-AREA.
            03  WRK-HI              PIC 9(02).
-           03  WRK-NISUU           PIC X(54).
+           03  WRK-NISUU           PIC X(100).
            03  WRK-MAE-CD          PIC X(01).
            03  WRK-ACCT-MCNT       PIC 9(02).
-           03  WRK-KAI             PIC X(54).
+           03  WRK-KAI             PIC X(100).
            03  WRK-MCNT1           PIC 9(02).
       *
       *    入院期間
@@ -245,6 +247,7 @@
                        MOVE    ZERO            TO  WRK-MCNT1
                        MOVE    1               TO  FLG-HI
                    WHEN    OTHER
+                       DISPLAY "WRK-ACCT-MCNT=" WRK-ACCT-MCNT
       *                回数
                        IF      (FLG-AST        =   1   )  AND
                                (FLG-KAI        =   ZERO)
@@ -254,6 +257,7 @@
                                                       (WRK-ACCT-MCNT:1)
                        END-IF
       *                日数・回数の数値チェック
+                       DISPLAY "WRK-MCNT1=" WRK-MCNT1
                        IF      (FLG-AST        =   1   )  AND
                                (FLG-KAI        =   1   )
                            ADD     1               TO  WRK-MCNT1
