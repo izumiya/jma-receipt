@@ -25,11 +25,11 @@
       *
        01  ORCSNDAYCHGAREA.
       *    入力内容
-           03  ORCSNDAYCHG-INPUTCD          PIC X(54).
+           03  ORCSNDAYCHG-INPUTCD          PIC X(100).
       *    診療年月日
            03  ORCSNDAYCHG-SRYYMD           PIC X(08).
       *    入力桁数
-           03  ORCSNDAYCHG-KETA             PIC 9(02).
+           03  ORCSNDAYCHG-KETA             PIC 9(03).
       *    処理区分（１：入院期間チェックあり）
            03  ORCSNDAYCHG-KBN              PIC X(01).
       *    入院期間
