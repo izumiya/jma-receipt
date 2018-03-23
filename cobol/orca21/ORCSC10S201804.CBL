@@ -449,6 +449,7 @@
            03  WRK-IDX-INS             PIC 9(04).
       *
            03  WRK-SYO-SRYCD           PIC X(09).
+           03  WRK-SAI-SRYCD           PIC X(09).
       *
       *    ø«ª°Œ¡•∆°º•÷•Î
        01  TBL-SINSATU-AREA.
@@ -650,6 +651,8 @@
       *
       *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘§´§´§Í§ƒ§±ø«Œ≈Œ¡°À
        01  CONS-SYOKAKCD2          PIC X(09)  VALUE   "113027870".
+      *    ÃÙ∫ﬁ≈¨¿µª»Õ—œ¢∑»≤√ªª° ∫∆ø«°À
+       01  CONS-YKZTEKICD          PIC X(09)   VALUE    "112021970".
       *
       *     ›∏± ÃªªƒÍÕ˙ŒÚ•∆°º•÷•Î
            COPY   "CMSANTEITBL.INC".
@@ -3589,6 +3592,14 @@
            ELSE
       *        √œ∞Ë∞ÂŒ≈π◊∏•°¶Ã¿∫ŸΩÒ»Øπ‘¬Œ¿©≈˘≤√ªª
                PERFORM 33013-SAISINKSN-SEC
+      *H30.4
+      *        ÃÙ∫ﬁ≈¨¿µª»Õ—œ¢∑»≤√ªª° ∫∆ø«°À§Œ∆˛Œœ§¨§¢§Îª˛
+               IF      WRK-SAI-SRYCD   NOT =   SPACE
+                   MOVE    WRK-SAI-SRYCD       TO  WRK-SRYCD
+      *            ƒ…≤√∂¶ƒÃΩËÕ˝
+                   MOVE    ZERO                TO  WRK-IDX-IN
+                   PERFORM 33041-SRYCD-ADD-SEC
+               END-IF
            END-IF
       *
       *
@@ -7368,6 +7379,7 @@
       *H30.4
       *    æÆª˘π≥∂›≈¨¿µÃÙª»Õ—≤√ªª° æÆª˘≤ ≥∞ÕËø«Œ≈Œ¡°À
            MOVE    SPACE               TO  WRK-SYO-SRYCD
+           MOVE    SPACE               TO  WRK-SAI-SRYCD
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
                              ((HZN-COM-INPUTCD (IDX)   =   SPACE ) AND
@@ -7376,6 +7388,11 @@
                     AND (HZN-COM-INPUTCD(IDX)    =   CONS-SYOUNICD2
                                                  OR  CONS-SYOKAKCD2)
                      MOVE    HZN-COM-INPUTCD(IDX)    TO  WRK-SYO-SRYCD
+                 END-IF
+      *          ÃÙ∫ﬁ≈¨¿µª»Õ—œ¢∑»≤√ªª° ∫∆ø«°À
+                 IF     (HZN-COM-SRYKBN(IDX)     =   "12"  )
+                    AND (HZN-COM-INPUTCD(IDX)    =   CONS-YKZTEKICD)
+                     MOVE    HZN-COM-INPUTCD(IDX)    TO  WRK-SAI-SRYCD
                  END-IF
            END-PERFORM
       *
