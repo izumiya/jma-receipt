@@ -355,16 +355,20 @@
            ELSE
                GO  TO  200-MAIN-1-EXT
            END-IF
-      *    注加算
+      *    注加算（入院基本料）
            IF   ((TNS-CDKBN-KBNNUM         >=  100)   AND
                  (TNS-CDKBN-KBNNUM         <=  199))
-      *        入院基本料等加算
                MOVE      1                 TO  FLG-KSN
            END-IF
+      *    注加算（特定入院料）
            IF   ((TNS-CDKBN-KBNNUM         >=  300)   AND
                  (TNS-CDKBN-KBNNUM         <=  399))
-      *        入院基本料等加算
                MOVE      1                 TO  FLG-KSN
+           END-IF
+      *    入院基本料等加算
+             IF ((TNS-CDKBN-KBNNUM         >=  200)   AND
+                 (TNS-CDKBN-KBNNUM         <=  299))  
+               MOVE      2                 TO  FLG-KSN
            END-IF
       *
       *    平成３０年３月までは入院料加算チェックマスタを使用する
@@ -378,7 +382,6 @@
              IF ((TNS-CDKBN-KBNNUM         >=  200)   AND
                  (TNS-CDKBN-KBNNUM         <=  299))  
       *        入院基本料等加算
-               MOVE      2                 TO  FLG-KSN
                MOVE    TNS-CHUKSNCD        TO  WRK-KSN-CHUKSNCD
                MOVE    TNS-CHUKSNTUBAN     TO  WRK-KSN-CHUKSNTUBAN
                IF      WRK-KSN-CHUKSNTUBAN  NOT =  "0"
