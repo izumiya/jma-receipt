@@ -7170,18 +7170,6 @@
                    END-IF
       *
                END-IF
-      *H30.4
-      *        Ç¥ÉØ²Ã»»¡¡¤¢¤ê
-               IF      FLG-ARI             =   ZERO
-                   SET     TBL-NPIDX18         TO  1
-                   SEARCH  TBL-NINPUKSN18-OCC  VARYING   TBL-NPIDX18
-                       AT   END
-                           CONTINUE
-                       WHEN   (TBL-NP18-SRYCD (TBL-NPIDX18)
-                                           =   SPA-COM-INPUTCD (IDX))
-                           MOVE    1               TO  FLG-NINPU-IN
-                   END-SEARCH
-               END-IF
       *
                EVALUATE    SPA-COM-INPUTCD (IDX)
       *                £Ä£Õ£Í£Í£Ù¿Ç»¡ÎÁ
@@ -7208,6 +7196,13 @@
                    MOVE    1               TO  FLG-GAI
                END-IF
            END-PERFORM
+      *H30.4
+      *    Ç¥ÉØ²Ã»»È½Äê
+           PERFORM 7001-NINPU-CHK-SEC
+           IF      SPA-NINPUKBN-IN         =   1
+               MOVE    1                   TO  FLG-NINPU-IN
+           END-IF
+           MOVE    ZERO                TO  SPA-NINPUKBN-IN
            .
        1001-TBLCHEK-EXT.
            EXIT.
