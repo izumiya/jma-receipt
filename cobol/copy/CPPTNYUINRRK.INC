@@ -55,6 +55,10 @@
            03  PTNYUINRRK-TOKUTEI-NYUIN           PIC  X(02).
       *特定入院料算定要件区分（空白：該当する／１：該当しない）
            03  PTNYUINRRK-TOKU-SANTEIYOUKENKBN    PIC  X(01).
+      *入院加算コード
+           03  PTNYUINRRK-KSNSRYCD-G.
+               05  PTNYUINRRK-KSNSRYCD-OCC        OCCURS   3.
+                   07  PTNYUINRRK-KSNSRYCD        PIC  X(09).
       *室料差額
            03  PTNYUINRRK-RM-SAGAKU               PIC  X(02).
       *定期請求区分
@@ -101,7 +105,19 @@
       *入院履歴最大枝番号
            03  PTNYUINRRK-MAXEDANUM               PIC  9(03).
       *入院食事区分（０：食なし／１：食あり／２：特食）
+      *　　　　　　（Ａ：変更なし／Ｂ：個別指示／Ｃ：個別指示変更なし）
            03  PTNYUINRRK-SKJKBN                  PIC  X(01).
+           03  PTNYUINRRK-SKJKBN-KOBETSU-G.
+      *入院食事区分　朝（０：食なし／１：食あり／２：特食）
+               05  PTNYUINRRK-SKJKBN-ASA              PIC  X(01).
+      *入院食事区分　昼（０：食なし／１：食あり／２：特食）
+               05  PTNYUINRRK-SKJKBN-HIRU             PIC  X(01).
+      *入院食事区分　夕（０：食なし／１：食あり／２：特食）
+               05  PTNYUINRRK-SKJKBN-YU               PIC  X(01).
+           03  PTNYUINRRK-SKJKBN-KOBETSU-R
+                           REDEFINES PTNYUINRRK-SKJKBN-KOBETSU-G.
+               05  PTNYUINRRK-SKJKBN-KOBETSU      PIC  X(01)
+                                                  OCCURS 3.
       *入院日食事開始時間区分
       *（０：食なし／１：朝から／２：昼から／３：夕から）
            03  PTNYUINRRK-TIMEKBN-IN              PIC  X(01).
