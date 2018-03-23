@@ -240,7 +240,7 @@
                MOVE    ZERO                TO  SNYUINRYO-AUTOSET
            END-IF
       *
-           IF    ( SNYUINRYO-AUTOSET       =   "1" )
+           IF    ( SNYUINRYO-AUTOSET       =   "2" )
             AND  ( SNYUINRYO-SYORIKBN      =   CONST-IDO )
                PERFORM 900-PTNYUINRRK-KEY3-SEL-SEC
                IF    ( SNYUINRYO-SRYYMD    <   PTNYUINRRK-TENNYUYMD )
@@ -272,7 +272,7 @@
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC        TO  SYS-5001-REC
       *
-           IF    ( SNYUINRYO-AUTOSET       =   "1" )
+           IF    ( SNYUINRYO-AUTOSET       =   "2" )
             AND  ( SNYUINRYO-SYORIKBN      =   CONST-IDO )
             AND  ( SYS-5001-BTU-SBT    NOT =   LAST-BTU-BTU-SBT )
                MOVE    1               TO  FLG-BTU-SBT-CHG
@@ -373,14 +373,17 @@
                PERFORM 2001-NYUINRYO-EDIT-SEC
                EVALUATE    SNYUINRYO-AUTOSET
                WHEN    "1"
+                   PERFORM 2001-AUTOSET-SEC
+                   PERFORM 2002-AUTOSET-SEC
+      *
+               WHEN    "2"
                    IF    ( SNYUINRYO-SYORIKBN  =   CONST-IDO )
                        PERFORM 2001-LAST-NYUINRYO-CHK-SEC
+                       IF    ( FLG-KEEP        =   ZERO )
+                           PERFORM 2001-AUTOSET-SEC
+                           PERFORM 2002-AUTOSET-SEC
+                       END-IF
                    END-IF
-                   IF    ( FLG-KEEP        =   ZERO )
-                       PERFORM 2001-AUTOSET-SEC
-                       PERFORM 2002-AUTOSET-SEC
-                   END-IF
-      *
                WHEN    "A"
                    PERFORM 2002-AUTOSET-SEC
                END-EVALUATE
