@@ -12,9 +12,12 @@ tbl_ptnyuinrrk	{
 	TAIINYMD		char(8);
 	TAIINCD			char(2);
 	TOKUTEI_KBN		char(1);
-	TOKUTEI_NYUIN		char(2);
+	TOKUTEI_NYUIN   char(2);
 	TOKU_SANTEIYOUKENKBN		char(1);
-	RM_SAGAKU		char(2);
+	KSNSRYCD1		 varchar(9);
+	KSNSRYCD2		 varchar(9);
+	KSNSRYCD3		 varchar(9);
+	RM_SAGAKU		 char(2);
 	TEIKI_SEIKYUKBN		char(1);
 	KENSAKU_DISPKBN		char(1);
 	SHOKAIKBN		char(1);
@@ -35,6 +38,9 @@ tbl_ptnyuinrrk	{
 	DOUJITSUKBN		char(1);
 	MAXEDANUM		number(3,0);
 	SKJKBN			char(1);
+	SKJKBN_ASA	    varchar(1);
+	SKJKBN_HIRU		varchar(1);
+	SKJKBN_YU		varchar(1);
 	TIMEKBN_IN		char(1);
 	SENTEIKBN		char(1);
 	TAINRELKBN		char(1);

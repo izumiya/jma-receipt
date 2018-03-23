@@ -30,7 +30,7 @@
                05  ODRITEM-ITEMNUM       PIC 9(02).
            03  ODRITEM-ITEMID            PIC X(05).
            03  ODRITEM-ITEM              PIC X(10).
-           03  ODRITEM-MEMO              PIC X(80).
+           03  ODRITEM-MEMO              PIC X(128).
            03  ODRITEM-ERRCD             PIC X(04).
            03  ODRITEM-STATUS            PIC 9(01).
            03  ODRITEM-TERMID            PIC X(16).
