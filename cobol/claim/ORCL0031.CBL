@@ -1863,8 +1863,14 @@
                        CONTINUE
                     WHEN   WRK-SRYCD       =   TBL-NP18-SRYCD
                                                       (TBL-NPIDX18)
-                       MOVE    TBL-NP18-TIMKBN (TBL-NPIDX18)
-                                           TO  WRK-TIMEKBN
+                       IF      TBL-NP18-TIMKBN (TBL-NPIDX18)
+                                               =   ZERO
+      *                    Ç¥ÉØ²Ã»»¤ÏÂÐ¾Ý³°
+                           CONTINUE
+                       ELSE
+                           MOVE    TBL-NP18-TIMKBN (TBL-NPIDX18)
+                                               TO  WRK-TIMEKBN
+                       END-IF
                END-SEARCH
            END-IF
       *
