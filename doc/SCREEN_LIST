@@ -45,6 +45,7 @@ XF01X.glade	orca06	(XF01X)メモＣＬＡＩＭ送信選択サブ
 XG01.glade	orca07	(XG01)ＣＳＶ出力選択画面
 XG02.glade	orca07	(XG02)ＣＳＶ出力指示画面
 XG03.glade	orca07	(XG03)電子版お薬手帳データ送信画面
+XG04.glade	orca07	(XG04)ＣＳＶ出力選択画面
 XG99.glade	orca07	(XG99)処理結果
 XGERR.glade	orca07	(XGERR)エラー情報
 XGID1.glade	orca07	(XGID1)確認画面
@@ -405,6 +406,7 @@ W67.glade	orca101	(W67)システム管理情報−出産費用内訳明細情報
 W68.glade	orca101	(W68)システム管理情報−保険者付加情報
 W91.glade	orca101	(W91)システム管理情報−医療情報連携基盤情報
 W92.glade	orca101	(W92)システム管理情報−医療情報連携基盤情報
+W93.glade	orca101	(W93)システム管理情報−医療情報代理機関情報
 W96.glade	orca101	(W96)システム管理情報−CRON設定情報
 W98.glade	orca101	(W98)システム管理情報−排他情報設定
 W981.glade	orca101	(W981)システム管理情報−排他制御状態
