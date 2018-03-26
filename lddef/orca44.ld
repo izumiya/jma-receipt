@@ -57,9 +57,9 @@ db "xml2" {
  xml_receiptdata_check_makev3res;
 };
 
-#db "monblob" {
-# monblob;
-#};
+#@monblob@db "monblob" {
+#@monblob@ monblob;
+#@monblob@};
 
 db	{
 	tbl_btpara;

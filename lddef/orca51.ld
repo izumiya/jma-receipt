@@ -96,9 +96,9 @@ db "xml2" {
  xml_temp_medical_addv3res;
 };
 
-#db "monblob" {
-# monblob;
-#};
+#@monblob@db "monblob" {
+#@monblob@ monblob;
+#@monblob@};
 
 db	{
 	tbl_syskanri;
