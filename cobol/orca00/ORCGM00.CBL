@@ -1055,6 +1055,11 @@
                IF    ( DBKANRI-DBSVERSION1 NOT =   DBKANRI-DBSVERSION2 )
                    MOVE    "1010"      TO  SPA-ERRCD
                ELSE
+      *          2018.04改定対応
+                 IF  ( DBKANRI-DBSVERSION1     <
+                                               "S-050000-1-20180306-1")
+                   MOVE    "1020"      TO  SPA-ERRCD
+                 ELSE
       *
                    CALL    "ORCSVERSION"       USING   SVERSION-AREA
                    IF    ( SVERSION-VERSION    NOT =   SPACE )
@@ -1064,6 +1069,7 @@
                                        TO  SPA-ERRCD
                        END-IF
                    END-IF
+                 END-IF
                END-IF
            ELSE
                    MOVE    "1011"      TO  SPA-ERRCD
@@ -2045,6 +2051,12 @@
                WHEN    "1018"
                    STRING  "あなたは管理者ではありませんので参加"
                            "する場合は管理者まで連絡してください。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "1020"
+                   STRING  "ＤＢが改定未対応です！"
+                           "プログラム更新処理を実施してください。"
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
