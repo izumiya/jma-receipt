@@ -3813,9 +3813,9 @@
       *****************************************************************
        33021-KYOUKAKSN-ADD-SEC         SECTION.
       *
-           IF      SPA-KYOUKAKSN       =   ZERO
-               GO    TO      33021-KYOUKAKSN-ADD-EXT
-           END-IF
+      **   IF      SPA-KYOUKAKSN       =   ZERO
+      *        GO    TO      33021-KYOUKAKSN-ADD-EXT
+      **   END-IF
       *
       *    機能強化加算
            MOVE    "111013770"         TO  WRK-SRYCD
