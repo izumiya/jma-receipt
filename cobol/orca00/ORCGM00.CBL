@@ -1057,7 +1057,7 @@
                ELSE
       *          2018.04²þÄêÂÐ±þ
                  IF  ( DBKANRI-DBSVERSION1     <
-                                               "S-050000-1-20180306-1")
+                                               "S-040800-1-20180306-1")
                    MOVE    "1020"      TO  SPA-ERRCD
                  ELSE
       *
