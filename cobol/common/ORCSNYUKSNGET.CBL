@@ -2450,7 +2450,6 @@
                MOVE    "tbl_etensu_1" TO MCP-TABLE
                MOVE    "key4"         TO  MCP-PATHNAME
                PERFORM 910-ETENSU1-READ-SEC
-               DISPLAY "FLG-ETENSU1 = " FLG-ETENSU1
                IF      FLG-ETENSU1    NOT =   ZERO
                    MOVE   1        TO     FLG-NYUKSN
                END-IF
@@ -3015,7 +3014,6 @@
                     PERFORM 910-DBFETCH-SEC
                     IF    ( MCP-RC          =   ZERO )
                         MOVE    MCPDATA-REC TO  TNS-TENSU-REC
-                        DISPLAY "YOMIKAE AFTER TNS-SRYCD = " TNS-SRYCD
                     END-IF
       *
                     MOVE    "tbl_tensu"         TO  MCP-TABLE
@@ -3043,9 +3041,6 @@
                MOVE    TNS-CDKBN-KBNNUM-EDA
                                         TO  WRK-KSN-CDKBN-KBNNUM-EDA
            END-IF
-           DISPLAY "48012-TENSU-SEL-EXT"
-           DISPLAY "LNK-NYUKSNGET-SANTEIYM = " LNK-NYUKSNGET-SANTEIYM
-           DISPLAY "TNS-SRYCD = " TNS-SRYCD
            .
       *
        48012-TENSU-SEL-EXT.
