@@ -1520,6 +1520,7 @@
       *
            MOVE    WRK-SRYKA-NAME      TO  SPA-SRYKAMEI
            MOVE    WRK-DRCD-NAME       TO  SPA-DRCD-NAME
+           MOVE    WRK-DRCD            TO  SPA-DRCD
       *
            INITIALIZE                  ORCSC95AREA
            MOVE    "@"                 TO  LNK-SC95-KBN
@@ -2146,6 +2147,8 @@
                EVALUATE    SPA-GMN-INPUTCD (IDX)(1:1)
                    WHEN    "."
                    WHEN    "*"
+                   WHEN    "#"
+                   WHEN    "$"
                        CONTINUE
                    WHEN    OTHER
       *                点数マスタチェック（再表示編集時にエラー）
@@ -2703,6 +2706,7 @@
            IF     (SPA-COM-INPUTCD(IDX)(1:1) =   "8")
              OR   (SPA-COM-INPUTCD(IDX)(1:3) =   "008")
              OR   (SPA-COM-INPUTCD(IDX)(1:3) =   "001")
+      *H30.4
              OR   (SPA-COM-INPUTCD(IDX)(1:7) =   "0992081")
                IF     (SPA-COM-INPUTCD(IDX)  =   "810000001"
                                              OR  "008500000"
@@ -2863,7 +2867,7 @@
               OR ((SPA-COM-INPUTCD(IDX)(1:3)   =   "001") AND
                   (SPA-COM-YCOMKBN (IDX)       =   "1" ))
       *H30.4
-              OR  (SPA-COM-INPUTCD(IDX)(1:7)   =   "0992081")
+               OR (SPA-COM-INPUTCD(IDX)(1:7)   =   "0992081" )
                PERFORM VARYING     IDX-A   FROM    1   BY  1
                        UNTIL      (IDX-A       >   5   )
                    IF      SPA-COM-ATAI (IDX IDX-A)    NOT =   SPACE
@@ -3646,12 +3650,28 @@
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算１が算定できます。"
+                           "ＯＫで自動算定します。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "0130"
                    STRING  "長期投薬加算が算定できます。"
                            "ＯＫで自動算定します。"
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算２が算定できます。"
+                           "ＯＫで自動算定します。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "0213"
                    STRING  "特定疾患処方管理加算が算定できます。"
                             "ＯＫで自動算定します。"
@@ -3659,6 +3679,15 @@
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算１が算定できます。"
+                            "ＯＫで自動算定します。"
+                            "（併用算定警告該当有）"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "0230"
                    STRING  "長期投薬加算が算定できます。"
                            "ＯＫで自動算定します。"
@@ -3666,6 +3695,15 @@
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *H30.4 から
+                   IF      SPA-SRYYMD      >=  "20180401"
+                   STRING  "特定疾患処方管理加算２が算定できます。"
+                           "ＯＫで自動算定します。"
+                            "（併用算定警告該当有）"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+                   END-IF
                WHEN    "2001"
                    STRING   "内服薬剤が７種類以上になります。"
                             "逓減しますか？"
