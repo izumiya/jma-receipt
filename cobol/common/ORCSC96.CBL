@@ -2326,6 +2326,12 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0287"
+                   STRING  "注加算コードのある加算はまとめて"
+                           "入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "K120"
                    STRING  "警告！"
