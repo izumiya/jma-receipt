@@ -190,6 +190,8 @@
       *    薬剤適正使用連携加算
            03  FLG-YKZTEKICD       PIC 9(01).
       *
+           03  FLG-CHK-ARI         PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -2234,7 +2236,7 @@
            IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-KYOUKACD3
                MOVE    3                   TO  FLG-KYOUKACD
            END-IF
-      *    薬剤適正使用連携加算
+      *    薬剤適正使用連携加算（再診）
            IF      WRK-COM-INPUTCD(IDX-Z)  =   CONS-YKZTEKICD
                MOVE    1                   TO  FLG-YKZTEKICD
            END-IF
@@ -5499,11 +5501,31 @@
       *****************************************************************
        10012-CHUKSNCD-CHK-SEC          SECTION.
       *
+           MOVE    ZERO                TO  FLG-CHK-ARI
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-MAX-LINE  )   OR
                               (WRK-ERRCD   NOT =   SPACE )  OR
                              ((WRK-COM-INPUTCD (IDX-Z) =   SPACE ) AND
                               (WRK-GMN-INPUTCD (IDX-Z) =   SPACE ))
+               IF     (WRK-COM-INPUTCD  (IDX-Z)(1:1)   =   "1"  )
+                  AND (WRK-COM-TENSIKIBETU(IDX-Z)      =   5
+                                                       OR  6   )
+                   MOVE    1               TO  FLG-CHK-ARI
+      *            注加算コードがあればエラー
+                   IF      WRK-COM-CHUKSNCD (IDX-Z)    NOT =   ZERO
+                       MOVE    2               TO  FLG-CHK-ARI
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    剤内に％加算、減算がある時のみ、注加算コード順のチェック
+      *
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-MAX-LINE  )   OR
+                              (WRK-ERRCD   NOT =   SPACE )  OR
+                             ((WRK-COM-INPUTCD (IDX-Z) =   SPACE ) AND
+                              (WRK-GMN-INPUTCD (IDX-Z) =   SPACE ))
+                       OR    ( FLG-CHK-ARI     =   ZERO     )
                IF     (WRK-COM-INPUTCD  (IDX-Z)(1:1)   =   "1"  )  AND
                       (WRK-COM-CHUKSNCD (IDX-Z)    NOT =   ZERO )
                    COMPUTE IDX-Z2              =   IDX-Z   +   1
@@ -5524,6 +5546,14 @@
                        END-IF
                    END-PERFORM
                    IF      IDX-ERR             >   ZERO
+                       IF      FLG-CHK-ARI     =   2
+                           MOVE    "0287"          TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR
+                                                             (IDX-ERR)
+                           MOVE    WRK-COM-NAME (IDX-ERR)
+                                               TO  LNK-ORCSC-ERRMSG
+                       ELSE
+      *
       *                注加算コードの違う加算が間に存在する
                        IF     (WRK-COM-KZMFLG (IDX-ERR)
                                                    =   SPACE )  AND
@@ -5537,6 +5567,9 @@
                            MOVE    WRK-COM-NAME (IDX-ERR)
                                                TO  LNK-ORCSC-ERRMSG
                        END-IF
+      *
+                       END-IF
+      *
                    END-IF
                END-IF
            END-PERFORM
@@ -5926,22 +5959,6 @@
                                                    OR  6
                CONTINUE
            ELSE
-      *往診　%加算廃止
-      *        往診料の時、往診区分により、点数集計を変更する
-      *        IF     (WRK-COM-SRYKBN      (IDX-Z)     =   "14" )  AND
-      *               (WRK-COM-TUSOKUGAIKBN(IDX-Z) NOT =   "1"  )  AND
-      *               (WRK-COM-OSINKBN     (IDX-Z) NOT =   ZERO )
-      *            EVALUATE    WRK-COM-OSINKBN (IDX-Z)
-      *            WHEN    1
-      *            WHEN    2
-      *            特別往診料
-      *            WHEN    5
-      *            WHEN    6
-      *                ADD     WRK-COM-KISOTEN (IDX-Z) TO  WRK-TENSU-O1
-      *            WHEN    OTHER
-      *                ADD     WRK-COM-KISOTEN (IDX-Z) TO  WRK-TENSU-O2
-      *            END-EVALUATE
-      **       ELSE
       *        通則加算対象外区分判定
                IF      WRK-COM-TUSOKUGAIKBN(IDX-Z) =   "1"
                    ADD     WRK-COM-KISOTEN (IDX-Z) TO  WRK-TENSU-GAI
@@ -5965,7 +5982,19 @@
                               (WRK-GMN-INPUTCD (IDX)   =   SPACE )
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )
+                  AND (WRK-COM-CHUKSNCD   (IDX)    =   ZERO)
                    COMPUTE WRK-TENSUKEI        =   WRK-TENSU-KEI
+                                               *  (WRK-COM-KISOTEN(IDX)
+                                               /   100 )
+      *            %加算
+                   ADD     WRK-TENSUKEI        TO  WRK-TENSUKEI-G
+               END-IF
+      *        %加算（手技）
+               IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )
+                  AND (WRK-COM-CHUKSNCD   (IDX)    NOT =   ZERO)
+                   COMPUTE WRK-TENSUKEI        =   WRK-COM-KISOTEN
+                                                             (IDX-SYU)
                                                *  (WRK-COM-KISOTEN(IDX)
                                                /   100 )
       *            %加算
