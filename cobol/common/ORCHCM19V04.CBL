@@ -119,7 +119,7 @@
            COPY    "HCM19V04.INC"   REPLACING   //HCM19V04//
                                    BY           //HCM19//.
       *
-      *    処方せん（分割指示別紙）
+      *    処方せん（分割指示別紙）（A4も同じCOPY）
            COPY    "HC02ZA5.INC".
       *
       *     印刷用データ 名称領域 
@@ -5313,7 +5313,7 @@
       *
             INITIALIZE                 ORCSMKPRTAREA
             MOVE   "HC01.sh"           TO  MKPRT-ID
-            MOVE   "HC02ZA5.red"       TO  MKPRT-DIA
+            MOVE   "HC02ZA4.red"       TO  MKPRT-DIA
             MOVE   SPACE               TO  MKPRT-DEF
             MOVE   ASGNPARA            TO  MKPRT-DAT
             MOVE   SYS-1031-PRTNM(2)   TO  MKPRT-PRTNM
