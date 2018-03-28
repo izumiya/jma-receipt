@@ -1262,7 +1262,9 @@
       *          OR   (SPA-NAI-SELCD       >=  3501  AND
       *                                    <=  8000   )
       *        3601から8000 はエラーとする
-                 OR   (SPA-NAI-SELCD       >=  3601  AND
+      **         OR   (SPA-NAI-SELCD       >=  3601  AND
+      *        4001から8000 はエラーとする
+                 OR   (SPA-NAI-SELCD       >=  4001  AND
                                            <=  8000   )
                    MOVE    "0001"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR
@@ -1453,8 +1455,13 @@
       *    END-IF
       *H28.4
       *    3601から8000 までは画面表示なしとする
+      *    IF      SPA-GMN-PAGE   =   320
+      *        MOVE    144        TO  SPA-GMN-PAGE
+      *    END-IF
+      *H30.4
+      *    4001から8000 までは画面表示なしとする
            IF      SPA-GMN-PAGE   =   320
-               MOVE    144        TO  SPA-GMN-PAGE
+               MOVE    160        TO  SPA-GMN-PAGE
            END-IF
       *
            PERFORM 3101-SSTKIJUN-HENSYU-SEC  
@@ -1500,7 +1507,12 @@
       *    END-IF
       *H28.4
       *    3601から8000 までは画面表示なしとする
-           IF      SPA-GMN-PAGE   =   145
+      *    IF      SPA-GMN-PAGE   =   145
+      *        MOVE    321        TO  SPA-GMN-PAGE
+      *    END-IF
+      *H30.4
+      *    4001から8000 までは画面表示なしとする
+           IF      SPA-GMN-PAGE   =   161
                MOVE    321        TO  SPA-GMN-PAGE
            END-IF
       *
