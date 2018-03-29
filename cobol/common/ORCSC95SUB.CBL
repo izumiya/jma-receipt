@@ -760,8 +760,7 @@
                MOVE    SYS-1038-SETALLKBN      TO  SPA-SETALLKBN
       *H28.4   ∞Ï»ÃÃæ…Ωº®
                IF      SYS-1038-GENERICFLG     =   "2"
-      *v5          MOVE    "1"                 TO  SPA-GENERICFLG
-                   MOVE    "0"                 TO  SPA-GENERICFLG
+                   MOVE    "1"                 TO  SPA-GENERICFLG
                END-IF
            END-IF
            IF      SPA-KAGRPFLG        =   SPACE
@@ -908,6 +907,9 @@
       *****************************************************************
        1009-SISETU-KIJUN-SEC            SECTION.
       *
+           MOVE    ZERO                TO  SPA-CHKHTKKSN
+           MOVE    ZERO                TO  SPA-NNCHIHKJN
+      *
            MOVE    SPACE               TO  SYS-1006-REC
            INITIALIZE                      SYS-1006-REC
            MOVE    "1006"              TO  SYS-1006-KANRICD
@@ -1001,8 +1003,8 @@
       *                √œ∞Ë Ò≥Áø«Œ≈≤√ªª° 3195)
                        IF      SYS-1006-SSTKIJUN (195) =   1
                            MOVE    1               TO  SPA-CHKHTKKSN
-                       ELSE
-                           MOVE    ZERO            TO  SPA-CHKHTKKSN
+      **               ELSE
+      **                   MOVE    ZERO            TO  SPA-CHKHTKKSN
                        END-IF
                    END-IF
       *H28.4
@@ -1010,14 +1012,27 @@
       *                «ß√Œæ…√œ∞Ë Ò≥Áø«Œ≈≤√ªª° 3339)
                        IF      SYS-1006-SSTKIJUN (339) =   1
                            MOVE    1               TO  SPA-NNCHIHKJN
-                       ELSE
-                           MOVE    ZERO            TO  SPA-NNCHIHKJN
+      **               ELSE
+      **                   MOVE    ZERO            TO  SPA-NNCHIHKJN
                        END-IF
       *                æÆª˘§´§´§Í§ƒ§±° 3467)
                        IF      SYS-1006-SSTKIJUN (467) =   1
                            MOVE    1               TO  SPA-SYOUNIKJN
                        ELSE
                            MOVE    ZERO            TO  SPA-SYOUNIKJN
+                       END-IF
+                   END-IF
+               END-IF
+      *H30.4
+               IF      SYS-1006-KBNCD      =   "8"
+                   IF      SPA-SRYYMD      >=  "20180401"
+      *                √œ∞Ë Ò≥Áø«Œ≈≤√ªª£±(3523°À
+                       IF     (SYS-1006-SSTKIJUN (023) =   1 )
+                           MOVE    1               TO  SPA-CHKHTKKSN
+                       END-IF
+      *                «ß√Œæ…√œ∞Ë Ò≥Áø«Œ≈Œ¡£±° 3585)
+                       IF     (SYS-1006-SSTKIJUN (085) =   1 )
+                           MOVE    1               TO  SPA-NNCHIHKJN
                        END-IF
                    END-IF
                END-IF
