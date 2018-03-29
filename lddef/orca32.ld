@@ -15,8 +15,6 @@ bind	"I4ERR"		"OpenCOBOL"	"ORCGI4ERR";
 bind	"I4ID1"		"OpenCOBOL"	"ORCGI4ID1";
 bind	"I4ID2"		"OpenCOBOL"	"ORCGI4ID2";
 bindapi	"hsptevalmodv2"	"OpenCOBOL"	"ORCGI4API01";
-bindapi "hsacctmodv2" 	"OpenCOBOL"	"ORCGI4API02";
-bindapi "hspmmv2" 	"OpenCOBOL"	"ORCGI4API03";
 
 multiplex_group	orca32;
 
@@ -34,18 +32,12 @@ data 	{
 		I4ID1;
 		I4ID2;
 		hsptevalmodv2;
-		hsacctmodv2;
-		hspmmv2;
 	};
 };
 
 db "xml2" {
  xml_hsptevalmodv2req;
  xml_hsptevalmodv2res;
- xml_hsacctmodv2req;
- xml_hsacctmodv2res;
- xml_hspmmv2req;
- xml_hspmmv2res;
 };
 
 #include "orcadb.inc"

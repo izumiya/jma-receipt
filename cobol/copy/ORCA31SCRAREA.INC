@@ -31,3 +31,7 @@
                                        //APILST-// BY //I0API01-//.
            COPY    "CPAPILSTV2.INC"    REPLACING
                                        //APILST-// BY //I0API02-//.
+           COPY    "CPAPILSTV2.INC"    REPLACING
+                                       //APILST-// BY //I4API02-//.
+           COPY    "CPAPILSTV2.INC"    REPLACING
+                                       //APILST-// BY //I4API03-//.
