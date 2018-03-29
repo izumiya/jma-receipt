@@ -5563,8 +5563,11 @@
       *
            IF      WKSRY-RENNUM        =   1
                IF      FLG-HENSYU          =   1
-      *            前の剤内容保存処理
-                   PERFORM 2100-SYOHOU-ALLHEN-SEC
+                   PERFORM 20032-PRINT-HENSYU-SEC
+                   IF      FLG-OK2             =   1
+      *                前の剤内容保存処理
+                       PERFORM 2100-SYOHOU-ALLHEN-SEC
+                   END-IF
                END-IF
       *        剤毎のクリア
                PERFORM 20020-INIT-ZAINUM-SEC
