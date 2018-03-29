@@ -2246,9 +2246,10 @@
       *    確認画面名称表示区分
            MOVE    "0 一般名表示"      TO  SPA-GMN-GENERICFLG-LST(1)
            MOVE    "1 銘柄名表示"      TO  SPA-GMN-GENERICFLG-LST(2)
-           MOVE    "2 一般名表示（全画面）"
-                                       TO  SPA-GMN-GENERICFLG-LST(3)
-           MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
+           MOVE    2                   TO  SPA-GMN-GENERICFLG-MAX
+      **   MOVE    "2 一般名表示（全画面）"
+      **                               TO  SPA-GMN-GENERICFLG-LST(3)
+      **   MOVE    3                   TO  SPA-GMN-GENERICFLG-MAX
       *
            MOVE    "0 発行しない"      TO  SPA-GMN-SYUSKYPRTGLST(1)
            MOVE    "1 発行する"        TO  SPA-GMN-SYUSKYPRTGLST(2)
