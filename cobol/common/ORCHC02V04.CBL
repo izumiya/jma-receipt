@@ -5504,8 +5504,11 @@
                    END-IF
                END-PERFORM
                IF      FLG-HENSYU          =   1
-      *            前の剤内容保存処理
-                   PERFORM 2100-SYOHOU-ALLHEN-SEC
+                   PERFORM 20032-PRINT-HENSYU-SEC
+                   IF      FLG-OK2             =   1
+      *                前の剤内容保存処理
+                       PERFORM 2100-SYOHOU-ALLHEN-SEC
+                   END-IF
       *            伝票番号毎の印刷編集処理
                    PERFORM 2100-SYOHOU-SYORI-SEC
                END-IF
