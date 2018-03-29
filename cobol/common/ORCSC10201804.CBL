@@ -545,9 +545,24 @@
       *    小児科かかりつけ診察料(院内処方 再診)
            03  FILLER              PIC X(14)   VALUE   "400 N113019810".
       *
+      *H30.4
+      *    電話再診料（一般 病院）（３０年３月以前継続）
+           03  FILLER              PIC X(14)   VALUE   "100T 112023350".
+      *    同日電話再診（一般 病院）（３０年３月以前継続）
+           03  FILLER              PIC X(14)   VALUE   "100S 112023450".
+      *    電話再診（同一日２科目）（３０年３月以前継続）
+           03  FILLER              PIC X(14)   VALUE   "100JD112023550".
+      *    電話等再診（妥結率５割以下）（３０年３月以前継続
+           03  FILLER              PIC X(14)   VALUE   "120T 112023650".
+      *    同日電話等再診（妥結率５割以下）（３０年３月以前継続
+           03  FILLER              PIC X(14)   VALUE   "120S 112023750".
+      *    電話等特定妥結率（同一日複数科２科目・３０年３月以前継続）
+           03  FILLER              PIC X(14)   VALUE   "120JD112023850".
+      *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       **   03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  35    INDEXED  TBL-IDX.
+      **   03  TBL-SINSATU-OCC         OCCURS  35    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  41    INDEXED  TBL-IDX.
       *        １：一般、２：小児科外来診察料、３：外来診療料、
       *        ４：かかりつけ診察料
                05  TBL-KAISU           PIC 9(01).
